@@ -1,0 +1,714 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Code with Morais{% endblock %}
+
+{% block sidebar %}
+<aside class="sidebar">
+    <ul class="sidebar-menu">
+        <li><a href="#overview" class="active"><i class="fas fa-chart-line"></i> Overview</a></li>
+        <li><a href="#daily-challenge"><i class="fas fa-calendar-day"></i> Daily Challenge</a></li>
+        <li><a href="#leaderboard"><i class="fas fa-trophy"></i> Leaderboard</a></li>
+        <li><a href="#activity"><i class="fas fa-stream"></i> Activity Feed</a></li>
+        <li><a href="#progress"><i class="fas fa-tasks"></i> Exam Progress</a></li>
+        <li><a href="/lessons"><i class="fas fa-book"></i> All Lessons</a></li>
+    </ul>
+</aside>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h1>Welcome back, {{ user.username }}!</h1>
+    
+    <!-- Stats Overview -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value" id="user-xp">{{ user.xp }}</div>
+            <div class="stat-label">Total XP</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="user-coins">{{ user.pycoins }}</div>
+            <div class="stat-label">PyCoins</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ user.level }}</div>
+            <div class="stat-label">Level</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ user.streak }}</div>
+            <div class="stat-label">Day Streak 🔥</div>
+        </div>
+    </div>
+    
+    <!-- Current Progress Section -->
+    <section class="card">
+        <h2><i class="fas fa-graduation-cap"></i> Your Learning Journey</h2>
+        <div class="progress-overview">
+            <div class="current-lesson">
+                <h3>Continue Learning</h3>
+                <p>Ready for your next Python adventure?</p>
+                <a href="/lessons" class="btn btn-primary">
+                    <i class="fas fa-play"></i> Continue Lessons
+                </a>
+            </div>
+            <div class="progress-stats">
+                <div class="progress-item">
+                    <span class="progress-label">Lessons Completed</span>
+                    <span class="progress-value">{{ user.completed_lessons|length }}/10</span>
+                </div>
+                <div class="progress-item">
+                    <span class="progress-label">Next Milestone</span>
+                    <span class="progress-value">Level {{ user.level + 1 }}</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Daily Challenge -->
+    <section id="daily-challenge" class="card">
+        <div class="card-header">
+            <h2><i class="fas fa-calendar-day"></i> Daily Challenge</h2>
+            <span class="timer">Time left: <span id="daily-timer">23h 45m</span></span>
+        </div>
+        
+        {% if daily_challenge %}
+        <div class="challenge-content">
+            <h3>{{ daily_challenge.title }}</h3>
+            <p>{{ daily_challenge.description }}</p>
+            <div class="challenge-rewards">
+                <span><i class="fas fa-star"></i> +{{ daily_challenge.xp_reward }} XP</span>
+                <span><i class="fas fa-coins"></i> +{{ daily_challenge.coin_reward }} PyCoins</span>
+                <span class="difficulty difficulty-{{ daily_challenge.difficulty }}">{{ daily_challenge.difficulty|title }}</span>
+            </div>
+            <button class="btn btn-primary" onclick="startDailyChallenge()">
+                Start Challenge
+            </button>
+        </div>
+        {% else %}
+        <p>No daily challenge available today. Check back tomorrow!</p>
+        {% endif %}
+    </section>
+    
+    <!-- Two Column Layout -->
+    <div class="dashboard-grid">
+        <!-- Leaderboard -->
+        <section id="leaderboard" class="card">
+            <h2><i class="fas fa-trophy"></i> Global Leaderboard</h2>
+            <div class="leaderboard">
+                {% for user_entry in leaderboard %}
+                <div class="leaderboard-item">
+                    <span class="leaderboard-rank">{{ loop.index }}</span>
+                    <div class="leaderboard-user">
+                        <strong>{{ user_entry.username }}</strong>
+                        {% if user_entry.username == user.username %}
+                        <span class="you-badge">You!</span>
+                        {% endif %}
+                    </div>
+                    <span class="leaderboard-xp">{{ user_entry.xp }} XP</span>
+                </div>
+                {% endfor %}
+            </div>
+            <a href="#" class="btn btn-secondary btn-sm">View Full Leaderboard</a>
+        </section>
+        
+        <!-- Activity Feed -->
+        <section id="activity" class="card">
+            <h2><i class="fas fa-stream"></i> Recent Activity</h2>
+            <div id="activity-feed" class="activity-feed">
+                {% for activity in recent_activity %}
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-{{ activity.icon }}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <p class="activity-message">{{ activity.message }}</p>
+                        <span class="activity-time">
+                            {% if activity.timestamp %}
+                                {{ activity.timestamp.strftime('%H:%M') }}
+                            {% else %}
+                                Just now
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+    
+    <!-- IT Specialist Exam Progress -->
+    <section id="progress" class="card">
+        <h2><i class="fas fa-tasks"></i> IT Specialist Exam Objectives</h2>
+        <div id="exam-objectives" class="exam-objectives">
+            <div class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i> Loading exam objectives...
+            </div>
+        </div>
+        <div class="exam-readiness" id="exam-readiness">
+            <h3>Overall Exam Readiness</h3>
+            <div class="readiness-score" id="readiness-score">
+                <div class="score-circle">
+                    <span id="readiness-percentage">0%</span>
+                </div>
+                <p>Ready for IT Specialist Certification</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.progress-overview {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: center;
+}
+
+.current-lesson h3 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.progress-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.progress-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+}
+
+.progress-label {
+    color: var(--text-secondary);
+}
+
+.progress-value {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.timer {
+    color: var(--secondary-color);
+    font-weight: bold;
+}
+
+.challenge-content h3 {
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+.challenge-rewards {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+}
+
+.challenge-rewards span {
+    padding: 0.5rem 1rem;
+    background-color: var(--bg-secondary);
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.difficulty {
+    font-weight: bold;
+}
+
+.difficulty-easy { color: var(--success-color); }
+.difficulty-medium { color: var(--warning-color); }
+.difficulty-hard { color: var(--danger-color); }
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.you-badge {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+}
+
+.exam-objectives {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.objective-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: var(--bg-secondary);
+}
+
+.objective-item.completed {
+    border-left: 4px solid var(--success-color);
+}
+
+.objective-item.active {
+    border-left: 4px solid var(--primary-color);
+}
+
+.objective-item i {
+    font-size: 1.5rem;
+    width: 24px;
+}
+
+.objective-item.completed i {
+    color: var(--success-color);
+}
+
+.objective-item.active i {
+    color: var(--primary-color);
+}
+
+.objective-content {
+    flex: 1;
+}
+
+.objective-content h4 {
+    margin-bottom: 0.25rem;
+}
+
+.objective-content p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.objective-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.lesson-count {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.weight {
+    background-color: var(--bg-tertiary);
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+}
+
+.objective-progress {
+    position: relative;
+    margin-top: 0.75rem;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: var(--primary-color);
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    position: absolute;
+    right: 0;
+    top: -1.5rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.loading-spinner {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+}
+
+.loading-spinner i {
+    margin-right: 0.5rem;
+    color: var(--primary-color);
+}
+
+.error {
+    text-align: center;
+    padding: 2rem;
+    color: var(--error-color);
+    background-color: var(--error-bg);
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+/* Exam Readiness Styles */
+.exam-readiness {
+    margin-top: 2rem;
+    text-align: center;
+    padding: 1.5rem;
+    background-color: var(--bg-secondary);
+    border-radius: 12px;
+}
+
+.exam-readiness h3 {
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+.readiness-score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.score-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .progress-overview {
+        grid-template-columns: 1fr;
+    }
+    
+    .challenge-rewards {
+        justify-content: center;
+    }
+}
+</style>
+
+<script>
+// Dashboard API integration
+class DashboardManager {
+    constructor() {
+        this.refreshInterval = 30000; // 30 seconds
+        this.init();
+    }
+    
+    init() {
+        this.loadDashboardStats();
+        this.loadExamObjectives();
+        this.loadDailyChallenge();
+        this.loadLeaderboard();
+        this.loadActivityFeed();
+        this.loadNextLesson();
+        
+        // Set up auto-refresh
+        setInterval(() => this.refreshData(), this.refreshInterval);
+    }
+    
+    async loadDashboardStats() {
+        try {
+            const response = await fetch('/api/dashboard/stats');
+            const data = await response.json();
+            
+            if (data.user) {
+                document.getElementById('user-xp').textContent = data.user.xp;
+                document.getElementById('user-coins').textContent = data.user.pycoins;
+                
+                // Update progress information
+                if (data.progress) {
+                    const progressText = `${data.progress.completed_lessons}/${data.progress.total_lessons} lessons completed`;
+                    const progressElement = document.querySelector('.progress-text');
+                    if (progressElement) {
+                        progressElement.textContent = progressText;
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error loading dashboard stats:', error);
+        }
+    }
+    
+    async loadExamObjectives() {
+        try {
+            const response = await fetch('/api/dashboard/exam-objectives');
+            const data = await response.json();
+            
+            if (data.objectives) {
+                this.renderExamObjectives(data.objectives, data.overall_exam_readiness);
+            }
+        } catch (error) {
+            console.error('Error loading exam objectives:', error);
+        }
+    }
+    
+    renderExamObjectives(objectives, overallReadiness) {
+        const container = document.querySelector('.exam-objectives');
+        if (!container) return;
+        
+        container.innerHTML = objectives.map(objective => `
+            <div class="objective-item ${objective.status}">
+                <i class="fas fa-${objective.status === 'completed' ? 'check-circle' : objective.status === 'in-progress' ? 'clock' : 'circle'}"></i>
+                <div class="objective-content">
+                    <h4>${objective.title}</h4>
+                    <p>${objective.description}</p>
+                    <div class="objective-progress">
+                        <div class="progress-bar" style="width: ${objective.progress}%"></div>
+                    </div>
+                    <small>${objective.completed_lessons}/${objective.total_lessons} lessons completed (${objective.progress}%)</small>
+                </div>
+            </div>
+        `).join('');
+        
+        // Update overall exam readiness
+        const readinessElement = document.querySelector('.exam-readiness');
+        if (readinessElement) {
+            readinessElement.innerHTML = `
+                <h3>Overall Exam Readiness: ${Math.round(overallReadiness)}%</h3>
+                <div class="progress-bar-large">
+                    <div class="progress-fill" style="width: ${overallReadiness}%"></div>
+                </div>
+            `;
+        }
+    }
+    
+    async loadDailyChallenge() {
+        try {
+            const response = await fetch('/api/dashboard/daily-challenge');
+            const data = await response.json();
+            
+            if (data.challenge) {
+                const challenge = data.challenge;
+                const challengeElement = document.getElementById('daily-challenge-content');
+                if (challengeElement) {
+                    challengeElement.innerHTML = `
+                        <h3>${challenge.title}</h3>
+                        <p>${challenge.description}</p>
+                        <div class="challenge-rewards">
+                            <span class="reward-badge">+${challenge.xp_reward} XP</span>
+                            <span class="reward-badge">+${challenge.coin_reward} Coins</span>
+                        </div>
+                        <button onclick="startDailyChallenge('${challenge.id}')" class="btn btn-primary">
+                            Start Challenge
+                        </button>
+                    `;
+                }
+            }
+        } catch (error) {
+            console.error('Error loading daily challenge:', error);
+        }
+    }
+    
+    async loadLeaderboard() {
+        try {
+            const response = await fetch('/api/dashboard/leaderboard');
+            const data = await response.json();
+            
+            if (data.leaderboard) {
+                const leaderboardElement = document.querySelector('.leaderboard-list');
+                if (leaderboardElement) {
+                    leaderboardElement.innerHTML = data.leaderboard.map((user, index) => `
+                        <div class="leaderboard-item">
+                            <span class="leaderboard-rank">#${index + 1}</span>
+                            <div class="leaderboard-user">
+                                <strong>${user.username}</strong>
+                                <span class="level-badge">Level ${user.level}</span>
+                            </div>
+                            <span class="leaderboard-xp">${user.xp} XP</span>
+                        </div>
+                    `).join('');
+                }
+            }
+        } catch (error) {
+            console.error('Error loading leaderboard:', error);
+        }
+    }
+    
+    async loadActivityFeed() {
+        try {
+            const response = await fetch('/api/dashboard/activity-feed');
+            const data = await response.json();
+            
+            if (data.activities) {
+                const feedElement = document.getElementById('activity-feed');
+                if (feedElement) {
+                    feedElement.innerHTML = data.activities.map(activity => `
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-${activity.icon || 'code'}"></i>
+                            </div>
+                            <div class="activity-content">
+                                <p class="activity-message">${activity.message}</p>
+                                <span class="activity-time">${this.formatTime(activity.timestamp)}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+        } catch (error) {
+            console.error('Error loading activity feed:', error);
+        }
+    }
+    
+    async loadNextLesson() {
+        try {
+            const response = await fetch('/api/dashboard/next-lesson');
+            const data = await response.json();
+            
+            if (data.next_lesson) {
+                const lesson = data.next_lesson;
+                const nextLessonElement = document.querySelector('.current-lesson');
+                if (nextLessonElement) {
+                    nextLessonElement.innerHTML = `
+                        <h3>${lesson.is_review ? 'Review' : 'Continue Learning'}</h3>
+                        <h4>${lesson.title}</h4>
+                        <p>${lesson.description || 'Ready for your next Python adventure?'}</p>
+                        <a href="/lesson/${lesson.id}" class="btn btn-primary">
+                            <i class="fas fa-play"></i> ${lesson.is_review ? 'Review Lesson' : 'Continue Lesson'}
+                        </a>
+                    `;
+                }
+            }
+        } catch (error) {
+            console.error('Error loading next lesson:', error);
+        }
+    }
+    
+    formatTime(timestamp) {
+        if (!timestamp) return 'Just now';
+        
+        const now = new Date();
+        const time = new Date(timestamp);
+        const diffMs = now - time;
+        const diffMins = Math.floor(diffMs / 60000);
+        
+        if (diffMins < 1) return 'Just now';
+        if (diffMins < 60) return `${diffMins}m ago`;
+        if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
+        return time.toLocaleDateString();
+    }
+    
+    refreshData() {
+        this.loadDashboardStats();
+        this.loadActivityFeed();
+        // Don't refresh everything too frequently to avoid overwhelming the user
+    }
+}
+
+function startDailyChallenge(challengeId) {
+    if (challengeId) {
+        window.location.href = `/challenge/${challengeId}`;
+    } else {
+        showNotification('Daily challenge started! Good luck! 🚀');
+    }
+}
+
+// Load Exam Objectives
+async function loadExamObjectives() {
+    try {
+        const response = await fetch('/api/dashboard/exam-objectives');
+        const data = await response.json();
+        
+        if (response.ok) {
+            renderExamObjectives(data.objectives);
+            updateExamReadiness(data.overall_exam_readiness);
+        } else {
+            console.error('Failed to load exam objectives:', data.error);
+            document.getElementById('exam-objectives').innerHTML = 
+                '<p class="error">Failed to load exam objectives. Please try again.</p>';
+        }
+    } catch (error) {
+        console.error('Error loading exam objectives:', error);
+        document.getElementById('exam-objectives').innerHTML = 
+            '<p class="error">Error loading exam objectives. Please check your connection.</p>';
+    }
+}
+
+function renderExamObjectives(objectives) {
+    const container = document.getElementById('exam-objectives');
+    container.innerHTML = '';
+    
+    objectives.forEach(objective => {
+        const statusIcon = getStatusIcon(objective.status);
+        const statusClass = objective.status;
+        
+        const objectiveElement = document.createElement('div');
+        objectiveElement.className = `objective-item ${statusClass}`;
+        objectiveElement.innerHTML = `
+            <i class="${statusIcon}"></i>
+            <div class="objective-content">
+                <h4>${objective.title}</h4>
+                <p>${objective.description}</p>
+                <div class="objective-details">
+                    <span class="lesson-count">${objective.completed_lessons}/${objective.total_lessons} lessons completed</span>
+                    <span class="weight">Weight: ${objective.weight}%</span>
+                </div>
+                <div class="objective-progress">
+                    <div class="progress-bar" style="width: ${objective.progress}%"></div>
+                    <span class="progress-text">${objective.progress}%</span>
+                </div>
+            </div>
+        `;
+        container.appendChild(objectiveElement);
+    });
+}
+
+function getStatusIcon(status) {
+    switch (status) {
+        case 'completed':
+            return 'fas fa-check-circle';
+        case 'in-progress':
+            return 'fas fa-circle-half-stroke';
+        default:
+            return 'far fa-circle';
+    }
+}
+
+function updateExamReadiness(readiness) {
+    const percentage = Math.round(readiness);
+    document.getElementById('readiness-percentage').textContent = `${percentage}%`;
+    
+    // Update color based on readiness level
+    const scoreCircle = document.querySelector('.score-circle');
+    if (percentage >= 80) {
+        scoreCircle.style.color = '#4CAF50'; // Green
+    } else if (percentage >= 60) {
+        scoreCircle.style.color = '#FF9800'; // Orange
+    } else {
+        scoreCircle.style.color = '#F44336'; // Red
+    }
+}
+
+// Initialize dashboard when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    new DashboardManager();
+    loadExamObjectives();
+});
+</script>
+{% endblock %}

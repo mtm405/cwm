@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-signin-client_id" content="{{ google_client_id }}">
+    <title>{% block title %}Code with Morais{% endblock %}</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- ACE Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.23.4/ace.js"></script>
+    
+    <!-- Google Sign-In -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="theme-dark">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="/" class="logo">
+                <i class="fas fa-code"></i> Code with Morais
+            </a>
+            
+            <ul class="nav-links">
+                <li><a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="/lessons"><i class="fas fa-book"></i> Lessons</a></li>
+                <li><a href="/dashboard#leaderboard"><i class="fas fa-trophy"></i> Leaderboard</a></li>
+                
+                {% if user %}
+                <li class="user-info">
+                    <span class="user-stats">
+                        <i class="fas fa-star"></i> <span id="user-xp">{{ user.xp }}</span> XP
+                        <i class="fas fa-coins"></i> <span id="user-coins">{{ user.pycoins }}</span>
+                    </span>
+                </li>
+                <li class="user-profile">
+                    <div class="user-dropdown">
+                        <img src="{{ user.profile_picture or '/static/img/default-avatar.png' }}" alt="Profile" class="user-avatar">
+                        <span class="user-name">{{ user.display_name or user.username or user.email }}</span>
+                        <div class="dropdown-menu">
+                            <a href="/profile"><i class="fas fa-user"></i> Profile</a>
+                            {% if user.is_admin %}
+                            <a href="/admin"><i class="fas fa-shield-alt"></i> Admin</a>
+                            {% endif %}
+                            <button onclick="signOut()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+                        </div>
+                    </div>
+                </li>
+                {% else %}
+                <li class="auth-section">
+                    <div id="g_id_onload"
+                         data-client_id="{{ google_client_id }}"
+                         data-callback="handleCredentialResponse"
+                         data-auto_prompt="false">
+                    </div>
+                    <div class="g_id_signin"
+                         data-type="standard"
+                         data-size="large"
+                         data-theme="outline"
+                         data-text="sign_in_with"
+                         data-shape="rectangular"
+                         data-logo_alignment="left">
+                    </div>
+                </li>
+                {% endif %}
+                
+                <li class="theme-switcher">
+                    <select onchange="setTheme(this.value)" class="form-control">
+                        <option value="dark">Dark Theme</option>
+                        <option value="light">Light Theme</option>
+                        <option value="glass">Glass Theme</option>
+                    </select>
+                </li>
+            </ul>
+            
+            <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Main Content Area -->
+    <div class="app-container">
+        {% block sidebar %}{% endblock %}
+        
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
