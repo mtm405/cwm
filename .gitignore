@@ -35,6 +35,14 @@ firebase_web_config.json
 credentials.json
 client_secret*.json
 
+# Cloudflare
+cloudflare-tunnel.yml
+*.toml
+
+# Logs
+*.log
+app.log
+
 # IDE
 .vscode/
 .idea/
@@ -55,10 +63,6 @@ Thumbs.db
 htmlcov/
 *.cover
 .hypothesis/
-
-# Logs
-*.log
-logs/
 
 # Database
 *.db

@@ -14,7 +14,7 @@ class Config:
     
     # Flask Configuration
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
-    DEV_MODE = os.environ.get('DEV_MODE', 'True').lower() == 'true'
+    DEV_MODE = os.environ.get('DEV_MODE', 'False').lower() == 'true'
     
     # Firebase Configuration
     FIREBASE_CONFIG = {
