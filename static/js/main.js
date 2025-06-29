@@ -48,8 +48,8 @@ function handleCredentialResponse(response) {
         console.log('Backend response:', data);
         if (data.success) {
             console.log('Session login successful');
-            // Reload page to update UI with user data
-            window.location.reload();
+            // Redirect to dashboard after successful login
+            window.location.href = '/dashboard';
         } else {
             console.error('Session login failed:', data.error);
             alert('Login failed: ' + data.error);
