@@ -45,6 +45,8 @@ def get_current_user() -> Optional[Dict[str, Any]]:
     
     # Check if we have a user ID in session
     user_id = session.get('user_id')
+    logger.debug(f"get_current_user called, session user_id: {user_id}")
+    
     if not user_id:
         # Return dev user if in development mode
         from config import get_config
@@ -52,16 +54,20 @@ def get_current_user() -> Optional[Dict[str, Any]]:
         if config.DEV_MODE:
             logger.debug("No user in session, returning dev user")
             return DEV_USER
+        logger.debug("No user in session and not in dev mode")
         return None
     
     # Try to get user from Firebase
     if firebase_service and firebase_service.is_available():
+        logger.debug(f"Attempting to retrieve user {user_id} from Firebase")
         user_data = firebase_service.get_user(user_id)
         if user_data:
-            logger.debug(f"Retrieved user {user_id} from Firebase")
+            logger.debug(f"Successfully retrieved user {user_id} from Firebase")
             return user_data
         else:
             logger.warning(f"User {user_id} not found in Firebase")
+    else:
+        logger.warning("Firebase service not available")
     
     # Fallback to dev user in dev mode
     from config import get_config

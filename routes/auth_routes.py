@@ -117,13 +117,38 @@ def session_login():
                     if not success:
                         return jsonify({'success': False, 'error': 'Failed to create user'}), 500
                     
-                    user_data = firebase_service.get_user(user_id)
+                    # Retry getting user data after creation (handle eventual consistency)
+                    user_data = None
+                    import time
+                    for attempt in range(3):
+                        user_data = firebase_service.get_user(user_id)
+                        if user_data:
+                            break
+                        time.sleep(0.1)  # Small delay for Firestore consistency
+                    
+                    if not user_data:
+                        logger.warning(f"User created but not immediately retrievable: {user_id}")
+                        # Still proceed with basic user info
+                        user_data = {
+                            'username': user_name,
+                            'display_name': user_name,
+                            'profile_picture': user_picture,
+                            'xp': 0,
+                            'level': 1,
+                            'pycoins': 100,
+                            'streak': 0,
+                            'is_admin': False
+                        }
                     logger.info(f"Created new user: {user_email}")
                 else:
                     # Update last login for existing user
-                    firebase_service.update_user(user_id, {
-                        'last_login': firebase_service.get_server_timestamp()
-                    })
+                    update_data = {
+                        'last_login': firebase_service.get_server_timestamp(),
+                        'updated_at': firebase_service.get_server_timestamp()
+                    }
+                    firebase_service.update_user(user_id, update_data)
+                    logger.info(f"Updated user {user_id} with {len(update_data)} fields")
+                    
                     user_data = existing_user
                     logger.info(f"Updated existing user login: {user_email}")
                 
