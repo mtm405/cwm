@@ -26,11 +26,7 @@ try:
     from dotenv import load_dotenv
     load_dotenv()
     
-    # Check DEV_MODE directly from environment
-    dev_mode = os.environ.get('DEV_MODE', 'True').lower() == 'true'
-    logger.info(f"DEV_MODE from environment: {dev_mode}")
-    
-    # Initialize Firebase even in dev mode for Google OAuth to work
+    # Initialize Firebase for Google OAuth to work
     if config.validate_firebase_config():
         firebase_service = FirebaseService(config.FIREBASE_CONFIG)
         logger.info("Firebase service initialized successfully")
@@ -124,7 +120,6 @@ def debug_google_oauth():
             'GOOGLE_CLIENT_ID_length': len(os.environ.get('GOOGLE_CLIENT_ID', '')),
             'host': os.environ.get('HOST'),
             'port': os.environ.get('PORT'),
-            'dev_mode': config.DEV_MODE,
             'flask_env': os.environ.get('FLASK_ENV'),
             'cwd': os.getcwd(),
             'env_file_exists': os.path.exists('.env'),
@@ -195,7 +190,6 @@ def debug_firebase_status():
             'firebase_apps_initialized': len(firebase_admin._apps) > 0,
             'firebase_service_available': firebase_service is not None,
             'firebase_service_is_available': firebase_service.is_available() if firebase_service else False,
-            'dev_mode': config.DEV_MODE,
             'firebase_config_valid': config.validate_firebase_config(),
             'firebase_project_id': config.FIREBASE_CONFIG.get('project_id', 'Not set'),
             'firebase_client_email': config.FIREBASE_CONFIG.get('client_email', 'Not set')
@@ -219,7 +213,6 @@ def debug_env_vars():
     """Debug endpoint to check environment variables (safely)"""
     try:
         env_status = {
-            'DEV_MODE': os.environ.get('DEV_MODE'),
             'FLASK_ENV': os.environ.get('FLASK_ENV'),
             'GOOGLE_CLIENT_ID': os.environ.get('GOOGLE_CLIENT_ID', 'Not set'),
             'FIREBASE_PROJECT_ID': os.environ.get('FIREBASE_PROJECT_ID', 'Not set'),
@@ -254,7 +247,6 @@ def health_check():
     try:
         health_status = {
             'status': 'healthy',
-            'dev_mode': config.DEV_MODE,
             'firebase_available': firebase_service is not None and firebase_service.is_available() if firebase_service else False,
             'timestamp': logging.time.time()
         }
@@ -271,7 +263,7 @@ def add_security_headers(response):
     response.headers['X-Frame-Options'] = 'DENY'
     response.headers['X-XSS-Protection'] = '1; mode=block'
     
-    if not config.DEV_MODE:
+    if os.environ.get('FLASK_ENV') == 'production':
         response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
     
     return response
@@ -328,14 +320,14 @@ def debug_test_token():
 if __name__ == '__main__':
     try:
         logger.info("Starting Code with Morais application")
-        logger.info(f"Environment: {'Development' if config.DEV_MODE else 'Production'}")
+        logger.info(f"Environment: {os.environ.get('FLASK_ENV', 'development')}")
         logger.info(f"Firebase available: {firebase_service is not None and firebase_service.is_available() if firebase_service else False}")
         
         # Production vs Development settings
         port = int(os.environ.get('PORT', 8080))
         host = os.environ.get('HOST', '0.0.0.0')
         
-        if config.DEV_MODE:
+        if os.environ.get('FLASK_ENV') == 'development':
             app.run(host=host, port=port, debug=True)
         else:
             # Production settings

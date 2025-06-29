@@ -42,7 +42,7 @@ cd code-with-morais
 2. Create a `.env` file:
 ```bash
 SECRET_KEY=your-secret-key-here
-DEV_MODE=True
+FLASK_ENV=development
 ```
 
 3. Add your Firebase service account key as `serviceAccountKey.json`
@@ -54,8 +54,37 @@ pip install -r requirements.txt
 
 5. Run locally:
 ```bash
+# Method 1: Command line
 python app.py
+
+# Method 2: VS Code Tasks (recommended)
+# Press Ctrl+Shift+B or run the "Deploy Full Stack" task
+# See DEPLOYMENT_GUIDE.md for more details
 ```
+
+## VS Code Tasks and Development
+
+This project includes VS Code tasks to make development and deployment easier:
+
+1. **Start Flask App** (Default Build Task)
+   - Press `Ctrl+Shift+B` to start the Flask app
+   - Runs in production mode with real Firebase data
+
+2. **Start Cloudflare Tunnel** (Default Test Task)
+   - Open Command Palette (`Ctrl+Shift+P`) and select "Run Test Task"
+   - Exposes your local server to the internet via Cloudflare
+
+3. **Deploy Full Stack**
+   - Runs both tasks in parallel
+   - Available in the VS Code tasks menu
+
+### Recommended VS Code Extensions
+
+For an improved development experience, install the recommended extensions:
+- Task Explorer: For a visual task interface with one-click run buttons
+- Task Manager: For status bar task buttons
+
+See [RECOMMENDED_EXTENSIONS.md](./RECOMMENDED_EXTENSIONS.md) for more details.
 
 Or use Docker:
 ```bash
@@ -143,9 +172,9 @@ code-with-morais/
     └── test_app.py    # Unit tests
 ```
 
-## Development Mode
+## Development vs Production
 
-The platform runs in development mode by default, bypassing authentication for rapid testing. To disable dev mode, set `DEV_MODE=False` in your `.env` file.
+The platform can be run in either development or production mode. To switch between modes, set `FLASK_ENV=development` or `FLASK_ENV=production` in your `.env` file or as an environment variable.
 
 ## Contributing
 

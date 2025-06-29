@@ -89,11 +89,8 @@ def execute_python_code(code: str, inputs: Optional[str] = None) -> Dict[str, An
                 'output': ''
             }
         
-        # Execute based on mode
-        if config.DEV_MODE:
-            return _execute_mock(code, inputs)
-        else:
-            return _execute_remote(code, inputs)
+        # Execute code remotely
+        return _execute_remote(code, inputs)
             
     except Exception as e:
         logger.error(f"Code execution error: {str(e)}")

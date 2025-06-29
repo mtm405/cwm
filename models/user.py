@@ -16,30 +16,6 @@ def set_firebase_service(service):
     global firebase_service
     firebase_service = service
 
-# Mock user for development
-DEV_USER = {
-    'uid': 'dev-user-001',
-    'email': 'dev@codewithmorais.com',
-    'username': 'DevUser',
-    'xp': 1500,
-    'pycoins': 100,
-    'level': 5,
-    'streak': 3,
-    'last_login': datetime.now().isoformat(),
-    'theme': 'dark',
-    'completed_lessons': ['python-basics'],
-    'lesson_progress': {
-        'python-basics': {
-            'completed': True,
-            'progress': 100,
-            'completed_subtopics': ['variables', 'data-types']
-        }
-    },
-    'quiz_scores': {
-        'python-basics-quiz': 85
-    }
-}
-
 def get_current_user() -> Optional[Dict[str, Any]]:
     """Get current user data from Firebase or dev user in dev mode"""
     
@@ -49,13 +25,7 @@ def get_current_user() -> Optional[Dict[str, Any]]:
     logger.debug(f"Session keys: {list(session.keys())}")
     
     if not user_id:
-        # Return dev user if in development mode
-        from config import get_config
-        config = get_config()
-        if config.DEV_MODE:
-            logger.debug("No user in session, returning dev user")
-            return DEV_USER
-        logger.debug("No user in session and not in dev mode")
+        logger.debug("No user in session")
         return None
     
     # Try to get user from Firebase
@@ -72,7 +42,7 @@ def get_current_user() -> Optional[Dict[str, Any]]:
     else:
         logger.warning("Firebase service not available")
     
-    # If Firebase fails but we have session data, create basic user from session
+    # Fallback to basic user data if Firebase unavailable
     if session.get('authenticated'):
         logger.info("Creating user data from session information")
         return {
@@ -88,26 +58,11 @@ def get_current_user() -> Optional[Dict[str, Any]]:
             'is_admin': session.get('is_admin', False)
         }
     
-    # Fallback to dev user in dev mode
-    from config import get_config
-    config = get_config()
-    if config.DEV_MODE:
-        logger.info("Firebase unavailable, using dev user")
-        return DEV_USER
-    
-    logger.error(f"User {user_id} not found anywhere")
+    logger.error(f"User {user_id} not found")
     return None
 
 def update_user_data(user_id: str, data: Dict[str, Any]) -> bool:
     """Update user data in Firebase"""
-    
-    # Update dev user in dev mode
-    from config import get_config
-    config = get_config()
-    if config.DEV_MODE and user_id == DEV_USER['uid']:
-        DEV_USER.update(data)
-        logger.debug(f"Updated dev user data: {list(data.keys())}")
-        return True
     
     # Update in Firebase
     if firebase_service and firebase_service.is_available():
@@ -161,35 +116,11 @@ def update_user_progress(user_id: str, lesson_id: str, progress_data: Dict[str, 
     if firebase_service and firebase_service.is_available():
         return firebase_service.update_user_progress(user_id, lesson_id, progress_data)
     else:
-        # Update dev user in dev mode
-        from config import get_config
-        config = get_config()
-        if config.DEV_MODE and user_id == DEV_USER['uid']:
-            if 'lesson_progress' not in DEV_USER:
-                DEV_USER['lesson_progress'] = {}
-            DEV_USER['lesson_progress'][lesson_id] = progress_data
-            logger.debug(f"Updated dev user progress for lesson {lesson_id}")
-            return True
-        
         logger.warning("Firebase not available, cannot update user progress")
         return False
 
 def get_user_progress(user_id):
     """Get user's progress across all lessons"""
-    from config import get_config
-    config = get_config()
-    
-    if config.DEV_MODE:
-        # Mock progress for development
-        return {
-            'python-basics': {'completed': True, 'completed_subtopics': ['variables', 'data-types'], 'progress': 66},
-            'flow-control': {'completed': False, 'completed_subtopics': ['if-statements'], 'progress': 33},
-            'io-operations': {'completed': False, 'completed_subtopics': [], 'progress': 0},
-            'code-structure': {'completed': False, 'completed_subtopics': [], 'progress': 0},
-            'error-handling': {'completed': False, 'completed_subtopics': [], 'progress': 0},
-            'module-operations': {'completed': False, 'completed_subtopics': [], 'progress': 0}
-        }
-    
     # Try Firebase
     if firebase_service and firebase_service.is_available():
         user_data = firebase_service.get_user(user_id)
@@ -199,9 +130,6 @@ def get_user_progress(user_id):
 
 def update_lesson_progress(user_id: str, lesson_id: str, progress: int, completed: bool, completed_subtopics: list, time_spent: int = 0) -> bool:
     """Update lesson progress for a user"""
-    from config import get_config
-    config = get_config()
-    
     try:
         progress_data = {
             'progress': progress,
@@ -210,14 +138,6 @@ def update_lesson_progress(user_id: str, lesson_id: str, progress: int, complete
             'time_spent': time_spent,
             'last_accessed': datetime.now().isoformat()
         }
-        
-        if config.DEV_MODE and user_id == DEV_USER['uid']:
-            # Update dev user progress
-            if 'lesson_progress' not in DEV_USER:
-                DEV_USER['lesson_progress'] = {}
-            DEV_USER['lesson_progress'][lesson_id] = progress_data
-            logger.debug(f"Updated dev user lesson progress for {lesson_id}")
-            return True
         
         # Update in Firebase
         if firebase_service and firebase_service.is_available():

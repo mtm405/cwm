@@ -22,19 +22,19 @@
     <!-- Stats Overview -->
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-value" id="user-xp">{{ user.xp }}</div>
+            <div class="stat-value" id="user-xp">{{ user.xp if user.xp is defined else 0 }}</div>
             <div class="stat-label">Total XP</div>
         </div>
         <div class="stat-card">
-            <div class="stat-value" id="user-coins">{{ user.pycoins }}</div>
+            <div class="stat-value" id="user-coins">{{ user.pycoins if user.pycoins is defined else 0 }}</div>
             <div class="stat-label">PyCoins</div>
         </div>
         <div class="stat-card">
-            <div class="stat-value">{{ user.level }}</div>
+            <div class="stat-value">{{ user.level if user.level is defined else 1 }}</div>
             <div class="stat-label">Level</div>
         </div>
         <div class="stat-card">
-            <div class="stat-value">{{ user.streak }}</div>
+            <div class="stat-value">{{ user.streak if user.streak is defined else 0 }}</div>
             <div class="stat-label">Day Streak 🔥</div>
         </div>
     </div>
@@ -53,11 +53,11 @@
             <div class="progress-stats">
                 <div class="progress-item">
                     <span class="progress-label">Lessons Completed</span>
-                    <span class="progress-value">{{ user.completed_lessons|length }}/10</span>
+                    <span class="progress-value">{{ user.completed_lessons|length if user.completed_lessons else 0 }}/10</span>
                 </div>
                 <div class="progress-item">
                     <span class="progress-label">Next Milestone</span>
-                    <span class="progress-value">Level {{ user.level + 1 }}</span>
+                    <span class="progress-value">Level {{ (user.level + 1) if user.level is defined else 1 }}</span>
                 </div>
             </div>
         </div>

@@ -14,7 +14,6 @@ class Config:
     
     # Flask Configuration
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
-    DEV_MODE = os.environ.get('DEV_MODE', 'False').lower() == 'true'
     
     # Firebase Configuration
     FIREBASE_CONFIG = {
@@ -59,12 +58,10 @@ class Config:
 class DevelopmentConfig(Config):
     """Development configuration."""
     DEBUG = True
-    DEV_MODE = True
 
 class ProductionConfig(Config):
     """Production configuration."""
     DEBUG = False
-    DEV_MODE = False
     
     @classmethod
     def validate(cls):
@@ -78,7 +75,6 @@ class ProductionConfig(Config):
 class TestingConfig(Config):
     """Testing configuration."""
     TESTING = True
-    DEV_MODE = True
     
 def get_config() -> Config:
     """Get configuration based on environment."""
@@ -122,10 +118,9 @@ def setup_logging(config: Config):
     )
     
     # Suppress noisy loggers in development
-    if config.DEV_MODE:
+    if os.environ.get('FLASK_ENV') != 'production':
         logging.getLogger('werkzeug').setLevel(logging.WARNING)
         logging.getLogger('urllib3').setLevel(logging.WARNING)
 
 # Legacy support - remove in Phase 2
 SECRET_KEY = Config.SECRET_KEY
-DEV_MODE = Config.DEV_MODE

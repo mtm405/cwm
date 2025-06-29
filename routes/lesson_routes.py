@@ -92,16 +92,14 @@ def complete_subtopic():
             return jsonify({'error': 'Missing required fields'}), 400
         
         # Get Firebase service
-        firebase_service = current_app.firebase_service
+        firebase_service = current_app.config.get('firebase_service')
         
-        # In dev mode or if Firebase unavailable, return mock response
-        if config.DEV_MODE or not (firebase_service and firebase_service.is_available()):
+        # If Firebase unavailable, return error
+        if not (firebase_service and firebase_service.is_available()):
             return jsonify({
-                'success': True,
-                'xp_earned': 50,
-                'new_progress': 66,
-                'lesson_completed': False
-            })
+                'success': False,
+                'error': 'Firebase service unavailable'
+            }), 503
         
         # Update user progress using Firebase service
         user_data = firebase_service.get_user(user['uid'])

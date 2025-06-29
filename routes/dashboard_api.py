@@ -259,16 +259,19 @@ def get_activity_feed():
 def get_leaderboard():
     """Get leaderboard data"""
     try:
-        from config import get_config
-        config = get_config()
+        firebase_service = current_app.config.get('firebase_service')
         
-        if config.DEV_MODE:
+        if firebase_service and firebase_service.is_available():
+            from firebase_admin import firestore
+            db = firebase_service.db
+            users_ref = db.collection('users').order_by('xp', direction=firestore.Query.DESCENDING).limit(10)
             leaderboard = [
-                {'username': 'DevUser', 'xp': 1500, 'level': 5},
-                {'username': 'AlexPython', 'xp': 1200, 'level': 4},
-                {'username': 'CodeMaster', 'xp': 1000, 'level': 3},
-                {'username': 'PyNinja', 'xp': 850, 'level': 3},
-                {'username': 'ScriptKid', 'xp': 750, 'level': 2}
+                {
+                    'username': u.to_dict().get('username', 'Anonymous'),
+                    'xp': u.to_dict().get('xp', 0),
+                    'level': u.to_dict().get('level', 1)
+                } 
+                for u in users_ref.stream()
             ]
         else:
             # Get from Firebase

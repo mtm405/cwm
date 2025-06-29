@@ -25,10 +25,8 @@ def dashboard():
     """User dashboard"""
     user = get_current_user()
     
-    # Redirect to login if no user and not in dev mode
-    from config import get_config
-    config = get_config()
-    if not user and not config.DEV_MODE:
+    # Redirect to login if no user
+    if not user:
         return redirect(url_for('main.index'))
     
     # Ensure we have a valid user object
@@ -47,28 +45,19 @@ def dashboard():
         }
     
     # Get leaderboard data
-    if config.DEV_MODE:
-        leaderboard = [
-            {'username': 'DevUser', 'xp': 1500},
-            {'username': 'AlexPython', 'xp': 1200},
-            {'username': 'CodeMaster', 'xp': 1000},
-            {'username': 'PyNinja', 'xp': 850},
-            {'username': 'ScriptKid', 'xp': 750}
-        ]
+    if db:
+        from firebase_admin import firestore
+        users_ref = db.collection('users').order_by('xp', direction=firestore.Query.DESCENDING).limit(10)
+        leaderboard = [{'username': u.to_dict().get('username'), 'xp': u.to_dict().get('xp', 0)} 
+                      for u in users_ref.stream()]
     else:
-        if db:
-            from firebase_admin import firestore
-            users_ref = db.collection('users').order_by('xp', direction=firestore.Query.DESCENDING).limit(10)
-            leaderboard = [{'username': u.to_dict().get('username'), 'xp': u.to_dict().get('xp', 0)} 
-                          for u in users_ref.stream()]
-        else:
-            leaderboard = []
+        leaderboard = []
     
     # Get daily challenge
     daily_challenge = get_daily_challenge()
     
     # Get recent activity
-    recent_activity = get_recent_activity(user['uid'] if user else 'dev-user-001')
+    recent_activity = get_recent_activity(user['uid'] if user else None)
     
     return render_template('dashboard.html', 
                          user=user, 

@@ -10,7 +10,6 @@
    - ✅ **Added**: Missing `/api/update-theme` endpoint for theme management
 
 2. **Authentication & Error Handling**
-   - ❌ **Issue**: `NameError: DEV_MODE not defined` in user model
    - ✅ **Fixed**: Proper environment variable handling and config imports
    - ✅ **Improved**: Robust error handling across all routes
 
@@ -66,19 +65,29 @@ GET /api/dashboard/leaderboard
 ### **📋 VS Code Tasks for Deployment**
 
 #### **Available Tasks:**
-1. **`Start Flask App - Development`**: Runs with DEV_MODE=True
-2. **`Start Flask App - Production`**: Runs with DEV_MODE=False
-3. **`Start Cloudflare Tunnel`**: Connects to dev.codewithmorais.com
-4. **`Deploy to dev.codewithmorais.com`**: Full deployment sequence
+1. **`Start Flask App`**: Runs the Flask app in production mode
+2. **`Start Cloudflare Tunnel`**: Connects to dev.codewithmorais.com
+3. **`Deploy Full Stack`**: Runs both tasks in parallel
 
-#### **Quick Deploy Commands:**
+#### **Quick Deploy Methods:**
 ```bash
-# Development
-Ctrl+Shift+P → "Tasks: Run Task" → "Start Flask App - Development"
+# Method 1: Use Keyboard Shortcuts
+Ctrl+Shift+B                 # Run Flask App (default build task)
+Ctrl+Shift+P → "Run Test Task"    # Run Cloudflare Tunnel (default test task)
 
-# Production with Cloudflare
-Ctrl+Shift+P → "Tasks: Run Task" → "Deploy to dev.codewithmorais.com"
+# Method 2: Command Palette
+Ctrl+Shift+P → "Tasks: Run Task" → Select the task you want to run
+
+# Method 3: Task Explorer Extension (Recommended)
+# Install "Task Explorer" extension (spmeesseman.vscode-taskexplorer)
+# Shows all tasks in a dedicated sidebar with run buttons
+
+# Method 4: Task Manager Extension (Status Bar)
+# Install "Task Manager" extension (cnshenj.vscode-task-manager)
+# Adds task buttons to the status bar for one-click access
 ```
+
+See [RECOMMENDED_EXTENSIONS.md](./RECOMMENDED_EXTENSIONS.md) for details on installing and using these helpful extensions.
 
 ## 🌐 **DEPLOYMENT TO DEV.CODEWITHMORAIS.COM**
 
@@ -88,13 +97,21 @@ Ctrl+Shift+P → "Tasks: Run Task" → "Deploy to dev.codewithmorais.com"
 3. **Credentials**: `cloudflare-credentials.json` (secure file)
 
 ### **Deployment Steps**
-1. **Start Production App**:
-   ```bash
-   python app.py  # With DEV_MODE=False
+1. **Option 1: Use VS Code Tasks (Easiest)**:
+   ```
+   Press Ctrl+Shift+B to run Flask app (default build task)
+   - OR -
+   Use Command Palette (Ctrl+Shift+P) → "Tasks: Run Task" → "Deploy Full Stack"
+   - OR -
+   Use Task Explorer extension for one-click deployment
    ```
 
-2. **Start Cloudflare Tunnel**:
+2. **Option 2: Manual Commands**:
    ```bash
+   # Terminal 1: Start Flask App
+   python app.py  # Runs in production mode by default
+   
+   # Terminal 2: Start Cloudflare Tunnel
    cloudflared tunnel --config cloudflare-tunnel.yml run
    ```
 
@@ -109,7 +126,6 @@ Ctrl+Shift+P → "Tasks: Run Task" → "Deploy to dev.codewithmorais.com"
 ```env
 # Flask Configuration
 SECRET_KEY=1427f8083f48c1f147d5033672be1a85350f03c82090173f791c6ce7df3e4126
-DEV_MODE=False
 FLASK_ENV=production
 HOST=0.0.0.0
 PORT=8080

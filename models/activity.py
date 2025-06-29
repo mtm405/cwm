@@ -18,13 +18,6 @@ def set_firebase_service(service):
 def track_activity(user_id: str, activity_type: str, details: Dict[str, Any]) -> bool:
     """Track user activity in Firebase"""
     try:
-        # Mock activities in dev mode
-        from config import get_config
-        config = get_config()
-        if config.DEV_MODE:
-            logger.debug(f"Dev mode: tracked activity {activity_type} for user {user_id}")
-            return True
-        
         if not firebase_service or not firebase_service.is_available():
             logger.warning("Firebase not available for activity tracking")
             return False
@@ -46,18 +39,16 @@ def track_activity(user_id: str, activity_type: str, details: Dict[str, Any]) ->
         return False
 
 def get_recent_activity(user_id: str, limit: int = 10) -> List[Dict[str, Any]]:
-    """Get user's recent activity from Firebase or mock data"""
+    """Get user's recent activity from Firebase"""
     try:
-        from config import get_config
-        config = get_config()
-        
-        if config.DEV_MODE:
-            # Return mock activity data for development
+        # If Firebase is not available or no user_id provided, return mock data
+        if not firebase_service or not firebase_service.is_available() or not user_id:
+            logger.warning("Firebase not available for activity retrieval, returning mock data")
             return [
                 {
                     'type': 'lesson', 
                     'message': 'Completed "Variables and Data Types"', 
-                    'timestamp': datetime.now() - timedelta(hours=1),
+                    'timestamp': datetime.now() - timedelta(minutes=30),
                     'icon': 'book'
                 },
                 {
@@ -86,9 +77,6 @@ def get_recent_activity(user_id: str, limit: int = 10) -> List[Dict[str, Any]]:
                 }
             ]
         
-        if not firebase_service or not firebase_service.is_available():
-            return []
-        
         # Get activities from Firebase
         activities_ref = firebase_service.db.collection('activities')
         query = activities_ref.where('user_id', '==', user_id).order_by('timestamp', direction='DESCENDING').limit(limit)
@@ -111,6 +99,17 @@ def get_recent_activity(user_id: str, limit: int = 10) -> List[Dict[str, Any]]:
 
 def get_activity_icon(activity_type: str) -> str:
     """Get icon for activity type"""
+    icons = {
+        'lesson': 'book',
+        'quiz': 'clipboard-check',
+        'challenge': 'calendar-day',
+        'achievement': 'trophy',
+        'xp_gain': 'star',
+        'level_up': 'arrow-up',
+        'badge': 'medal',
+        'streak': 'fire'
+    }
+    return icons.get(activity_type, 'code')
     icons = {
         'lesson': 'book',
         'quiz': 'clipboard-check',
