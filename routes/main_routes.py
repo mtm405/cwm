@@ -25,7 +25,13 @@ def dashboard():
     """User dashboard"""
     user = get_current_user()
     
-    # Create default user object if no user is logged in (guest mode)
+    # Redirect to login if no user and not in dev mode
+    from config import get_config
+    config = get_config()
+    if not user and not config.DEV_MODE:
+        return redirect(url_for('main.index'))
+    
+    # Ensure we have a valid user object
     if not user:
         user = {
             'uid': 'guest',
@@ -41,7 +47,6 @@ def dashboard():
         }
     
     # Get leaderboard data
-    config = get_config()
     if config.DEV_MODE:
         leaderboard = [
             {'username': 'DevUser', 'xp': 1500},

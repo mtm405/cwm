@@ -5,7 +5,7 @@ Provides API endpoints for dashboard data
 from flask import Blueprint, jsonify, request, current_app
 from models.user import get_current_user, get_user_progress
 from models.lesson import get_all_lessons, calculate_overall_progress
-from models.activity import get_recent_activity
+from models.activity import get_recent_activity, track_activity
 from datetime import datetime, timedelta
 import logging
 
@@ -17,6 +17,7 @@ def get_dashboard_stats():
     """Get user dashboard statistics"""
     try:
         user = get_current_user()
+        
         if not user:
             # Return guest stats for unauthenticated users
             return jsonify({
@@ -42,7 +43,9 @@ def get_dashboard_stats():
         # Calculate statistics
         stats = {
             'user': {
-                'username': user.get('username', 'Student'),
+                'username': user.get('username', user.get('display_name', 'Student')),
+                'display_name': user.get('display_name', user.get('username', 'Student')),
+                'profile_picture': user.get('profile_picture', ''),
                 'xp': user.get('xp', 0),
                 'pycoins': user.get('pycoins', 0),
                 'level': user.get('level', 1),
@@ -54,6 +57,7 @@ def get_dashboard_stats():
                 'total_lessons': len(get_all_lessons())
             },
             'guest_mode': False,
+            'authenticated': True,
             'timestamp': datetime.now().isoformat()
         }
         
@@ -232,23 +236,47 @@ def get_exam_objectives():
         logger.error(f"Error getting exam objectives: {str(e)}")
         return jsonify({'error': 'Failed to load exam objectives'}), 500
 
+@dashboard_api_bp.route('/activity-feed')
+def get_activity_feed():
+    """Get user's activity feed"""
+    try:
+        user = get_current_user()
+        if not user:
+            return jsonify({'activities': [], 'guest_mode': True})
+        
+        activities = get_recent_activity(user['uid'])
+        
+        return jsonify({
+            'activities': activities,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting activity feed: {str(e)}")
+        return jsonify({'error': 'Failed to load activity feed'}), 500
+
 @dashboard_api_bp.route('/leaderboard')
 def get_leaderboard():
     """Get leaderboard data"""
     try:
-        firebase_service = current_app.firebase_service
+        from config import get_config
+        config = get_config()
         
-        if firebase_service and firebase_service.is_available():
-            leaderboard = firebase_service.get_leaderboard(limit=10)
-        else:
-            # Mock leaderboard for development
+        if config.DEV_MODE:
             leaderboard = [
-                {'username': 'CodeMaster', 'xp': 2500, 'level': 8},
-                {'username': 'PythonPro', 'xp': 2200, 'level': 7},
-                {'username': 'DevStudent', 'xp': 1800, 'level': 6},
-                {'username': 'TechExplorer', 'xp': 1500, 'level': 5},
-                {'username': 'CodingNinja', 'xp': 1200, 'level': 4}
+                {'username': 'DevUser', 'xp': 1500, 'level': 5},
+                {'username': 'AlexPython', 'xp': 1200, 'level': 4},
+                {'username': 'CodeMaster', 'xp': 1000, 'level': 3},
+                {'username': 'PyNinja', 'xp': 850, 'level': 3},
+                {'username': 'ScriptKid', 'xp': 750, 'level': 2}
             ]
+        else:
+            # Get from Firebase
+            firebase_service = current_app.config.get('firebase_service')
+            if firebase_service and firebase_service.is_available():
+                leaderboard = firebase_service.get_leaderboard(10)
+            else:
+                leaderboard = []
         
         return jsonify({
             'leaderboard': leaderboard,
@@ -260,32 +288,14 @@ def get_leaderboard():
         return jsonify({'error': 'Failed to load leaderboard'}), 500
 
 @dashboard_api_bp.route('/daily-challenge')
-def get_daily_challenge():
-    """Get today's daily challenge"""
+def get_daily_challenge_api():
+    """Get daily challenge"""
     try:
-        firebase_service = current_app.firebase_service
-        today = datetime.now().strftime('%Y-%m-%d')
-        
-        if firebase_service and firebase_service.is_available():
-            challenge = firebase_service.get_daily_challenge(today)
-        else:
-            # Mock challenge for development
-            challenge = {
-                'id': f'daily-{today}',
-                'title': 'Python Variables Practice',
-                'description': 'Create variables for storing personal information',
-                'difficulty': 'beginner',
-                'xp_reward': 75,
-                'coin_reward': 10,
-                'code_template': '# Create variables for your name, age, and favorite color\n# Print them in a formatted string\n',
-                'test_cases': [
-                    {'input': '', 'expected_contains': ['name', 'age', 'color']}
-                ]
-            }
+        from models.challenge import get_daily_challenge
+        challenge = get_daily_challenge()
         
         return jsonify({
             'challenge': challenge,
-            'date': today,
             'timestamp': datetime.now().isoformat()
         })
         
@@ -293,49 +303,40 @@ def get_daily_challenge():
         logger.error(f"Error getting daily challenge: {str(e)}")
         return jsonify({'error': 'Failed to load daily challenge'}), 500
 
-@dashboard_api_bp.route('/activity-feed')
-def get_activity_feed():
-    """Get user activity feed"""
-    try:
-        user = get_current_user()
-        if not user:
-            return jsonify({'error': 'Not authenticated'}), 401
-        
-        # Get recent activity
-        activities = get_recent_activity(user['uid'], limit=10)
-        
-        return jsonify({
-            'activities': activities,
-            'timestamp': datetime.now().isoformat()
-        })
-        
-    except Exception as e:
-        logger.error(f"Error getting activity feed: {str(e)}")
-        return jsonify({'error': 'Failed to load activity feed'}), 500
-
 @dashboard_api_bp.route('/next-lesson')
 def get_next_lesson():
-    """Get the next recommended lesson for the user"""
+    """Get user's next lesson"""
     try:
         user = get_current_user()
         if not user:
-            return jsonify({'error': 'Not authenticated'}), 401
+            return jsonify({'next_lesson': None, 'guest_mode': True})
         
+        # Get user's progress
         user_progress = get_user_progress(user['uid'])
         all_lessons = get_all_lessons()
         
-        # Find the first incomplete lesson
+        # Find next incomplete lesson
         next_lesson = None
-        for lesson in sorted(all_lessons, key=lambda x: x.get('order', 0)):
-            lesson_id = lesson['id']
+        for lesson in all_lessons:
+            lesson_id = lesson.get('id')
             if lesson_id not in user_progress or not user_progress[lesson_id].get('completed', False):
-                next_lesson = lesson
+                next_lesson = {
+                    'id': lesson_id,
+                    'title': lesson.get('title', 'Untitled Lesson'),
+                    'description': lesson.get('description', ''),
+                    'is_review': False
+                }
                 break
         
+        # If all lessons complete, suggest review
         if not next_lesson and all_lessons:
-            # All lessons completed, suggest the first one for review
-            next_lesson = all_lessons[0]
-            next_lesson['is_review'] = True
+            # Find least recently accessed lesson
+            next_lesson = {
+                'id': all_lessons[0].get('id'),
+                'title': all_lessons[0].get('title', 'Review Lesson'),
+                'description': 'Review this lesson to reinforce your knowledge',
+                'is_review': True
+            }
         
         return jsonify({
             'next_lesson': next_lesson,
@@ -344,4 +345,42 @@ def get_next_lesson():
         
     except Exception as e:
         logger.error(f"Error getting next lesson: {str(e)}")
-        return jsonify({'error': 'Failed to get next lesson'}), 500
+        return jsonify({'error': 'Failed to load next lesson'}), 500
+
+@dashboard_api_bp.route('/award-xp', methods=['POST'])
+def award_xp():
+    """Award XP and coins to user"""
+    try:
+        user = get_current_user()
+        if not user:
+            return jsonify({'success': False, 'error': 'Not authenticated'}), 401
+        
+        data = request.get_json()
+        xp = data.get('xp', 0)
+        coins = data.get('coins', 0)
+        reason = data.get('reason', 'Activity completion')
+        
+        # Award XP and coins
+        from models.user import award_xp_and_coins
+        result = award_xp_and_coins(user['uid'], xp, coins)
+        
+        if result:
+            # Track activity
+            track_activity(user['uid'], 'xp_gain', {
+                'message': f'Earned +{xp} XP: {reason}',
+                'xp': xp,
+                'coins': coins,
+                'reason': reason
+            })
+            
+            return jsonify({
+                'success': True,
+                'new_totals': result,
+                'message': f'Awarded {xp} XP and {coins} coins!'
+            })
+        else:
+            return jsonify({'success': False, 'error': 'Failed to award XP'}), 500
+        
+    except Exception as e:
+        logger.error(f"Error awarding XP: {str(e)}")
+        return jsonify({'success': False, 'error': 'Failed to award XP'}), 500

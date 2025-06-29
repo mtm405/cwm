@@ -44,6 +44,19 @@ except Exception as e:
 # Make Firebase service available to routes
 app.config['firebase_service'] = firebase_service
 
+# Inject Firebase service into models
+if firebase_service:
+    from models.user import set_firebase_service as set_user_firebase_service
+    from models.lesson import set_firebase_service as set_lesson_firebase_service  
+    from models.quiz import set_firebase_service as set_quiz_firebase_service
+    
+    set_user_firebase_service(firebase_service)
+    set_lesson_firebase_service(firebase_service)
+    set_quiz_firebase_service(firebase_service)
+    logger.info("Firebase service injected into all models")
+else:
+    logger.warning("Firebase service not available - models will use fallback data")
+
 # Register blueprints with error handling
 try:
     from routes.main_routes import main_bp

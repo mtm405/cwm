@@ -397,6 +397,59 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
+/* Notification styles */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 300px;
+    animation: slideIn 0.3s ease;
+}
+
+.notification-success {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+}
+
+.notification-error {
+    background: linear-gradient(135deg, #f44336, #e53935);
+}
+
+.notification-info {
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+}
+
+.notification button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    margin-left: auto;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
 @media (max-width: 768px) {
     .dashboard-grid {
         grid-template-columns: 1fr;
@@ -437,21 +490,50 @@ class DashboardManager {
             const response = await fetch('/api/dashboard/stats');
             const data = await response.json();
             
-            if (data.user) {
-                document.getElementById('user-xp').textContent = data.user.xp;
-                document.getElementById('user-coins').textContent = data.user.pycoins;
+            if (response.ok && data.user) {
+                // Update user stats with animation
+                this.updateStatWithAnimation('user-xp', data.user.xp);
+                this.updateStatWithAnimation('user-coins', data.user.pycoins);
+                
+                // Update welcome message if user data available
+                const welcomeMsg = document.querySelector('.dashboard-container h1');
+                if (welcomeMsg && data.user.username) {
+                    welcomeMsg.textContent = `Welcome back, ${data.user.username}!`;
+                }
                 
                 // Update progress information
                 if (data.progress) {
-                    const progressText = `${data.progress.completed_lessons}/${data.progress.total_lessons} lessons completed`;
-                    const progressElement = document.querySelector('.progress-text');
+                    const progressElement = document.querySelector('.progress-value');
                     if (progressElement) {
-                        progressElement.textContent = progressText;
+                        progressElement.textContent = `${data.progress.completed_lessons}/${data.progress.total_lessons}`;
                     }
                 }
+                
+                // Store user data for other functions
+                this.currentUser = data.user;
+                
+                // Show authentication status
+                if (data.authenticated) {
+                    console.log('User authenticated, real data loaded');
+                }
+            } else if (data.guest_mode) {
+                console.log('Guest mode active');
             }
         } catch (error) {
             console.error('Error loading dashboard stats:', error);
+        }
+    }
+    
+    updateStatWithAnimation(elementId, newValue) {
+        const element = document.getElementById(elementId);
+        if (element && element.textContent !== newValue.toString()) {
+            element.style.transition = 'all 0.3s ease';
+            element.style.transform = 'scale(1.1)';
+            element.textContent = newValue;
+            
+            setTimeout(() => {
+                element.style.transform = 'scale(1)';
+            }, 300);
         }
     }
     
@@ -555,7 +637,7 @@ class DashboardManager {
             const response = await fetch('/api/dashboard/activity-feed');
             const data = await response.json();
             
-            if (data.activities) {
+            if (response.ok && data.activities) {
                 const feedElement = document.getElementById('activity-feed');
                 if (feedElement) {
                     feedElement.innerHTML = data.activities.map(activity => `
@@ -569,6 +651,21 @@ class DashboardManager {
                             </div>
                         </div>
                     `).join('');
+                }
+            } else if (data.guest_mode) {
+                const feedElement = document.getElementById('activity-feed');
+                if (feedElement) {
+                    feedElement.innerHTML = `
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="activity-content">
+                                <p class="activity-message">Sign in to track your learning progress!</p>
+                                <span class="activity-time">Now</span>
+                            </div>
+                        </div>
+                    `;
                 }
             }
         } catch (error) {
@@ -618,6 +715,57 @@ class DashboardManager {
         this.loadDashboardStats();
         this.loadActivityFeed();
         // Don't refresh everything too frequently to avoid overwhelming the user
+    }
+    
+    async awardXP(xp, coins, reason) {
+        try {
+            const response = await fetch('/api/dashboard/award-xp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ xp, coins, reason })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Show notification
+                this.showNotification(`🎉 ${data.message}`, 'success');
+                
+                // Update dashboard stats immediately
+                this.loadDashboardStats();
+                this.loadActivityFeed();
+                
+                return true;
+            } else {
+                console.error('Failed to award XP:', data.error);
+                return false;
+            }
+        } catch (error) {
+            console.error('Error awarding XP:', error);
+            return false;
+        }
+    }
+    
+    showNotification(message, type = 'info') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <span>${message}</span>
+            <button onclick="this.parentElement.remove()">×</button>
+        `;
+        
+        // Add to page
+        document.body.appendChild(notification);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 5000);
     }
 }
 
