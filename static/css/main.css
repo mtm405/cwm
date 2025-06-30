@@ -13,6 +13,7 @@
 @import url('./components/buttons.css');
 @import url('./components/cards.css');
 @import url('./components/header.css');
+@import url('./components/header-modern.css');
 @import url('./components/navigation.css');
 @import url('./components/dashboard.css');
 @import url('./pages/dashboard-modern.css');

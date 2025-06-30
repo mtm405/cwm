@@ -57,22 +57,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Animate progress bars on load
     setTimeout(animateProgressBars, 800);
     
-    // Refresh dashboard functionality
-    const refreshButton = document.querySelector('.refresh-dashboard');
-    if (refreshButton) {
-        refreshButton.addEventListener('click', function() {
-            // Add spinning animation
-            const icon = this.querySelector('i');
-            icon.style.transform = 'rotate(360deg)';
-            icon.style.transition = 'transform 0.5s ease';
-            
-            setTimeout(() => {
-                icon.style.transform = 'rotate(0deg)';
-                animateProgressBars();
-                showNotification('Dashboard refreshed!', 'success');
-            }, 500);
-        });
-    }
+    // Dashboard functionality is now handled by the main dashboard manager
+    // No duplicate refresh button logic needed here
     
     // Notification system
     function showNotification(message, type = 'info') {

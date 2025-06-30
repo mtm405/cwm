@@ -118,6 +118,19 @@ function setTheme(theme) {
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize header functionality first
+    initHeaderFunctionality();
+    initDashboardFunctionality();
+    
+    // Initialize navigation
+    window.navigationManager = new NavigationManager();
+    
+    // Initialize theme management
+    window.themeManager = new ThemeManager();
+    
+    // Initialize animations
+    window.animationManager = new AnimationManager();
+    
     // Initialize Google Identity Services if available
     if (typeof google !== 'undefined') {
         initGoogleIdentity();
@@ -141,6 +154,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    
+    // Initialize page-specific components
+    const page = document.body.dataset.page;
+    if (page === 'dashboard' && typeof ModernDashboardManager !== 'undefined') {
+        window.dashboardManager = new ModernDashboardManager();
+        window.dashboardManager.init();
+    }
+    
+    console.log('🚀 Modern UI initialized successfully');
 });
 
 // Code Editor Management
@@ -586,6 +608,18 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
+// Header Functionality Initialization
+function initHeaderFunctionality() {
+    // Initialize live clock
+    initLiveClock();
+    
+    // Initialize search functionality
+    initSearchKeyHandler();
+    initSearchOutsideClick();
+    
+    console.log('📋 Header functionality initialized');
+}
+
 // Modern Navigation Manager
 class NavigationManager {
     constructor() {
@@ -929,28 +963,376 @@ class AnimationManager {
     }
 }
 
-// Initialize managers when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize navigation
-    window.navigationManager = new NavigationManager();
+// Live Clock Functionality
+function initLiveClock() {
+    const clockElement = document.getElementById('live-clock');
+    if (!clockElement) return;
     
-    // Initialize theme management
-    window.themeManager = new ThemeManager();
+    const timeDisplay = clockElement.querySelector('.time-display');
+    const periodDisplay = clockElement.querySelector('.period-display');
     
-    // Initialize animations
-    window.animationManager = new AnimationManager();
-    
-    // Initialize page-specific components
-    const page = document.body.dataset.page;
-    if (page === 'dashboard' && typeof ModernDashboardManager !== 'undefined') {
-        window.dashboardManager = new ModernDashboardManager();
-        window.dashboardManager.init();
+    function updateClock() {
+        const now = new Date();
+        let hours = now.getHours();
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+        const period = hours >= 12 ? 'PM' : 'AM';
+        
+        // Convert to 12-hour format
+        hours = hours % 12;
+        hours = hours ? hours : 12; // 0 should be 12
+        
+        // Format time with leading zeros
+        const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (timeDisplay) timeDisplay.textContent = timeString;
+        if (periodDisplay) periodDisplay.textContent = period;
     }
     
-    // Initialize Google Identity Services if available
-    if (typeof google !== 'undefined') {
-        initGoogleIdentity();
+    // Update immediately and then every second
+    updateClock();
+    setInterval(updateClock, 1000);
+}
+
+// Search Bar Toggle Functionality
+function toggleSearch() {
+    const searchBar = document.getElementById('search-bar');
+    const searchInput = document.getElementById('search-input');
+    
+    if (searchBar) {
+        const isActive = searchBar.classList.contains('active');
+        
+        if (isActive) {
+            searchBar.classList.remove('active');
+        } else {
+            searchBar.classList.add('active');
+            setTimeout(() => {
+                if (searchInput) searchInput.focus();
+            }, 200);
+        }
+    }
+}
+
+// Search Functionality
+function performSearch() {
+    const searchInput = document.getElementById('search-input');
+    if (!searchInput) return;
+    
+    const query = searchInput.value.trim();
+    if (!query) {
+        alert('Please enter a search term');
+        return;
     }
     
-    console.log('🚀 Modern UI initialized successfully');
-});
+    // Show loading state
+    const searchSubmit = document.querySelector('.search-submit');
+    if (searchSubmit) {
+        const originalHTML = searchSubmit.innerHTML;
+        searchSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        
+        // Simulate search (replace with actual search implementation)
+        setTimeout(() => {
+            searchSubmit.innerHTML = originalHTML;
+            // For now, redirect to lessons page with search query
+            window.location.href = `/lessons?search=${encodeURIComponent(query)}`;
+        }, 1000);
+    }
+}
+
+// Handle Enter key in search input
+function initSearchKeyHandler() {
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+    }
+}
+
+// Close search bar when clicking outside
+function initSearchOutsideClick() {
+    document.addEventListener('click', function(e) {
+        const searchContainer = document.querySelector('.search-container');
+        const searchBar = document.getElementById('search-bar');
+        
+        if (searchContainer && !searchContainer.contains(e.target)) {
+            if (searchBar && searchBar.classList.contains('active')) {
+                searchBar.classList.remove('active');
+            }
+        }
+    });
+}
+
+// Leaderboard Modal Functionality
+function openLeaderboardModal() {
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('leaderboard-modal');
+    if (!modal) {
+        modal = createLeaderboardModal();
+        document.body.appendChild(modal);
+    }
+    
+    // Show modal
+    modal.style.display = 'flex';
+    setTimeout(() => {
+        modal.classList.add('active');
+    }, 10);
+    
+    // Load leaderboard data
+    loadLeaderboardData();
+}
+
+function createLeaderboardModal() {
+    const modal = document.createElement('div');
+    modal.id = 'leaderboard-modal';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content leaderboard-modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-trophy"></i> Leaderboard</h2>
+                <button class="modal-close" onclick="closeLeaderboardModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="leaderboard-loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading leaderboard...</p>
+                </div>
+                <div class="leaderboard-content" style="display: none;">
+                    <div class="leaderboard-list">
+                        <!-- Leaderboard items will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    return modal;
+}
+
+function closeLeaderboardModal() {
+    const modal = document.getElementById('leaderboard-modal');
+    if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+}
+
+function loadLeaderboardData() {
+    fetch('/api/leaderboard')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                renderLeaderboard(data.leaderboard);
+            } else {
+                showLeaderboardError('Failed to load leaderboard data');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading leaderboard:', error);
+            showLeaderboardError('Network error while loading leaderboard');
+        });
+}
+
+function renderLeaderboard(leaderboard) {
+    const loadingElement = document.querySelector('.leaderboard-loading');
+    const contentElement = document.querySelector('.leaderboard-content');
+    const listElement = document.querySelector('.leaderboard-list');
+    
+    if (loadingElement) loadingElement.style.display = 'none';
+    if (contentElement) contentElement.style.display = 'block';
+    
+    if (listElement && leaderboard) {
+        listElement.innerHTML = leaderboard.map((user, index) => `
+            <div class="leaderboard-item ${index < 3 ? 'top-three' : ''}" data-rank="${index + 1}">
+                <div class="rank-badge">
+                    ${index < 3 ? 
+                        `<i class="fas fa-medal ${index === 0 ? 'gold' : index === 1 ? 'silver' : 'bronze'}"></i>` : 
+                        `<span class="rank-number">${index + 1}</span>`
+                    }
+                </div>
+                <div class="user-info">
+                    <img src="${user.profile_picture || '/static/img/default-avatar.png'}" alt="Avatar" class="user-avatar">
+                    <div class="user-details">
+                        <span class="user-name">${user.display_name || user.username}</span>
+                        <span class="user-level">Level ${user.level || 1}</span>
+                    </div>
+                </div>
+                <div class="user-stats">
+                    <div class="stat">
+                        <i class="fas fa-star"></i>
+                        <span>${user.xp || 0}</span>
+                    </div>
+                    <div class="stat">
+                        <i class="fas fa-coins"></i>
+                        <span>${user.pycoins || 0}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+function showLeaderboardError(message) {
+    const loadingElement = document.querySelector('.leaderboard-loading');
+    if (loadingElement) {
+        loadingElement.innerHTML = `
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>${message}</p>
+        `;
+    }
+}
+
+// Dashboard Refresh Functionality
+function refreshDashboard() {
+    // Check if dashboard manager exists (from dashboard.js)
+    if (window.dashboardManager && typeof window.dashboardManager.refreshDashboard === 'function') {
+        window.dashboardManager.refreshDashboard();
+        return;
+    }
+    
+    const refreshBtn = document.querySelector('.btn-refresh, .refresh-dashboard');
+    const refreshIcon = refreshBtn?.querySelector('i');
+    
+    if (refreshBtn && refreshIcon) {
+        // Add refreshing state
+        refreshBtn.classList.add('refreshing');
+        refreshBtn.disabled = true;
+        
+        // Show loading indicator
+        refreshIcon.classList.add('fa-spin');
+        
+        // Fetch fresh dashboard data
+        fetch('/api/dashboard/refresh', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update dashboard elements with fresh data
+                updateDashboardData(data.data);
+                // Note: refresh success notification is handled by dashboard.js component
+            } else {
+                showRefreshError('Failed to refresh dashboard data');
+            }
+        })
+        .catch(error => {
+            console.error('Error refreshing dashboard:', error);
+            showRefreshError('Network error while refreshing');
+        })
+        .finally(() => {
+            // Remove refreshing state
+            setTimeout(() => {
+                refreshBtn.classList.remove('refreshing');
+                refreshBtn.disabled = false;
+                refreshIcon.classList.remove('fa-spin');
+            }, 1000);
+        });
+    }
+}
+
+function updateDashboardData(data) {
+    // Update XP
+    const xpElement = document.getElementById('user-xp');
+    if (xpElement && data.user) {
+        xpElement.textContent = data.user.xp || 0;
+    }
+    
+    // Update PyCoins
+    const coinsElement = document.getElementById('user-coins');
+    if (coinsElement && data.user) {
+        coinsElement.textContent = data.user.pycoins || 0;
+    }
+    
+    // Update level
+    const levelElements = document.querySelectorAll('[data-stat="level"] .stat-value-large');
+    levelElements.forEach(element => {
+        if (data.user) {
+            element.textContent = data.user.level || 1;
+        }
+    });
+    
+    // Update stats cards
+    const xpCard = document.querySelector('[data-stat="xp"] .stat-value-large');
+    if (xpCard && data.user) {
+        xpCard.textContent = data.user.xp || 0;
+    }
+    
+    const coinsCard = document.querySelector('[data-stat="pycoins"] .stat-value-large');
+    if (coinsCard && data.user) {
+        coinsCard.textContent = data.user.pycoins || 0;
+    }
+    
+    // Update welcome message if available
+    const welcomeMessage = document.getElementById('welcome-message');
+    if (welcomeMessage && data.user && data.user.display_name) {
+        welcomeMessage.textContent = `Welcome back, ${data.user.display_name}! 🚀`;
+    }
+}
+
+// Note: showRefreshSuccess function removed - now handled by dashboard.js component
+
+function showRefreshError(message) {
+    // Create temporary error indicator
+    const errorIndicator = document.createElement('div');
+    errorIndicator.className = 'refresh-error';
+    errorIndicator.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+    errorIndicator.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background: #ef4444;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        z-index: 10001;
+        animation: slideInRight 0.3s ease;
+    `;
+    
+    document.body.appendChild(errorIndicator);
+    
+    setTimeout(() => {
+        errorIndicator.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => {
+            if (errorIndicator.parentNode) {
+                errorIndicator.parentNode.removeChild(errorIndicator);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// Dashboard Tab Switching
+function initDashboardTabs() {
+    const tabs = document.querySelectorAll('.nav-tab');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabId = tab.getAttribute('data-tab');
+            
+            // Remove active class from all tabs and panes
+            tabs.forEach(t => t.classList.remove('active'));
+            tabPanes.forEach(pane => pane.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding pane
+            tab.classList.add('active');
+            const targetPane = document.getElementById(`${tabId}-tab`);
+            if (targetPane) {
+                targetPane.classList.add('active');
+            }
+        });
+    });
+}
+
+// Enhanced initialization
+function initDashboardFunctionality() {
+    initDashboardTabs();
+}

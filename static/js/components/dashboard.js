@@ -10,6 +10,9 @@ class ModernDashboardManager {
         this.refreshInterval = null;
         this.animationDelay = 100;
         this.charts = {};
+        
+        // Register globally for refresh function access
+        window.dashboardManager = this;
     }
 
     async init() {
@@ -483,18 +486,22 @@ class ModernDashboardManager {
     }
 
     showRefreshIndicator() {
-        const refreshBtn = document.querySelector('.refresh-dashboard');
+        const refreshBtn = document.querySelector('.refresh-dashboard, .btn-refresh');
         if (refreshBtn) {
             const icon = refreshBtn.querySelector('i');
             icon.classList.add('fa-spin');
+            refreshBtn.classList.add('refreshing');
+            refreshBtn.disabled = true;
         }
     }
 
     showRefreshSuccess() {
-        const refreshBtn = document.querySelector('.refresh-dashboard');
+        const refreshBtn = document.querySelector('.refresh-dashboard, .btn-refresh');
         if (refreshBtn) {
             const icon = refreshBtn.querySelector('i');
             icon.classList.remove('fa-spin');
+            refreshBtn.classList.remove('refreshing');
+            refreshBtn.disabled = false;
             
             // Brief success indication
             refreshBtn.style.color = 'var(--success-color)';
@@ -503,14 +510,17 @@ class ModernDashboardManager {
             }, 1000);
         }
 
-        this.showToast('Dashboard updated!', 'success');
+        // Single toast message only
+        this.showToast('Dashboard refreshed!', 'success');
     }
 
     showRefreshError() {
-        const refreshBtn = document.querySelector('.refresh-dashboard');
+        const refreshBtn = document.querySelector('.refresh-dashboard, .btn-refresh');
         if (refreshBtn) {
             const icon = refreshBtn.querySelector('i');
             icon.classList.remove('fa-spin');
+            refreshBtn.classList.remove('refreshing');
+            refreshBtn.disabled = false;
             
             // Brief error indication
             refreshBtn.style.color = 'var(--danger-color)';

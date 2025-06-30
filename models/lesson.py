@@ -17,7 +17,7 @@ def set_firebase_service(service):
 
 def get_mock_lessons():
     """Get mock lessons for development"""
-    return [
+    lessons = [
         {
             'id': 'python-basics',
             'title': 'Python Basics',
@@ -25,7 +25,9 @@ def get_mock_lessons():
             'order': 1,
             'xp_reward': 100,
             'subtopics': ['Variables', 'Data Types', 'Basic Operations'],
-            'total_subtopics': 3
+            'total_subtopics': 3,
+            'color': '#3498db',
+            'icon': 'fas fa-code'
         },
         {
             'id': 'control-flow',
@@ -34,7 +36,9 @@ def get_mock_lessons():
             'order': 2,
             'xp_reward': 150,
             'subtopics': ['If Statements', 'For Loops', 'While Loops'],
-            'total_subtopics': 3
+            'total_subtopics': 3,
+            'color': '#e74c3c',
+            'icon': 'fas fa-route'
         },
         {
             'id': 'functions',
@@ -43,9 +47,17 @@ def get_mock_lessons():
             'order': 3,
             'xp_reward': 200,
             'subtopics': ['Defining Functions', 'Parameters', 'Return Values'],
-            'total_subtopics': 3
+            'total_subtopics': 3,
+            'color': '#f39c12',
+            'icon': 'fas fa-cogs'
         }
     ]
+    
+    # Enhance each lesson
+    for lesson in lessons:
+        _enhance_lesson_data(lesson)
+    
+    return lessons
 
 def get_mock_lesson(lesson_id):
     """Get mock lesson data for development"""
@@ -133,6 +145,7 @@ def get_lesson(lesson_id: str) -> Optional[Dict[str, Any]]:
     if firebase_service and firebase_service.is_available():
         lesson_data = firebase_service.get_lesson(lesson_id)
         if lesson_data:
+            _enhance_lesson_data(lesson_data)
             logger.info(f"Loaded lesson {lesson_id} from Firebase")
             return lesson_data
         else:
@@ -141,6 +154,7 @@ def get_lesson(lesson_id: str) -> Optional[Dict[str, Any]]:
     # Fallback to mock data
     lesson_data = get_mock_lesson(lesson_id)
     if lesson_data:
+        _enhance_lesson_data(lesson_data)
         logger.info(f"Loaded lesson {lesson_id} from mock data")
         return lesson_data
     
@@ -154,6 +168,9 @@ def get_all_lessons() -> List[Dict[str, Any]]:
     if firebase_service and firebase_service.is_available():
         lessons = firebase_service.get_all_lessons()
         if lessons:
+            # Enhance lessons with missing fields needed for the template
+            for lesson in lessons:
+                _enhance_lesson_data(lesson)
             logger.info(f"Loaded {len(lessons)} lessons from Firebase")
             return lessons
         else:
@@ -163,6 +180,54 @@ def get_all_lessons() -> List[Dict[str, Any]]:
     lessons = get_mock_lessons()
     logger.info(f"Loaded {len(lessons)} lessons from mock data")
     return lessons
+
+def _enhance_lesson_data(lesson: Dict[str, Any]) -> None:
+    """Enhance lesson data with fields needed for template rendering"""
+    
+    # Default colors and icons for lessons
+    lesson_styles = {
+        'python-basics-01': {'color': '#3498db', 'icon': 'fas fa-code'},
+        'variables-02': {'color': '#e74c3c', 'icon': 'fas fa-database'},
+        'functions-03': {'color': '#f39c12', 'icon': 'fas fa-cogs'},
+        'python-basics': {'color': '#3498db', 'icon': 'fas fa-code'},
+        'control-flow': {'color': '#e74c3c', 'icon': 'fas fa-route'},
+        'functions': {'color': '#f39c12', 'icon': 'fas fa-cogs'},
+        'flow-control': {'color': '#e74c3c', 'icon': 'fas fa-route'},
+    }
+    
+    lesson_id = lesson.get('id', '')
+    
+    # Add color and icon based on lesson ID or use defaults
+    if lesson_id in lesson_styles:
+        lesson['color'] = lesson_styles[lesson_id]['color']
+        lesson['icon'] = lesson_styles[lesson_id]['icon']
+    else:
+        # Default style for unknown lessons
+        lesson['color'] = '#9b59b6'
+        lesson['icon'] = 'fas fa-book'
+    
+    # Ensure total_subtopics field exists
+    if 'total_subtopics' not in lesson:
+        subtopics = lesson.get('subtopics', [])
+        if isinstance(subtopics, list):
+            lesson['total_subtopics'] = len(subtopics)
+        else:
+            lesson['total_subtopics'] = 0
+    
+    # Ensure subtopics field exists (required by template)
+    if 'subtopics' not in lesson or not lesson['subtopics']:
+        # Create default subtopics based on lesson content or use generic ones
+        lesson['subtopics'] = [
+            'Introduction', 
+            'Practice', 
+            'Assessment'
+        ]
+        # Update total_subtopics to match
+        lesson['total_subtopics'] = len(lesson['subtopics'])
+    
+    # Ensure xp_reward exists
+    if 'xp_reward' not in lesson:
+        lesson['xp_reward'] = 100  # Default XP reward
 
 def save_lesson(lesson_id: str, lesson_data: Dict[str, Any]) -> bool:
     """Save lesson to Firebase"""

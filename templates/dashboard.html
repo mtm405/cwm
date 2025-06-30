@@ -19,28 +19,32 @@
             </div>
             
             <div class="header-actions">
-                <button class="refresh-dashboard btn btn-ghost" title="Refresh Dashboard">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
                 <a href="/lessons" class="btn btn-primary">
                     <i class="fas fa-book"></i> Continue Learning
                 </a>
             </div>
         </div>
         
-        <!-- Quick Navigation Tabs -->
+        <!-- Quick Navigation Tabs with Refresh Button -->
         <nav class="dashboard-nav">
-            <button class="nav-tab active" data-tab="overview">
-                <i class="fas fa-chart-line"></i> Overview
-            </button>
-            <button class="nav-tab" data-tab="challenge">
-                <i class="fas fa-calendar-day"></i> Daily Challenge
-            </button>
-            <button class="nav-tab" data-tab="leaderboard">
-                <i class="fas fa-trophy"></i> Leaderboard
-            </button>
-            <button class="nav-tab" data-tab="activity">
-                <i class="fas fa-stream"></i> Activity
+            <div class="nav-tabs-container">
+                <button class="nav-tab active" data-tab="overview">
+                    <i class="fas fa-chart-line"></i> Overview
+                </button>
+                <button class="nav-tab" data-tab="challenge">
+                    <i class="fas fa-calendar-day"></i> Daily Challenge
+                </button>
+                <button class="nav-tab" data-tab="leaderboard">
+                    <i class="fas fa-trophy"></i> Leaderboard
+                </button>
+                <button class="nav-tab" data-tab="activity">
+                    <i class="fas fa-stream"></i> Activity
+                </button>
+            </div>
+            
+            <button class="refresh-dashboard btn-refresh" title="Refresh Dashboard" onclick="refreshDashboard()">
+                <i class="fas fa-sync-alt"></i>
+                <span>Refresh</span>
             </button>
         </nav>
     </header>

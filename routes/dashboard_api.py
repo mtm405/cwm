@@ -49,18 +49,21 @@ def get_dashboard_stats():
             })
         
         # Get fresh user data from Firebase if available
+        user_progress = {}  # Initialize user_progress for all code paths
+        
         if firebase_service.is_available():
             firebase_user = firebase_service.get_user(user['uid'])
             if firebase_user:
                 user.update(firebase_user)
             
             # Get lesson progress from Firebase
-            completed_lessons = len(user.get('lesson_progress', {}))
+            user_progress = user.get('lesson_progress', {})
+            completed_lessons = len(user_progress)
             total_lessons = len(firebase_service.get_all_lessons())
         else:
             # Fallback to local data
             user_progress = get_user_progress(user['uid'])
-            completed_lessons = user_progress.get('completed_lessons', 0)
+            completed_lessons = len([p for p in user_progress.values() if p.get('completed', False)])
             total_lessons = len(get_all_lessons())
         
         # Calculate overall progress
@@ -418,3 +421,52 @@ def award_xp():
     except Exception as e:
         logger.error(f"Error awarding XP: {str(e)}")
         return jsonify({'success': False, 'error': 'Failed to award XP'}), 500
+
+@dashboard_api_bp.route('/refresh', methods=['POST'])
+def refresh_dashboard():
+    """Refresh dashboard data with latest information from Firebase"""
+    try:
+        user = get_current_user()
+        firebase_service = get_firebase_service()
+        
+        if not user:
+            return jsonify({
+                'success': False,
+                'error': 'Authentication required'
+            }), 401
+        
+        # Get fresh user data from Firebase
+        user_data = firebase_service.get_user_by_id(user.get('uid'))
+        if not user_data:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to fetch user data'
+            }), 500
+        
+        # Get fresh dashboard data
+        dashboard_data = firebase_service.get_user_dashboard_data(user.get('uid'))
+        
+        # Track refresh activity
+        track_activity(user.get('uid'), 'dashboard_refresh', {
+            'timestamp': datetime.now().isoformat(),
+            'user_agent': request.headers.get('User-Agent', 'Unknown')
+        })
+        
+        logger.info(f"Dashboard refreshed for user: {user.get('uid')}")
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'user': user_data,
+                'dashboard': dashboard_data,
+                'refresh_time': datetime.now().isoformat()
+            },
+            'message': 'Dashboard refreshed successfully'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error refreshing dashboard: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Failed to refresh dashboard data'
+        }), 500

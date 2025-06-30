@@ -1,27 +1,5 @@
 /* Navigation and Header Component Styles */
 
-/* Main Navigation Bar */
-.navbar {
-    background-color: var(--bg-secondary);
-    padding: 0.75rem 0;
-    box-shadow: var(--shadow);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    border-bottom: 1px solid var(--border-color);
-    backdrop-filter: blur(10px);
-}
-
-.nav-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-    gap: 2rem;
-}
-
 /* Logo/Brand */
 .logo {
     font-size: 1.5rem;
@@ -291,17 +269,6 @@
 .mobile-menu-toggle:hover {
     background-color: rgba(108, 99, 255, 0.1);
     color: var(--primary-color);
-}
-
-/* Scrolled navbar effects */
-.navbar.scrolled {
-    background-color: rgba(0, 0, 0, 0.95);
-    backdrop-filter: blur(20px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-}
-
-.navbar {
-    transition: all 0.3s ease;
 }
 
 /* Enhanced User Profile Dropdown */

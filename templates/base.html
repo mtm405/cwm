@@ -22,38 +22,74 @@
 <body class="theme-dark" data-page="{% block page_name %}{% endblock %}">
     <!-- Navigation -->
     <nav class="navbar">
-        <div class="container nav-container">
-            <a href="/" class="logo">
-                <i class="fas fa-code"></i> Code with Morais
-            </a>
+        <div class="nav-container-modern">
+            <!-- Left Side: Main Navigation -->
+            <div class="nav-left">
+                <ul class="nav-links-modern">
+                    <li><a href="/dashboard" class="nav-link-modern"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="/lessons" class="nav-link-modern"><i class="fas fa-book"></i> Lessons</a></li>
+                    <li><button class="nav-link-modern leaderboard-btn" onclick="openLeaderboardModal()"><i class="fas fa-trophy"></i> Leaderboard</button></li>
+                </ul>
+            </div>
             
-            <ul class="nav-links">
-                <li><a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
-                <li><a href="/lessons"><i class="fas fa-book"></i> Lessons</a></li>
-                <li><a href="/dashboard#leaderboard"><i class="fas fa-trophy"></i> Leaderboard</a></li>
+            <!-- Center: Live Clock -->
+            <div class="nav-center">
+                <div class="live-clock" id="live-clock">
+                    <span class="time-display">12:00:00</span>
+                    <span class="period-display">AM</span>
+                </div>
+            </div>
+            
+            <!-- Right Side: Search & User Info -->
+            <div class="nav-right">
+                <!-- Search Bar -->
+                <div class="search-container">
+                    <button class="search-toggle" onclick="toggleSearch()">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <div class="search-bar" id="search-bar">
+                        <input type="text" placeholder="Search lessons, topics..." class="search-input" id="search-input">
+                        <button class="search-submit" onclick="performSearch()">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
                 
                 {% if user %}
-                <li class="user-info">
-                    <span class="user-stats">
-                        <i class="fas fa-star"></i> <span id="user-xp">{{ user.xp }}</span> XP
-                        <i class="fas fa-coins"></i> <span id="user-coins">{{ user.pycoins }}</span>
+                <!-- User Stats -->
+                <div class="user-info-modern">
+                    <span class="user-stats-modern">
+                        <span class="stat-item">
+                            <i class="fas fa-star"></i> 
+                            <span id="user-xp">{{ user.xp }}</span>
+                        </span>
+                        <span class="stat-item">
+                            <i class="fas fa-coins"></i> 
+                            <span id="user-coins">{{ user.pycoins }}</span>
+                        </span>
                     </span>
-                </li>
-                <li class="user-profile">
-                    <div class="user-dropdown">
-                        <img src="{{ user.profile_picture or '/static/img/default-avatar.png' }}" alt="Profile" class="user-avatar">
-                        <span class="user-name">{{ user.display_name or user.username or user.email }}</span>
-                        <div class="dropdown-menu">
+                </div>
+                
+                <!-- User Profile -->
+                <div class="user-profile-modern">
+                    <div class="user-dropdown-modern">
+                        <img src="{{ user.profile_picture or '/static/img/default-avatar.png' }}" alt="Profile" class="user-avatar-modern">
+                        <span class="user-name-modern">{{ user.display_name or user.username or user.email }}</span>
+                        <i class="fas fa-chevron-down dropdown-arrow"></i>
+                        <div class="dropdown-menu-modern">
                             <a href="/profile"><i class="fas fa-user"></i> Profile</a>
+                            <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
                             {% if user.is_admin %}
                             <a href="/admin"><i class="fas fa-shield-alt"></i> Admin</a>
                             {% endif %}
-                            <button onclick="signOut()" class="sign-out-btn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+                            <hr class="dropdown-divider">
+                            <button onclick="signOut()" class="sign-out-btn-modern"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
                         </div>
                     </div>
-                </li>
+                </div>
                 {% else %}
-                <li class="auth-section">
+                <!-- Auth Section for non-logged users -->
+                <div class="auth-section">
                     <div id="g_id_onload"
                          data-client_id="{{ google_client_id }}"
                          data-callback="handleCredentialResponse"
@@ -67,26 +103,9 @@
                          data-shape="rectangular"
                          data-logo_alignment="left">
                     </div>
-                </li>
+                </div>
                 {% endif %}
-                
-                <li class="theme-switcher">
-                    <select class="theme-selector">
-                        <option value="dark">Dark Theme</option>
-                        <option value="light">Light Theme</option>
-                        <option value="glass">Glass Theme</option>
-                        <option value="cyberpunk">Cyberpunk Theme</option>
-                        <option value="ocean">Ocean Theme</option>
-                        <option value="forest">Forest Theme</option>
-                        <option value="sunset">Sunset Theme</option>
-                        <option value="minimal">Minimal Theme</option>
-                    </select>
-                </li>
-            </ul>
-            
-            <button class="mobile-menu-toggle" onclick="window.navigationManager?.toggleMobileMenu()">
-                <i class="fas fa-bars"></i>
-            </button>
+            </div>
         </div>
     </nav>
     

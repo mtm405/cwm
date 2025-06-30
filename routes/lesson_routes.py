@@ -12,12 +12,29 @@ lesson_bp = Blueprint('lesson', __name__)
 @lesson_bp.route('/lessons')
 def lessons():
     """Lessons overview page"""
+    current_app.logger.info("=== LESSONS ROUTE STARTED ===")
     try:
+        current_app.logger.info("Getting config...")
         config = get_config()
+        
+        current_app.logger.info("Getting current user...")
         user = get_current_user()
+        
+        current_app.logger.info("Getting all lessons...")
         lessons_data = get_all_lessons()
+        current_app.logger.info(f"Retrieved {len(lessons_data)} lessons for /lessons route")
+        
+        # Debug: Print first lesson structure
+        if lessons_data:
+            first_lesson = lessons_data[0]
+            current_app.logger.info(f"First lesson: {first_lesson.get('title', 'No title')} with fields: {list(first_lesson.keys())}")
+        else:
+            current_app.logger.warning("No lessons data retrieved!")
+        
+        current_app.logger.info("Getting user progress...")
         user_progress = get_user_progress(user['uid'] if user else 'dev-user-001')
         
+        current_app.logger.info("Enhancing lessons with user progress...")
         # Enhance lessons with user progress
         for lesson in lessons_data:
             lesson_id = lesson['id']
@@ -31,15 +48,23 @@ def lessons():
                 lesson['completed_subtopics'] = 0
                 lesson['progress'] = 0
         
+        current_app.logger.info("Calculating overall progress...")
         # Calculate overall progress
         overall_progress = calculate_overall_progress(user['uid'] if user else 'dev-user-001', user_progress)
         
-        return render_template('lessons.html', 
+        current_app.logger.info(f"Rendering lessons template with {len(lessons_data)} lessons and {overall_progress}% progress")
+        
+        result = render_template('lessons.html', 
                              user=user, 
                              lessons=lessons_data,
                              overall_progress=overall_progress)
+        current_app.logger.info("Template rendered successfully")
+        return result
     except Exception as e:
-        current_app.logger.error(f"Error in lessons route: {str(e)}")
+        current_app.logger.error(f"EXCEPTION in lessons route: {str(e)}")
+        current_app.logger.error(f"Exception type: {type(e)}")
+        import traceback
+        current_app.logger.error(f"Traceback: {traceback.format_exc()}")
         return jsonify({'error': 'Failed to load lessons'}), 500
 
 @lesson_bp.route('/lesson/<lesson_id>')

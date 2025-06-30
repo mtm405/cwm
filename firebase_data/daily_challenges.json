@@ -55,6 +55,26 @@
       ],
       "completed_by": [],
       "created_at": "2025-06-27T00:00:00Z"
+    },
+    
+    "2025-06-30": {
+      "date": "2025-06-30",
+      "title": "Function Decorator Challenge",
+      "description": "Create a decorator function that measures and prints the execution time of any function it decorates.",
+      "difficulty": "medium",
+      "code_template": "import time\n\n# Create your decorator here\ndef timing_decorator(func):\n    # Your code here\n    pass\n\n# Test the decorator\n@timing_decorator\ndef slow_function():\n    time.sleep(1)\n    return \"Task completed\"\n\n# Call the function\nresult = slow_function()\nprint(result)",
+      "solution": "import time\n\ndef timing_decorator(func):\n    def wrapper(*args, **kwargs):\n        start_time = time.time()\n        result = func(*args, **kwargs)\n        end_time = time.time()\n        print(f\"{func.__name__} took {end_time - start_time:.4f} seconds\")\n        return result\n    return wrapper",
+      "expected_output": "slow_function took 1.0xxx seconds\\nTask completed",
+      "xp_reward": 100,
+      "pycoins_reward": 20,
+      "hints": [
+        "Decorators are functions that modify other functions",
+        "Use time.time() to measure execution time",
+        "Don't forget to return the original function's result",
+        "The wrapper function should accept *args and **kwargs"
+      ],
+      "completed_by": [],
+      "created_at": "2025-06-30T00:00:00Z"
     }
   }
 }

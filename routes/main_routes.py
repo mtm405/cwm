@@ -85,11 +85,7 @@ def dashboard():
                          daily_challenge=daily_challenge,
                          recent_activity=recent_activity)
 
-@main_bp.route('/lessons')
-def lessons():
-    """Lessons page"""
-    user = get_current_user()
-    return render_template('lessons.html', user=user)
+# Note: /lessons route moved to lesson_routes.py for better organization
 
 @main_bp.route('/lesson/<lesson_id>')
 def lesson_detail(lesson_id):

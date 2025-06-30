@@ -26,5 +26,36 @@ def get_daily_challenge():
         
         if challenge.exists:
             return challenge.to_dict()
+        else:
+            # If no challenge for today, create a default one
+            default_challenge = {
+                'id': f'daily_{today}',
+                'date': today,
+                'title': 'Daily Python Challenge',
+                'description': 'Practice your Python skills with today\'s coding challenge!',
+                'difficulty': 'medium',
+                'code_template': '# Write your Python code here\n\ndef solve_challenge():\n    # Complete this function\n    pass\n\nprint(solve_challenge())',
+                'xp_reward': 75,
+                'pycoins_reward': 15,
+                'hints': ['Read the problem carefully', 'Test your solution with different inputs', 'Don\'t forget edge cases'],
+                'completed_by': [],
+                'created_at': datetime.now().isoformat()
+            }
+            
+            # Save the default challenge to Firestore
+            try:
+                challenge_ref.set(default_challenge)
+                return default_challenge
+            except Exception as e:
+                print(f"Could not save default challenge: {e}")
+                return default_challenge
     
-    return None
+    # Fallback if no database connection
+    return {
+        'id': f'daily_{today}',
+        'title': 'Daily Python Challenge',
+        'description': 'Practice your Python skills with today\'s coding challenge!',
+        'xp_reward': 75,
+        'coin_reward': 15,
+        'difficulty': 'medium'
+    }
