@@ -585,3 +585,372 @@ document.addEventListener('keydown', function(e) {
         modals.forEach(modal => modal.classList.remove('active'));
     }
 });
+
+// Modern Navigation Manager
+class NavigationManager {
+    constructor() {
+        this.mobileMenuOpen = false;
+        this.dropdownsOpen = new Set();
+        this.init();
+    }
+
+    init() {
+        this.setupMobileMenu();
+        this.setupDropdowns();
+        this.setupKeyboardNavigation();
+        this.setupScrollEffects();
+    }
+
+    setupMobileMenu() {
+        const mobileToggle = document.querySelector('.mobile-menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        
+        if (mobileToggle && navLinks) {
+            mobileToggle.addEventListener('click', () => this.toggleMobileMenu());
+            
+            // Close mobile menu when clicking on a link
+            navLinks.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        this.closeMobileMenu();
+                    }
+                });
+            });
+            
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!navLinks.contains(e.target) && !mobileToggle.contains(e.target)) {
+                    this.closeMobileMenu();
+                }
+            });
+        }
+    }
+
+    toggleMobileMenu() {
+        const navLinks = document.querySelector('.nav-links');
+        const mobileToggle = document.querySelector('.mobile-menu-toggle');
+        
+        this.mobileMenuOpen = !this.mobileMenuOpen;
+        
+        if (navLinks) {
+            navLinks.classList.toggle('mobile-active', this.mobileMenuOpen);
+        }
+        
+        if (mobileToggle) {
+            const icon = mobileToggle.querySelector('i');
+            icon.className = this.mobileMenuOpen ? 'fas fa-times' : 'fas fa-bars';
+        }
+        
+        // Prevent body scroll when mobile menu is open
+        document.body.classList.toggle('mobile-menu-open', this.mobileMenuOpen);
+    }
+
+    closeMobileMenu() {
+        if (this.mobileMenuOpen) {
+            this.toggleMobileMenu();
+        }
+    }
+
+    setupDropdowns() {
+        const dropdowns = document.querySelectorAll('.user-dropdown, .dropdown');
+        
+        dropdowns.forEach(dropdown => {
+            const trigger = dropdown.querySelector('.dropdown-trigger, .user-avatar, .user-name');
+            const menu = dropdown.querySelector('.dropdown-menu');
+            
+            if (trigger && menu) {
+                trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggleDropdown(dropdown);
+                });
+            }
+        });
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', () => {
+            this.closeAllDropdowns();
+        });
+        
+        // Close dropdowns on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.closeAllDropdowns();
+            }
+        });
+    }
+
+    toggleDropdown(dropdown) {
+        const isOpen = this.dropdownsOpen.has(dropdown);
+        
+        if (isOpen) {
+            this.closeDropdown(dropdown);
+        } else {
+            this.closeAllDropdowns(); // Close other dropdowns first
+            this.openDropdown(dropdown);
+        }
+    }
+
+    openDropdown(dropdown) {
+        dropdown.classList.add('active');
+        this.dropdownsOpen.add(dropdown);
+        
+        // Animate dropdown appearance
+        const menu = dropdown.querySelector('.dropdown-menu');
+        if (menu) {
+            menu.style.opacity = '0';
+            menu.style.transform = 'translateY(-10px)';
+            
+            requestAnimationFrame(() => {
+                menu.style.transition = 'all 0.3s ease';
+                menu.style.opacity = '1';
+                menu.style.transform = 'translateY(0)';
+            });
+        }
+    }
+
+    closeDropdown(dropdown) {
+        dropdown.classList.remove('active');
+        this.dropdownsOpen.delete(dropdown);
+        
+        const menu = dropdown.querySelector('.dropdown-menu');
+        if (menu) {
+            menu.style.opacity = '0';
+            menu.style.transform = 'translateY(-10px)';
+        }
+    }
+
+    closeAllDropdowns() {
+        this.dropdownsOpen.forEach(dropdown => {
+            this.closeDropdown(dropdown);
+        });
+    }
+
+    setupKeyboardNavigation() {
+        // Add keyboard navigation for accessibility
+        const navLinks = document.querySelectorAll('.nav-links a');
+        
+        navLinks.forEach((link, index) => {
+            link.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    const nextIndex = (index + 1) % navLinks.length;
+                    navLinks[nextIndex].focus();
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    const prevIndex = (index - 1 + navLinks.length) % navLinks.length;
+                    navLinks[prevIndex].focus();
+                }
+            });
+        });
+    }
+
+    setupScrollEffects() {
+        let lastScrollY = window.scrollY;
+        const navbar = document.querySelector('.navbar');
+        
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+            
+            if (navbar) {
+                // Hide/show navbar on scroll
+                if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                    navbar.style.transform = 'translateY(-100%)';
+                } else {
+                    navbar.style.transform = 'translateY(0)';
+                }
+                
+                // Add backdrop blur effect when scrolled
+                if (currentScrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            }
+            
+            lastScrollY = currentScrollY;
+        });
+    }
+}
+
+// Enhanced Theme Manager
+class ThemeManager {
+    constructor() {
+        this.currentTheme = localStorage.getItem('theme') || 'dark';
+        this.init();
+    }
+
+    init() {
+        this.applyTheme(this.currentTheme);
+        this.setupThemeControls();
+        this.setupSystemThemeDetection();
+    }
+
+    applyTheme(theme) {
+        document.body.className = `theme-${theme}`;
+        this.currentTheme = theme;
+        localStorage.setItem('theme', theme);
+        
+        // Update theme selector
+        const themeSelector = document.querySelector('.theme-switcher select');
+        if (themeSelector) {
+            themeSelector.value = theme;
+        }
+        
+        // Notify other components of theme change
+        document.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme } }));
+        
+        // Update backend
+        this.updateThemeBackend(theme);
+    }
+
+    setupThemeControls() {
+        const themeSelector = document.querySelector('.theme-switcher select');
+        if (themeSelector) {
+            themeSelector.addEventListener('change', (e) => {
+                this.applyTheme(e.target.value);
+            });
+        }
+    }
+
+    setupSystemThemeDetection() {
+        // Detect system theme preference
+        if (window.matchMedia) {
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            
+            mediaQuery.addEventListener('change', (e) => {
+                if (!localStorage.getItem('theme')) {
+                    this.applyTheme(e.matches ? 'dark' : 'light');
+                }
+            });
+        }
+    }
+
+    async updateThemeBackend(theme) {
+        try {
+            await fetch('/api/update-theme', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ theme })
+            });
+        } catch (error) {
+            console.warn('Failed to update theme on backend:', error);
+        }
+    }
+}
+
+// Enhanced Animation Manager
+class AnimationManager {
+    constructor() {
+        this.observedElements = new Set();
+        this.init();
+    }
+
+    init() {
+        this.setupIntersectionObserver();
+        this.setupPageTransitions();
+        this.setupLoadingAnimations();
+    }
+
+    setupIntersectionObserver() {
+        const options = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        this.observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                    this.observer.unobserve(entry.target);
+                }
+            });
+        }, options);
+
+        // Observe elements with animation classes
+        const animatedElements = document.querySelectorAll('.fade-in, .slide-in, .scale-in');
+        animatedElements.forEach(el => {
+            this.observer.observe(el);
+        });
+    }
+
+    setupPageTransitions() {
+        // Add smooth page transitions
+        const links = document.querySelectorAll('a[href^="/"]');
+        
+        links.forEach(link => {
+            link.addEventListener('click', (e) => {
+                if (link.target !== '_blank' && !e.ctrlKey && !e.metaKey) {
+                    e.preventDefault();
+                    this.navigateWithTransition(link.href);
+                }
+            });
+        });
+    }
+
+    navigateWithTransition(url) {
+        // Add page exit animation
+        document.body.classList.add('page-transition');
+        
+        setTimeout(() => {
+            window.location.href = url;
+        }, 300);
+    }
+
+    setupLoadingAnimations() {
+        // Add loading states for dynamic content
+        const buttons = document.querySelectorAll('.btn[data-loading]');
+        
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                this.addLoadingState(button);
+            });
+        });
+    }
+
+    addLoadingState(element) {
+        element.classList.add('loading');
+        element.disabled = true;
+        
+        const originalText = element.textContent;
+        element.textContent = 'Loading...';
+        
+        // Remove loading state after a reasonable time or when operation completes
+        setTimeout(() => {
+            this.removeLoadingState(element, originalText);
+        }, 3000);
+    }
+
+    removeLoadingState(element, originalText) {
+        element.classList.remove('loading');
+        element.disabled = false;
+        element.textContent = originalText;
+    }
+}
+
+// Initialize managers when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize navigation
+    window.navigationManager = new NavigationManager();
+    
+    // Initialize theme management
+    window.themeManager = new ThemeManager();
+    
+    // Initialize animations
+    window.animationManager = new AnimationManager();
+    
+    // Initialize page-specific components
+    const page = document.body.dataset.page;
+    if (page === 'dashboard' && typeof ModernDashboardManager !== 'undefined') {
+        window.dashboardManager = new ModernDashboardManager();
+        window.dashboardManager.init();
+    }
+    
+    // Initialize Google Identity Services if available
+    if (typeof google !== 'undefined') {
+        initGoogleIdentity();
+    }
+    
+    console.log('🚀 Modern UI initialized successfully');
+});

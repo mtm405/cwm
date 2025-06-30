@@ -1,0 +1,128 @@
+{
+  "user_activities": {
+    "activity_001": {
+      "user_id": "dev-user-001",
+      "activity_type": "lesson_completed",
+      "title": "Completed Python Basics",
+      "description": "Successfully finished the Python Basics lesson with a score of 95%",
+      "lesson_id": "python-basics-01",
+      "score": 95,
+      "xp_gained": 50,
+      "pycoins_gained": 10,
+      "timestamp": "2025-06-29T10:30:00Z",
+      "metadata": {
+        "time_spent": 1800,
+        "attempts": 1
+      }
+    },
+    
+    "activity_002": {
+      "user_id": "dev-user-001",
+      "activity_type": "quiz_passed",
+      "title": "Python Basics Quiz - 95%",
+      "description": "Passed the Python Basics quiz with an excellent score",
+      "quiz_id": "python-basics-quiz",
+      "score": 95,
+      "xp_gained": 25,
+      "pycoins_gained": 5,
+      "timestamp": "2025-06-29T10:45:00Z",
+      "metadata": {
+        "questions_correct": 4,
+        "questions_total": 4,
+        "time_spent": 180
+      }
+    },
+    
+    "activity_003": {
+      "user_id": "dev-user-001",
+      "activity_type": "challenge_completed",
+      "title": "Daily Challenge Conquered!",
+      "description": "Completed today's List Comprehension challenge",
+      "challenge_id": "2025-06-29",
+      "xp_gained": 75,
+      "pycoins_gained": 15,
+      "timestamp": "2025-06-29T11:15:00Z",
+      "metadata": {
+        "difficulty": "medium",
+        "attempts": 2,
+        "time_spent": 600
+      }
+    },
+    
+    "activity_004": {
+      "user_id": "dev-user-001",
+      "activity_type": "lesson_completed",
+      "title": "Mastered Variables and Data Types",
+      "description": "Completed the Variables lesson with a good understanding",
+      "lesson_id": "variables-02",
+      "score": 88,
+      "xp_gained": 75,
+      "pycoins_gained": 15,
+      "timestamp": "2025-06-29T11:45:00Z",
+      "metadata": {
+        "time_spent": 1200,
+        "attempts": 2
+      }
+    },
+    
+    "activity_005": {
+      "user_id": "dev-user-001",
+      "activity_type": "achievement_earned",
+      "title": "Quiz Master Achievement!",
+      "description": "Earned the Quiz Master achievement for scoring 90%+ on 3 quizzes",
+      "achievement_id": "quiz_master",
+      "xp_gained": 100,
+      "pycoins_gained": 25,
+      "timestamp": "2025-06-29T11:50:00Z",
+      "metadata": {
+        "achievement_tier": "bronze"
+      }
+    },
+    
+    "activity_006": {
+      "user_id": "dev-user-002",
+      "activity_type": "lesson_completed", 
+      "title": "Started Python Journey",
+      "description": "Completed first Python lesson - Python Basics",
+      "lesson_id": "python-basics-01",
+      "score": 92,
+      "xp_gained": 50,
+      "pycoins_gained": 10,
+      "timestamp": "2025-06-28T14:20:00Z",
+      "metadata": {
+        "time_spent": 2100,
+        "attempts": 1
+      }
+    },
+    
+    "activity_007": {
+      "user_id": "dev-user-002",
+      "activity_type": "lesson_completed",
+      "title": "Variables and Data Types Completed",
+      "description": "Learned about Python variables and different data types",
+      "lesson_id": "variables-02", 
+      "score": 85,
+      "xp_gained": 75,
+      "pycoins_gained": 15,
+      "timestamp": "2025-06-28T16:30:00Z",
+      "metadata": {
+        "time_spent": 1800,
+        "attempts": 3
+      }
+    },
+    
+    "activity_008": {
+      "user_id": "dev-user-002",
+      "activity_type": "achievement_earned",
+      "title": "First Steps Achievement",
+      "description": "Earned the First Steps achievement for completing the first lesson",
+      "achievement_id": "first_lesson",
+      "xp_gained": 50,
+      "pycoins_gained": 10,
+      "timestamp": "2025-06-28T14:25:00Z",
+      "metadata": {
+        "achievement_tier": "starter"
+      }
+    }
+  }
+}

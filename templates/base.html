@@ -7,7 +7,7 @@
     <title>{% block title %}Code with Morais{% endblock %}</title>
     
     <!-- CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -19,7 +19,7 @@
     
     {% block extra_css %}{% endblock %}
 </head>
-<body class="theme-dark">
+<body class="theme-dark" data-page="{% block page_name %}{% endblock %}">
     <!-- Navigation -->
     <nav class="navbar">
         <div class="container nav-container">
@@ -48,7 +48,7 @@
                             {% if user.is_admin %}
                             <a href="/admin"><i class="fas fa-shield-alt"></i> Admin</a>
                             {% endif %}
-                            <button onclick="signOut()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+                            <button onclick="signOut()" class="sign-out-btn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
                         </div>
                     </div>
                 </li>
@@ -71,7 +71,7 @@
                 {% endif %}
                 
                 <li class="theme-switcher">
-                    <select onchange="setTheme(this.value)" class="form-control">
+                    <select class="theme-selector">
                         <option value="dark">Dark Theme</option>
                         <option value="light">Light Theme</option>
                         <option value="glass">Glass Theme</option>
@@ -84,7 +84,7 @@
                 </li>
             </ul>
             
-            <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+            <button class="mobile-menu-toggle" onclick="window.navigationManager?.toggleMobileMenu()">
                 <i class="fas fa-bars"></i>
             </button>
         </div>

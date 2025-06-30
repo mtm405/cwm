@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Users can read/write their own data, and read others for leaderboard
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null; // For leaderboard and user discovery
+    }
+    
+    // Lessons are public read, admin write only
+    match /lessons/{lessonId} {
+      allow read: if true; // Anyone can read lessons
+      allow write: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.is_admin == true;
+    }
+    
+    // Quizzes are public read, admin write only
+    match /quizzes/{quizId} {
+      allow read: if true; // Anyone can read quizzes
+      allow write: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.is_admin == true;
+    }
+    
+    // Daily challenges are public read, admin write only
+    match /daily_challenges/{challengeId} {
+      allow read: if true; // Anyone can read challenges
+      allow write: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.is_admin == true;
+    }
+    
+    // Activities are user-specific - users can only see their own activities
+    match /activities/{activityId} {
+      allow read, write: if request.auth != null && 
+        resource.data.user_id == request.auth.uid;
+      allow create: if request.auth != null && 
+        request.resource.data.user_id == request.auth.uid;
+    }
+    
+    // User achievements are user-specific read, system write
+    match /user_achievements/{achievementId} {
+      allow read: if request.auth != null && 
+        resource.data.user_id == request.auth.uid;
+      allow write: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.is_admin == true;
+    }
+    
+    // Allow reading of global leaderboard data
+    match /leaderboard/{entry} {
+      allow read: if request.auth != null;
+      allow write: if false; // System-generated only
+    }
+  }
+}
+
+

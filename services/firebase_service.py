@@ -307,50 +307,147 @@ class FirebaseService:
             logger.error(f"Error saving quiz {quiz_id}: {str(e)}")
             return False
     
-    def update_user_progress(self, user_id: str, lesson_id: str, progress_data: Dict[str, Any]) -> bool:
-        """Update user's lesson progress"""
+    def get_user_dashboard_data(self, user_id: str) -> Dict[str, Any]:
+        """Get comprehensive user dashboard data."""
         if not self.is_available():
-            logger.warning("Firebase not available for progress update")
-            return False
+            logger.warning("Firebase not available, cannot get user dashboard data")
+            return {}
         
         try:
-            from firebase_admin import firestore
+            user_data = self.get_user(user_id) or {}
             
-            user_ref = self.db.collection('users').document(user_id)
-            
-            # Use dot notation to update nested field
-            update_data = {
-                f'lesson_progress.{lesson_id}': progress_data,
-                'last_activity': firestore.SERVER_TIMESTAMP
-            }
-            
-            user_ref.update(update_data)
-            
-            logger.info(f"Updated progress for user {user_id}, lesson {lesson_id}")
-            return True
+            # Calculate derived values
+            if user_data:
+                user_data['current_streak'] = self._calculate_streak(user_data)
+                user_data['lessons_completed'] = user_data.get('lessons_completed', [])
+                user_data['total_lessons'] = 10  # You can make this dynamic
+                user_data['progress_percentage'] = (len(user_data.get('lessons_completed', [])) / 10) * 100
+                
+            return user_data
             
         except Exception as e:
-            logger.error(f"Error updating user progress: {str(e)}")
-            return False
+            logger.error(f"Error getting user dashboard data: {str(e)}")
+            return {}
+    
+    def _calculate_streak(self, user_data: Dict[str, Any]) -> int:
+        """Calculate user's current learning streak."""
+        try:
+            # Get user's recent activities
+            activities = self.get_user_activities(user_data.get('uid', ''), limit=30)
+            if not activities:
+                return 0
+            
+            from datetime import datetime, timedelta
+            
+            current_date = datetime.now().date()
+            streak = 0
+            check_date = current_date
+            
+            # Group activities by date
+            activity_dates = set()
+            for activity in activities:
+                if activity.get('timestamp'):
+                    # Handle both Firestore timestamp and datetime objects
+                    activity_date = activity['timestamp']
+                    if hasattr(activity_date, 'date'):
+                        activity_dates.add(activity_date.date())
+                    elif isinstance(activity_date, str):
+                        try:
+                            parsed_date = datetime.fromisoformat(activity_date.replace('Z', '+00:00'))
+                            activity_dates.add(parsed_date.date())
+                        except:
+                            continue
+            
+            # Calculate streak
+            while check_date in activity_dates:
+                streak += 1
+                check_date -= timedelta(days=1)
+                
+                # Prevent infinite loops
+                if streak > 365:
+                    break
+            
+            return streak
+            
+        except Exception as e:
+            logger.error(f"Error calculating streak: {str(e)}")
+            return 0
+    
+    def get_user_activities(self, user_id: str, limit: int = 10) -> list:
+        """Get user's recent activities."""
+        if not self.is_available():
+            logger.warning("Firebase not available, cannot get user activities")
+            return []
+        
+        try:
+            activities_ref = self.db.collection('activities')
+            query = activities_ref.where('user_id', '==', user_id).order_by('timestamp', direction=firestore.Query.DESCENDING).limit(limit)
+            
+            activities = []
+            for doc in query.stream():
+                activity_data = doc.to_dict()
+                activity_data['id'] = doc.id
+                activities.append(activity_data)
+            
+            logger.debug(f"Retrieved {len(activities)} activities for user {user_id}")
+            return activities
+            
+        except Exception as e:
+            logger.error(f"Error retrieving user activities: {str(e)}")
+            return []
+    
+    def get_leaderboard(self, limit: int = 10) -> list:
+        """Get global leaderboard."""
+        if not self.is_available():
+            logger.warning("Firebase not available, cannot get leaderboard")
+            return []
+        
+        try:
+            users_ref = self.db.collection('users')
+            query = users_ref.order_by('xp', direction=firestore.Query.DESCENDING).limit(limit)
+            
+            leaderboard = []
+            for doc in query.stream():
+                user_data = doc.to_dict()
+                user_data['uid'] = doc.id
+                # Only include necessary fields for leaderboard
+                leaderboard_entry = {
+                    'uid': user_data.get('uid'),
+                    'username': user_data.get('username', user_data.get('display_name', 'Anonymous')),
+                    'display_name': user_data.get('display_name', user_data.get('username', 'Anonymous')),
+                    'xp': user_data.get('xp', 0),
+                    'level': user_data.get('level', 1),
+                    'profile_picture': user_data.get('profile_picture', '')
+                }
+                leaderboard.append(leaderboard_entry)
+            
+            logger.debug(f"Retrieved leaderboard with {len(leaderboard)} users")
+            return leaderboard
+            
+        except Exception as e:
+            logger.error(f"Error retrieving leaderboard: {str(e)}")
+            return []
     
     def get_daily_challenge(self, date_str: str = None) -> Optional[Dict[str, Any]]:
-        """Get daily challenge for specific date"""
+        """Get daily challenge for a specific date."""
         if not self.is_available():
-            logger.warning("Firebase not available for daily challenge")
+            logger.warning("Firebase not available, cannot get daily challenge")
             return None
         
         try:
-            if not date_str:
-                from datetime import datetime
+            from datetime import datetime
+            
+            if date_str is None:
                 date_str = datetime.now().strftime('%Y-%m-%d')
             
-            challenge_ref = self.db.collection('daily_challenges').document(date_str)
-            challenge_doc = challenge_ref.get()
+            challenges_ref = self.db.collection('daily_challenges')
+            query = challenges_ref.where('date', '==', date_str).limit(1)
             
-            if challenge_doc.exists:
-                challenge_data = challenge_doc.to_dict()
-                challenge_data['id'] = challenge_doc.id
-                logger.debug(f"Retrieved daily challenge for {date_str}")
+            challenges = list(query.stream())
+            if challenges:
+                challenge_data = challenges[0].to_dict()
+                challenge_data['id'] = challenges[0].id
+                logger.debug(f"Found daily challenge for {date_str}")
                 return challenge_data
             else:
                 logger.info(f"No daily challenge found for {date_str}")
@@ -444,11 +541,18 @@ class FirebaseService:
         
         try:
             # Extract user data from Google info
+            full_name = google_user_info.get('name', '')
+            name_parts = full_name.split(' ') if full_name else []
+            first_name = name_parts[0] if name_parts else ''
+            last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else ''
+            
             user_data = {
                 'uid': user_id,
                 'email': google_user_info.get('email'),
                 'username': google_user_info.get('name', '').replace(' ', '').lower() or google_user_info.get('email', '').split('@')[0],
-                'display_name': google_user_info.get('name', ''),
+                'display_name': full_name,
+                'first_name': first_name,
+                'last_name': last_name,
                 'profile_picture': google_user_info.get('picture', ''),
                 'email_verified': google_user_info.get('email_verified', False),
                 'auth_provider': 'google',

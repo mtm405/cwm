@@ -3,10 +3,7 @@ Main routes for Code with Morais
 """
 from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for, current_app
 from models.user import get_current_user, get_user_progress
-from models.activity import get_recent_activity
-from models.challenge import get_daily_challenge
 from models.lesson import get_mock_lessons, calculate_overall_progress
-from services.firebase_service import db
 from config import get_config
 import os
 
@@ -22,7 +19,7 @@ def index():
 
 @main_bp.route('/dashboard')
 def dashboard():
-    """User dashboard"""
+    """User dashboard with Firebase integration"""
     user = get_current_user()
     
     # Redirect to login if no user and not in dev mode
@@ -31,44 +28,56 @@ def dashboard():
     if not user and not config.DEV_MODE:
         return redirect(url_for('main.index'))
     
-    # Ensure we have a valid user object
-    if not user:
-        user = {
+    # Initialize Firebase service
+    from services.firebase_service import FirebaseService
+    firebase_service = FirebaseService(config.FIREBASE_CONFIG if hasattr(config, 'FIREBASE_CONFIG') else {})
+    
+    # Get real user data from Firebase or use fallback
+    if user and firebase_service.is_available():
+        # Get comprehensive user dashboard data from Firebase
+        user_data = firebase_service.get_user_dashboard_data(user['uid'])
+        user.update(user_data)
+        
+        # Get leaderboard from Firebase
+        leaderboard = firebase_service.get_leaderboard(limit=10)
+        
+        # Get daily challenge from Firebase
+        daily_challenge = firebase_service.get_daily_challenge()
+        
+        # Get recent activities from Firebase
+        recent_activity = firebase_service.get_user_activities(user['uid'], limit=10)
+        
+    else:
+        # Enhanced fallback for dev mode or when Firebase is unavailable
+        user = user or {
             'uid': 'guest',
             'username': 'Guest Student',
             'display_name': 'Guest Student',
+            'first_name': 'Guest',
+            'last_name': 'Student',
             'email': '',
             'xp': 0,
-            'pycoins': 0,
+            'pycoins': 100,
             'level': 1,
             'streak': 0,
             'is_admin': False,
-            'profile_picture': ''
+            'profile_picture': '',
+            'completed_lessons': [],
+            'lesson_progress': {},
+            'fallback_mode': True
         }
-    
-    # Get leaderboard data
-    if config.DEV_MODE:
+        
+        # Mock data for development
         leaderboard = [
-            {'username': 'DevUser', 'xp': 1500},
-            {'username': 'AlexPython', 'xp': 1200},
-            {'username': 'CodeMaster', 'xp': 1000},
-            {'username': 'PyNinja', 'xp': 850},
-            {'username': 'ScriptKid', 'xp': 750}
+            {'username': 'DevUser', 'xp': 1500, 'level': 15},
+            {'username': 'AlexPython', 'xp': 1200, 'level': 12},
+            {'username': 'CodeMaster', 'xp': 1000, 'level': 10},
+            {'username': 'PyNinja', 'xp': 850, 'level': 8},
+            {'username': 'ScriptKid', 'xp': 750, 'level': 7}
         ]
-    else:
-        if db:
-            from firebase_admin import firestore
-            users_ref = db.collection('users').order_by('xp', direction=firestore.Query.DESCENDING).limit(10)
-            leaderboard = [{'username': u.to_dict().get('username'), 'xp': u.to_dict().get('xp', 0)} 
-                          for u in users_ref.stream()]
-        else:
-            leaderboard = []
-    
-    # Get daily challenge
-    daily_challenge = get_daily_challenge()
-    
-    # Get recent activity
-    recent_activity = get_recent_activity(user['uid'] if user else 'dev-user-001')
+        
+        daily_challenge = firebase_service.get_daily_challenge()
+        recent_activity = firebase_service.get_user_activities(user['uid'], limit=10)
     
     return render_template('dashboard.html', 
                          user=user, 

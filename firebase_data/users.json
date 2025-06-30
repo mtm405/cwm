@@ -1,0 +1,141 @@
+{
+  "users": {
+    "dev-user-001": {
+      "uid": "dev-user-001",
+      "email": "student@codewithmorais.com",
+      "username": "pythonlearner2025",
+      "display_name": "João Silva",
+      "first_name": "João",
+      "last_name": "Silva",
+      "profile_picture": "",
+      "auth_provider": "google",
+      
+      "xp": 1250,
+      "level": 12,
+      "pycoins": 350,
+      "streak": 7,
+      "total_time_spent": 18000,
+      
+      "lesson_progress": {
+        "python-basics-01": {
+          "completed": true,
+          "score": 95,
+          "time_spent": 1800,
+          "completed_at": "2025-06-29T10:30:00Z",
+          "attempts": 1
+        },
+        "variables-02": {
+          "completed": true,
+          "score": 88,
+          "time_spent": 1200,
+          "completed_at": "2025-06-29T11:45:00Z",
+          "attempts": 2
+        },
+        "functions-03": {
+          "completed": false,
+          "score": 0,
+          "time_spent": 300,
+          "last_accessed": "2025-06-29T12:00:00Z",
+          "attempts": 0
+        }
+      },
+      
+      "quiz_scores": {
+        "python-basics-quiz": 95,
+        "variables-quiz": 88
+      },
+      
+      "achievements": [
+        {
+          "id": "first_lesson",
+          "title": "First Steps",
+          "description": "Completed your first lesson",
+          "earned_at": "2025-06-29T10:30:00Z",
+          "xp_reward": 50
+        },
+        {
+          "id": "quiz_master",
+          "title": "Quiz Master",
+          "description": "Scored 90% or higher on 3 quizzes",
+          "earned_at": "2025-06-29T11:45:00Z",
+          "xp_reward": 100
+        }
+      ],
+      
+      "settings": {
+        "theme": "dark",
+        "notifications": true,
+        "language": "en",
+        "preferred_difficulty": "intermediate"
+      },
+      
+      "is_admin": false,
+      "last_challenge_date": "2025-06-29",
+      "created_at": "2025-06-15T08:00:00Z",
+      "updated_at": "2025-06-29T12:00:00Z",
+      "last_login": "2025-06-29T12:00:00Z"
+    },
+    
+    "dev-user-002": {
+      "uid": "dev-user-002", 
+      "email": "maria@codewithmorais.com",
+      "username": "mariapython",
+      "display_name": "Maria Santos",
+      "first_name": "Maria",
+      "last_name": "Santos",
+      "profile_picture": "",
+      "auth_provider": "google",
+      
+      "xp": 850,
+      "level": 9,
+      "pycoins": 200,
+      "streak": 3,
+      "total_time_spent": 12000,
+      
+      "lesson_progress": {
+        "python-basics-01": {
+          "completed": true,
+          "score": 92,
+          "time_spent": 2100,
+          "completed_at": "2025-06-28T14:20:00Z",
+          "attempts": 1
+        },
+        "variables-02": {
+          "completed": true,
+          "score": 85,
+          "time_spent": 1800,
+          "completed_at": "2025-06-28T16:30:00Z",
+          "attempts": 3
+        }
+      },
+      
+      "quiz_scores": {
+        "python-basics-quiz": 92,
+        "variables-quiz": 85
+      },
+      
+      "achievements": [
+        {
+          "id": "first_lesson",
+          "title": "First Steps", 
+          "description": "Completed your first lesson",
+          "earned_at": "2025-06-28T14:20:00Z",
+          "xp_reward": 50
+        }
+      ],
+      
+      "settings": {
+        "theme": "light",
+        "notifications": true,
+        "language": "en",
+        "preferred_difficulty": "beginner"
+      },
+      
+      "is_admin": false,
+      "last_challenge_date": "2025-06-28",
+      "created_at": "2025-06-20T10:00:00Z",
+      "updated_at": "2025-06-28T16:30:00Z",
+      "last_login": "2025-06-28T16:30:00Z"
+    }
+  }
+}

@@ -1,91 +1,455 @@
 {% extends "base.html" %}
 
+{% block page_name %}dashboard{% endblock %}
+
 {% block title %}Dashboard - Code with Morais{% endblock %}
 
 {% block sidebar %}
-<aside class="sidebar">
-    <ul class="sidebar-menu">
-        <li><a href="#overview" class="active"><i class="fas fa-chart-line"></i> Overview</a></li>
-        <li><a href="#daily-challenge"><i class="fas fa-calendar-day"></i> Daily Challenge</a></li>
-        <li><a href="#leaderboard"><i class="fas fa-trophy"></i> Leaderboard</a></li>
-        <li><a href="#activity"><i class="fas fa-stream"></i> Activity Feed</a></li>
-        <li><a href="#progress"><i class="fas fa-tasks"></i> Exam Progress</a></li>
-        <li><a href="/lessons"><i class="fas fa-book"></i> All Lessons</a></li>
-    </ul>
-</aside>
+<!-- Sidebar removed for modern full-width layout -->
 {% endblock %}
 
 {% block content %}
 <div class="dashboard-container">
-    <h1>Welcome back, {{ user.username }}!</h1>
-    
-    <!-- Stats Overview -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-value" id="user-xp">{{ user.xp }}</div>
-            <div class="stat-label">Total XP</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value" id="user-coins">{{ user.pycoins }}</div>
-            <div class="stat-label">PyCoins</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">{{ user.level }}</div>
-            <div class="stat-label">Level</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">{{ user.streak }}</div>
-            <div class="stat-label">Day Streak 🔥</div>
-        </div>
-    </div>
-    
-    <!-- Current Progress Section -->
-    <section class="card">
-        <h2><i class="fas fa-graduation-cap"></i> Your Learning Journey</h2>
-        <div class="progress-overview">
-            <div class="current-lesson">
-                <h3>Continue Learning</h3>
-                <p>Ready for your next Python adventure?</p>
+    <!-- Modern Header with Navigation Tabs -->
+    <header class="modern-dashboard-header">
+        <div class="header-content">
+            <div class="welcome-section">
+                <h1 id="welcome-message">Welcome back, Student! 🚀</h1>
+                <p class="dashboard-subtitle">Ready to continue your Python journey?</p>
+            </div>
+            
+            <div class="header-actions">
+                <button class="refresh-dashboard btn btn-ghost" title="Refresh Dashboard">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
                 <a href="/lessons" class="btn btn-primary">
-                    <i class="fas fa-play"></i> Continue Lessons
+                    <i class="fas fa-book"></i> Continue Learning
                 </a>
             </div>
-            <div class="progress-stats">
-                <div class="progress-item">
-                    <span class="progress-label">Lessons Completed</span>
-                    <span class="progress-value">{{ user.completed_lessons|length }}/10</span>
-                </div>
-                <div class="progress-item">
-                    <span class="progress-label">Next Milestone</span>
-                    <span class="progress-value">Level {{ user.level + 1 }}</span>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Daily Challenge -->
-    <section id="daily-challenge" class="card">
-        <div class="card-header">
-            <h2><i class="fas fa-calendar-day"></i> Daily Challenge</h2>
-            <span class="timer">Time left: <span id="daily-timer">23h 45m</span></span>
         </div>
         
-        {% if daily_challenge %}
-        <div class="challenge-content">
-            <h3>{{ daily_challenge.title }}</h3>
-            <p>{{ daily_challenge.description }}</p>
-            <div class="challenge-rewards">
-                <span><i class="fas fa-star"></i> +{{ daily_challenge.xp_reward }} XP</span>
-                <span><i class="fas fa-coins"></i> +{{ daily_challenge.coin_reward }} PyCoins</span>
-                <span class="difficulty difficulty-{{ daily_challenge.difficulty }}">{{ daily_challenge.difficulty|title }}</span>
-            </div>
-            <button class="btn btn-primary" onclick="startDailyChallenge()">
-                Start Challenge
+        <!-- Quick Navigation Tabs -->
+        <nav class="dashboard-nav">
+            <button class="nav-tab active" data-tab="overview">
+                <i class="fas fa-chart-line"></i> Overview
             </button>
+            <button class="nav-tab" data-tab="challenge">
+                <i class="fas fa-calendar-day"></i> Daily Challenge
+            </button>
+            <button class="nav-tab" data-tab="leaderboard">
+                <i class="fas fa-trophy"></i> Leaderboard
+            </button>
+            <button class="nav-tab" data-tab="activity">
+                <i class="fas fa-stream"></i> Activity
+            </button>
+        </nav>
+    </header>
+    
+    <!-- Tab Content Sections -->
+    <div class="tab-content">
+        
+        <!-- Overview Tab -->
+        <div class="tab-pane active" id="overview-tab">
+            <!-- Modern Stats Cards -->
+            <section class="stats-section">
+                <div class="stats-grid-modern">
+                    <div class="stat-card-modern primary" data-stat="xp">
+                        <div class="stat-header">
+                            <i class="stat-icon fas fa-star"></i>
+                            <span class="stat-trend">+25%</span>
+                        </div>
+                        <div class="stat-body">
+                            <span class="stat-value-large">{{ user.get('xp', 0) }}</span>
+                            <span class="stat-label">Total XP</span>
+                        </div>
+                        <div class="stat-progress">
+                            <div class="progress-bar-mini">
+                                <div class="progress-fill-mini" style="width: 75%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card-modern success" data-stat="pycoins">
+                        <div class="stat-header">
+                            <i class="stat-icon fas fa-coins"></i>
+                            <span class="stat-trend">+12</span>
+                        </div>
+                        <div class="stat-body">
+                            <span class="stat-value-large">{{ user.get('pycoins', 0) }}</span>
+                            <span class="stat-label">PyCoins</span>
+                        </div>
+                        <div class="stat-progress">
+                            <div class="progress-bar-mini">
+                                <div class="progress-fill-mini" style="width: 60%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card-modern warning" data-stat="level">
+                        <div class="stat-header">
+                            <i class="stat-icon fas fa-trophy"></i>
+                            <span class="stat-trend">Level Up!</span>
+                        </div>
+                        <div class="stat-body">
+                            <span class="stat-value-large">{{ user.get('level', 1) }}</span>
+                            <span class="stat-label">Current Level</span>
+                        </div>
+                        <div class="stat-progress">
+                            <div class="progress-bar-mini">
+                                <div class="progress-fill-mini" style="width: 85%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card-modern info" data-stat="streak">
+                        <div class="stat-header">
+                            <i class="stat-icon fas fa-fire"></i>
+                            <span class="stat-trend">🔥 Hot!</span>
+                        </div>
+                        <div class="stat-body">
+                            <span class="stat-value-large">{{ user.get('streak', 0) }}</span>
+                            <span class="stat-label">Day Streak</span>
+                        </div>
+                        <div class="stat-progress">
+                            <div class="progress-bar-mini">
+                                <div class="progress-fill-mini" style="width: 90%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Learning Path Dashboard -->
+            <section class="learning-dashboard">
+                <div class="dashboard-grid">
+                    <!-- Continue Learning Card -->
+                    <div class="dashboard-card featured">
+                        <div class="card-header-modern">
+                            <h3><i class="fas fa-play-circle"></i> Continue Learning</h3>
+                            <span class="card-status">Ready</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="lesson-preview">
+                                <div class="lesson-thumbnail">
+                                    <i class="fas fa-python"></i>
+                                </div>
+                                <div class="lesson-info">
+                                    <h4>Python Fundamentals</h4>
+                                    <p>Next: Variables and Data Types</p>
+                                    <div class="lesson-progress-modern">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: {{ ((user.get('lessons_completed', [])|length / 10) * 100)|round }}%"></div>
+                                        </div>
+                                        <span class="progress-text">{{ user.get('lessons_completed', [])|length }}/10 completed</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="/lessons" class="btn btn-primary btn-block">
+                                <i class="fas fa-arrow-right"></i> Continue Journey
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Stats Card -->
+                    <div class="dashboard-card">
+                        <div class="card-header-modern">
+                            <h3><i class="fas fa-chart-line"></i> Your Progress</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="progress-stats-modern">
+                                <div class="progress-item-modern">
+                                    <div class="progress-icon">
+                                        <i class="fas fa-graduation-cap"></i>
+                                    </div>
+                                    <div class="progress-details">
+                                        <span class="progress-label">Lessons</span>
+                                        <span class="progress-value">{{ user.get('lessons_completed', [])|length }}/10</span>
+                                    </div>
+                                </div>
+                                <div class="progress-item-modern">
+                                    <div class="progress-icon">
+                                        <i class="fas fa-trophy"></i>
+                                    </div>
+                                    <div class="progress-details">
+                                        <span class="progress-label">Next Level</span>
+                                        <span class="progress-value">{{ (user.get('level', 1)|int) + 1 }}</span>
+                                    </div>
+                                </div>
+                                <div class="progress-item-modern">
+                                    <div class="progress-icon">
+                                        <i class="fas fa-target"></i>
+                                    </div>
+                                    <div class="progress-details">
+                                        <span class="progress-label">XP Needed</span>
+                                        {% set xp_needed = ((user.get('level', 1)|int + 1) * 100) - user.get('xp', 0)|int %}
+                                        <span class="progress-value">{{ xp_needed if xp_needed > 0 else 0 }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Activity Card -->
+                    <div class="dashboard-card">
+                        <div class="card-header-modern">
+                            <h3><i class="fas fa-clock"></i> Recent Activity</h3>
+                            <button class="btn btn-ghost btn-sm">View All</button>
+                        </div>
+                        <div class="card-content">
+                            <div class="activity-feed-compact">
+                                <div class="activity-item">
+                                    <div class="activity-icon success">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div class="activity-details">
+                                        <p>Completed: Python Basics</p>
+                                        <span class="activity-time">2 hours ago</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon primary">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <div class="activity-details">
+                                        <p>Earned 50 XP</p>
+                                        <span class="activity-time">3 hours ago</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon warning">
+                                        <i class="fas fa-fire"></i>
+                                    </div>
+                                    <div class="activity-details">
+                                        <p>5-day streak!</p>
+                                        <span class="activity-time">Yesterday</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
-        {% else %}
-        <p>No daily challenge available today. Check back tomorrow!</p>
-        {% endif %}
+        
+        <!-- Challenge Tab -->
+        <div class="tab-pane" id="challenge-tab">
+            <section class="challenge-section">
+                <div class="challenge-card-modern">
+                    {% if daily_challenge %}
+                    <div class="challenge-header">
+                        <div class="challenge-title">
+                            <h2><i class="fas fa-calendar-day"></i> {{ daily_challenge.title }}</h2>
+                            <div class="challenge-timer">
+                                <i class="fas fa-clock"></i>
+                                <span>Time left: <span id="daily-timer">23h 45m</span></span>
+                            </div>
+                        </div>
+                        <div class="challenge-difficulty difficulty-{{ daily_challenge.difficulty }}">
+                            <i class="fas fa-signal"></i>
+                            {{ daily_challenge.difficulty|title }}
+                        </div>
+                    </div>
+                    
+                    <div class="challenge-content">
+                        <p class="challenge-description">{{ daily_challenge.description }}</p>
+                        
+                        <div class="challenge-rewards-modern">
+                            <div class="reward-card">
+                                <i class="fas fa-star"></i>
+                                <span class="reward-value">+{{ daily_challenge.xp_reward }}</span>
+                                <span class="reward-label">XP</span>
+                            </div>
+                            <div class="reward-card">
+                                <i class="fas fa-coins"></i>
+                                <span class="reward-value">+{{ daily_challenge.coin_reward }}</span>
+                                <span class="reward-label">PyCoins</span>
+                            </div>
+                        </div>
+                        
+                        <div class="challenge-actions-modern">
+                            <button class="btn btn-primary btn-lg" data-challenge-id="{{ daily_challenge.id }}">
+                                <i class="fas fa-play"></i> Start Challenge
+                            </button>
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-eye"></i> Preview
+                            </button>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="no-challenge-modern">
+                        <div class="no-challenge-icon">
+                            <i class="fas fa-calendar-times"></i>
+                        </div>
+                        <h3>No Challenge Today</h3>
+                        <p>Check back tomorrow for a new coding challenge!</p>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-history"></i> View Previous Challenges
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+        
+        <!-- Leaderboard Tab -->
+        <div class="tab-pane" id="leaderboard-tab">
+            <section class="leaderboard-section">
+                <div class="leaderboard-card-modern">
+                    <div class="leaderboard-header">
+                        <h2><i class="fas fa-trophy"></i> Global Leaderboard</h2>
+                        <div class="leaderboard-controls">
+                            <select class="filter-select">
+                                <option value="all">All Time</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="leaderboard-modern">
+                        {% for user_entry in leaderboard %}
+                        <div class="leaderboard-item-modern {% if user_entry.username == user.get('username') %}current-user{% endif %}">
+                            <div class="leaderboard-rank">
+                                {% if loop.index <= 3 %}
+                                    <i class="fas fa-trophy rank-{{ loop.index }}"></i>
+                                {% else %}
+                                    <span class="rank-number">{{ loop.index }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="leaderboard-avatar">
+                                <img src="{{ user_entry.profile_picture or '/static/img/default-avatar.png' }}" alt="Avatar">
+                                {% if user_entry.username == user.get('username') %}
+                                <span class="you-badge">YOU</span>
+                                {% endif %}
+                            </div>
+                            <div class="leaderboard-info">
+                                <span class="username">{{ user_entry.username }}</span>
+                                <span class="level">Level {{ user_entry.level }}</span>
+                            </div>
+                            <div class="leaderboard-stats">
+                                <span class="xp-value">{{ user_entry.xp }} XP</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Activity Tab -->
+        <div class="tab-pane" id="activity-tab">
+            <section class="activity-section">
+                <div class="activity-card-modern">
+                    <div class="activity-header">
+                        <h2><i class="fas fa-stream"></i> Recent Activity</h2>
+                        <div class="activity-controls">
+                            <button class="btn btn-secondary btn-sm">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-feed-modern">
+                        <div class="activity-item-large">
+                            <div class="activity-icon-large success">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h4>Lesson Completed</h4>
+                                <p>You completed "Python Basics: Variables"</p>
+                                <div class="activity-rewards">
+                                    <span class="reward-badge">+50 XP</span>
+                                    <span class="reward-badge">+10 PyCoins</span>
+                                </div>
+                                <span class="activity-time">2 hours ago</span>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item-large">
+                            <div class="activity-icon-large primary">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h4>Achievement Unlocked</h4>
+                                <p>First Steps - Complete your first lesson</p>
+                                <div class="activity-rewards">
+                                    <span class="reward-badge special">🏆 Achievement</span>
+                                </div>
+                                <span class="activity-time">3 hours ago</span>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item-large">
+                            <div class="activity-icon-large warning">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h4>Streak Milestone</h4>
+                                <p>You've maintained a 5-day learning streak!</p>
+                                <div class="activity-rewards">
+                                    <span class="reward-badge">+25 XP</span>
+                                </div>
+                                <span class="activity-time">Yesterday</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+    </div> <!-- End of tab-content -->
+    
+</div> <!-- End of dashboard-container -->
+        <div class="card-header">
+            <h2><i class="fas fa-calendar-day"></i> Daily Challenge</h2>
+            <div class="challenge-timer">
+                <i class="fas fa-clock"></i>
+                <span>Time left: <span id="daily-timer" data-target="23:59:59">23h 45m</span></span>
+            </div>
+        </div>
+        
+        <div class="challenge-content" id="challenge-content">
+            {% if daily_challenge %}
+            <div class="challenge-info">
+                <h3>{{ daily_challenge.title }}</h3>
+                <p class="challenge-description">{{ daily_challenge.description }}</p>
+                
+                <div class="challenge-rewards">
+                    <div class="reward-item">
+                        <i class="fas fa-star"></i>
+                        <span>+{{ daily_challenge.xp_reward }} XP</span>
+                    </div>
+                    <div class="reward-item">
+                        <i class="fas fa-coins"></i>
+                        <span>+{{ daily_challenge.coin_reward }} PyCoins</span>
+                    </div>
+                    <div class="difficulty-badge difficulty-{{ daily_challenge.difficulty }}">
+                        <i class="fas fa-signal"></i>
+                        {{ daily_challenge.difficulty|title }}
+                    </div>
+                </div>
+                
+                <div class="challenge-actions">
+                    <button class="btn btn-primary challenge-start-btn" 
+                            data-challenge-id="{{ daily_challenge.id }}">
+                        <i class="fas fa-play"></i> Start Challenge
+                    </button>
+                    <button class="btn btn-secondary" onclick="previewChallenge()">
+                        <i class="fas fa-eye"></i> Preview
+                    </button>
+                </div>
+            </div>
+            {% else %}
+            <div class="no-challenge">
+                <i class="fas fa-calendar-times"></i>
+                <h3>No Challenge Today</h3>
+                <p>Check back tomorrow for a new coding challenge!</p>
+                <button class="btn btn-secondary" onclick="loadPreviousChallenges()">
+                    <i class="fas fa-history"></i> View Previous Challenges
+                </button>
+            </div>
+            {% endif %}
+        </div>
     </section>
     
     <!-- Two Column Layout -->
@@ -99,7 +463,7 @@
                     <span class="leaderboard-rank">{{ loop.index }}</span>
                     <div class="leaderboard-user">
                         <strong>{{ user_entry.username }}</strong>
-                        {% if user_entry.username == user.username %}
+                        {% if user_entry.username == user.get('username') %}
                         <span class="you-badge">You!</span>
                         {% endif %}
                     </div>
@@ -495,10 +859,15 @@ class DashboardManager {
                 this.updateStatWithAnimation('user-xp', data.user.xp);
                 this.updateStatWithAnimation('user-coins', data.user.pycoins);
                 
-                // Update welcome message if user data available
-                const welcomeMsg = document.querySelector('.dashboard-container h1');
-                if (welcomeMsg && data.user.username) {
-                    welcomeMsg.textContent = `Welcome back, ${data.user.username}!`;
+                // Update welcome message with time-based greeting and first name
+                const welcomeMsg = document.getElementById('welcome-message');
+                if (welcomeMsg && data.user) {
+                    const firstName = data.user.first_name || 
+                                    (data.user.display_name && data.user.display_name.split(' ')[0]) || 
+                                    data.user.username || 'Student';
+                    
+                    const greeting = this.getTimeBasedGreeting();
+                    welcomeMsg.innerHTML = `${greeting}, ${firstName}! 🚀`;
                 }
                 
                 // Update progress information
@@ -518,9 +887,29 @@ class DashboardManager {
                 }
             } else if (data.guest_mode) {
                 console.log('Guest mode active');
+                // Set guest greeting
+                const welcomeMsg = document.getElementById('welcome-message');
+                if (welcomeMsg) {
+                    const greeting = this.getTimeBasedGreeting();
+                    welcomeMsg.innerHTML = `${greeting}, Guest! 🚀`;
+                }
             }
         } catch (error) {
             console.error('Error loading dashboard stats:', error);
+        }
+    }
+    
+    getTimeBasedGreeting() {
+        const hour = new Date().getHours();
+        
+        if (hour >= 5 && hour < 12) {
+            return 'Good morning';
+        } else if (hour >= 12 && hour < 17) {
+            return 'Good afternoon';
+        } else if (hour >= 17 && hour < 22) {
+            return 'Good evening';
+        } else {
+            return 'Good night';
         }
     }
     
@@ -859,4 +1248,5 @@ document.addEventListener('DOMContentLoaded', () => {
     loadExamObjectives();
 });
 </script>
+<script src="{{ url_for('static', filename='js/dashboard-modern.js') }}"></script>
 {% endblock %}

@@ -1,0 +1,125 @@
+{
+  "lessons": {
+    "python-basics-01": {
+      "id": "python-basics-01",
+      "title": "Python Basics: Getting Started",
+      "description": "Learn the fundamentals of Python programming language. This introductory lesson covers variables, basic syntax, and your first Python program.",
+      "content": "# Python Basics: Getting Started\n\nWelcome to your first Python lesson! In this lesson, you'll learn the fundamentals of Python programming.\n\n## What is Python?\n\nPython is a high-level, interpreted programming language known for its simplicity and readability. It's perfect for beginners and powerful enough for advanced applications.\n\n## Your First Python Program\n\nLet's start with the traditional \"Hello, World!\" program:\n\n```python\nprint(\"Hello, World!\")\n```\n\n## Variables\n\nVariables are containers for storing data values:\n\n```python\nname = \"João\"\nage = 16\nprint(f\"Hello, my name is {name} and I am {age} years old.\")\n```\n\n## Basic Data Types\n\n- **Strings**: Text data (`\"Hello\"`)\n- **Integers**: Whole numbers (`42`)\n- **Floats**: Decimal numbers (`3.14`)\n- **Booleans**: True or False values\n\n## Practice Exercise\n\nCreate a variable with your name and print a greeting message.",
+      "order": 1,
+      "difficulty": "beginner",
+      "estimated_time": 30,
+      "prerequisites": [],
+      "tags": ["basics", "syntax", "introduction", "variables"],
+      
+      "xp_reward": 50,
+      "pycoins_reward": 10,
+      
+      "code_examples": [
+        {
+          "title": "Hello World",
+          "code": "print(\"Hello, World!\")",
+          "explanation": "This prints a greeting message to the console."
+        },
+        {
+          "title": "Variables",
+          "code": "name = \"Student\"\nprint(f\"Welcome, {name}!\")",
+          "explanation": "This creates a variable and uses it in a formatted string."
+        }
+      ],
+      
+      "exercises": [
+        {
+          "title": "Create Your Greeting",
+          "description": "Create a variable with your name and print a personalized greeting.",
+          "starter_code": "# Your code here\nname = \nprint()",
+          "solution": "name = \"Your Name\"\nprint(f\"Hello, {name}!\")",
+          "hints": ["Use quotes for string values", "Use f-strings for formatting"]
+        }
+      ],
+      
+      "quiz_id": "python-basics-quiz",
+      
+      "created_at": "2025-06-15T08:00:00Z",
+      "updated_at": "2025-06-29T12:00:00Z",
+      "is_published": true
+    },
+    
+    "variables-02": {
+      "id": "variables-02",
+      "title": "Variables and Data Types",
+      "description": "Deep dive into Python variables, data types, and how to work with different kinds of data in your programs.",
+      "content": "# Variables and Data Types\n\nNow that you've learned the basics, let's explore variables and data types in more detail.\n\n## Understanding Variables\n\nThink of variables as labeled boxes that store information:\n\n```python\nstudent_name = \"Maria\"\nstudent_age = 17\nstudent_grade = 95.5\nis_passing = True\n```\n\n## String Operations\n\nStrings have many useful methods:\n\n```python\nmessage = \"Hello, Python!\"\nprint(message.upper())  # HELLO, PYTHON!\nprint(message.lower())  # hello, python!\nprint(len(message))     # 14\n```\n\n## Number Operations\n\n```python\nx = 10\ny = 3\n\nprint(x + y)   # Addition: 13\nprint(x - y)   # Subtraction: 7\nprint(x * y)   # Multiplication: 30\nprint(x / y)   # Division: 3.333...\nprint(x // y)  # Floor division: 3\nprint(x % y)   # Modulo: 1\nprint(x ** y)  # Exponentiation: 1000\n```\n\n## Type Conversion\n\n```python\n# Convert between types\nage_str = \"17\"\nage_int = int(age_str)\nage_float = float(age_str)\n\nprint(f\"String: {age_str}, Integer: {age_int}, Float: {age_float}\")\n```",
+      "order": 2,
+      "difficulty": "beginner",
+      "estimated_time": 45,
+      "prerequisites": ["python-basics-01"],
+      "tags": ["variables", "data types", "strings", "numbers"],
+      
+      "xp_reward": 75,
+      "pycoins_reward": 15,
+      
+      "code_examples": [
+        {
+          "title": "String Methods",
+          "code": "text = \"Python Programming\"\nprint(text.upper())\nprint(text.count('P'))",
+          "explanation": "Demonstrates common string methods for text manipulation."
+        }
+      ],
+      
+      "exercises": [
+        {
+          "title": "Calculator",
+          "description": "Create a simple calculator that performs basic arithmetic operations.",
+          "starter_code": "# Create variables for two numbers\nnum1 = \nnum2 = \n\n# Perform calculations\nsum_result = \nproduct = ",
+          "solution": "num1 = 15\nnum2 = 4\n\nsum_result = num1 + num2\nproduct = num1 * num2\n\nprint(f\"Sum: {sum_result}\")\nprint(f\"Product: {product}\")",
+          "hints": ["Use meaningful variable names", "Don't forget to print the results"]
+        }
+      ],
+      
+      "quiz_id": "variables-quiz",
+      
+      "created_at": "2025-06-15T08:30:00Z",
+      "updated_at": "2025-06-29T12:00:00Z",
+      "is_published": true
+    },
+    
+    "functions-03": {
+      "id": "functions-03",
+      "title": "Functions and Code Reusability",
+      "description": "Learn how to create and use functions to make your code more organized, reusable, and maintainable.",
+      "content": "# Functions and Code Reusability\n\nFunctions are reusable blocks of code that perform specific tasks. They help organize your code and avoid repetition.\n\n## Creating Functions\n\n```python\ndef greet_student(name):\n    \"\"\"Function to greet a student\"\"\"\n    return f\"Hello, {name}! Ready to code?\"\n\n# Call the function\nmessage = greet_student(\"Ana\")\nprint(message)\n```\n\n## Function Parameters\n\n```python\ndef calculate_grade(points, total_points):\n    \"\"\"Calculate percentage grade\"\"\"\n    percentage = (points / total_points) * 100\n    return round(percentage, 2)\n\n# Usage\nstudent_grade = calculate_grade(85, 100)\nprint(f\"Grade: {student_grade}%\")\n```\n\n## Default Parameters\n\n```python\ndef introduce_student(name, age=16, subject=\"Python\"):\n    return f\"{name} is {age} years old and loves {subject}!\"\n\nprint(introduce_student(\"Carlos\"))\nprint(introduce_student(\"Sofia\", 17, \"Mathematics\"))\n```\n\n## Return Values\n\n```python\ndef get_user_info():\n    name = input(\"Enter your name: \")\n    age = int(input(\"Enter your age: \"))\n    return name, age  # Return multiple values\n\nuser_name, user_age = get_user_info()\nprint(f\"Welcome, {user_name}!\")\n```",
+      "order": 3,
+      "difficulty": "intermediate",
+      "estimated_time": 60,
+      "prerequisites": ["python-basics-01", "variables-02"],
+      "tags": ["functions", "parameters", "return", "code organization"],
+      
+      "xp_reward": 100,
+      "pycoins_reward": 20,
+      
+      "code_examples": [
+        {
+          "title": "Simple Function",
+          "code": "def add_numbers(a, b):\n    return a + b\n\nresult = add_numbers(5, 3)\nprint(result)",
+          "explanation": "A basic function that takes two parameters and returns their sum."
+        }
+      ],
+      
+      "exercises": [
+        {
+          "title": "Student Grade Calculator",
+          "description": "Create a function that calculates and categorizes student grades.",
+          "starter_code": "def calculate_letter_grade(percentage):\n    # Your code here\n    pass\n\n# Test your function\nprint(calculate_letter_grade(85))",
+          "solution": "def calculate_letter_grade(percentage):\n    if percentage >= 90:\n        return 'A'\n    elif percentage >= 80:\n        return 'B'\n    elif percentage >= 70:\n        return 'C'\n    elif percentage >= 60:\n        return 'D'\n    else:\n        return 'F'\n\nprint(calculate_letter_grade(85))  # Should print 'B'",
+          "hints": ["Use if-elif-else statements", "Consider the grade boundaries"]
+        }
+      ],
+      
+      "quiz_id": "functions-quiz",
+      
+      "created_at": "2025-06-15T09:00:00Z",
+      "updated_at": "2025-06-29T12:00:00Z",
+      "is_published": true
+    }
+  }
+}

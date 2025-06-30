@@ -1,0 +1,60 @@
+{
+  "daily_challenges": {
+    "2025-06-29": {
+      "date": "2025-06-29",
+      "title": "List Comprehension Challenge",
+      "description": "Create a list comprehension that filters even numbers from 1 to 20 and squares them.",
+      "difficulty": "medium",
+      "code_template": "# Create a list of numbers from 1 to 20\nnumbers = list(range(1, 21))\n\n# Your list comprehension here\neven_squares = # Complete this line\n\nprint(even_squares)",
+      "solution": "[x**2 for x in range(1, 21) if x % 2 == 0]",
+      "expected_output": "[4, 16, 36, 64, 100, 144, 196, 256, 324, 400]",
+      "xp_reward": 75,
+      "pycoins_reward": 15,
+      "hints": [
+        "Use modulo operator % to check if a number is even",
+        "List comprehension syntax: [expression for item in iterable if condition]",
+        "To square a number, use ** 2 or multiply it by itself"
+      ],
+      "completed_by": ["dev-user-001"],
+      "created_at": "2025-06-29T00:00:00Z"
+    },
+    
+    "2025-06-28": {
+      "date": "2025-06-28",
+      "title": "String Manipulation Challenge",
+      "description": "Create a function that counts vowels in a given string (case-insensitive).",
+      "difficulty": "easy",
+      "code_template": "def count_vowels(text):\n    # Your code here\n    pass\n\n# Test your function\ntest_string = \"Code with Morais\"\nresult = count_vowels(test_string)\nprint(f\"Vowels in '{test_string}': {result}\")",
+      "solution": "def count_vowels(text):\n    vowels = 'aeiouAEIOU'\n    return sum(1 for char in text if char in vowels)",
+      "expected_output": "Vowels in 'Code with Morais': 6",
+      "xp_reward": 50,
+      "pycoins_reward": 10,
+      "hints": [
+        "Consider both uppercase and lowercase vowels",
+        "You can iterate through each character in the string",
+        "Use the 'in' operator to check if a character is a vowel"
+      ],
+      "completed_by": ["dev-user-001", "dev-user-002"],
+      "created_at": "2025-06-28T00:00:00Z"
+    },
+    
+    "2025-06-27": {
+      "date": "2025-06-27",
+      "title": "Dictionary Challenge",
+      "description": "Create a dictionary that maps student names to their grades and find the student with the highest grade.",
+      "difficulty": "medium",
+      "code_template": "# Student grades data\nstudents_grades = {\n    \"Ana\": 95,\n    \"Bruno\": 87,\n    \"Carlos\": 92,\n    \"Diana\": 98,\n    \"Eduardo\": 89\n}\n\n# Find the student with the highest grade\ntop_student = # Your code here\nprint(f\"Top student: {top_student}\")",
+      "solution": "max(students_grades, key=students_grades.get)",
+      "expected_output": "Top student: Diana",
+      "xp_reward": 60,
+      "pycoins_reward": 12,
+      "hints": [
+        "Use the max() function with a key parameter",
+        "The key should be a function that returns the value to compare",
+        "dict.get is useful for getting values from a dictionary"
+      ],
+      "completed_by": [],
+      "created_at": "2025-06-27T00:00:00Z"
+    }
+  }
+}

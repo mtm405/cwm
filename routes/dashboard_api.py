@@ -1,28 +1,38 @@
 """
 Dashboard API routes for Code with Morais
-Provides API endpoints for dashboard data
+Provides API endpoints for dashboard data with Firebase integration
 """
 from flask import Blueprint, jsonify, request, current_app
 from models.user import get_current_user, get_user_progress
 from models.lesson import get_all_lessons, calculate_overall_progress
 from models.activity import get_recent_activity, track_activity
+from services.firebase_service import FirebaseService
+from config import get_config
 from datetime import datetime, timedelta
 import logging
 
 logger = logging.getLogger(__name__)
 dashboard_api_bp = Blueprint('dashboard_api', __name__, url_prefix='/api/dashboard')
 
+def get_firebase_service():
+    """Get Firebase service instance"""
+    config = get_config()
+    return FirebaseService(config.FIREBASE_CONFIG if hasattr(config, 'FIREBASE_CONFIG') else {})
+
 @dashboard_api_bp.route('/stats')
 def get_dashboard_stats():
-    """Get user dashboard statistics"""
+    """Get user dashboard statistics with Firebase integration"""
     try:
         user = get_current_user()
+        firebase_service = get_firebase_service()
         
         if not user:
             # Return guest stats for unauthenticated users
             return jsonify({
                 'user': {
                     'username': 'Guest Student',
+                    'display_name': 'Guest Student',
+                    'first_name': 'Guest',
                     'xp': 0,
                     'pycoins': 0,
                     'level': 1,
@@ -31,20 +41,44 @@ def get_dashboard_stats():
                 'progress': {
                     'overall_progress': 0,
                     'completed_lessons': 0,
-                    'total_lessons': len(get_all_lessons())
+                    'total_lessons': 10
                 },
                 'guest_mode': True,
+                'firebase_available': firebase_service.is_available(),
                 'timestamp': datetime.now().isoformat()
             })
         
-        # Get user progress
-        user_progress = get_user_progress(user['uid'])
+        # Get fresh user data from Firebase if available
+        if firebase_service.is_available():
+            firebase_user = firebase_service.get_user(user['uid'])
+            if firebase_user:
+                user.update(firebase_user)
+            
+            # Get lesson progress from Firebase
+            completed_lessons = len(user.get('lesson_progress', {}))
+            total_lessons = len(firebase_service.get_all_lessons())
+        else:
+            # Fallback to local data
+            user_progress = get_user_progress(user['uid'])
+            completed_lessons = user_progress.get('completed_lessons', 0)
+            total_lessons = len(get_all_lessons())
+        
+        # Calculate overall progress
+        overall_progress = (completed_lessons / total_lessons * 100) if total_lessons > 0 else 0
+        
+        # Extract first name from display_name or username
+        first_name = user.get('first_name')
+        if not first_name:
+            display_name = user.get('display_name') or user.get('username', 'Student')
+            first_name = display_name.split(' ')[0] if display_name else 'Student'
         
         # Calculate statistics
         stats = {
             'user': {
-                'username': user.get('username', user.get('display_name', 'Student')),
+                'uid': user.get('uid'),
+                'username': user.get('username', 'Student'),
                 'display_name': user.get('display_name', user.get('username', 'Student')),
+                'first_name': first_name,
                 'profile_picture': user.get('profile_picture', ''),
                 'xp': user.get('xp', 0),
                 'pycoins': user.get('pycoins', 0),
