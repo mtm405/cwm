@@ -1,0 +1,23 @@
+<!--
+Lesson Navigation Component
+Usage: {% include 'components/lesson/navigation.html' with context %}
+Variables needed:
+- lesson: lesson object
+- currentSubtopicIndex: current subtopic index (JavaScript variable)
+
+Description: Previous/Next navigation and completion buttons for lessons
+-->
+<div class="lesson-navigation">
+    <a href="/lessons" class="btn btn-secondary">
+        <i class="fas fa-list"></i> All Lessons
+    </a>
+    
+    <div style="display: flex; gap: 1rem;">
+        <button id="prev-subtopic-btn" class="btn btn-outline" onclick="previousSubtopic()" disabled>
+            <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button id="complete-subtopic-btn" class="btn btn-success" onclick="completeCurrentSubtopic()">
+            <i class="fas fa-check"></i> Complete & Next
+        </button>
+    </div>
+</div>

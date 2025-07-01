@@ -42,13 +42,13 @@ def test_lessons_route(client):
     
 def test_lesson_detail_route(client):
     """Test individual lesson page"""
-    response = client.get('/lesson/python-basics')
+    response = client.get('/lesson-view/python-basics')
     assert response.status_code == 200
     assert b'Python Basics' in response.data
 
 def test_lesson_not_found(client):
     """Test non-existent lesson"""
-    response = client.get('/lesson/non-existent')
+    response = client.get('/lesson-view/non-existent')
     assert response.status_code == 404
 
 def test_complete_subtopic_api(client):

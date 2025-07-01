@@ -1,0 +1,53 @@
+<!--
+Info Modal Component  
+Usage: {% include 'components/modals/info-modal.html' with context %}
+Variables needed:
+- info_id: Unique identifier for the modal
+- info_title: Title text for modal header
+- info_description: Main description text
+- info_icon: Font Awesome icon class (optional)
+- info_tips: Array of tip strings (optional)
+- info_sections: Array of {title, content} objects for additional sections (optional)
+-->
+<div id="{{ info_id }}" class="modal-overlay" style="display: none;">
+    <div class="modal-backdrop" onclick="closeInfoModal('{{ info_id }}')"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">
+                {% if info_icon %}<i class="{{ info_icon }}"></i>{% endif %}
+                {{ info_title }}
+            </h3>
+            <button class="modal-close" onclick="closeInfoModal('{{ info_id }}')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-description">{{ info_description }}</p>
+            
+            {% if info_sections %}
+            {% for section in info_sections %}
+            <div class="modal-section">
+                <h4>{{ section.title }}</h4>
+                <div class="section-content">{{ section.content | safe }}</div>
+            </div>
+            {% endfor %}
+            {% endif %}
+            
+            {% if info_tips %}
+            <div class="modal-section">
+                <h4><i class="fas fa-lightbulb"></i> Pro Tips:</h4>
+                <ul class="modal-tips">
+                    {% for tip in info_tips %}
+                    <li><i class="fas fa-check"></i> {{ tip }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" onclick="closeInfoModal('{{ info_id }}')">
+                Got it!
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,43 @@
+<!--
+Skeleton Loader Component
+Usage: Set component_type variable then include this template
+Example (in your template):
+    {% raw %}{% set component_type = 'dashboard-stats' %}{% endraw %}
+    {% raw %}{% include 'components/common/skeleton-loader.html' %}{% endraw %}
+
+Variables needed:
+- component_type: Type of skeleton to show ('dashboard-stats', 'exam-objectives', 'lesson-grid', etc.)
+
+Description: Shows animated skeleton placeholders while content is loading
+-->
+<div class="skeleton-loader" data-component="{{ component_type }}">
+    {% if component_type == 'dashboard-stats' %}
+        <div class="skeleton-pulse stat-card-skeleton"></div>
+        <div class="skeleton-pulse stat-card-skeleton"></div>
+        <div class="skeleton-pulse stat-card-skeleton"></div>
+        <div class="skeleton-pulse stat-card-skeleton"></div>
+    {% elif component_type == 'exam-objectives' %}
+        {% for i in range(6) %}
+        <div class="skeleton-pulse objective-skeleton"></div>
+        {% endfor %}
+    {% elif component_type == 'lesson-grid' %}
+        {% for i in range(8) %}
+        <div class="skeleton-pulse lesson-card-skeleton"></div>
+        {% endfor %}
+    {% elif component_type == 'activity-feed' %}
+        {% for i in range(5) %}
+        <div class="skeleton-pulse activity-item-skeleton"></div>
+        {% endfor %}
+    {% elif component_type == 'leaderboard' %}
+        {% for i in range(10) %}
+        <div class="skeleton-pulse leaderboard-item-skeleton"></div>
+        {% endfor %}
+    {% elif component_type == 'daily-challenge' %}
+        <div class="skeleton-pulse challenge-skeleton"></div>
+    {% elif component_type == 'lesson-content' %}
+        <div class="skeleton-pulse lesson-header-skeleton"></div>
+        <div class="skeleton-pulse lesson-text-skeleton"></div>
+        <div class="skeleton-pulse lesson-text-skeleton"></div>
+        <div class="skeleton-pulse lesson-code-skeleton"></div>
+    {% endif %}
+</div>

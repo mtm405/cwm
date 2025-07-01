@@ -1,0 +1,517 @@
+{% extends "base/layout.html" %}
+
+{% block page_name %}profile{% endblock %}
+
+{% block title %}Profile Settings - Code with Morais{% endblock %}
+
+{% block extra_css %}
+<style>
+.profile-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: var(--card-bg);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--border-color);
+}
+
+.profile-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.profile-subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.profile-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.profile-tab {
+    padding: 0.75rem 1rem;
+    border: none;
+    background: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.profile-tab:hover {
+    color: var(--text-primary);
+}
+
+.profile-tab.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.danger-zone {
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: var(--border-radius-lg);
+    padding: 2rem;
+    margin-top: 2rem;
+}
+
+.danger-zone-title {
+    color: #ef4444;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.danger-zone-description {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+}
+
+.current-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-item {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    display: block;
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+    <!-- Header -->
+    <div class="profile-header">
+        <h1 class="profile-title">Profile Settings</h1>
+        <p class="profile-subtitle">
+            Manage your account, preferences, and learning profile
+        </p>
+    </div>
+
+    <!-- Current Stats -->
+    <div class="current-stats">
+        <div class="stat-item">
+            <span class="stat-value">{{ user.lessons_completed or 0 }}</span>
+            <span class="stat-label">Lessons Completed</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-value">{{ user.streak_days or 0 }}</span>
+            <span class="stat-label">Day Streak</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-value">{{ user.badges_earned or 0 }}</span>
+            <span class="stat-label">Badges Earned</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-value">{{ user.total_code_runs or 0 }}</span>
+            <span class="stat-label">Code Executions</span>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="profile-tabs">
+        <button class="profile-tab active" onclick="showTab('personal')">
+            <i class="fas fa-user"></i>
+            Personal Info
+        </button>
+        <button class="profile-tab" onclick="showTab('preferences')">
+            <i class="fas fa-cog"></i>
+            Preferences
+        </button>
+        <button class="profile-tab" onclick="showTab('security')">
+            <i class="fas fa-shield-alt"></i>
+            Security
+        </button>
+        <button class="profile-tab" onclick="showTab('danger')">
+            <i class="fas fa-exclamation-triangle"></i>
+            Danger Zone
+        </button>
+    </div>
+
+    <!-- Personal Info Tab -->
+    <div id="personal" class="tab-content active">
+        {% set form_action = '/profile/update' %}
+        {% set user = current_user %}
+        {% set show_password_change = false %}
+        {% set show_avatar_upload = true %}
+        {% set success_message = get_flashed_messages(category_filter=['success'])[0] if get_flashed_messages(category_filter=['success']) %}
+        {% set form_errors = get_flashed_messages(category_filter=['form_errors'])[0] if get_flashed_messages(category_filter=['form_errors']) %}
+        {% include 'components/forms/profile-form.html' with context %}
+    </div>
+
+    <!-- Preferences Tab -->
+    <div id="preferences" class="tab-content">
+        <div class="form-section">
+            <h3 class="section-title">
+                <i class="fas fa-palette"></i>
+                Appearance
+            </h3>
+            
+            <div class="form-group">
+                <label class="form-label">Theme</label>
+                <div class="radio-group">
+                    <label class="radio-container">
+                        <input type="radio" name="theme" value="dark" {% if user.theme == 'dark' or not user.theme %}checked{% endif %}>
+                        <span class="radio-mark"></span>
+                        <span class="radio-label">Dark Mode (Recommended)</span>
+                    </label>
+                    <label class="radio-container">
+                        <input type="radio" name="theme" value="light" {% if user.theme == 'light' %}checked{% endif %}>
+                        <span class="radio-mark"></span>
+                        <span class="radio-label">Light Mode</span>
+                    </label>
+                    <label class="radio-container">
+                        <input type="radio" name="theme" value="auto" {% if user.theme == 'auto' %}checked{% endif %}>
+                        <span class="radio-mark"></span>
+                        <span class="radio-label">Auto (Follow System)</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Code Editor Theme</label>
+                <select name="editor_theme" class="form-control">
+                    <option value="monokai" {% if user.editor_theme == 'monokai' %}selected{% endif %}>Monokai (Dark)</option>
+                    <option value="github" {% if user.editor_theme == 'github' %}selected{% endif %}>GitHub (Light)</option>
+                    <option value="tomorrow_night" {% if user.editor_theme == 'tomorrow_night' %}selected{% endif %}>Tomorrow Night</option>
+                    <option value="solarized_dark" {% if user.editor_theme == 'solarized_dark' %}selected{% endif %}>Solarized Dark</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3 class="section-title">
+                <i class="fas fa-graduation-cap"></i>
+                Learning Preferences
+            </h3>
+            
+            <div class="form-group">
+                <label class="checkbox-container">
+                    <input type="checkbox" name="auto_save_code" {% if user.auto_save_code %}checked{% endif %}>
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Auto-save code as I type</span>
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label class="checkbox-container">
+                    <input type="checkbox" name="show_hints" {% if user.show_hints %}checked{% endif %}>
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Show hints and tips during lessons</span>
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label class="checkbox-container">
+                    <input type="checkbox" name="sound_effects" {% if user.sound_effects %}checked{% endif %}>
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Play sound effects for achievements</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-lg" onclick="savePreferences()">
+                <i class="fas fa-save"></i>
+                <span class="button-text">Save Preferences</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Security Tab -->
+    <div id="security" class="tab-content">
+        <div class="form-section">
+            <h3 class="section-title">
+                <i class="fas fa-lock"></i>
+                Change Password
+            </h3>
+            
+            <form method="POST" action="/profile/change-password" class="password-change-form">
+                <div class="form-group">
+                    <label for="current_password" class="form-label">Current Password <span class="required">*</span></label>
+                    <div class="input-wrapper has-icon">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="current_password" name="current_password" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="new_password" class="form-label">New Password <span class="required">*</span></label>
+                    <div class="input-wrapper has-icon">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="new_password" name="new_password" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm_new_password" class="form-label">Confirm New Password <span class="required">*</span></label>
+                    <div class="input-wrapper has-icon">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="confirm_new_password" name="confirm_new_password" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-key"></i>
+                        <span class="button-text">Update Password</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="form-section">
+            <h3 class="section-title">
+                <i class="fas fa-mobile-alt"></i>
+                Two-Factor Authentication
+            </h3>
+            
+            <p class="section-description">
+                Add an extra layer of security to your account with two-factor authentication.
+            </p>
+            
+            {% if user.two_factor_enabled %}
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <span>Two-factor authentication is enabled</span>
+            </div>
+            
+            <button type="button" class="btn btn-secondary" onclick="disableTwoFactor()">
+                <i class="fas fa-times"></i>
+                <span class="button-text">Disable 2FA</span>
+            </button>
+            {% else %}
+            <button type="button" class="btn btn-primary" onclick="enableTwoFactor()">
+                <i class="fas fa-shield-alt"></i>
+                <span class="button-text">Enable 2FA</span>
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Danger Zone Tab -->
+    <div id="danger" class="tab-content">
+        <div class="danger-zone">
+            <h3 class="danger-zone-title">
+                <i class="fas fa-exclamation-triangle"></i>
+                Danger Zone
+            </h3>
+            
+            <p class="danger-zone-description">
+                These actions are permanent and cannot be undone. Please be careful.
+            </p>
+            
+            <div class="form-group">
+                <h4>Export Account Data</h4>
+                <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1rem;">
+                    Download all your account data, including progress, code submissions, and profile information.
+                </p>
+                <button type="button" class="btn btn-secondary" onclick="exportData()">
+                    <i class="fas fa-download"></i>
+                    <span class="button-text">Export Data</span>
+                </button>
+            </div>
+            
+            <div class="form-group">
+                <h4 style="color: #ef4444;">Delete Account</h4>
+                <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1rem;">
+                    Permanently delete your account and all associated data. This action cannot be undone.
+                </p>
+                <button type="button" class="btn btn-danger" onclick="confirmDeleteAccount()">
+                    <i class="fas fa-trash-alt"></i>
+                    <span class="button-text">Delete Account</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Tab functionality
+function showTab(tabName) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Remove active class from all tabs
+    document.querySelectorAll('.profile-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Show selected tab content
+    document.getElementById(tabName).classList.add('active');
+    
+    // Add active class to clicked tab
+    event.target.classList.add('active');
+}
+
+// Save preferences
+function savePreferences() {
+    const formData = new FormData();
+    
+    // Theme preferences
+    const theme = document.querySelector('input[name="theme"]:checked')?.value;
+    const editorTheme = document.querySelector('select[name="editor_theme"]')?.value;
+    
+    // Learning preferences
+    const autoSaveCode = document.querySelector('input[name="auto_save_code"]')?.checked;
+    const showHints = document.querySelector('input[name="show_hints"]')?.checked;
+    const soundEffects = document.querySelector('input[name="sound_effects"]')?.checked;
+    
+    formData.append('theme', theme);
+    formData.append('editor_theme', editorTheme);
+    formData.append('auto_save_code', autoSaveCode);
+    formData.append('show_hints', showHints);
+    formData.append('sound_effects', soundEffects);
+    
+    fetch('/profile/preferences', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Preferences saved successfully', 'success');
+        } else {
+            showToast('Failed to save preferences', 'error');
+        }
+    })
+    .catch(error => {
+        showToast('An error occurred', 'error');
+    });
+}
+
+// Two-factor authentication
+function enableTwoFactor() {
+    // This would open a modal or navigate to 2FA setup
+    showToast('2FA setup coming soon', 'info');
+}
+
+function disableTwoFactor() {
+    if (confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.')) {
+        // Make API call to disable 2FA
+        showToast('2FA disabled', 'success');
+    }
+}
+
+// Data export
+function exportData() {
+    showToast('Preparing your data export...', 'info');
+    
+    fetch('/profile/export', {
+        method: 'POST'
+    })
+    .then(response => response.blob())
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'code-with-morais-data.json';
+        a.click();
+        window.URL.revokeObjectURL(url);
+        showToast('Data exported successfully', 'success');
+    })
+    .catch(error => {
+        showToast('Failed to export data', 'error');
+    });
+}
+
+// Account deletion
+function confirmDeleteAccount() {
+    const confirmation = prompt('Type "DELETE" to confirm account deletion:');
+    
+    if (confirmation === 'DELETE') {
+        if (confirm('This action is permanent and cannot be undone. Are you absolutely sure?')) {
+            // Make API call to delete account
+            fetch('/profile/delete', {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/';
+                } else {
+                    showToast('Failed to delete account', 'error');
+                }
+            })
+            .catch(error => {
+                showToast('An error occurred', 'error');
+            });
+        }
+    } else if (confirmation !== null) {
+        showToast('Account deletion cancelled - confirmation text was incorrect', 'warning');
+    }
+}
+
+// Password change validation
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordForm = document.querySelector('.password-change-form');
+    if (passwordForm) {
+        passwordForm.addEventListener('submit', function(e) {
+            const newPassword = document.getElementById('new_password').value;
+            const confirmPassword = document.getElementById('confirm_new_password').value;
+            
+            if (newPassword !== confirmPassword) {
+                e.preventDefault();
+                showToast('New passwords do not match', 'error');
+                return;
+            }
+            
+            if (newPassword.length < 8) {
+                e.preventDefault();
+                showToast('Password must be at least 8 characters long', 'error');
+                return;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

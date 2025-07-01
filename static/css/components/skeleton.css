@@ -1,0 +1,300 @@
+/*
+ * Skeleton Loader Components
+ * Animated placeholders for loading states
+ */
+
+/* Base skeleton animation */
+@keyframes skeleton-pulse {
+    0% {
+        background-color: var(--skeleton-base, #e0e7ff);
+    }
+    50% {
+        background-color: var(--skeleton-highlight, #f0f4f8);
+    }
+    100% {
+        background-color: var(--skeleton-base, #e0e7ff);
+    }
+}
+
+@keyframes skeleton-shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Base skeleton styles */
+.skeleton-loader {
+    display: grid;
+    gap: 1rem;
+    width: 100%;
+}
+
+.skeleton-pulse {
+    border-radius: var(--border-radius-md, 8px);
+    animation: skeleton-pulse 2s infinite ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Shimmer effect overlay */
+.skeleton-pulse::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+    );
+    animation: skeleton-shimmer 2s infinite;
+}
+
+/* Dashboard Stats Skeletons */
+.skeleton-loader[data-component="dashboard-stats"] {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.stat-card-skeleton {
+    height: 140px;
+    background: var(--skeleton-base, #e0e7ff);
+    border-radius: 12px;
+    animation-delay: calc(var(--i, 0) * 0.2s);
+}
+
+.stat-card-skeleton:nth-child(1) { --i: 0; }
+.stat-card-skeleton:nth-child(2) { --i: 1; }
+.stat-card-skeleton:nth-child(3) { --i: 2; }
+.stat-card-skeleton:nth-child(4) { --i: 3; }
+
+/* Exam Objectives Skeletons */
+.skeleton-loader[data-component="exam-objectives"] {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.objective-skeleton {
+    height: 80px;
+    background: var(--skeleton-base, #e0e7ff);
+    border-radius: 8px;
+    animation-delay: calc(var(--i, 0) * 0.1s);
+}
+
+.objective-skeleton:nth-child(1) { --i: 0; }
+.objective-skeleton:nth-child(2) { --i: 1; }
+.objective-skeleton:nth-child(3) { --i: 2; }
+.objective-skeleton:nth-child(4) { --i: 3; }
+.objective-skeleton:nth-child(5) { --i: 4; }
+.objective-skeleton:nth-child(6) { --i: 5; }
+
+/* Lesson Grid Skeletons */
+.skeleton-loader[data-component="lesson-grid"] {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.lesson-card-skeleton {
+    height: 200px;
+    background: var(--skeleton-base, #e0e7ff);
+    border-radius: 12px;
+    animation-delay: calc(var(--i, 0) * 0.15s);
+}
+
+.lesson-card-skeleton:nth-child(1) { --i: 0; }
+.lesson-card-skeleton:nth-child(2) { --i: 1; }
+.lesson-card-skeleton:nth-child(3) { --i: 2; }
+.lesson-card-skeleton:nth-child(4) { --i: 3; }
+.lesson-card-skeleton:nth-child(5) { --i: 4; }
+.lesson-card-skeleton:nth-child(6) { --i: 5; }
+.lesson-card-skeleton:nth-child(7) { --i: 6; }
+.lesson-card-skeleton:nth-child(8) { --i: 7; }
+
+/* Activity Feed Skeletons */
+.skeleton-loader[data-component="activity-feed"] {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.activity-item-skeleton {
+    height: 60px;
+    background: var(--skeleton-base, #e0e7ff);
+    border-radius: 8px;
+    animation-delay: calc(var(--i, 0) * 0.1s);
+}
+
+.activity-item-skeleton:nth-child(1) { --i: 0; }
+.activity-item-skeleton:nth-child(2) { --i: 1; }
+.activity-item-skeleton:nth-child(3) { --i: 2; }
+.activity-item-skeleton:nth-child(4) { --i: 3; }
+.activity-item-skeleton:nth-child(5) { --i: 4; }
+
+/* Leaderboard Skeletons */
+.skeleton-loader[data-component="leaderboard"] {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.leaderboard-item-skeleton {
+    height: 50px;
+    background: var(--skeleton-base, #e0e7ff);
+    border-radius: 8px;
+    animation-delay: calc(var(--i, 0) * 0.05s);
+}
+
+.leaderboard-item-skeleton:nth-child(1) { --i: 0; }
+.leaderboard-item-skeleton:nth-child(2) { --i: 1; }
+.leaderboard-item-skeleton:nth-child(3) { --i: 2; }
+.leaderboard-item-skeleton:nth-child(4) { --i: 3; }
+.leaderboard-item-skeleton:nth-child(5) { --i: 4; }
+.leaderboard-item-skeleton:nth-child(6) { --i: 5; }
+.leaderboard-item-skeleton:nth-child(7) { --i: 6; }
+.leaderboard-item-skeleton:nth-child(8) { --i: 7; }
+.leaderboard-item-skeleton:nth-child(9) { --i: 8; }
+.leaderboard-item-skeleton:nth-child(10) { --i: 9; }
+
+/* Daily Challenge Skeleton */
+.challenge-skeleton {
+    height: 180px;
+    background: var(--skeleton-base, #e0e7ff);
+    border-radius: 12px;
+}
+
+/* Lesson Content Skeletons */
+.skeleton-loader[data-component="lesson-content"] {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.lesson-header-skeleton {
+    height: 40px;
+    background: var(--skeleton-base, #e0e7ff);
+    border-radius: 8px;
+    width: 60%;
+}
+
+.lesson-text-skeleton {
+    height: 20px;
+    background: var(--skeleton-base, #e0e7ff);
+    border-radius: 4px;
+    animation-delay: calc(var(--i, 0) * 0.1s);
+}
+
+.lesson-text-skeleton:nth-child(2) { 
+    --i: 1;
+    width: 90%;
+}
+
+.lesson-text-skeleton:nth-child(3) { 
+    --i: 2;
+    width: 75%;
+}
+
+.lesson-code-skeleton {
+    height: 120px;
+    background: var(--skeleton-base, #e0e7ff);
+    border-radius: 8px;
+    animation-delay: 0.3s;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .skeleton-loader[data-component="dashboard-stats"] {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .skeleton-loader[data-component="lesson-grid"] {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .stat-card-skeleton,
+    .lesson-card-skeleton {
+        height: 120px;
+    }
+}
+
+/* Dark Theme Support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --skeleton-base: #2a2d3d;
+        --skeleton-highlight: #3a3d4d;
+    }
+}
+
+/* Theme integration for existing dark theme class */
+.theme-dark {
+    --skeleton-base: #2a2d3d;
+    --skeleton-highlight: #3a3d4d;
+}
+
+/* Accessibility - Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .skeleton-pulse,
+    .skeleton-pulse::after {
+        animation: none;
+    }
+    
+    .skeleton-pulse {
+        background-color: var(--skeleton-base, #e0e7ff);
+    }
+}
+
+/* Utility classes for manual skeleton creation */
+.skeleton {
+    background: var(--skeleton-base, #e0e7ff);
+    border-radius: 4px;
+    animation: skeleton-pulse 2s infinite ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+    );
+    animation: skeleton-shimmer 2s infinite;
+}
+
+.skeleton-text {
+    height: 16px;
+    margin: 8px 0;
+}
+
+.skeleton-text.large {
+    height: 24px;
+}
+
+.skeleton-text.small {
+    height: 12px;
+}
+
+.skeleton-circle {
+    border-radius: 50%;
+}
+
+.skeleton-rounded {
+    border-radius: 8px;
+}

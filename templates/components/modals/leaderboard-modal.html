@@ -1,0 +1,39 @@
+<!--
+Leaderboard Modal Component
+Usage: {% include 'components/modals/leaderboard-modal.html' %}
+Self-contained component that loads leaderboard data dynamically
+-->
+<div id="leaderboard-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-backdrop" onclick="closeLeaderboardModal()"></div>
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <h2 class="modal-title">
+                <i class="fas fa-trophy"></i> Leaderboard
+            </h2>
+            <button class="modal-close" onclick="closeLeaderboardModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="leaderboard-loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading leaderboard...</p>
+            </div>
+            <div class="leaderboard-content" style="display: none;">
+                <div class="leaderboard-filters">
+                    <button class="filter-btn active" data-filter="all">All Time</button>
+                    <button class="filter-btn" data-filter="weekly">This Week</button>
+                    <button class="filter-btn" data-filter="monthly">This Month</button>
+                </div>
+                <div class="leaderboard-list">
+                    <!-- Leaderboard items will be loaded here -->
+                </div>
+            </div>
+            <div class="leaderboard-error" style="display: none;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Failed to load leaderboard. Please try again.</p>
+                <button class="btn btn-primary" onclick="loadLeaderboardData()">Retry</button>
+            </div>
+        </div>
+    </div>
+</div>

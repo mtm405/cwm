@@ -1,0 +1,304 @@
+/* 
+  Lesson Page Styles
+  Extracted from lesson templates for better maintainability
+  Used by: lesson.html (consolidated template)
+*/
+
+/* Lesson container */
+.lesson-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.lesson-header {
+    margin-bottom: 2rem;
+}
+
+/* Back link component */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary-color);
+    text-decoration: none;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.back-link:hover {
+    color: var(--secondary-color);
+    transform: translateX(-5px);
+}
+
+/* Progress bar component */
+.lesson-progress-bar {
+    background-color: var(--bg-card);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: var(--bg-secondary);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background-color: var(--primary-color);
+    transition: width 0.3s ease;
+}
+
+/* Lesson tabs */
+.lesson-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+}
+
+.lesson-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background-color: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.lesson-tab:hover {
+    border-color: var(--primary-color);
+}
+
+.lesson-tab.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.tab-check {
+    color: var(--text-secondary);
+}
+
+.tab-check.completed {
+    color: var(--success-color);
+}
+
+/* Content blocks */
+.lesson-content-area {
+    margin: 2rem 0;
+}
+
+.content-block {
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background-color: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.text-block {
+    line-height: 1.8;
+}
+
+.text-block h1, .text-block h2, .text-block h3 {
+    color: var(--primary-color);
+    margin: 1rem 0;
+}
+
+/* Code examples */
+.code-example {
+    background-color: var(--bg-secondary);
+}
+
+.code-header {
+    background-color: var(--bg-primary);
+    margin: -2rem -2rem 1rem -2rem;
+    padding: 1rem 2rem;
+    border-radius: 12px 12px 0 0;
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-copy {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.btn-copy:hover {
+    color: var(--primary-color);
+}
+
+.code-example pre {
+    background-color: transparent;
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+}
+
+.code-example code {
+    font-family: 'Fira Code', 'Consolas', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Interactive challenges */
+.interactive-challenge h3 {
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+}
+
+/* Code editor component */
+.code-editor-container {
+    margin: 1rem 0;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.code-editor-header {
+    background-color: var(--bg-primary);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 500;
+}
+
+.code-editor {
+    height: 300px;
+    border: none;
+}
+
+.code-output {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    min-height: 50px;
+    font-family: monospace;
+    border: 1px solid var(--border-color);
+}
+
+.output-success {
+    color: var(--success-color);
+    border-color: var(--success-color);
+}
+
+.output-success .rewards {
+    background-color: var(--success-color);
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.error {
+    color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+
+/* Quiz blocks */
+.quiz-block {
+    background-color: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0;
+    border: 2px solid var(--primary-color);
+}
+
+.quiz-block h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.quiz-start {
+    text-align: center;
+    padding: 2rem;
+}
+
+/* Lesson navigation */
+.lesson-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+}
+
+#complete-subtopic-btn {
+    background: var(--success-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+#complete-subtopic-btn:hover {
+    background: var(--success-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+#complete-subtopic-btn:disabled {
+    background: var(--text-secondary);
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .lesson-container {
+        padding: 1rem;
+    }
+    
+    .lesson-navigation {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .lesson-navigation button {
+        width: 100%;
+    }
+    
+    .lesson-tabs {
+        flex-direction: column;
+    }
+    
+    .lesson-tab {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .code-editor-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}

@@ -1,0 +1,258 @@
+{% extends "base/layout.html" %}
+
+{% block page_name %}signup{% endblock %}
+
+{% block title %}Sign Up - Code with Morais{% endblock %}
+
+{% block extra_css %}
+<style>
+.auth-page {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, 
+        rgba(59, 130, 246, 0.1) 0%, 
+        rgba(147, 51, 234, 0.1) 100%);
+}
+
+.auth-content {
+    width: 100%;
+    max-width: 500px;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.auth-subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.code-with-morais-logo {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.code-with-morais-logo:hover {
+    color: var(--primary-hover);
+}
+
+.benefits-list {
+    background: var(--card-bg);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    margin-top: 2rem;
+    border: 1px solid var(--border-color);
+}
+
+.benefits-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.benefits-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.benefit-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.benefit-item i {
+    color: var(--success-color);
+    font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .benefits-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-content">
+        <!-- Header -->
+        <div class="auth-header">
+            <a href="/" class="code-with-morais-logo">
+                <i class="fas fa-code"></i>
+                Code with Morais
+            </a>
+            <h1 class="auth-title">Start Learning Today!</h1>
+            <p class="auth-subtitle">
+                Join thousands of students mastering Python<br>
+                and preparing for IT certifications
+            </p>
+        </div>
+
+        <!-- Signup Form Component -->
+        {% set form_action = '/auth/signup' %}
+        {% set show_google_auth = true %}
+        {% set show_email_signup = true %}
+        {% set google_client_id = config.GOOGLE_CLIENT_ID %}
+        {% set form_error = get_flashed_messages(category_filter=['error'])[0] if get_flashed_messages(category_filter=['error']) %}
+        {% set redirect_url = request.args.get('next') %}
+        {% set terms_url = '/terms' %}
+        {% set privacy_url = '/privacy' %}
+        {% include 'components/forms/signup-form.html' with context %}
+
+        <!-- Benefits Section -->
+        <div class="benefits-list">
+            <h3 class="benefits-title">
+                <i class="fas fa-star"></i>
+                What you'll get:
+            </h3>
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Interactive Python lessons</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Real-time code execution</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Progress tracking</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Certificate preparation</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Community support</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Mobile-friendly access</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Handle form submissions and validation
+document.addEventListener('DOMContentLoaded', function() {
+    const signupForm = document.querySelector('.signup-form');
+    if (signupForm) {
+        // Password strength validation
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm_password');
+        
+        if (passwordInput) {
+            passwordInput.addEventListener('input', function() {
+                validatePasswordStrength(this.value);
+                if (confirmPasswordInput.value) {
+                    validatePasswordMatch();
+                }
+            });
+        }
+        
+        if (confirmPasswordInput) {
+            confirmPasswordInput.addEventListener('input', validatePasswordMatch);
+        }
+        
+        // Form submission handling
+        signupForm.addEventListener('submit', function(e) {
+            const firstName = document.getElementById('first_name').value;
+            const lastName = document.getElementById('last_name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            const agreeTerms = document.getElementById('agree_terms').checked;
+            
+            // Validation
+            if (!firstName || !lastName || !email || !password || !confirmPassword) {
+                e.preventDefault();
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                showToast('Passwords do not match', 'error');
+                return;
+            }
+            
+            if (!agreeTerms) {
+                e.preventDefault();
+                showToast('Please agree to the Terms of Service and Privacy Policy', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const submitButton = signupForm.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+                const buttonText = submitButton.querySelector('.button-text');
+                const buttonIcon = submitButton.querySelector('i');
+                
+                if (buttonText) buttonText.textContent = 'Creating Account...';
+                if (buttonIcon) buttonIcon.className = 'fas fa-spinner fa-spin';
+            }
+        });
+    }
+    
+    function validatePasswordStrength(password) {
+        // This function is already defined in the signup-form component
+        // but we can add additional UI feedback here if needed
+    }
+    
+    function validatePasswordMatch() {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm_password').value;
+        const confirmInput = document.getElementById('confirm_password');
+        
+        if (confirmPassword && password !== confirmPassword) {
+            confirmInput.setCustomValidity('Passwords do not match');
+            confirmInput.classList.add('error');
+        } else {
+            confirmInput.setCustomValidity('');
+            confirmInput.classList.remove('error');
+        }
+    }
+    
+    // Auto-focus first name field
+    const firstNameInput = document.getElementById('first_name');
+    if (firstNameInput) {
+        firstNameInput.focus();
+    }
+});
+</script>
+{% endblock %}

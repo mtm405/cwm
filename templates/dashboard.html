@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros/dashboard.html" import stat_card, cached_stat_card, tab_button, progress_bar %}
 
 {% block page_name %}dashboard{% endblock %}
 
@@ -28,18 +29,10 @@
         <!-- Quick Navigation Tabs with Refresh Button -->
         <nav class="dashboard-nav">
             <div class="nav-tabs-container">
-                <button class="nav-tab active" data-tab="overview">
-                    <i class="fas fa-chart-line"></i> Overview
-                </button>
-                <button class="nav-tab" data-tab="challenge">
-                    <i class="fas fa-calendar-day"></i> Daily Challenge
-                </button>
-                <button class="nav-tab" data-tab="leaderboard">
-                    <i class="fas fa-trophy"></i> Leaderboard
-                </button>
-                <button class="nav-tab" data-tab="activity">
-                    <i class="fas fa-stream"></i> Activity
-                </button>
+                {{ tab_button('overview', 'fas fa-chart-line', 'Overview', true) }}
+                {{ tab_button('challenge', 'fas fa-calendar-day', 'Daily Challenge') }}
+                {{ tab_button('leaderboard', 'fas fa-trophy', 'Leaderboard') }}
+                {{ tab_button('activity', 'fas fa-stream', 'Activity') }}
             </div>
             
             <button class="refresh-dashboard btn-refresh" title="Refresh Dashboard" onclick="refreshDashboard()">
@@ -56,70 +49,57 @@
         <div class="tab-pane active" id="overview-tab">
             <!-- Modern Stats Cards -->
             <section class="stats-section">
-                <div class="stats-grid-modern">
-                    <div class="stat-card-modern primary" data-stat="xp">
-                        <div class="stat-header">
-                            <i class="stat-icon fas fa-star"></i>
-                            <span class="stat-trend">+25%</span>
-                        </div>
-                        <div class="stat-body">
-                            <span class="stat-value-large">{{ user.get('xp', 0) }}</span>
-                            <span class="stat-label">Total XP</span>
-                        </div>
-                        <div class="stat-progress">
-                            <div class="progress-bar-mini">
-                                <div class="progress-fill-mini" style="width: 75%"></div>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Skeleton Loader - shown while loading -->
+                <div id="stats-skeleton" class="stats-grid-modern">
+                    {% set component_type = 'dashboard-stats' %}
+                    {% include 'components/common/skeleton-loader.html' %}
+                </div>
+                
+                <!-- Actual Stats - shown after loading -->
+                <div id="stats-content" class="stats-grid-modern" style="display: none;">
+                    {{ cached_stat_card(
+                        type='primary',
+                        icon='fas fa-star',
+                        trend='+25%',
+                        value=user.get('xp', 0),
+                        label='Total XP',
+                        progress=75,
+                        data_stat='xp',
+                        user_id=user.get('id', 'anonymous')
+                    ) }}
                     
-                    <div class="stat-card-modern success" data-stat="pycoins">
-                        <div class="stat-header">
-                            <i class="stat-icon fas fa-coins"></i>
-                            <span class="stat-trend">+12</span>
-                        </div>
-                        <div class="stat-body">
-                            <span class="stat-value-large">{{ user.get('pycoins', 0) }}</span>
-                            <span class="stat-label">PyCoins</span>
-                        </div>
-                        <div class="stat-progress">
-                            <div class="progress-bar-mini">
-                                <div class="progress-fill-mini" style="width: 60%"></div>
-                            </div>
-                        </div>
-                    </div>
+                    {{ cached_stat_card(
+                        type='success',
+                        icon='fas fa-coins',
+                        trend='+12',
+                        value=user.get('pycoins', 0),
+                        label='PyCoins',
+                        progress=60,
+                        data_stat='pycoins',
+                        user_id=user.get('id', 'anonymous')
+                    ) }}
                     
-                    <div class="stat-card-modern warning" data-stat="level">
-                        <div class="stat-header">
-                            <i class="stat-icon fas fa-trophy"></i>
-                            <span class="stat-trend">Level Up!</span>
-                        </div>
-                        <div class="stat-body">
-                            <span class="stat-value-large">{{ user.get('level', 1) }}</span>
-                            <span class="stat-label">Current Level</span>
-                        </div>
-                        <div class="stat-progress">
-                            <div class="progress-bar-mini">
-                                <div class="progress-fill-mini" style="width: 85%"></div>
-                            </div>
-                        </div>
-                    </div>
+                    {{ cached_stat_card(
+                        type='warning',
+                        icon='fas fa-trophy',
+                        trend='Level Up!',
+                        value=user.get('level', 1),
+                        label='Current Level',
+                        progress=85,
+                        data_stat='level',
+                        user_id=user.get('id', 'anonymous')
+                    ) }}
                     
-                    <div class="stat-card-modern info" data-stat="streak">
-                        <div class="stat-header">
-                            <i class="stat-icon fas fa-fire"></i>
-                            <span class="stat-trend">🔥 Hot!</span>
-                        </div>
-                        <div class="stat-body">
-                            <span class="stat-value-large">{{ user.get('streak', 0) }}</span>
-                            <span class="stat-label">Day Streak</span>
-                        </div>
-                        <div class="stat-progress">
-                            <div class="progress-bar-mini">
-                                <div class="progress-fill-mini" style="width: 90%"></div>
-                            </div>
-                        </div>
-                    </div>
+                    {{ cached_stat_card(
+                        type='info',
+                        icon='fas fa-fire',
+                        trend='🔥 Hot!',
+                        value=user.get('streak', 0),
+                        label='Day Streak',
+                        progress=90,
+                        data_stat='streak',
+                        user_id=user.get('id', 'anonymous')
+                    ) }}
                 </div>
             </section>
             
@@ -1252,5 +1232,5 @@ document.addEventListener('DOMContentLoaded', () => {
     loadExamObjectives();
 });
 </script>
-<script src="{{ url_for('static', filename='js/dashboard-modern.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/dashboard.js') }}"></script>
 {% endblock %}

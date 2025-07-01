@@ -21,93 +21,7 @@
 </head>
 <body class="theme-dark" data-page="{% block page_name %}{% endblock %}">
     <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container-modern">
-            <!-- Left Side: Main Navigation -->
-            <div class="nav-left">
-                <ul class="nav-links-modern">
-                    <li><a href="/dashboard" class="nav-link-modern"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-                    <li><a href="/lessons" class="nav-link-modern"><i class="fas fa-book"></i> Lessons</a></li>
-                    <li><button class="nav-link-modern leaderboard-btn" onclick="openLeaderboardModal()"><i class="fas fa-trophy"></i> Leaderboard</button></li>
-                </ul>
-            </div>
-            
-            <!-- Center: Live Clock -->
-            <div class="nav-center">
-                <div class="live-clock" id="live-clock">
-                    <span class="time-display">12:00:00</span>
-                    <span class="period-display">AM</span>
-                </div>
-            </div>
-            
-            <!-- Right Side: Search & User Info -->
-            <div class="nav-right">
-                <!-- Search Bar -->
-                <div class="search-container">
-                    <button class="search-toggle" onclick="toggleSearch()">
-                        <i class="fas fa-search"></i>
-                    </button>
-                    <div class="search-bar" id="search-bar">
-                        <input type="text" placeholder="Search lessons, topics..." class="search-input" id="search-input">
-                        <button class="search-submit" onclick="performSearch()">
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                {% if user %}
-                <!-- User Stats -->
-                <div class="user-info-modern">
-                    <span class="user-stats-modern">
-                        <span class="stat-item">
-                            <i class="fas fa-star"></i> 
-                            <span id="user-xp">{{ user.xp }}</span>
-                        </span>
-                        <span class="stat-item">
-                            <i class="fas fa-coins"></i> 
-                            <span id="user-coins">{{ user.pycoins }}</span>
-                        </span>
-                    </span>
-                </div>
-                
-                <!-- User Profile -->
-                <div class="user-profile-modern">
-                    <div class="user-dropdown-modern">
-                        <img src="{{ user.profile_picture or '/static/img/default-avatar.png' }}" alt="Profile" class="user-avatar-modern">
-                        <span class="user-name-modern">{{ user.display_name or user.username or user.email }}</span>
-                        <i class="fas fa-chevron-down dropdown-arrow"></i>
-                        <div class="dropdown-menu-modern">
-                            <a href="/profile"><i class="fas fa-user"></i> Profile</a>
-                            <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
-                            {% if user.is_admin %}
-                            <a href="/admin"><i class="fas fa-shield-alt"></i> Admin</a>
-                            {% endif %}
-                            <hr class="dropdown-divider">
-                            <button onclick="signOut()" class="sign-out-btn-modern"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
-                        </div>
-                    </div>
-                </div>
-                {% else %}
-                <!-- Auth Section for non-logged users -->
-                <div class="auth-section">
-                    <div id="g_id_onload"
-                         data-client_id="{{ google_client_id }}"
-                         data-callback="handleCredentialResponse"
-                         data-auto_prompt="false">
-                    </div>
-                    <div class="g_id_signin"
-                         data-type="standard"
-                         data-size="large"
-                         data-theme="outline"
-                         data-text="sign_in_with"
-                         data-shape="rectangular"
-                         data-logo_alignment="left">
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </nav>
+    {% include 'components/navigation/navbar.html' %}
     
     <!-- Main Content Area -->
     <div class="app-container">
@@ -117,8 +31,12 @@
             {% block content %}{% endblock %}
         </main>
     </div>
+
+    <!-- Toast Notifications -->
+    {% include 'components/common/toast-notifications.html' %}
     
     <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/components/modal-manager.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block extra_js %}{% endblock %}
 </body>

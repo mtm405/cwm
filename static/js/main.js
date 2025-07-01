@@ -120,7 +120,13 @@ function setTheme(theme) {
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize header functionality first
     initHeaderFunctionality();
-    initDashboardFunctionality();
+    
+    // Initialize dashboard functionality if on dashboard page
+    if (typeof initDashboardFunctionality === 'function') {
+        initDashboardFunctionality();
+    } else {
+        console.log('📊 Dashboard functionality not needed on this page');
+    }
     
     // Initialize navigation
     window.navigationManager = new NavigationManager();
@@ -1187,152 +1193,12 @@ function showLeaderboardError(message) {
     }
 }
 
-// Dashboard Refresh Functionality
+// Dashboard Refresh Bridge - Delegates to dashboard.js
 function refreshDashboard() {
-    // Check if dashboard manager exists (from dashboard.js)
+    // Delegate to dashboard manager if available (from dashboard.js)
     if (window.dashboardManager && typeof window.dashboardManager.refreshDashboard === 'function') {
         window.dashboardManager.refreshDashboard();
-        return;
-    }
-    
-    const refreshBtn = document.querySelector('.btn-refresh, .refresh-dashboard');
-    const refreshIcon = refreshBtn?.querySelector('i');
-    
-    if (refreshBtn && refreshIcon) {
-        // Add refreshing state
-        refreshBtn.classList.add('refreshing');
-        refreshBtn.disabled = true;
-        
-        // Show loading indicator
-        refreshIcon.classList.add('fa-spin');
-        
-        // Fetch fresh dashboard data
-        fetch('/api/dashboard/refresh', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Update dashboard elements with fresh data
-                updateDashboardData(data.data);
-                // Note: refresh success notification is handled by dashboard.js component
-            } else {
-                showRefreshError('Failed to refresh dashboard data');
-            }
-        })
-        .catch(error => {
-            console.error('Error refreshing dashboard:', error);
-            showRefreshError('Network error while refreshing');
-        })
-        .finally(() => {
-            // Remove refreshing state
-            setTimeout(() => {
-                refreshBtn.classList.remove('refreshing');
-                refreshBtn.disabled = false;
-                refreshIcon.classList.remove('fa-spin');
-            }, 1000);
-        });
     }
 }
 
-function updateDashboardData(data) {
-    // Update XP
-    const xpElement = document.getElementById('user-xp');
-    if (xpElement && data.user) {
-        xpElement.textContent = data.user.xp || 0;
-    }
-    
-    // Update PyCoins
-    const coinsElement = document.getElementById('user-coins');
-    if (coinsElement && data.user) {
-        coinsElement.textContent = data.user.pycoins || 0;
-    }
-    
-    // Update level
-    const levelElements = document.querySelectorAll('[data-stat="level"] .stat-value-large');
-    levelElements.forEach(element => {
-        if (data.user) {
-            element.textContent = data.user.level || 1;
-        }
-    });
-    
-    // Update stats cards
-    const xpCard = document.querySelector('[data-stat="xp"] .stat-value-large');
-    if (xpCard && data.user) {
-        xpCard.textContent = data.user.xp || 0;
-    }
-    
-    const coinsCard = document.querySelector('[data-stat="pycoins"] .stat-value-large');
-    if (coinsCard && data.user) {
-        coinsCard.textContent = data.user.pycoins || 0;
-    }
-    
-    // Update welcome message if available
-    const welcomeMessage = document.getElementById('welcome-message');
-    if (welcomeMessage && data.user && data.user.display_name) {
-        welcomeMessage.textContent = `Welcome back, ${data.user.display_name}! 🚀`;
-    }
-}
-
-// Note: showRefreshSuccess function removed - now handled by dashboard.js component
-
-function showRefreshError(message) {
-    // Create temporary error indicator
-    const errorIndicator = document.createElement('div');
-    errorIndicator.className = 'refresh-error';
-    errorIndicator.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
-    errorIndicator.style.cssText = `
-        position: fixed;
-        top: 100px;
-        right: 20px;
-        background: #ef4444;
-        color: white;
-        padding: 0.75rem 1.5rem;
-        border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
-        z-index: 10001;
-        animation: slideInRight 0.3s ease;
-    `;
-    
-    document.body.appendChild(errorIndicator);
-    
-    setTimeout(() => {
-        errorIndicator.style.animation = 'slideOutRight 0.3s ease';
-        setTimeout(() => {
-            if (errorIndicator.parentNode) {
-                errorIndicator.parentNode.removeChild(errorIndicator);
-            }
-        }, 300);
-    }, 3000);
-}
-
-// Dashboard Tab Switching
-function initDashboardTabs() {
-    const tabs = document.querySelectorAll('.nav-tab');
-    const tabPanes = document.querySelectorAll('.tab-pane');
-    
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const tabId = tab.getAttribute('data-tab');
-            
-            // Remove active class from all tabs and panes
-            tabs.forEach(t => t.classList.remove('active'));
-            tabPanes.forEach(pane => pane.classList.remove('active'));
-            
-            // Add active class to clicked tab and corresponding pane
-            tab.classList.add('active');
-            const targetPane = document.getElementById(`${tabId}-tab`);
-            if (targetPane) {
-                targetPane.classList.add('active');
-            }
-        });
-    });
-}
-
-// Enhanced initialization
-function initDashboardFunctionality() {
-    initDashboardTabs();
-}
+// Note: All other dashboard functionality is handled by components/dashboard.js

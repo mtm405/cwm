@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'base/head.html' %}
+</head>
+<body class="theme-dark" data-page="{% block page_name %}{% endblock %}">
+    {% include 'components/navigation/navbar.html' %}
+    
+    <!-- Main Content Area -->
+    <div class="app-container">
+        {% block sidebar %}{% endblock %}
+        
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    
+    <!-- Toast Notifications -->
+    {% include 'components/common/toast-notifications.html' %}
+    
+    {% include 'base/scripts.html' %}
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

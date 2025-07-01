@@ -1,0 +1,61 @@
+<!--
+Toast Notification Component
+Usage: Use via JavaScript showToast(message, type, duration)
+This template provides the container structure
+-->
+<div class="toast-container" id="toast-container">
+    <!-- Toast notifications will be dynamically added here -->
+</div>
+
+<script>
+// Toast notification system
+function showToast(message, type = 'info', duration = 3000) {
+    // Remove any existing notifications of the same type
+    const existingToasts = document.querySelectorAll(`.toast-${type}`);
+    existingToasts.forEach(toast => toast.remove());
+    
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+        <i class="fas fa-${getToastIcon(type)}"></i>
+        <span class="toast-message">${message}</span>
+        <button class="toast-close" onclick="removeToast(this.parentElement)">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    const container = document.getElementById('toast-container') || document.body;
+    container.appendChild(toast);
+    
+    // Animate in
+    requestAnimationFrame(() => {
+        toast.classList.add('show');
+    });
+    
+    // Auto remove after duration
+    setTimeout(() => {
+        removeToast(toast);
+    }, duration);
+}
+
+function removeToast(toast) {
+    if (toast && toast.parentNode) {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }
+}
+
+function getToastIcon(type) {
+    const icons = {
+        success: 'check-circle',
+        error: 'exclamation-circle',
+        warning: 'exclamation-triangle',
+        info: 'info-circle'
+    };
+    return icons[type] || 'info-circle';
+}
+</script>

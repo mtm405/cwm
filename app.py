@@ -4,7 +4,9 @@ A gamified Python learning platform for teenagers
 """
 import os
 import logging
+import re
 from flask import Flask, request, jsonify, render_template
+from flask_caching import Cache
 from config import get_config, setup_logging
 from services.firebase_service import FirebaseService
 
@@ -18,6 +20,14 @@ logger = logging.getLogger(__name__)
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
+
+# Initialize caching
+app.config.update(config.TEMPLATE_CACHE_CONFIG)
+cache = Cache(app)
+logger.info("Template caching initialized")
+
+# Make cache available to templates
+app.jinja_env.globals['cache'] = cache
 
 # Initialize Firebase service
 firebase_service = None
@@ -43,6 +53,10 @@ except Exception as e:
 
 # Make Firebase service available to routes
 app.config['firebase_service'] = firebase_service
+
+# Set global firebase service for backward compatibility
+from services.firebase_service import set_firebase_service
+set_firebase_service(firebase_service)
 
 # Inject Firebase service into models
 if firebase_service:
@@ -167,10 +181,9 @@ def debug_rendered_html():
         google_client_id = os.environ.get('GOOGLE_CLIENT_ID')
         
         # Get a snippet of the actual rendered template
-        rendered = render_template('index.html', user=user, google_client_id=google_client_id)
+        rendered = render_template('pages/index.html', user=user, google_client_id=google_client_id)
         
         # Extract just the relevant part with the client ID
-        import re
         client_id_matches = re.findall(r'data-client_id="([^"]*)"', rendered)
         
         debug_info = {

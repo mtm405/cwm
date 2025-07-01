@@ -15,7 +15,7 @@ def index():
     user = get_current_user()
     # Pass the Google client ID for OAuth from environment
     google_client_id = os.environ.get('GOOGLE_CLIENT_ID')
-    return render_template('index.html', user=user, google_client_id=google_client_id)
+    return render_template('pages/index.html', user=user, google_client_id=google_client_id)
 
 @main_bp.route('/dashboard')
 def dashboard():
@@ -79,16 +79,19 @@ def dashboard():
         daily_challenge = firebase_service.get_daily_challenge()
         recent_activity = firebase_service.get_user_activities(user['uid'], limit=10)
     
+    # Temporary debug - return simple response to test template issue
+    # return jsonify({'status': 'template_test', 'user_exists': user is not None})
+    
     return render_template('dashboard.html', 
                          user=user, 
                          leaderboard=leaderboard,
                          daily_challenge=daily_challenge,
                          recent_activity=recent_activity)
 
-# Note: /lessons route moved to lesson_routes.py for better organization
+@main_bp.route('/test-template')
+def test_template():
+    """Simple test route to check template rendering"""
+    return render_template('simple_test.html')
 
-@main_bp.route('/lesson/<lesson_id>')
-def lesson_detail(lesson_id):
-    """Individual lesson page"""
-    user = get_current_user()
-    return render_template('lesson.html', user=user, lesson_id=lesson_id)
+# Note: /lessons route moved to lesson_routes.py for better organization
+# Note: /lesson/<lesson_id> route also moved to lesson_routes.py for proper data handling

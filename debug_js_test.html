@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JS Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { margin: 10px 0; padding: 10px; border-left: 4px solid #ccc; }
+        .success { border-color: #4CAF50; background: #f0f8f0; }
+        .error { border-color: #f44336; background: #fff0f0; }
+        .warning { border-color: #ff9800; background: #fff8f0; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>JavaScript Debug Test Page</h1>
+    <div id="results"></div>
+    
+    <script>
+        const results = document.getElementById('results');
+        
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+        
+        function runTests() {
+            addResult('Starting JavaScript component tests...', 'info');
+            
+            // Test 1: Load lesson-manager.js
+            try {
+                const script1 = document.createElement('script');
+                script1.src = '/static/js/components/lesson-manager.js';
+                script1.onload = () => {
+                    if (typeof LessonPageManager !== 'undefined') {
+                        addResult('✅ LessonPageManager loaded successfully', 'success');
+                        
+                        // Test instantiation
+                        try {
+                            const manager = new LessonPageManager();
+                            addResult('✅ LessonPageManager instantiated successfully', 'success');
+                        } catch (e) {
+                            addResult(`❌ LessonPageManager instantiation failed: ${e.message}`, 'error');
+                            addResult(`<pre>${e.stack}</pre>`, 'error');
+                        }
+                    } else {
+                        addResult('❌ LessonPageManager not available after loading', 'error');
+                    }
+                };
+                script1.onerror = (e) => {
+                    addResult(`❌ Failed to load lesson-manager.js: ${e.message}`, 'error');
+                };
+                document.head.appendChild(script1);
+            } catch (e) {
+                addResult(`❌ Error loading lesson-manager.js: ${e.message}`, 'error');
+            }
+            
+            // Test 2: Load progress-tracker.js
+            setTimeout(() => {
+                try {
+                    const script2 = document.createElement('script');
+                    script2.src = '/static/js/components/progress-tracker.js';
+                    script2.onload = () => {
+                        if (typeof ProgressTracker !== 'undefined') {
+                            addResult('✅ ProgressTracker loaded successfully', 'success');
+                            
+                            // Test instantiation
+                            try {
+                                const tracker = new ProgressTracker('test-lesson', 'test-user');
+                                addResult('✅ ProgressTracker instantiated successfully', 'success');
+                                
+                                // Check for init method
+                                if (typeof tracker.init === 'function') {
+                                    addResult('✅ ProgressTracker.init() method exists', 'success');
+                                } else {
+                                    addResult('❌ ProgressTracker.init() method not found', 'error');
+                                    addResult(`Available methods: ${Object.getOwnPropertyNames(Object.getPrototypeOf(tracker)).join(', ')}`, 'info');
+                                }
+                            } catch (e) {
+                                addResult(`❌ ProgressTracker instantiation failed: ${e.message}`, 'error');
+                                addResult(`<pre>${e.stack}</pre>`, 'error');
+                            }
+                        } else {
+                            addResult('❌ ProgressTracker not available after loading', 'error');
+                        }
+                    };
+                    script2.onerror = (e) => {
+                        addResult(`❌ Failed to load progress-tracker.js: ${e.message}`, 'error');
+                    };
+                    document.head.appendChild(script2);
+                } catch (e) {
+                    addResult(`❌ Error loading progress-tracker.js: ${e.message}`, 'error');
+                }
+            }, 1000);
+            
+            // Test 3: Check for syntax errors by trying to fetch and evaluate
+            setTimeout(() => {
+                fetch('/static/js/components/lesson-manager.js')
+                    .then(response => response.text())
+                    .then(code => {
+                        try {
+                            // Try to parse the JavaScript
+                            new Function(code);
+                            addResult('✅ lesson-manager.js syntax is valid', 'success');
+                        } catch (e) {
+                            addResult(`❌ Syntax error in lesson-manager.js: ${e.message}`, 'error');
+                            addResult(`Error at line: ${e.lineNumber || 'unknown'}`, 'error');
+                        }
+                    })
+                    .catch(e => {
+                        addResult(`❌ Failed to fetch lesson-manager.js: ${e.message}`, 'error');
+                    });
+            }, 2000);
+        }
+        
+        // Capture console errors
+        const originalError = console.error;
+        console.error = function(...args) {
+            addResult(`Console Error: ${args.join(' ')}`, 'error');
+            originalError.apply(console, args);
+        };
+        
+        // Start tests
+        runTests();
+    </script>
+</body>
+</html>

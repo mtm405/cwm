@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lesson.title if lesson else "Lesson" }} - Code with Morais{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/lesson.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="lesson-container">
+    <!-- LESSON HEADER SECTION -->
+    <header class="lesson-header">
+        <div class="lesson-header-content">
+            <div class="lesson-meta">
+                <h1 class="lesson-title">
+                    <i class="fas fa-{{ lesson.icon or 'code' }}"></i>
+                    {{ lesson.title }}
+                </h1>
+                <div class="lesson-badges">
+                    <span class="difficulty-badge {{ lesson.difficulty or 'beginner' }}">
+                        {{ (lesson.difficulty or 'beginner')|title }}
+                    </span>
+                    <span class="time-badge">
+                        <i class="fas fa-clock"></i> {{ lesson.estimated_time or 30 }}min
+                    </span>
+                    <span class="xp-badge">
+                        <i class="fas fa-star"></i> {{ lesson.xp_reward or 100 }} XP
+                    </span>
+                </div>
+            </div>
+            
+            <!-- PROGRESS BAR SECTION -->
+            <div class="progress-section">
+                <div class="progress-header">
+                    <span class="progress-text">Progress</span>
+                    <span class="progress-percentage" id="progress-percentage">{{ lesson_progress.progress or 0 }}%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="lesson-progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: {{ lesson_progress.progress or 0 }}%"></div>
+                    </div>
+                </div>
+                <div class="progress-stats">
+                    <span class="completed-blocks" id="completed-blocks-text">
+                        {{ lesson_progress.completed_blocks|length or 0 }} of {{ lesson.blocks|length or 0 }} blocks completed
+                    </span>
+                    <span class="earned-rewards" id="earned-rewards">
+                        {% if lesson_progress.xp_earned %}+{{ lesson_progress.xp_earned }} XP{% endif %}
+                        {% if lesson_progress.coins_earned %}+{{ lesson_progress.coins_earned }} 🪙{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="lesson-content-wrapper">
+        
+        <!-- Loading Skeleton -->
+        <div id="content-loading" class="content-loading">
+            <div class="spinner">Loading lesson content...</div>
+        </div>
+        
+        <!-- Dynamic Content Container -->
+        <div id="lesson-content" class="lesson-content" style="display: none;">
+            <div id="lesson-content-container" class="content-blocks-container">
+                <!-- Content blocks will be dynamically rendered here by JavaScript -->
+                <div class="placeholder-content">
+                    <h3>📚 Welcome to {{ lesson.title }}</h3>
+                    <p>{{ lesson.description or 'This lesson will teach you important Python concepts.' }}</p>
+                    
+                    {% if lesson.content %}
+                    <div class="legacy-content">
+                        {% for block in lesson.content %}
+                        <div class="content-block {{ block.type }}-block">
+                            {% if block.type == 'text' %}
+                            <div class="text-content">{{ block.content | safe }}</div>
+                            {% elif block.type == 'code_example' %}
+                            <div class="code-example">
+                                <pre><code class="language-{{ block.language or 'python' }}">{{ block.code }}</code></pre>
+                            </div>
+                            {% elif block.type == 'interactive_challenge' %}
+                            <div class="interactive-challenge">
+                                <h4>🎯 Interactive Challenge</h4>
+                                <p>{{ block.instructions }}</p>
+                                <div class="code-editor">
+                                    <textarea>{{ block.starter_code or '# Write your code here' }}</textarea>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+    </main>
+
+    <!-- LESSON NAVIGATION FOOTER -->
+    <footer class="lesson-navigation">
+        <div class="nav-buttons">
+            <a href="/lessons" class="nav-btn prev-btn">
+                <i class="fas fa-arrow-left"></i>
+                <span class="nav-text">
+                    <small>Back to</small>
+                    <strong>Lessons</strong>
+                </span>
+            </a>
+            
+            <div class="nav-center">
+                <button id="lesson-menu-btn" class="lesson-menu-btn">
+                    <i class="fas fa-list"></i>
+                    <span>Lesson Menu</span>
+                </button>
+            </div>
+            
+            <a href="/lessons" class="nav-btn next-btn">
+                <span class="nav-text">
+                    <small>Next</small>
+                    <strong>Lesson</strong>
+                </span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </footer>
+
+</div>
+
+<script>
+// Simple lesson JavaScript
+window.lessonData = {{ lesson|tojson if lesson else '{}' }};
+window.lessonProgress = {{ lesson_progress|tojson if lesson_progress else '{}' }};
+window.currentUser = {{ user|tojson if user else '{}' }};
+window.lessonId = '{{ lesson.id if lesson else '' }}';
+
+console.log('📚 Lesson data loaded:', window.lessonData);
+console.log('📊 Progress data loaded:', window.lessonProgress);
+
+// Initialize lesson when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Simple lesson template loaded successfully');
+    
+    // Hide loading and show content
+    const loading = document.getElementById('content-loading');
+    const content = document.getElementById('lesson-content');
+    
+    if (loading && content) {
+        loading.style.display = 'none';
+        content.style.display = 'block';
+    }
+    
+    // Simple progress update
+    console.log('✅ Lesson initialized - ready for JavaScript integration');
+});
+</script>
+{% endblock %}

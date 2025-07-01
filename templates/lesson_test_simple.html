@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Lesson: {{ lesson.title if lesson else "No lesson" }}</title>
+</head>
+<body>
+    <h1>Simple Test</h1>
+    <p>Lesson ID: {{ lesson.id if lesson else "No lesson" }}</p>
+    <p>User: {{ user.name if user else "No user" }}</p>
+</body>
+</html>

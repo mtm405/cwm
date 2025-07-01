@@ -1,0 +1,27 @@
+<!--
+Reusable Stat Card Component
+Usage: {% include 'components/dashboard/stat-card.html' with context %}
+Variables needed:
+- stat_type: CSS class variant (primary, success, warning, info)
+- stat_icon: Font Awesome icon class (e.g., "fas fa-star")
+- stat_trend: Trend text (e.g., "+25%", "Level Up!")
+- stat_value: Main numeric value
+- stat_label: Label text
+- stat_progress: Progress percentage (0-100)
+- data_stat: Data attribute value
+-->
+<div class="stat-card-modern {{ stat_type }}" data-stat="{{ data_stat }}">
+    <div class="stat-header">
+        <i class="stat-icon {{ stat_icon }}"></i>
+        <span class="stat-trend">{{ stat_trend }}</span>
+    </div>
+    <div class="stat-body">
+        <span class="stat-value-large">{{ stat_value }}</span>
+        <span class="stat-label">{{ stat_label }}</span>
+    </div>
+    <div class="stat-progress">
+        <div class="progress-bar-mini">
+            <div class="progress-fill-mini" style="width: {{ stat_progress }}%"></div>
+        </div>
+    </div>
+</div>

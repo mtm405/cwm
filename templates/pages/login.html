@@ -1,0 +1,130 @@
+{% extends "base/layout.html" %}
+
+{% block page_name %}login{% endblock %}
+
+{% block title %}Sign In - Code with Morais{% endblock %}
+
+{% block extra_css %}
+<style>
+.auth-page {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, 
+        rgba(59, 130, 246, 0.1) 0%, 
+        rgba(147, 51, 234, 0.1) 100%);
+}
+
+.auth-content {
+    width: 100%;
+    max-width: 450px;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.auth-subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.code-with-morais-logo {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.code-with-morais-logo:hover {
+    color: var(--primary-hover);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-content">
+        <!-- Header -->
+        <div class="auth-header">
+            <a href="/" class="code-with-morais-logo">
+                <i class="fas fa-code"></i>
+                Code with Morais
+            </a>
+            <h1 class="auth-title">Welcome Back!</h1>
+            <p class="auth-subtitle">
+                Sign in to continue your Python learning journey
+            </p>
+        </div>
+
+        <!-- Login Form Component -->
+        {% set form_action = '/auth/login' %}
+        {% set show_google_auth = true %}
+        {% set show_email_login = true %}
+        {% set google_client_id = config.GOOGLE_CLIENT_ID %}
+        {% set form_error = get_flashed_messages(category_filter=['error'])[0] if get_flashed_messages(category_filter=['error']) %}
+        {% set redirect_url = request.args.get('next') %}
+        {% include 'components/forms/login-form.html' with context %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Handle form submissions and Google OAuth
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle login form submission
+    const loginForm = document.querySelector('.login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                e.preventDefault();
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const submitButton = loginForm.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+                const buttonText = submitButton.querySelector('.button-text');
+                const buttonIcon = submitButton.querySelector('i');
+                
+                if (buttonText) buttonText.textContent = 'Signing In...';
+                if (buttonIcon) buttonIcon.className = 'fas fa-spinner fa-spin';
+            }
+        });
+    }
+    
+    // Handle Google OAuth success/failure
+    window.handleCredentialResponse = function(response) {
+        // This would be handled by your backend
+        console.log('Google OAuth response received');
+    };
+    
+    // Auto-focus email field
+    const emailInput = document.getElementById('email');
+    if (emailInput) {
+        emailInput.focus();
+    }
+});
+</script>
+{% endblock %}

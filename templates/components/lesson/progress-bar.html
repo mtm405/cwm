@@ -1,0 +1,18 @@
+<!--
+Lesson Progress Bar Component
+Usage: {% include 'components/lesson/progress-bar.html' with context %}
+Variables needed:
+- lesson: lesson object with progress data
+- lesson_progress: user's progress data (optional)
+
+Description: Displays lesson completion progress with dynamic progress bar
+-->
+<div class="lesson-progress-bar">
+    <div class="progress-info">
+        <span>Progress: {{ ((lesson_progress.completed_subtopics | length / lesson.subtopics | length) * 100) | round if lesson and lesson.subtopics else 0 }}%</span>
+        <span>{{ lesson_progress.completed_subtopics | length if lesson_progress else 0 }} / {{ lesson.subtopics | length if lesson and lesson.subtopics else 0 }} completed</span>
+    </div>
+    <div class="progress-bar">
+        <div class="progress-bar-fill" style="width: {{ ((lesson_progress.completed_subtopics | length / lesson.subtopics | length) * 100) | round if lesson and lesson.subtopics else 0 }}%"></div>
+    </div>
+</div>

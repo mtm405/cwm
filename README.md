@@ -116,7 +116,7 @@ code-with-morais/
 │   ├── firebase_service.py # Firebase interactions
 │   └── code_execution.py   # Python code execution service
 ├── static/               # Static assets
-│   ├── css/              # Stylesheets
+│   ├── css/              # Stylesheets (see static/css/CSS_ARCHITECTURE_MAPPING.md)
 │   └── js/               # JavaScript files
 ├── templates/            # HTML templates
 ├── utils/                # Utility functions
@@ -146,6 +146,19 @@ code-with-morais/
 ## Development Mode
 
 The platform runs in development mode by default, bypassing authentication for rapid testing. To disable dev mode, set `DEV_MODE=False` in your `.env` file.
+
+## Development Guidelines
+
+### CSS Development
+- **📖 Read First**: [`static/css/CSS_ARCHITECTURE_MAPPING.md`](static/css/CSS_ARCHITECTURE_MAPPING.md) - Complete CSS guide
+- **🎯 Component Structure**: CSS is organized by components in `static/css/components/`
+- **⚡ Entry Point**: All styles imported through `static/css/main.css`
+- **🚨 Before Changes**: Check which file owns the class you want to modify
+
+### Documentation
+- **📚 Complete docs**: [`docs/README.md`](docs/README.md) - Organized documentation index
+- **🏗️ Architecture**: See `docs/architecture/` for technical details
+- **🔧 Maintenance**: See `docs/maintenance/` for cleanup guides
 
 ## Contributing
 

@@ -1,0 +1,52 @@
+<!--
+Form Input Component
+Usage: {% include 'components/forms/form-input.html' with context %}
+Variables needed:
+- input_id: Unique identifier for the input
+- input_name: Name attribute for the input
+- input_label: Label text
+- input_type: Input type (text, email, password, etc.) - default: 'text'
+- input_placeholder: Placeholder text (optional)
+- input_value: Default value (optional)
+- input_required: Whether field is required (default: false)
+- input_error: Error message to display (optional)
+- input_help: Help text to display (optional)
+- input_class: Additional CSS classes (optional)
+- input_icon: Font Awesome icon class (optional)
+-->
+<div class="form-group">
+    <label for="{{ input_id }}" class="form-label">
+        {{ input_label }}
+        {% if input_required %}<span class="required">*</span>{% endif %}
+    </label>
+    
+    <div class="input-wrapper {% if input_icon %}has-icon{% endif %}">
+        {% if input_icon %}
+        <i class="{{ input_icon }} input-icon"></i>
+        {% endif %}
+        
+        <input 
+            type="{{ input_type or 'text' }}"
+            id="{{ input_id }}"
+            name="{{ input_name }}"
+            class="form-control {% if input_error %}error{% endif %} {{ input_class or '' }}"
+            {% if input_placeholder %}placeholder="{{ input_placeholder }}"{% endif %}
+            {% if input_value %}value="{{ input_value }}"{% endif %}
+            {% if input_required %}required{% endif %}
+        >
+    </div>
+    
+    {% if input_error %}
+    <div class="form-error">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ input_error }}
+    </div>
+    {% endif %}
+    
+    {% if input_help %}
+    <div class="form-help">
+        <i class="fas fa-info-circle"></i>
+        {{ input_help }}
+    </div>
+    {% endif %}
+</div>

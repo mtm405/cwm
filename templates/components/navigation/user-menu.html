@@ -1,0 +1,50 @@
+{% if user %}
+<!-- User Stats -->
+<div class="user-info-modern">
+    <span class="user-stats-modern">
+        <span class="stat-item">
+            <i class="fas fa-star"></i> 
+            <span id="user-xp">{{ user.xp }}</span>
+        </span>
+        <span class="stat-item">
+            <i class="fas fa-coins"></i> 
+            <span id="user-coins">{{ user.pycoins }}</span>
+        </span>
+    </span>
+</div>
+
+<!-- User Profile -->
+<div class="user-profile-modern">
+    <div class="user-dropdown-modern">
+        <img src="{{ user.profile_picture or '/static/img/default-avatar.png' }}" alt="Profile" class="user-avatar-modern">
+        <span class="user-name-modern">{{ user.display_name or user.username or user.email }}</span>
+        <i class="fas fa-chevron-down dropdown-arrow"></i>
+        <div class="dropdown-menu-modern">
+            <a href="/profile"><i class="fas fa-user"></i> Profile</a>
+            <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
+            {% if user.is_admin %}
+            <a href="/admin"><i class="fas fa-shield-alt"></i> Admin</a>
+            {% endif %}
+            <hr class="dropdown-divider">
+            <button onclick="signOut()" class="sign-out-btn-modern"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+        </div>
+    </div>
+</div>
+{% else %}
+<!-- Auth Section for non-logged users -->
+<div class="auth-section">
+    <div id="g_id_onload"
+         data-client_id="{{ google_client_id }}"
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin"
+         data-type="standard"
+         data-size="large"
+         data-theme="outline"
+         data-text="sign_in_with"
+         data-shape="rectangular"
+         data-logo_alignment="left">
+    </div>
+</div>
+{% endif %}

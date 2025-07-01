@@ -3,7 +3,6 @@ Lesson model for Code with Morais
 """
 import logging
 from typing import Optional, List, Dict, Any
-from services.firebase_service import db
 
 logger = logging.getLogger(__name__)
 
@@ -93,6 +92,25 @@ def get_mock_lesson(lesson_id):
                 {'id': 'variables', 'title': 'Variables', 'order': 1},
                 {'id': 'data-types', 'title': 'Data Types', 'order': 2},
                 {'id': 'operations', 'title': 'Basic Operations', 'order': 3}
+            ]
+        },
+        'python-basics-01': {
+            'id': 'python-basics-01',
+            'title': 'Python Basics - Chapter 1',
+            'content': [
+                {
+                    'type': 'text',
+                    'content': '# Welcome to Python Basics - Chapter 1!\n\nThis is the first chapter of our Python basics series.'
+                },
+                {
+                    'type': 'code_example',
+                    'language': 'python',
+                    'code': '# Chapter 1: Introduction\nprint("Welcome to Python!")\n\n# Your first variable\nmy_name = "Student"\nprint(f"Hello, {my_name}!")'
+                }
+            ],
+            'subtopics': [
+                {'id': 'introduction', 'title': 'Introduction', 'order': 1},
+                {'id': 'first-steps', 'title': 'First Steps', 'order': 2}
             ]
         },
         'flow-control': {

@@ -1,0 +1,332 @@
+<!--
+Achievement Toast Component
+Usage: {% include 'components/gamification/achievement-toast.html' %}
+Variables needed: None (controlled via JavaScript)
+
+Description: Displays toast notifications for achievements, streaks, and other gamification events
+-->
+
+<div class="toast-container" id="achievement-toast-container">
+    <!-- Toasts will be dynamically inserted here -->
+</div>
+
+<!-- Toast Templates (hidden, used by JavaScript) -->
+<template id="achievement-toast-template">
+    <div class="achievement-toast" data-toast-type="achievement">
+        <div class="toast-icon">
+            <span class="toast-icon-content">🏆</span>
+            <div class="toast-icon-glow"></div>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">Achievement Unlocked!</div>
+            <div class="toast-message">Achievement name here</div>
+        </div>
+        <div class="toast-close" onclick="closeToast(this)">×</div>
+        <div class="toast-progress-bar"></div>
+    </div>
+</template>
+
+<template id="xp-gain-toast-template">
+    <div class="achievement-toast xp-gain-toast" data-toast-type="xp-gain">
+        <div class="toast-icon">
+            <span class="toast-icon-content">⭐</span>
+            <div class="toast-icon-pulse"></div>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">XP Gained!</div>
+            <div class="toast-message">+<span class="xp-amount">0</span> XP earned</div>
+        </div>
+        <div class="toast-close" onclick="closeToast(this)">×</div>
+        <div class="toast-progress-bar"></div>
+    </div>
+</template>
+
+<template id="streak-toast-template">
+    <div class="achievement-toast streak-toast" data-toast-type="streak">
+        <div class="toast-icon">
+            <span class="toast-icon-content">🔥</span>
+            <div class="toast-icon-flame"></div>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">Streak Milestone!</div>
+            <div class="toast-message"><span class="streak-days">0</span> day streak!</div>
+        </div>
+        <div class="toast-close" onclick="closeToast(this)">×</div>
+        <div class="toast-progress-bar"></div>
+    </div>
+</template>
+
+<template id="level-up-toast-template">
+    <div class="achievement-toast level-up-toast" data-toast-type="level-up">
+        <div class="toast-icon">
+            <span class="toast-icon-content">🎉</span>
+            <div class="toast-icon-celebration"></div>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">Level Up!</div>
+            <div class="toast-message">Welcome to Level <span class="new-level">0</span>!</div>
+        </div>
+        <div class="toast-close" onclick="closeToast(this)">×</div>
+        <div class="toast-progress-bar"></div>
+    </div>
+</template>
+
+<template id="challenge-complete-toast-template">
+    <div class="achievement-toast challenge-complete-toast" data-toast-type="challenge-complete">
+        <div class="toast-icon">
+            <span class="toast-icon-content">🏅</span>
+            <div class="toast-icon-bounce"></div>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">Challenge Complete!</div>
+            <div class="toast-message">Great work on today's challenge!</div>
+        </div>
+        <div class="toast-close" onclick="closeToast(this)">×</div>
+        <div class="toast-progress-bar"></div>
+    </div>
+</template>
+
+<template id="lesson-complete-toast-template">
+    <div class="achievement-toast lesson-complete-toast" data-toast-type="lesson-complete">
+        <div class="toast-icon">
+            <span class="toast-icon-content">📚</span>
+            <div class="toast-icon-shine"></div>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">Lesson Complete!</div>
+            <div class="toast-message">Well done! Ready for the next one?</div>
+        </div>
+        <div class="toast-close" onclick="closeToast(this)">×</div>
+        <div class="toast-progress-bar"></div>
+    </div>
+</template>
+
+<script>
+class AchievementToastManager {
+    constructor() {
+        this.container = document.getElementById('achievement-toast-container');
+        this.toasts = [];
+        this.maxToasts = 5;
+        this.defaultDuration = 5000; // 5 seconds
+        
+        // Initialize if container exists
+        if (this.container) {
+            this.init();
+        }
+    }
+    
+    init() {
+        console.log('🎯 Achievement Toast Manager initialized');
+    }
+    
+    showToast(type, data = {}) {
+        const template = document.getElementById(`${type}-toast-template`);
+        if (!template) {
+            console.warn(`Toast template not found: ${type}`);
+            return;
+        }
+        
+        // Clone template
+        const toastElement = template.content.cloneNode(true).children[0];
+        
+        // Customize based on type and data
+        this.customizeToast(toastElement, type, data);
+        
+        // Add to container
+        this.container.appendChild(toastElement);
+        
+        // Track toast
+        const toastData = {
+            element: toastElement,
+            type: type,
+            timestamp: Date.now(),
+            duration: data.duration || this.defaultDuration
+        };
+        this.toasts.push(toastData);
+        
+        // Limit number of toasts
+        this.enforceMaxToasts();
+        
+        // Animate in
+        this.animateToastIn(toastElement);
+        
+        // Auto-remove
+        this.scheduleToastRemoval(toastData);
+        
+        console.log(`🎉 Showing ${type} toast:`, data);
+    }
+    
+    customizeToast(toastElement, type, data) {
+        switch (type) {
+            case 'achievement':
+                if (data.name) {
+                    toastElement.querySelector('.toast-message').textContent = data.name;
+                }
+                if (data.icon) {
+                    toastElement.querySelector('.toast-icon-content').textContent = data.icon;
+                }
+                break;
+                
+            case 'xp-gain':
+                if (data.amount) {
+                    toastElement.querySelector('.xp-amount').textContent = data.amount;
+                }
+                break;
+                
+            case 'streak':
+                if (data.days) {
+                    toastElement.querySelector('.streak-days').textContent = data.days;
+                }
+                break;
+                
+            case 'level-up':
+                if (data.level) {
+                    toastElement.querySelector('.new-level').textContent = data.level;
+                }
+                break;
+                
+            case 'challenge-complete':
+                if (data.challengeName) {
+                    toastElement.querySelector('.toast-message').textContent = `Completed: ${data.challengeName}`;
+                }
+                break;
+                
+            case 'lesson-complete':
+                if (data.lessonName) {
+                    toastElement.querySelector('.toast-message').textContent = `Completed: ${data.lessonName}`;
+                }
+                break;
+        }
+        
+        // Add custom classes if provided
+        if (data.className) {
+            toastElement.classList.add(data.className);
+        }
+    }
+    
+    animateToastIn(toastElement) {
+        // Start with slide-in animation
+        toastElement.style.transform = 'translateX(100%)';
+        toastElement.style.opacity = '0';
+        
+        // Trigger animation after a brief delay
+        setTimeout(() => {
+            toastElement.style.transition = 'all 0.3s ease-out';
+            toastElement.style.transform = 'translateX(0)';
+            toastElement.style.opacity = '1';
+        }, 50);
+    }
+    
+    animateToastOut(toastElement) {
+        return new Promise((resolve) => {
+            toastElement.style.transition = 'all 0.3s ease-in';
+            toastElement.style.transform = 'translateX(100%)';
+            toastElement.style.opacity = '0';
+            
+            setTimeout(() => {
+                if (toastElement.parentNode) {
+                    toastElement.parentNode.removeChild(toastElement);
+                }
+                resolve();
+            }, 300);
+        });
+    }
+    
+    scheduleToastRemoval(toastData) {
+        setTimeout(() => {
+            this.removeToast(toastData);
+        }, toastData.duration);
+        
+        // Start progress bar animation
+        const progressBar = toastData.element.querySelector('.toast-progress-bar');
+        if (progressBar) {
+            progressBar.style.transition = `width ${toastData.duration}ms linear`;
+            progressBar.style.width = '0%';
+        }
+    }
+    
+    async removeToast(toastData) {
+        const index = this.toasts.findIndex(t => t === toastData);
+        if (index !== -1) {
+            this.toasts.splice(index, 1);
+            await this.animateToastOut(toastData.element);
+        }
+    }
+    
+    enforceMaxToasts() {
+        while (this.toasts.length > this.maxToasts) {
+            const oldestToast = this.toasts.shift();
+            this.animateToastOut(oldestToast.element);
+        }
+    }
+    
+    // Public methods for different toast types
+    showAchievement(achievementData) {
+        this.showToast('achievement', achievementData);
+    }
+    
+    showXPGain(amount, source = '') {
+        this.showToast('xp-gain', { 
+            amount, 
+            source,
+            duration: 3000 // Shorter duration for XP gains
+        });
+    }
+    
+    showStreakMilestone(days) {
+        this.showToast('streak', { 
+            days,
+            duration: 4000
+        });
+    }
+    
+    showLevelUp(level) {
+        this.showToast('level-up', { 
+            level,
+            duration: 6000 // Longer duration for level ups
+        });
+    }
+    
+    showChallengeComplete(challengeName = '') {
+        this.showToast('challenge-complete', { 
+            challengeName,
+            duration: 4000
+        });
+    }
+    
+    showLessonComplete(lessonName = '') {
+        this.showToast('lesson-complete', { 
+            lessonName,
+            duration: 4000
+        });
+    }
+    
+    clearAllToasts() {
+        this.toasts.forEach(toastData => {
+            this.animateToastOut(toastData.element);
+        });
+        this.toasts = [];
+    }
+}
+
+// Global toast functions
+window.closeToast = function(closeButton) {
+    const toastElement = closeButton.closest('.achievement-toast');
+    if (toastElement && window.achievementToastManager) {
+        const toastData = window.achievementToastManager.toasts.find(t => t.element === toastElement);
+        if (toastData) {
+            window.achievementToastManager.removeToast(toastData);
+        }
+    }
+};
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    window.achievementToastManager = new AchievementToastManager();
+});
+
+// Export for external use
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = AchievementToastManager;
+}
+</script>

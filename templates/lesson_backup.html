@@ -3,1199 +3,572 @@
 {% block title %}{{ lesson.title if lesson else "Lesson" }} - Code with Morais{% endblock %}
 
 {% block extra_css %}
-<style>
-/* Lesson container */
-.lesson-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 2rem;
-}
-
-.lesson-header {
-    margin-bottom: 2rem;
-}
-
-.back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--primary-color);
-    text-decoration: none;
-    margin-bottom: 1rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.back-link:hover {
-    color: var(--secondary-color);
-    transform: translateX(-5px);
-}
-
-.lesson-progress-bar {
-    background-color: var(--bg-card);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin: 1.5rem 0;
-}
-
-.progress-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 8px;
-    background-color: var(--bg-secondary);
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.progress-bar-fill {
-    height: 100%;
-    background-color: var(--primary-color);
-    transition: width 0.3s ease;
-}
-
-.lesson-tabs {
-    display: flex;
-    gap: 0.5rem;
-    margin: 1rem 0;
-    flex-wrap: wrap;
-}
-
-.lesson-tab {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    background-color: var(--bg-secondary);
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
-}
-
-.lesson-tab:hover {
-    border-color: var(--primary-color);
-}
-
-.lesson-tab.active {
-    background-color: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-}
-
-.tab-check {
-    color: var(--text-secondary);
-}
-
-.tab-check.completed {
-    color: var(--success-color);
-}
-
-.lesson-content-area {
-    margin: 2rem 0;
-}
-
-.content-block {
-    margin-bottom: 2rem;
-    padding: 2rem;
-    background-color: var(--bg-card);
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-}
-
-.text-block {
-    line-height: 1.8;
-}
-
-.text-block h1, .text-block h2, .text-block h3 {
-    color: var(--primary-color);
-    margin: 1rem 0;
-}
-
-.code-example {
-    background-color: var(--bg-secondary);
-}
-
-.code-header {
-    background-color: var(--bg-primary);
-    margin: -2rem -2rem 1rem -2rem;
-    padding: 1rem 2rem;
-    border-radius: 12px 12px 0 0;
-    font-weight: 500;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.btn-copy {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    padding: 0.5rem;
-    transition: color 0.3s ease;
-}
-
-.btn-copy:hover {
-    color: var(--primary-color);
-}
-
-.code-example pre {
-    background-color: transparent;
-    margin: 0;
-    padding: 0;
-    overflow-x: auto;
-}
-
-.code-example code {
-    font-family: 'Fira Code', 'Consolas', monospace;
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-.interactive-challenge h3 {
-    color: var(--secondary-color);
-    margin-bottom: 1rem;
-}
-
-.quiz-block {
-    background-color: var(--bg-secondary);
-    border-radius: 12px;
-    padding: 2rem;
-    margin: 2rem 0;
-    border: 2px solid var(--primary-color);
-}
-
-.quiz-block h3 {
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-}
-
-.lesson-navigation {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border-color);
-}
-
-@media (max-width: 768px) {
-    .lesson-navigation {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .lesson-navigation button {
-        width: 100%;
-    }
-}
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/lesson.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/lesson-content-blocks.css') }}">
 {% endblock %}
 
 {% block content %}
 <div class="lesson-container">
-    <div class="lesson-header">
+    <!-- LESSON HEADER SECTION -->
+    <header class="lesson-header">
         <a href="/lessons" class="back-link">
             <i class="fas fa-arrow-left"></i> Back to Lessons
         </a>
-        <h1>{{ lesson.title }}</h1>
         
-        <!-- Lesson Progress Bar -->
-        <div class="lesson-progress-bar">
-            <div class="progress-info">
-                <span>Lesson Progress</span>
-                <span id="progress-percentage">{{ lesson_progress.progress|default(0) }}%</span>
+        <div class="lesson-header-content">
+            <div class="lesson-meta">
+                <h1 class="lesson-title">
+                    <i class="fas fa-{{ lesson.icon or 'code' }}"></i>
+                    {{ lesson.title }}
+                </h1>
+                <div class="lesson-badges">
+                    <span class="difficulty-badge {{ lesson.difficulty or 'beginner' }}">
+                        {{ (lesson.difficulty or 'beginner')|title }}
+                    </span>
+                    <span class="time-badge">
+                        <i class="fas fa-clock"></i> {{ lesson.estimated_time or 30 }}min
+                    </span>
+                    <span class="xp-badge">
+                        <i class="fas fa-star"></i> {{ lesson.xp_reward or 100 }} XP
+                    </span>
+                </div>
             </div>
-            <div class="progress-bar">
-                <div class="progress-bar-fill" id="lesson-progress-fill" style="width: {{ lesson_progress.progress|default(0) }}%"></div>
+            
+            <!-- Progress Bar -->
+            <div class="lesson-progress-wrapper">
+                <div class="progress-info">
+                    <span class="progress-label">Lesson Progress</span>
+                    <span class="progress-text" id="lesson-progress-text">0%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="lesson-progress-bar"></div>
+                </div>
             </div>
         </div>
-        
-        {% if lesson.subtopics %}
-        <div class="lesson-tabs">
+    </header>
+
+    <!-- SUBTOPIC TABS -->
+    {% if lesson.subtopics %}
+    <nav class="subtopic-tabs" role="tablist">
+        <div class="tabs-container">
             {% for subtopic in lesson.subtopics %}
-            <button class="lesson-tab {% if loop.first %}active{% endif %}" 
-                    data-subtopic-id="{{ subtopic.id }}"
-                    data-completed="{{ 'true' if subtopic.id in lesson_progress.completed_subtopics else 'false' }}"
-                    onclick="switchLessonTab('{{ subtopic.id }}')">
-                <i class="fas fa-check-circle tab-check {% if subtopic.id in lesson_progress.completed_subtopics %}completed{% endif %}"></i>
-                {{ subtopic.title }}
+            <button class="subtopic-tab {% if loop.first %}active{% endif %}" 
+                    role="tab" 
+                    data-subtopic-index="{{ loop.index0 }}"
+                    onclick="switchSubtopic({{ loop.index0 }})">
+                <i class="tab-icon fas fa-circle"></i>
+                <span class="tab-text">{{ subtopic if subtopic is string else (subtopic.title if subtopic is mapping and 'title' in subtopic else subtopic) }}</span>
             </button>
             {% endfor %}
         </div>
-        {% endif %}
+        
+        <!-- Swipe Navigation Indicators -->
+        <div class="swipe-indicators">
+            <button class="swipe-nav swipe-prev" onclick="previousSubtopic()" disabled>
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="swipe-nav swipe-next" onclick="nextSubtopic()">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- LESSON CONTENT -->
+    <main class="lesson-content" id="lesson-content-container" style="opacity: 0; transition: opacity 0.3s ease;">
+        <!-- Content will be dynamically loaded here -->
+        <div class="loading-placeholder" id="content-loading-placeholder">
+            <div class="loading-spinner"></div>
+            <p>Loading lesson content...</p>
+        </div>
+    </main>
+
+    <!-- LESSON NAVIGATION -->
+    <nav class="lesson-navigation">
+        <button class="btn btn-secondary" id="prev-btn" onclick="previousSubtopic()" disabled>
+            <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        
+        <div class="nav-center">
+            <button class="btn btn-primary complete-btn" onclick="completeCurrentSubtopic()" id="complete-subtopic-btn">
+                Mark Complete
+            </button>
+        </div>
+        
+        <button class="btn btn-primary" id="next-btn" onclick="nextSubtopic()">
+            Next <i class="fas fa-chevron-right"></i>
+        </button>
+    </nav>
+
+    <!-- OFFLINE STATUS INDICATOR -->
+    <div class="offline-indicator" id="offline-indicator" style="display: none;">
+        <i class="fas fa-wifi-slash"></i>
+        <span>Offline Mode - Content cached locally</span>
     </div>
+
+    <!-- CELEBRATION OVERLAY -->
+    <div class="celebration-overlay" id="celebration-overlay">
+        <div class="celebration-content">
+            <div class="trophy-container">
+                <i class="fas fa-trophy trophy-icon"></i>
+            </div>
+            <h2 class="celebration-title"></h2>
+            <p class="celebration-message"></p>
+            <div class="confetti-container"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Core JavaScript Files -->
+<script src="{{ url_for('static', filename='js/components/lesson-manager.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/content-renderer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/progress-tracker.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/interactive-editor.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/quiz.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/gamification-manager.js') }}"></script>
+
+<!-- ACE Editor -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.23.4/ace.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.23.4/mode-python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.23.4/theme-monokai.min.js"></script>
+
+<script>
+// Initialize the lesson when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize lesson data
+    const lessonData = {{ lesson | tojson | safe }};
     
-    <div class="lesson-content-area" id="lesson-content">
-        {% for content_block in lesson.content %}
-            {% if content_block.type == 'text' %}
-            <div class="content-block text-block">
-                {{ content_block.content | safe }}
-            </div>
-            
-            {% elif content_block.type == 'code_example' %}
-            <div class="content-block code-example">
-                <div class="code-header">
-                    <span>Example Code</span>
-                    <button class="btn btn-sm" onclick="copyCode(this)">
-                        <i class="fas fa-copy"></i> Copy
-                    </button>
+    // Initialize LessonPageManager (from lesson-manager.js) - only if not already initialized
+    if (typeof LessonPageManager !== 'undefined' && !window.lessonPageManager) {
+        window.lessonPageManager = new LessonPageManager();
+        console.log('✅ LessonPageManager initialized from template');
+        
+        // Set up callback to show content when LessonPageManager is ready
+        window.lessonPageManager.onContentReady = function() {
+            showLessonContent();
+        };
+    } else if (window.lessonPageManager) {
+        console.log('✅ LessonPageManager already initialized');
+        showLessonContent();
+    }
+    
+    // Initialize ProgressTracker (from progress-tracker.js)
+    if (typeof ProgressTracker !== 'undefined') {
+        window.progressTracker = new ProgressTracker(lessonData.id);
+        window.progressTracker.init();
+    }
+    
+    // Initialize GamificationManager (from gamification-manager.js)
+    if (typeof GamificationManager !== 'undefined') {
+        window.gamificationManager = new GamificationManager();
+    }
+    
+    // Only use fallback rendering if LessonPageManager is not available
+    if (!window.lessonPageManager && typeof LessonPageManager === 'undefined') {
+        console.log('🔄 Using template fallback rendering (LessonPageManager not available)...');
+        renderLessonContent();
+        showLessonContent();
+    } else {
+        console.log('✅ LessonPageManager will handle content rendering');
+    }
+    
+    // Initialize offline support
+    initializeOfflineSupport();
+    
+    // Initialize touch/swipe navigation for mobile
+    initializeTouchNavigation();
+});
+
+// Function to show lesson content (removes loading state)
+function showLessonContent() {
+    const contentContainer = document.getElementById('lesson-content-container');
+    const loadingPlaceholder = document.getElementById('content-loading-placeholder');
+    
+    if (contentContainer) {
+        contentContainer.style.opacity = '1';
+    }
+    
+    if (loadingPlaceholder) {
+        loadingPlaceholder.style.display = 'none';
+    }
+    
+    console.log('✅ Lesson content is now visible');
+}
+
+// Offline Support
+function initializeOfflineSupport() {
+    const offlineIndicator = document.getElementById('offline-indicator');
+    
+    function updateOnlineStatus() {
+        if (navigator.onLine) {
+            offlineIndicator.style.display = 'none';
+        } else {
+            offlineIndicator.style.display = 'flex';
+        }
+    }
+    
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
+    
+    // Cache lesson content in localStorage
+    const lessonData = {{ lesson | tojson | safe }};
+    localStorage.setItem(`lesson_${lessonData.id}_cache`, JSON.stringify(lessonData));
+}
+
+// Touch/Swipe Navigation
+function initializeTouchNavigation() {
+    const container = document.querySelector('.lesson-container');
+    let startX = 0;
+    let startY = 0;
+    
+    container.addEventListener('touchstart', function(e) {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+    });
+    
+    container.addEventListener('touchmove', function(e) {
+        e.preventDefault(); // Prevent scrolling while swiping
+    });
+    
+    container.addEventListener('touchend', function(e) {
+        const endX = e.changedTouches[0].clientX;
+        const endY = e.changedTouches[0].clientY;
+        const diffX = startX - endX;
+        const diffY = startY - endY;
+        
+        // Only process horizontal swipes
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+            if (diffX > 0) {
+                // Swipe left - next subtopic
+                nextSubtopic();
+            } else {
+                // Swipe right - previous subtopic
+                previousSubtopic();
+            }
+        }
+    });
+}
+
+// Global functions for backward compatibility
+function switchSubtopic(index) {
+    if (window.lessonPageManager) {
+        window.lessonPageManager.switchSubtopic(index);
+    }
+}
+
+function previousSubtopic() {
+    if (window.lessonPageManager) {
+        window.lessonPageManager.previousSubtopic();
+    }
+}
+
+function nextSubtopic() {
+    if (window.lessonPageManager) {
+        window.lessonPageManager.nextSubtopic();
+    }
+}
+
+function completeCurrentSubtopic() {
+    if (window.progressTracker) {
+        window.progressTracker.completeCurrentSubtopic();
+    }
+}
+
+// Copy code functionality
+function copyCode(button) {
+    const codeBlock = button.closest('.code-container').querySelector('code') || 
+                      button.closest('.interactive-editor').querySelector('.ace_editor');
+    
+    let text = '';
+    if (codeBlock.classList && codeBlock.classList.contains('ace_editor')) {
+        // ACE Editor
+        const editorId = codeBlock.closest('[id]').id;
+        text = ace.edit(editorId).getValue();
+    } else {
+        // Regular code block
+        text = codeBlock.textContent;
+    }
+    
+    navigator.clipboard.writeText(text).then(() => {
+        const icon = button.querySelector('i');
+        const originalClass = icon.className;
+        const originalText = button.textContent;
+        
+        icon.className = 'fas fa-check';
+        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        
+        setTimeout(() => {
+            icon.className = originalClass;
+            button.innerHTML = originalText;
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy code:', err);
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        setTimeout(() => {
+            button.innerHTML = '<i class="fas fa-copy"></i> Copy';
+        }, 2000);
+    });
+}
+
+// Render lesson content based on current data structure
+function renderLessonContent() {
+    const contentContainer = document.getElementById('lesson-content-container');
+    if (!contentContainer) {
+        console.error('Content container not found');
+        return;
+    }
+    
+    const lessonData = {{ lesson | tojson | safe }};
+    
+    // Create content based on available lesson data
+    let contentHTML = '';
+    
+    // Add main content if available
+    if (lessonData.content) {
+        contentHTML += `
+            <div class="content-block text-block" data-block-id="content-main">
+                <div class="block-content">
+                    ${lessonData.content.replace(/\n/g, '<br>').replace(/```python/g, '<pre><code class="language-python">').replace(/```/g, '</code></pre>')}
                 </div>
-                <pre><code class="language-{{ content_block.language }}">{{ content_block.code }}</code></pre>
             </div>
-            
-            {% elif content_block.type == 'interactive_challenge' %}
-            <div class="content-block interactive-challenge">
-                <h3>Interactive Challenge</h3>
-                <p>{{ content_block.instructions }}</p>
-                
-                <div class="code-editor-container">
-                    <div class="code-editor-header">
-                        <span>Python Editor</span>
-                        <button class="btn btn-primary" id="submit-code" 
-                                onclick="submitCode('{{ lesson.id }}', '{{ content_block.id }}')">
+        `;
+    }
+    
+    // Add code examples if available
+    if (lessonData.code_examples && lessonData.code_examples.length > 0) {
+        lessonData.code_examples.forEach((example, index) => {
+            contentHTML += `
+                <div class="content-block code-example-block" data-block-id="code-example-${index}">
+                    <h3>${example.title || 'Code Example'}</h3>
+                    <div class="code-container">
+                        <pre><code class="language-python">${example.code}</code></pre>
+                        <button class="copy-code-btn" onclick="copyCode(this)">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    ${example.explanation ? `<p class="explanation">${example.explanation}</p>` : ''}
+                </div>
+            `;
+        });
+    }
+    
+    // Add exercises if available
+    if (lessonData.exercises && lessonData.exercises.length > 0) {
+        lessonData.exercises.forEach((exercise, index) => {
+            contentHTML += `
+                <div class="content-block exercise-block" data-block-id="exercise-${index}">
+                    <h3>${exercise.title || 'Exercise'}</h3>
+                    <p>${exercise.description || ''}</p>
+                    <div class="code-editor-container">
+                        <div id="editor-${index}" class="code-editor">${exercise.starter_code || ''}</div>
+                        <button class="run-code-btn" onclick="runCode('editor-${index}')">
                             <i class="fas fa-play"></i> Run Code
                         </button>
                     </div>
-                    <div id="editor">{{ content_block.starter_code or '# Write your Python code here\n' }}</div>
+                    ${exercise.hints ? `<div class="hints"><strong>Hints:</strong> ${exercise.hints.join(', ')}</div>` : ''}
                 </div>
-                
-                <div id="code-output" class="code-output"></div>
-            </div>
-            
-            {% elif content_block.type == 'quiz' %}
-            <div class="content-block quiz-block">
-                <h3><i class="fas fa-clipboard-check"></i> Knowledge Check</h3>
-                <p>Test your understanding with this quiz</p>
-                <div id="quiz-{{ content_block.quiz_id }}" data-quiz-id="{{ content_block.quiz_id }}">
-                    <div class="spinner"></div>
+            `;
+        });
+    }
+    
+    // If no content available, show message
+    if (!contentHTML) {
+        contentHTML = `
+            <div class="content-block text-block">
+                <div class="block-content">
+                    <h3>Lesson Content</h3>
+                    <p>This lesson is being prepared. Content will be available soon!</p>
                 </div>
             </div>
-            {% endif %}
-        {% endfor %}
-    </div>
-    
-    <div class="lesson-navigation">
-        <a href="/lessons" class="btn btn-secondary">
-            <i class="fas fa-list"></i> All Lessons
-        </a>
-        <button class="btn btn-primary" onclick="markLessonComplete()">
-            <i class="fas fa-check"></i> Mark Complete & Next
-        </button>
-    </div>
-</div>
-
-<script>
-// Initialize ACE Editor when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    if (document.getElementById('editor')) {
-        initializeEditor('editor');
-    }
-});
-
-function markLessonComplete() {
-    showNotification('Lesson marked as complete! +100 XP earned! 🎉');
-    // In production, this would make an API call to mark lesson complete
-}
-
-function copyCode(button) {
-    const codeBlock = button.closest('.code-example').querySelector('code');
-    const text = codeBlock.textContent;
-    
-    navigator.clipboard.writeText(text).then(() => {
-        const originalHtml = button.innerHTML;
-        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
-        setTimeout(() => {
-            button.innerHTML = originalHtml;
-        }, 2000);
-    });
-}
-</script>
-
-<!-- Include the quiz system -->
-<script src="{{ url_for('static', filename='js/quiz.js') }}"></script>
-{% endblock %}
-    border: 1px solid var(--border-color);
-}
-
-.text-block {
-    line-height: 1.8;
-}
-
-.text-block h1, .text-block h2, .text-block h3 {
-    color: var(--primary-color);
-    margin: 1rem 0;
-}
-
-.code-example {
-    background-color: var(--bg-secondary);
-}
-
-.code-header {
-    background-color: var(--bg-primary);
-    margin: -2rem -2rem 1rem -2rem;
-    padding: 1rem 2rem;
-    border-radius: 12px 12px 0 0;
-    font-weight: 500;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.btn-copy {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    padding: 0.5rem;
-    transition: color 0.3s ease;
-}
-
-.btn-copy:hover {
-    color: var(--primary-color);
-}
-
-.code-example pre {
-    background-color: transparent;
-    margin: 0;
-    padding: 0;
-    overflow-x: auto;
-}
-
-.code-example code {
-    font-family: 'Fira Code', 'Consolas', monospace;
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-.interactive-challenge h3 {
-    color: var(--secondary-color);
-    margin-bottom: 1rem;
-}
-
-.code-output {
-    margin-top: 1rem;
-    padding: 1rem;
-    background-color: var(--bg-secondary);
-    border-radius: 8px;
-    min-height: 50px;
-    font-family: monospace;
-}
-
-.output-success {
-    color: var(--success-color);
-}
-
-.output-success .rewards {
-    background-color: var(--success-color);
-    color: white;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-top: 1rem;
-    text-align: center;
-}
-
-.error {
-    color: var(--danger-color);
-}
-
-.quiz-block h3 {
-    color: var(--warning-color);
-    margin-bottom: 1rem;
-}
-
-.quiz-start {
-    text-align: center;
-    padding: 2rem;
-}
-
-.lesson-navigation {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border-color);
-}
-
-#complete-subtopic-btn {
-    background-color: var(--success-color);
-}
-
-#complete-subtopic-btn:hover {
-    background-color: #45a049;
-}
-
-#complete-subtopic-btn:disabled {
-    background-color: var(--text-secondary);
-    cursor: not-allowed;
-}
-
-@media (max-width: 768px) {
-    .lesson-navigation {
-        flex-direction: column;
-        gap: 1rem;
+        `;
     }
     
-    .lesson-navigation button {
-        width: 100%;
+    contentContainer.innerHTML = contentHTML;
+    
+    // Initialize code editors for exercises
+    if (lessonData.exercises && lessonData.exercises.length > 0) {
+        lessonData.exercises.forEach((exercise, index) => {
+            try {
+                const editor = ace.edit(`editor-${index}`);
+                editor.setTheme("ace/theme/monokai");
+                editor.session.setMode("ace/mode/python");
+                editor.setOptions({
+                    fontSize: 14,
+                    showPrintMargin: false,
+                    wrap: true
+                });
+            } catch (error) {
+                console.log(`Could not initialize editor ${index}:`, error);
+            }
+        });
     }
     
-    .code-editor-header {
-        flex-direction: column;
-        gap: 1rem;
-    }
-}
-</style>
-
-<script>
-// Current subtopic tracking
-let currentSubtopicIndex = 0;
-let subtopics = {{ lesson.subtopics | tojson }};
-let completedSubtopics = {{ lesson_progress.completed_subtopics | default([]) | tojson }};
-
-// Initialize ACE Editor when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    if (document.getElementById('editor')) {
-        initializeEditor('editor');
-    }
-    updateCompleteButton();
-});
-
-function switchLessonTab(subtopicId) {
-    // Update active tab
-    document.querySelectorAll('.lesson-tab').forEach(tab => {
-        tab.classList.remove('active');
-        if (tab.getAttribute('data-subtopic-id') === subtopicId) {
-            tab.classList.add('active');
-            currentSubtopicIndex = subtopics.findIndex(s => s.id === subtopicId);
-        }
-    });
-    
-    // Update content (in a real app, this would load subtopic-specific content)
-    updateCompleteButton();
+    console.log('✅ Lesson content rendered successfully');
 }
 
-function updateCompleteButton() {
-    const currentSubtopic = subtopics[currentSubtopicIndex];
-    const btn = document.getElementById('complete-subtopic-btn');
-    
-    if (completedSubtopics.includes(currentSubtopic.id)) {
-        btn.textContent = '✓ Completed';
-        btn.disabled = true;
-    } else {
-        btn.textContent = 'Mark as Complete';
-        btn.disabled = false;
-    }
-}
-
-async function completeCurrentSubtopic() {
-    const currentSubtopic = subtopics[currentSubtopicIndex];
+// Additional global functions for code execution and interaction
+window.runCode = function(editorIndex) {
+    console.log(`Running code from editor ${editorIndex}`);
     
     try {
-        const response = await fetch('/api/lesson/complete-subtopic', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                lesson_id: '{{ lesson.id }}',
-                subtopic_id: currentSubtopic.id
-            })
-        });
+        const editorElement = document.getElementById(`editor-${editorIndex}`);
+        if (!editorElement) {
+            console.error(`Editor ${editorIndex} not found`);
+            return;
+        }
         
-        const result = await response.json();
+        let code = '';
         
-        if (result.success) {
-            // Update UI
-            completedSubtopics.push(currentSubtopic.id);
-            
-            // Update progress bar
-            document.getElementById('progress-percentage').textContent = result.new_progress + '%';
-            document.getElementById('lesson-progress-fill').style.width = result.new_progress + '%';
-            
-            // Update tab check mark
-            const tab = document.querySelector(`[data-subtopic-id="${currentSubtopic.id}"]`);
-            const checkIcon = tab.querySelector('.tab-check');
-            checkIcon.classList.add('completed');
-            
-            // Update button
-            updateCompleteButton();
-            
-            // Show reward notification
-            showNotification(`Subtopic completed! +${result.xp_earned} XP earned! 🎉`);
-            
-            if (result.lesson_completed) {
-                setTimeout(() => {
-                    showNotification('Lesson completed! Great job! 🏆');
-                }, 1000);
+        // Try to get code from ACE editor first
+        try {
+            if (typeof ace !== 'undefined') {
+                const editor = ace.edit(`editor-${editorIndex}`);
+                code = editor.getValue();
+            }
+        } catch (e) {
+            // Fallback to text content
+            code = editorElement.textContent || editorElement.innerText;
+        }
+        
+        if (!code.trim()) {
+            showToast('Please write some code first!', 'warning');
+            return;
+        }
+        
+        // Show output container
+        const outputContainer = document.getElementById(`output-${editorIndex}`);
+        if (outputContainer) {
+            outputContainer.style.display = 'block';
+            const outputContent = outputContainer.querySelector('.output-content');
+            if (outputContent) {
+                outputContent.textContent = 'Running code...';
             }
         }
-    } catch (error) {
-        console.error('Error completing subtopic:', error);
-        showNotification('Error saving progress. Please try again.', 'error');
-    }
-}
-
-function previousSubtopic() {
-    if (currentSubtopicIndex > 0) {
-        const prevSubtopic = subtopics[currentSubtopicIndex - 1];
-        switchLessonTab(prevSubtopic.id);
-    }
-}
-
-function nextSubtopic() {
-    if (currentSubtopicIndex < subtopics.length - 1) {
-        const nextSubtopic = subtopics[currentSubtopicIndex + 1];
-        switchLessonTab(nextSubtopic.id);
-    }
-}
-
-function copyCode(button) {
-    const codeBlock = button.closest('.code-example').querySelector('code');
-    const text = codeBlock.textContent;
-    
-    navigator.clipboard.writeText(text).then(() => {
-        const originalHTML = button.innerHTML;
-        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        
+        // Simulate code execution (replace with actual execution endpoint)
         setTimeout(() => {
-            button.innerHTML = originalHTML;
-        }, 2000);
-    });
-}
-</script>
-{% endblock %}
-// Lesson data from backend
-const lessonData = {{ lesson | tojson | safe }};
-let currentSubtopic = 0;
-let lessonProgress = {};
-let editors = {};
-let quizStates = {};
+            if (outputContainer) {
+                const outputContent = outputContainer.querySelector('.output-content');
+                if (outputContent) {
+                    // Simple simulation - in real implementation, send to backend
+                    outputContent.textContent = `Code executed successfully!\nInput: ${code.substring(0, 50)}${code.length > 50 ? '...' : ''}`;
+                }
+            }
+            showToast('Code executed successfully!', 'success');
+        }, 1000);
+        
+    } catch (error) {
+        console.error('Error running code:', error);
+        showToast('Error executing code', 'error');
+    }
+};
 
-// Initialize lesson
-document.addEventListener('DOMContentLoaded', function() {
-    initializeLesson();
+window.resetCode = function(editorIndex) {
+    console.log(`Resetting code in editor ${editorIndex}`);
+    
+    try {
+        const editorElement = document.getElementById(`editor-${editorIndex}`);
+        if (!editorElement) {
+            console.error(`Editor ${editorIndex} not found`);
+            return;
+        }
+        
+        // Reset ACE editor if available
+        try {
+            if (typeof ace !== 'undefined') {
+                const editor = ace.edit(`editor-${editorIndex}`);
+                editor.setValue('# Write your code here\n', -1);
+            }
+        } catch (e) {
+            // Fallback to text content reset
+            editorElement.textContent = '# Write your code here\n';
+        }
+        
+        // Hide output
+        const outputContainer = document.getElementById(`output-${editorIndex}`);
+        if (outputContainer) {
+            outputContainer.style.display = 'none';
+        }
+        
+        showToast('Code reset successfully!', 'info');
+        
+    } catch (error) {
+        console.error('Error resetting code:', error);
+        showToast('Error resetting code', 'error');
+    }
+};
+
+window.loadQuiz = function(quizId) {
+    console.log(`Loading quiz: ${quizId}`);
+    showToast('Quiz loading feature coming soon!', 'info');
+};
+
+// Notification system for user feedback
+function showNotification(message, type = 'success') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Show notification
+    setTimeout(() => notification.classList.add('show'), 100);
+    
+    // Remove notification after delay
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => document.body.removeChild(notification), 300);
+    }, 3000);
+}
+
+// Accessibility improvements
+document.addEventListener('keydown', function(e) {
+    // Keyboard navigation for subtopics
+    if (e.key === 'ArrowLeft' && e.ctrlKey) {
+        e.preventDefault();
+        previousSubtopic();
+    } else if (e.key === 'ArrowRight' && e.ctrlKey) {
+        e.preventDefault();
+        nextSubtopic();
+    }
+    
+    // Escape key to close overlays
+    if (e.key === 'Escape') {
+        const overlay = document.getElementById('celebration-overlay');
+        if (overlay && overlay.style.display !== 'none') {
+            overlay.style.display = 'none';
+        }
+    }
 });
 
-function initializeLesson() {
-    // Load saved progress
-    const savedProgress = localStorage.getItem(`lesson_${lessonData.id}_progress`);
-    if (savedProgress) {
-        lessonProgress = JSON.parse(savedProgress);
-    }
-    
-    // Render first subtopic or all content if no subtopics
-    if (lessonData.subtopics && lessonData.subtopics.length > 0) {
-        renderSubtopic(0);
-    } else {
-        renderLessonContent(lessonData.blocks || lessonData.content);
-    }
-    
-    updateProgressBar();
-}
-
-function renderSubtopic(index) {
-    currentSubtopic = index;
-    const container = document.getElementById('lesson-content-container');
-    
-    // Update tab active state
-    document.querySelectorAll('.subtopic-tab').forEach((tab, i) => {
-        tab.classList.toggle('active', i === index);
-    });
-    
-    // Clear container
-    container.innerHTML = '';
-    
-    // Get blocks for this subtopic
-    const subtopicBlocks = lessonData.blocks.filter(block => 
-        block.subtopic_index === index || (!block.subtopic_index && index === 0)
-    );
-    
-    renderLessonContent(subtopicBlocks);
-    updateNavigationButtons();
-}
-
-function renderLessonContent(blocks) {
-    const container = document.getElementById('lesson-content-container');
-    container.innerHTML = '';
-    
-    blocks.forEach((block, index) => {
-        const blockElement = createBlockElement(block, index);
-        if (blockElement) {
-            container.appendChild(blockElement);
-        }
-    });
-    
-    // Initialize ACE editors after rendering
-    setTimeout(() => {
-        Object.keys(editors).forEach(id => {
-            const editorInfo = editors[id];
-            initializeAceEditor(id, editorInfo.options);
-            if (editorInfo.code) {
-                ace.edit(id).setValue(editorInfo.code, -1);
-            }
-        });
-    }, 100);
-}
-
-function createBlockElement(block, index) {
-    const div = document.createElement('div');
-    div.className = 'content-block';
-    div.id = `block-${index}`;
-    
-    switch(block.type) {
-        case 'text':
-            div.innerHTML = `<div class="text-block">${block.content}</div>`;
-            break;
-            
-        case 'code_snippet':
-            div.innerHTML = createCodeSnippetBlock(block);
-            break;
-            
-        case 'ide':
-            div.innerHTML = createIDEBlock(block);
-            break;
-            
-        case 'quiz':
-            div.innerHTML = createQuizBlock(block);
-            break;
-            
-        case 'debug_challenge':
-            div.innerHTML = createDebugBlock(block);
-            break;
-            
-        case 'divider':
-            div.innerHTML = `<div class="${block.style || 'topic-divider'}"></div>`;
-            break;
-            
-        default:
-            console.warn('Unknown block type:', block.type);
-            return null;
-    }
-    
-    return div;
-}
-
-function createCodeSnippetBlock(block) {
-    const editorId = `snippet-${block.id}`;
-    editors[editorId] = {
-        code: block.code,
-        options: { readOnly: true, maxLines: 20 }
-    };
-    
-    return `
-        <div class="code-snippet-block">
-            <div class="code-snippet-header">
-                <span>${block.language || 'python'}</span>
-                <button class="copy-button" onclick="copyCode('${editorId}')">
-                    <i class="fas fa-copy"></i> Copy
-                </button>
-            </div>
-            <div class="code-snippet-content">
-                <div id="${editorId}" class="ace-editor"></div>
-            </div>
-        </div>
-    `;
-}
-
-function createIDEBlock(block) {
-    const editorId = `ide-${block.id}`;
-    editors[editorId] = {
-        code: block.default_code || '# Write your code here\n',
-        options: { readOnly: !block.editable }
-    };
-    
-    return `
-        <div class="ide-block">
-            <div class="ide-header">
-                <span class="ide-label">${block.label || 'Python Editor'}</span>
-                <div class="ide-controls">
-                    ${block.hint ? `<button class="btn btn-secondary btn-sm" onclick="toggleHint('${block.id}')">
-                        <i class="fas fa-lightbulb"></i> Hint
-                    </button>` : ''}
-                    <button class="btn btn-secondary btn-sm" onclick="resetCode('${editorId}', \`${(block.default_code || '').replace(/`/g, '\\`')}\`)">
-                        <i class="fas fa-undo"></i> Reset
-                    </button>
-                    <button class="btn btn-primary btn-sm" onclick="runCode('${editorId}', '${block.id}')">
-                        <i class="fas fa-play"></i> Run
-                    </button>
-                </div>
-            </div>
-            <div id="${editorId}" class="ace-editor"></div>
-            <div id="output-${block.id}" class="ide-output"></div>
-            ${block.hint ? `<div id="hint-${block.id}" class="ide-hint">${block.hint}</div>` : ''}
-        </div>
-    `;
-}
-
-function createQuizBlock(block) {
-    const quizId = block.id;
-    if (!quizStates[quizId]) {
-        quizStates[quizId] = {
-            currentQuestion: 0,
-            answers: {},
-            submitted: false
-        };
-    }
-    
-    return `
-        <div class="quiz-block" id="quiz-${quizId}">
-            <div class="quiz-header">
-                <h3>${block.title}</h3>
-                ${block.instructions ? `<p>${block.instructions}</p>` : ''}
-                <div class="quiz-meta">
-                    <span><i class="fas fa-question-circle"></i> ${block.questions.length} questions</span>
-                    <span><i class="fas fa-star"></i> ${block.total_points} points</span>
-                    <span><i class="fas fa-percentage"></i> Pass: ${block.passing_score}%</span>
-                </div>
-            </div>
-            <div id="quiz-content-${quizId}">
-                ${createQuizQuestion(block, 0)}
-            </div>
-            <div class="quiz-navigation" style="margin-top: 1.5rem;">
-                <button class="btn btn-secondary" onclick="previousQuizQuestion('${quizId}')" 
-                        id="quiz-prev-${quizId}" style="display: none;">Previous</button>
-                <button class="btn btn-primary" onclick="nextQuizQuestion('${quizId}')" 
-                        id="quiz-next-${quizId}">Next</button>
-                <button class="btn btn-success" onclick="submitQuiz('${quizId}')" 
-                        id="quiz-submit-${quizId}" style="display: none;">Submit Quiz</button>
-            </div>
-        </div>
-    `;
-}
-
-function createQuizQuestion(quiz, questionIndex) {
-    const question = quiz.questions[questionIndex];
-    let html = `<div class="quiz-question">`;
-    
-    html += `<h4>Question ${questionIndex + 1} of ${quiz.questions.length}</h4>`;
-    html += `<p>${question.question}</p>`;
-    
-    switch(question.type) {
-        case 'multiple_choice':
-            html += `<div class="quiz-options">`;
-            question.options.forEach((option, i) => {
-                html += `
-                    <div class="quiz-option" onclick="selectQuizOption('${quiz.id}', ${questionIndex}, ${i})">
-                        ${option}
-                    </div>
-                `;
-            });
-            html += `</div>`;
-            break;
-            
-        case 'fill_in_the_blank':
-            const questionText = question.question.replace('______', 
-                `<input type="text" class="fill-blank-input" 
-                        id="quiz-${quiz.id}-q${questionIndex}-input"
-                        onchange="updateFillBlank('${quiz.id}', ${questionIndex}, this.value)">`);
-            html = `<div class="quiz-question">
-                <h4>Question ${questionIndex + 1} of ${quiz.questions.length}</h4>
-                <p>${questionText}</p>
-            </div>`;
-            break;
-            
-        case 'drag_and_drop':
-            html += createDragDropQuestion(quiz.id, question, questionIndex);
-            break;
-    }
-    
-    html += `</div>`;
-    return html;
-}
-
-function createDragDropQuestion(quizId, question, questionIndex) {
-    let html = `<div class="drag-drop-container">`;
-    
-    // Drag items
-    html += `<div class="drag-items">`;
-    html += `<h5>Options:</h5>`;
-    question.options.forEach((option, i) => {
-        html += `
-            <div class="drag-item" draggable="true" 
-                 data-option-index="${i}"
-                 ondragstart="handleDragStart(event)"
-                 ondragend="handleDragEnd(event)">
-                ${option}
-            </div>
-        `;
-    });
-    html += `</div>`;
-    
-    // Drop zones
-    html += `<div class="drop-zones">`;
-    html += `<h5>Match with:</h5>`;
-    question.stems.forEach((stem, i) => {
-        html += `
-            <div>
-                <div class="drop-zone-label">${stem}</div>
-                <div class="drop-zone" 
-                     data-stem-index="${i}"
-                     data-quiz-id="${quizId}"
-                     data-question-index="${questionIndex}"
-                     ondragover="handleDragOver(event)"
-                     ondragleave="handleDragLeave(event)"
-                     ondrop="handleDrop(event)">
-                </div>
-            </div>
-        `;
-    });
-    html += `</div>`;
-    
-    html += `</div>`;
-    return html;
-}
-
-function createDebugBlock(block) {
-    const editorId = `debug-${block.id}`;
-    editors[editorId] = {
-        code: block.buggy_code,
-        options: { readOnly: false }
-    };
-    
-    return `
-        <div class="debug-block">
-            <div class="debug-header">
-                <h3><i class="fas fa-bug"></i> ${block.label || 'Debug Challenge'}</h3>
-            </div>
-            <div class="debug-content">
-                <p class="debug-instructions">${block.instructions}</p>
-                <div id="${editorId}" class="ace-editor"></div>
-                <div id="debug-output-${block.id}" class="ide-output"></div>
-                <div style="margin-top: 1rem;">
-                    <button class="btn btn-primary" onclick="checkDebugSolution('${block.id}', '${editorId}')">
-                        <i class="fas fa-check"></i> Check Solution
-                    </button>
-                    <button class="btn btn-secondary" onclick="showDebugSolution('${block.id}')">
-                        <i class="fas fa-lightbulb"></i> Show Solution
-                    </button>
-                </div>
-                <div id="debug-solution-${block.id}" style="display: none; margin-top: 1rem;">
-                    <div class="alert alert-info">
-                        <h4>Solution:</h4>
-                        <p>${block.solution.explanation}</p>
-                        <pre>${block.solution.correct_code}</pre>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-// ACE Editor functions
-function initializeAceEditor(editorId, options = {}) {
-    const editor = ace.edit(editorId);
-    editor.setTheme("ace/theme/monokai");
-    editor.session.setMode("ace/mode/python");
-    editor.setOptions({
-        fontSize: "14px",
-        showPrintMargin: false,
-        enableBasicAutocompletion: true,
-        enableLiveAutocompletion: true,
-        ...options
-    });
-    return editor;
-}
-
-function copyCode(editorId) {
-    const editor = ace.edit(editorId);
-    const code = editor.getValue();
-    
-    navigator.clipboard.writeText(code).then(() => {
-        const button = event.target.closest('.copy-button');
-        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
-        button.classList.add('copied');
-        
+// Performance monitoring
+if ('performance' in window) {
+    window.addEventListener('load', function() {
         setTimeout(() => {
-            button.innerHTML = '<i class="fas fa-copy"></i> Copy';
-            button.classList.remove('copied');
-        }, 2000);
-    });
-}
-
-function toggleHint(blockId) {
-    const hint = document.getElementById(`hint-${blockId}`);
-    hint.classList.toggle('show');
-}
-
-function resetCode(editorId, defaultCode) {
-    const editor = ace.edit(editorId);
-    editor.setValue(defaultCode, -1);
-}
-
-function runCode(editorId, blockId) {
-    const editor = ace.edit(editorId);
-    const code = editor.getValue();
-    const outputDiv = document.getElementById(`output-${blockId}`);
-    
-    outputDiv.innerHTML = '<div class="spinner"></div>';
-    
-    // Send code to backend
-    fetch('/api/submit-code', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            code: code,
-            lesson_id: lessonData.id,
-            challenge_id: blockId
-        })
-    })
-    .then(response => response.json())
-    .then(result => {
-        if (result.success) {
-            outputDiv.innerHTML = result.output || 'Code executed successfully!';
-            if (result.passed_tests) {
-                outputDiv.innerHTML += `\n\n✅ All tests passed! +${result.xp_earned} XP`;
-                markBlockComplete(blockId);
+            const perfData = performance.getEntriesByType('navigation')[0];
+            if (perfData) {
+                console.log(`Page loaded in ${Math.round(perfData.loadEventEnd - perfData.fetchStart)}ms`);
             }
-        } else {
-            outputDiv.innerHTML = `Error: ${result.error || 'Unknown error'}`;
-            outputDiv.style.color = 'var(--danger-color)';
-        }
-    })
-    .catch(error => {
-        outputDiv.innerHTML = `Error: ${error.message}`;
-        outputDiv.style.color = 'var(--danger-color)';
+        }, 0);
     });
-}
-
-// Quiz functions
-function selectQuizOption(quizId, questionIndex, optionIndex) {
-    const state = quizStates[quizId];
-    state.answers[questionIndex] = optionIndex;
-    
-    // Update UI
-    const options = document.querySelectorAll(`#quiz-content-${quizId} .quiz-option`);
-    options.forEach((opt, i) => {
-        opt.classList.toggle('selected', i === optionIndex);
-    });
-}
-
-function updateFillBlank(quizId, questionIndex, value) {
-    const state = quizStates[quizId];
-    state.answers[questionIndex] = value;
-}
-
-function previousQuizQuestion(quizId) {
-    const state = quizStates[quizId];
-    const quiz = lessonData.blocks.find(b => b.id === quizId);
-    
-    if (state.currentQuestion > 0) {
-        state.currentQuestion--;
-        const content = document.getElementById(`quiz-content-${quizId}`);
-        content.innerHTML = createQuizQuestion(quiz, state.currentQuestion);
-        updateQuizNavigation(quizId, quiz);
-    }
-}
-
-function nextQuizQuestion(quizId) {
-    const state = quizStates[quizId];
-    const quiz = lessonData.blocks.find(b => b.id === quizId);
-    
-    if (state.currentQuestion < quiz.questions.length - 1) {
-        state.currentQuestion++;
-        const content = document.getElementById(`quiz-content-${quizId}`);
-        content.innerHTML = createQuizQuestion(quiz, state.currentQuestion);
-        updateQuizNavigation(quizId, quiz);
-    }
-}
-
-function updateQuizNavigation(quizId, quiz) {
-    const state = quizStates[quizId];
-    const prevBtn = document.getElementById(`quiz-prev-${quizId}`);
-    const nextBtn = document.getElementById(`quiz-next-${quizId}`);
-    const submitBtn = document.getElementById(`quiz-submit-${quizId}`);
-    
-    prevBtn.style.display = state.currentQuestion > 0 ? 'inline-block' : 'none';
-    nextBtn.style.display = state.currentQuestion < quiz.questions.length - 1 ? 'inline-block' : 'none';
-    submitBtn.style.display = state.currentQuestion === quiz.questions.length - 1 ? 'inline-block' : 'none';
-}
-
-function submitQuiz(quizId) {
-    const quiz = lessonData.blocks.find(b => b.id === quizId);
-    const state = quizStates[quizId];
-    
-    // Calculate score
-    let correct = 0;
-    let totalPoints = 0;
-    
-    quiz.questions.forEach((question, i) => {
-        const userAnswer = state.answers[i];
-        totalPoints += question.points || 1;
-        
-        if (question.type === 'multiple_choice' && userAnswer === question.correct_index) {
-            correct += question.points || 1;
-        } else if (question.type === 'fill_in_the_blank') {
-            const answers = Array.isArray(question.answers) ? question.answers : [question.answers];
-            if (answers.some(ans => ans.toLowerCase() === (userAnswer || '').toLowerCase())) {
-                correct += question.points || 1;
-            }
-        }
-    });
-    
-    const score = Math.round((correct / totalPoints) * 100);
-    const passed = score >= quiz.passing_score;
-    
-    // Display results
-    const content = document.getElementById(`quiz-content-${quizId}`);
-    content.innerHTML = `
-        <div class="quiz-results">
-            <h3>${passed ? '🎉 Quiz Passed!' : '😔 Try Again'}</h3>
-            <div class="score-display">
-                <div class="score-circle ${passed ? 'passed' : 'failed'}">
-                    ${score}%
-                </div>
-            </div>
-            <p>You scored ${correct} out of ${totalPoints} points</p>
-            ${passed ? `<p class="success">Great job! You've earned ${quiz.total_points} XP!</p>` : 
-                     `<p>You need ${quiz.passing_score}% to pass. Cost to retake: ${quiz.retake_cost} PyCoins</p>`}
-        </div>
-    `;
-    
-    // Hide navigation buttons
-    document.getElementById(`quiz-prev-${quizId}`).style.display = 'none';
-    document.getElementById(`quiz-submit-${quizId}`).style.display = 'none';
-    
-    if (passed) {
-        markBlockComplete(quizId);
-    }
-}
-
-// Drag and Drop functions
-let draggedElement = null;
-
-function handleDragStart(e) {
-    draggedElement = e.target;
-    e.target.classList.add('dragging');
-}
-
-function handleDragEnd(e) {
-    e.target.classList.remove('dragging');
-}
-
-function handleDragOver(e) {
-    e.preventDefault();
-    e.currentTarget.classList.add('drag-over');
-}
-
-function handleDragLeave(e) {
-    e.currentTarget.classList.remove('drag-over');
-}
-
-function handleDrop(e) {
-    e.preventDefault();
-    e.currentTarget.classList.remove('drag-over');
-    
-    if (draggedElement && e.currentTarget.classList.contains('drop-zone')) {
-        // Clone the dragged element
-        const clone = draggedElement.cloneNode(true);
-        clone.classList.remove('dragging');
-        
-        // Clear the drop zone and add the clone
-        e.currentTarget.innerHTML = '';
-        e.currentTarget.appendChild(clone);
-        
-        // Update quiz state
-        const quizId = e.currentTarget.dataset.quizId;
-        const questionIndex = parseInt(e.currentTarget.dataset.questionIndex);
-        const stemIndex = parseInt(e.currentTarget.dataset.stemIndex);
-        const optionIndex = parseInt(draggedElement.dataset.optionIndex);
-        
-        if (!quizStates[quizId].answers[questionIndex]) {
-            quizStates[quizId].answers[questionIndex] = {};
-        }
-        quizStates[quizId].answers[questionIndex][stemIndex] = optionIndex;
-    }
-}
-
-// Debug challenge functions
-function checkDebugSolution(blockId, editorId) {
-    const editor = ace.edit(editorId);
-    const code = editor.getValue();
-    const outputDiv = document.getElementById(`debug-output-${blockId}`);
-    
-    // Run the code first
-    runCode(editorId, blockId);
-    
-    // You can add additional validation here
-    const block = lessonData.blocks.find(b => b.id === blockId);
-    if (block && block.solution && code.trim() === block.solution.correct_code.trim()) {
-        outputDiv.innerHTML += '\n\n✅ Perfect! You fixed the bug!';
-        markBlockComplete(blockId);
-    }
-}
-
-function showDebugSolution(blockId) {
-    const solutionDiv = document.getElementById(`debug-solution-${blockId}`);
-    solutionDiv.style.display = solutionDiv.style.display === 'none' ? 'block' : 'none';
-}
-
-// Progress tracking
-function markBlockComplete(blockId) {
-    if (!lessonProgress[lessonData.id]) {
-        lessonProgress[lessonData.id] = {};
-    }
-    lessonProgress[lessonData.id][blockId] = true;
-    
-    // Save progress
-    localStorage.setItem(`lesson_${lessonData.id}_progress`, JSON.stringify(lessonProgress));
-    
-    // Update progress bar
-    updateProgressBar();
-}
-
-function updateProgressBar() {
-    const totalBlocks = lessonData.blocks ? lessonData.blocks.length : 0;
-    const completedBlocks = lessonProgress[lessonData.id] ? 
-        Object.keys(lessonProgress[lessonData.id]).length : 0;
-    
-    const progress = totalBlocks > 0 ? Math.round((completedBlocks / totalBlocks) * 100) : 0;
-    
-    document.getElementById('lesson-progress-bar').style.width = `${progress}%`;
-    document.getElementById('lesson-progress-text').textContent = `${progress}%`;
-}
-
-// Navigation functions
-function switchSubtopic(index) {
-    renderSubtopic(index);
-}
-
-function previousSubtopic() {
-    if (currentSubtopic > 0) {
-        renderSubtopic(currentSubtopic - 1);
-    }
-}
-
-function nextSubtopic() {
-    if (lessonData.subtopics && currentSubtopic < lessonData.subtopics.length - 1) {
-        renderSubtopic(currentSubtopic + 1);
-    } else {
-        // Lesson complete
-        showNotification('Lesson completed! Great job! 🎉');
-        window.location.href = '/lessons';
-    }
-}
-
-function updateNavigationButtons() {
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
-    
-    prevBtn.disabled = currentSubtopic === 0;
-    
-    if (lessonData.subtopics && currentSubtopic === lessonData.subtopics.length - 1) {
-        nextBtn.innerHTML = 'Complete <i class="fas fa-check"></i>';
-    } else {
-        nextBtn.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
-    }
 }
 </script>
 {% endblock %}

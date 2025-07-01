@@ -43,6 +43,13 @@ class Config:
     MAX_XP_PER_ACTION = 1000  # Maximum XP that can be earned in one action
     SESSION_TIMEOUT = 3600  # Session timeout in seconds
     
+    # Template Caching Configuration
+    TEMPLATE_CACHE_CONFIG = {
+        'CACHE_TYPE': 'simple',
+        'CACHE_DEFAULT_TIMEOUT': 300,  # 5 minutes
+        'CACHE_THRESHOLD': 1000
+    }
+    
     @classmethod
     def validate_firebase_config(cls) -> bool:
         """Validate that all required Firebase configuration is present."""

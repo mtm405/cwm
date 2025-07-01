@@ -1,0 +1,343 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lesson.title if lesson else "Lesson" }} - Code with Morais{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/lesson.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="lesson-container">
+    <!-- LESSON HEADER SECTION -->
+    <header class="lesson-header">
+        <a href="/lessons" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Lessons
+        </a>
+        
+        <div class="lesson-header-content">
+            <div class="lesson-meta">
+                <h1 class="lesson-title">
+                    <i class="fas fa-{{ lesson.icon or 'code' }}"></i>
+                    {{ lesson.title }}
+                </h1>
+                <div class="lesson-badges">
+                    <span class="difficulty-badge {{ lesson.difficulty or 'beginner' }}">
+                        {{ (lesson.difficulty or 'beginner')|title }}
+                    </span>
+                    <span class="time-badge">
+                        <i class="fas fa-clock"></i> {{ lesson.estimated_time or 30 }}min
+                    </span>
+                    <span class="xp-badge">
+                        <i class="fas fa-star"></i> {{ lesson.xp_reward or 100 }} XP
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="lesson-progress-wrapper">
+                <div class="progress-info">
+                    <span class="progress-label">Lesson Progress</span>
+                    <span class="progress-text" id="lesson-progress-text">0%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="lesson-progress-bar"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SUBTOPIC TABS -->
+    {% if lesson.subtopics %}
+    <nav class="subtopic-tabs" role="tablist">
+        <div class="tabs-container">
+            {% for subtopic in lesson.subtopics %}
+            <button class="subtopic-tab {% if loop.first %}active{% endif %}" 
+                    role="tab" 
+                    data-subtopic-index="{{ loop.index0 }}"
+                    onclick="switchSubtopic({{ loop.index0 }})">
+                <i class="tab-icon fas fa-circle"></i>
+                <span class="tab-text">{{ subtopic.title if subtopic.title else subtopic }}</span>
+            </button>
+            {% endfor %}
+        </div>
+        
+        <!-- Swipe Navigation Indicators -->
+        <div class="swipe-indicators">
+            <button class="swipe-nav swipe-prev" onclick="previousSubtopic()" disabled>
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="swipe-nav swipe-next" onclick="nextSubtopic()">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- LESSON CONTENT -->
+    <main class="lesson-content" id="lesson-content-container">
+        <!-- Content will be dynamically loaded here -->
+    </main>
+
+    <!-- LESSON NAVIGATION -->
+    <nav class="lesson-navigation">
+        <button class="btn btn-secondary" id="prev-btn" onclick="previousSubtopic()" disabled>
+            <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        
+        <div class="nav-center">
+            <button class="btn btn-primary complete-btn" onclick="completeCurrentSubtopic()" id="complete-subtopic-btn">
+                Mark Complete
+            </button>
+        </div>
+        
+        <button class="btn btn-primary" id="next-btn" onclick="nextSubtopic()">
+            Next <i class="fas fa-chevron-right"></i>
+        </button>
+    </nav>
+
+    <!-- OFFLINE STATUS INDICATOR -->
+    <div class="offline-indicator" id="offline-indicator" style="display: none;">
+        <i class="fas fa-wifi-slash"></i>
+        <span>Offline Mode - Content cached locally</span>
+    </div>
+
+    <!-- CELEBRATION OVERLAY -->
+    <div class="celebration-overlay" id="celebration-overlay">
+        <div class="celebration-content">
+            <div class="trophy-container">
+                <i class="fas fa-trophy trophy-icon"></i>
+            </div>
+            <h2 class="celebration-title"></h2>
+            <p class="celebration-message"></p>
+            <div class="confetti-container"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Core JavaScript Files -->
+<script src="{{ url_for('static', filename='js/components/lesson-manager.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/content-renderer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/progress-tracker.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/interactive-editor.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/quiz.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/gamification-manager.js') }}"></script>
+
+<!-- ACE Editor -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.23.4/ace.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.23.4/mode-python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.23.4/theme-monokai.min.js"></script>
+
+<script>
+// Initialize the lesson when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize lesson data
+    const lessonData = {{ lesson | tojson | safe }};
+    
+    // Initialize LessonManager (from lesson-manager.js)
+    if (typeof LessonManager !== 'undefined') {
+        window.lessonManager = new LessonManager(lessonData);
+        window.lessonManager.initialize();
+    }
+    
+    // Initialize ProgressTracker (from progress-tracker.js)
+    if (typeof ProgressTracker !== 'undefined') {
+        window.progressTracker = new ProgressTracker(lessonData.id);
+        window.progressTracker.initialize();
+    }
+    
+    // Initialize GamificationManager (from gamification-manager.js)
+    if (typeof GamificationManager !== 'undefined') {
+        window.gamificationManager = new GamificationManager();
+    }
+    
+    // Initialize offline support
+    initializeOfflineSupport();
+    
+    // Initialize touch/swipe navigation for mobile
+    initializeTouchNavigation();
+});
+
+// Offline Support
+function initializeOfflineSupport() {
+    const offlineIndicator = document.getElementById('offline-indicator');
+    
+    function updateOnlineStatus() {
+        if (navigator.onLine) {
+            offlineIndicator.style.display = 'none';
+        } else {
+            offlineIndicator.style.display = 'flex';
+        }
+    }
+    
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
+    
+    // Cache lesson content in localStorage
+    const lessonData = {{ lesson | tojson | safe }};
+    localStorage.setItem(`lesson_${lessonData.id}_cache`, JSON.stringify(lessonData));
+}
+
+// Touch/Swipe Navigation
+function initializeTouchNavigation() {
+    const container = document.querySelector('.lesson-container');
+    let startX = 0;
+    let startY = 0;
+    
+    container.addEventListener('touchstart', function(e) {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+    });
+    
+    container.addEventListener('touchmove', function(e) {
+        e.preventDefault(); // Prevent scrolling while swiping
+    });
+    
+    container.addEventListener('touchend', function(e) {
+        const endX = e.changedTouches[0].clientX;
+        const endY = e.changedTouches[0].clientY;
+        const diffX = startX - endX;
+        const diffY = startY - endY;
+        
+        // Only process horizontal swipes
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+            if (diffX > 0) {
+                // Swipe left - next subtopic
+                nextSubtopic();
+            } else {
+                // Swipe right - previous subtopic
+                previousSubtopic();
+            }
+        }
+    });
+}
+
+// Global functions for backward compatibility
+function switchSubtopic(index) {
+    if (window.lessonManager) {
+        window.lessonManager.switchSubtopic(index);
+    }
+}
+
+function previousSubtopic() {
+    if (window.lessonManager) {
+        window.lessonManager.previousSubtopic();
+    }
+}
+
+function nextSubtopic() {
+    if (window.lessonManager) {
+        window.lessonManager.nextSubtopic();
+    }
+}
+
+function completeCurrentSubtopic() {
+    if (window.progressTracker) {
+        window.progressTracker.completeCurrentSubtopic();
+    }
+}
+
+// Copy code functionality
+function copyCode(button) {
+    const codeBlock = button.closest('.code-container').querySelector('code') || 
+                      button.closest('.interactive-editor').querySelector('.ace_editor');
+    
+    let text = '';
+    if (codeBlock.classList && codeBlock.classList.contains('ace_editor')) {
+        // ACE Editor
+        const editorId = codeBlock.closest('[id]').id;
+        text = ace.edit(editorId).getValue();
+    } else {
+        // Regular code block
+        text = codeBlock.textContent;
+    }
+    
+    navigator.clipboard.writeText(text).then(() => {
+        const icon = button.querySelector('i');
+        const originalClass = icon.className;
+        const originalText = button.textContent;
+        
+        icon.className = 'fas fa-check';
+        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        
+        setTimeout(() => {
+            icon.className = originalClass;
+            button.innerHTML = originalText;
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy code:', err);
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        setTimeout(() => {
+            button.innerHTML = '<i class="fas fa-copy"></i> Copy';
+        }, 2000);
+    });
+}
+
+// Notification system for user feedback
+function showNotification(message, type = 'success') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Show notification
+    setTimeout(() => notification.classList.add('show'), 100);
+    
+    // Remove notification after delay
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => document.body.removeChild(notification), 300);
+    }, 3000);
+}
+
+// Accessibility improvements
+document.addEventListener('keydown', function(e) {
+    // Keyboard navigation for subtopics
+    if (e.key === 'ArrowLeft' && e.ctrlKey) {
+        e.preventDefault();
+        previousSubtopic();
+    } else if (e.key === 'ArrowRight' && e.ctrlKey) {
+        e.preventDefault();
+        nextSubtopic();
+    }
+    
+    // Escape key to close overlays
+    if (e.key === 'Escape') {
+        const overlay = document.getElementById('celebration-overlay');
+        if (overlay && overlay.style.display !== 'none') {
+            overlay.style.display = 'none';
+        }
+    }
+});
+
+// Performance monitoring
+if ('performance' in window) {
+    window.addEventListener('load', function() {
+        setTimeout(() => {
+            const perfData = performance.getEntriesByType('navigation')[0];
+            if (perfData) {
+                console.log(`Page loaded in ${Math.round(perfData.loadEventEnd - perfData.fetchStart)}ms`);
+            }
+        }, 0);
+    });
+}
+</script>
+{% endblock %}

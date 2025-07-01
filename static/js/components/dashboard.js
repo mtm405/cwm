@@ -62,6 +62,79 @@ class ModernDashboardManager {
         }
     }
 
+    showLoadingState() {
+        this.showSkeletonLoaders();
+    }
+
+    hideLoadingState() {
+        this.hideSkeletonLoaders();
+    }
+
+    showSkeletonLoaders() {
+        // Show skeleton loaders for stats
+        const statsContent = document.getElementById('stats-content');
+        const statsSkeleton = document.getElementById('stats-skeleton');
+        
+        if (statsContent && statsSkeleton) {
+            statsContent.style.display = 'none';
+            statsSkeleton.style.display = 'grid';
+        }
+
+        // Show skeleton loaders for other sections
+        const sections = [
+            { content: 'exam-objectives-content', skeleton: 'exam-objectives-skeleton' },
+            { content: 'activity-feed-content', skeleton: 'activity-feed-skeleton' },
+            { content: 'daily-challenge-content', skeleton: 'daily-challenge-skeleton' }
+        ];
+
+        sections.forEach(section => {
+            const contentEl = document.getElementById(section.content);
+            const skeletonEl = document.getElementById(section.skeleton);
+            
+            if (contentEl && skeletonEl) {
+                contentEl.style.display = 'none';
+                skeletonEl.style.display = 'block';
+            }
+        });
+
+        console.log('🔄 Skeleton loaders displayed');
+    }
+
+    hideSkeletonLoaders() {
+        // Hide skeleton loaders for stats
+        const statsContent = document.getElementById('stats-content');
+        const statsSkeleton = document.getElementById('stats-skeleton');
+        
+        if (statsContent && statsSkeleton) {
+            statsSkeleton.style.display = 'none';
+            statsContent.style.display = 'grid';
+        }
+
+        // Hide skeleton loaders for other sections
+        const sections = [
+            { content: 'exam-objectives-content', skeleton: 'exam-objectives-skeleton' },
+            { content: 'activity-feed-content', skeleton: 'activity-feed-skeleton' },
+            { content: 'daily-challenge-content', skeleton: 'daily-challenge-skeleton' }
+        ];
+
+        sections.forEach(section => {
+            const contentEl = document.getElementById(section.content);
+            const skeletonEl = document.getElementById(section.skeleton);
+            
+            if (contentEl && skeletonEl) {
+                skeletonEl.style.display = 'none';
+                contentEl.style.display = 'block';
+            }
+        });
+
+        console.log('✅ Skeleton loaders hidden, content displayed');
+    }
+
+    showErrorState() {
+        this.hideSkeletonLoaders();
+        this.showToast('Failed to load dashboard data. Please refresh the page.', 'error');
+    }
+
     async loadDashboardData() {
         try {
             // Show loading state

@@ -27,7 +27,19 @@ class FirebaseService:
                 logger.info("Using existing Firebase app")
                 return
             
-            # Validate configuration
+            # Try to use service account key file first
+            import os
+            service_key_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'serviceAccountKey.json')
+            
+            if os.path.exists(service_key_path):
+                logger.info(f"Using service account key file: {service_key_path}")
+                cred = credentials.Certificate(service_key_path)
+                firebase_admin.initialize_app(cred)
+                self.db = firestore.client()
+                logger.info("Firebase initialized successfully with service account key file")
+                return
+            
+            # Fallback to environment variables
             if not self._validate_config():
                 raise ValueError("Invalid Firebase configuration")
             
@@ -38,13 +50,13 @@ class FirebaseService:
             })
             self.db = firestore.client()
             
-            logger.info("Firebase initialized successfully with real credentials")
+            logger.info("Firebase initialized successfully with environment variables")
             
         except Exception as e:
             logger.error(f"Failed to initialize Firebase: {str(e)}")
             self.db = None
             # Don't raise in production - allow graceful degradation
-            if not self.config.get('project_id'):
+            if not self.config.get('project_id') and not os.path.exists(service_key_path):
                 logger.warning("Firebase configuration missing - running in offline mode")
             else:
                 raise
@@ -656,6 +668,69 @@ class FirebaseService:
         except Exception as e:
             logger.error(f"Error getting latest announcement: {str(e)}")
             return None
+    
+    def update_user_rewards(self, user_id: str, xp_gained: int, coins_gained: int) -> bool:
+        """Update user's total XP and PyCoins"""
+        try:
+            if not self._validate_user_id(user_id):
+                return False
+            
+            user_ref = self.db.collection('users').document(user_id)
+            
+            # Use atomic transaction to ensure consistency
+            @firestore.transactional
+            def update_in_transaction(transaction):
+                user_doc = transaction.get(user_ref)
+                
+                if user_doc.exists:
+                    current_data = user_doc.to_dict()
+                    current_xp = current_data.get('total_xp', 0)
+                    current_coins = current_data.get('pycoins', 0)
+                    
+                    # Calculate new totals
+                    new_xp = current_xp + xp_gained
+                    new_coins = current_coins + coins_gained
+                    
+                    # Calculate level from XP
+                    new_level = self._calculate_level(new_xp)
+                    current_level = self._calculate_level(current_xp)
+                    
+                    update_data = {
+                        'total_xp': new_xp,
+                        'pycoins': new_coins,
+                        'level': new_level,
+                        'last_reward_update': firestore.SERVER_TIMESTAMP
+                    }
+                    
+                    # Check for level up
+                    if new_level > current_level:
+                        update_data['level_up_timestamp'] = firestore.SERVER_TIMESTAMP
+                        logger.info(f"User {user_id} leveled up to level {new_level}")
+                    
+                    transaction.update(user_ref, update_data)
+                    
+                    logger.info(f"Updated rewards for user {user_id}: +{xp_gained} XP, +{coins_gained} coins")
+                    return True
+                else:
+                    logger.error(f"User {user_id} not found for reward update")
+                    return False
+            
+            # Execute transaction
+            transaction = self.db.transaction()
+            return update_in_transaction(transaction)
+            
+        except Exception as e:
+            logger.error(f"Error updating user rewards: {str(e)}")
+            return False
+    
+    def _calculate_level(self, total_xp: int) -> int:
+        """Calculate user level based on total XP"""
+        # Level calculation: level = floor(sqrt(xp/100)) + 1
+        # This means: Level 1: 0-99 XP, Level 2: 100-399 XP, Level 3: 400-899 XP, etc.
+        import math
+        if total_xp < 100:
+            return 1
+        return int(math.sqrt(total_xp / 100)) + 1
 
 # Legacy support functions for backward compatibility
 # TODO: Remove in Phase 2
@@ -665,3 +740,15 @@ def initialize_firebase():
     """Legacy function - use FirebaseService class instead."""
     logger.warning("Using deprecated initialize_firebase function")
     return None
+
+# Create a global firebase_service instance for backward compatibility
+firebase_service = None
+
+def get_firebase_service():
+    """Get the global firebase service instance."""
+    return firebase_service
+
+def set_firebase_service(service):
+    """Set the global firebase service instance."""
+    global firebase_service
+    firebase_service = service

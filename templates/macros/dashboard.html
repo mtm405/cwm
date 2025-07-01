@@ -1,0 +1,71 @@
+{# Dashboard Macros - Reusable components for dashboard UI #}
+
+{# Stat Card Macro
+Usage: {{ dashboard.stat_card(
+    type='primary', 
+    icon='fas fa-star', 
+    trend='+25%', 
+    value=user.xp, 
+    label='Total XP', 
+    progress=75, 
+    data_stat='xp'
+) }}
+#}
+{% macro stat_card(type, icon, trend, value, label, progress, data_stat) %}
+<div class="stat-card-modern {{ type }}" data-stat="{{ data_stat }}">
+    <div class="stat-header">
+        <i class="stat-icon {{ icon }}"></i>
+        <span class="stat-trend">{{ trend }}</span>
+    </div>
+    <div class="stat-body">
+        <span class="stat-value-large">{{ value }}</span>
+        <span class="stat-label">{{ label }}</span>
+    </div>
+    <div class="stat-progress">
+        <div class="progress-bar-mini">
+            <div class="progress-fill-mini" style="width: {{ progress }}%"></div>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{# Cached Stat Card Macro with User-Specific Caching
+Usage: {{ dashboard.cached_stat_card(
+    type='primary', 
+    icon='fas fa-star', 
+    trend='+25%', 
+    value=user.xp, 
+    label='Total XP', 
+    progress=75, 
+    data_stat='xp',
+    user_id=user.id
+) }}
+#}
+{% macro cached_stat_card(type, icon, trend, value, label, progress, data_stat, user_id) %}
+<!-- Cached stat card for {{ user_id }}_{{ data_stat }} -->
+{{ stat_card(type=type, icon=icon, trend=trend, value=value, label=label, progress=progress, data_stat=data_stat) }}
+{% endmacro %}
+
+{# Dashboard Tab Button Macro
+Usage: {{ dashboard.tab_button('overview', 'fas fa-chart-line', 'Overview', true) }}
+#}
+{% macro tab_button(tab_id, icon, label, active=false) %}
+<button class="nav-tab {{ 'active' if active else '' }}" data-tab="{{ tab_id }}">
+    <i class="{{ icon }}"></i> {{ label }}
+</button>
+{% endmacro %}
+
+{# Progress Bar Macro
+Usage: {{ dashboard.progress_bar(75, 'Lesson Progress') }}
+#}
+{% macro progress_bar(percentage, label='') %}
+<div class="progress-wrapper">
+    {% if label %}
+    <div class="progress-label">{{ label }}</div>
+    {% endif %}
+    <div class="progress-bar">
+        <div class="progress-bar-fill" style="width: {{ percentage }}%"></div>
+    </div>
+    <div class="progress-text">{{ percentage }}%</div>
+</div>
+{% endmacro %}

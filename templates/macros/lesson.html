@@ -1,0 +1,59 @@
+{# Lesson Macros - Reusable components for lesson UI #}
+
+{# Lesson Tab Macro
+Usage: {{ lesson.tab_button(subtopic.id, subtopic.title, loop.first, subtopic.id in lesson_progress.completed_subtopics) }}
+#}
+{% macro tab_button(subtopic_id, title, active=false, completed=false) %}
+<button class="lesson-tab {{ 'active' if active else '' }}" 
+        data-subtopic-id="{{ subtopic_id }}"
+        data-completed="{{ 'true' if completed else 'false' }}"
+        onclick="switchLessonTab('{{ subtopic_id }}')">
+    <i class="fas fa-check-circle tab-check {{ 'completed' if completed else '' }}"></i>
+    {{ title }}
+</button>
+{% endmacro %}
+
+{# Code Block Macro
+Usage: {{ lesson.code_block(content_block.content, content_block.language or 'python') }}
+#}
+{% macro code_block(code_content, language='python') %}
+<div class="content-block code-example">
+    <div class="code-header">
+        <span>Example Code</span>
+        <button class="btn btn-sm" onclick="copyCode(this)">
+            <i class="fas fa-copy"></i> Copy
+        </button>
+    </div>
+    <div class="code-content">
+        <pre><code class="language-{{ language }}">{{ code_content }}</code></pre>
+    </div>
+</div>
+{% endmacro %}
+
+{# Back Link Macro
+Usage: {{ lesson.back_link('/dashboard', 'Back to Dashboard') }}
+#}
+{% macro back_link(href, text='Back') %}
+<a href="{{ href }}" class="back-link">
+    <i class="fas fa-arrow-left"></i>
+    {{ text }}
+</a>
+{% endmacro %}
+
+{# Lesson Progress Bar Macro
+Usage: {{ lesson.progress_bar(progress_percentage, current_step, total_steps) }}
+#}
+{% macro progress_bar(percentage, current_step=None, total_steps=None) %}
+<div class="lesson-progress-bar">
+    <div class="progress-info">
+        <span class="progress-text">Lesson Progress</span>
+        {% if current_step and total_steps %}
+        <span class="progress-steps">{{ current_step }}/{{ total_steps }}</span>
+        {% endif %}
+        <span class="progress-percentage">{{ percentage }}%</span>
+    </div>
+    <div class="progress-bar">
+        <div class="progress-bar-fill" style="width: {{ percentage }}%"></div>
+    </div>
+</div>
+{% endmacro %}

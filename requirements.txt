@@ -1,5 +1,6 @@
 # Core Framework
 Flask==3.0.0
+Flask-Caching==2.1.0
 gunicorn==21.2.0
 
 # HTTP Requests
@@ -22,6 +23,9 @@ html5lib>=1.1
 
 # Rate Limiting & Security
 Flask-Limiter>=3.5.0
+
+# Template Caching
+Flask-Caching>=2.1.0
 
 # Development & Testing
 pytest==7.4.3

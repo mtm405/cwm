@@ -1,0 +1,616 @@
+<!--
+Form Macros
+Purpose: Reusable Jinja2 macros for common form patterns
+Usage: {% from 'macros/forms.html' import macro_name %}
+
+Available macros:
+- text_input(): Standard text input field
+- email_input(): Email input with validation
+- password_input(): Password input with toggle visibility
+- textarea_input(): Textarea with character counter
+- checkbox_input(): Checkbox with custom styling
+- radio_group(): Radio button group
+- select_input(): Select dropdown
+- file_input(): File upload with preview
+- form_actions(): Standard form action buttons
+-->
+
+{# Standard text input field #}
+{% macro text_input(name, label, value='', placeholder='', required=false, help_text='', error='', icon='', class='') %}
+<div class="form-group">
+    <label for="{{ name }}" class="form-label">
+        {{ label }}
+        {% if required %}<span class="required">*</span>{% endif %}
+    </label>
+    
+    <div class="input-wrapper {% if icon %}has-icon{% endif %}">
+        {% if icon %}
+        <i class="{{ icon }} input-icon"></i>
+        {% endif %}
+        
+        <input 
+            type="text"
+            id="{{ name }}"
+            name="{{ name }}"
+            class="form-control {% if error %}error{% endif %} {{ class }}"
+            {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+            {% if value %}value="{{ value }}"{% endif %}
+            {% if required %}required{% endif %}
+        >
+    </div>
+    
+    {% if error %}
+    <div class="form-error">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ error }}
+    </div>
+    {% endif %}
+    
+    {% if help_text %}
+    <div class="form-help">
+        <i class="fas fa-info-circle"></i>
+        {{ help_text }}
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# Email input with validation #}
+{% macro email_input(name='email', label='Email Address', value='', placeholder='Enter your email', required=true, error='', class='') %}
+<div class="form-group">
+    <label for="{{ name }}" class="form-label">
+        {{ label }}
+        {% if required %}<span class="required">*</span>{% endif %}
+    </label>
+    
+    <div class="input-wrapper has-icon">
+        <i class="fas fa-envelope input-icon"></i>
+        <input 
+            type="email"
+            id="{{ name }}"
+            name="{{ name }}"
+            class="form-control {% if error %}error{% endif %} {{ class }}"
+            placeholder="{{ placeholder }}"
+            {% if value %}value="{{ value }}"{% endif %}
+            {% if required %}required{% endif %}
+        >
+    </div>
+    
+    {% if error %}
+    <div class="form-error">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ error }}
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# Password input with toggle visibility #}
+{% macro password_input(name, label='Password', placeholder='Enter your password', required=true, error='', show_toggle=true, class='') %}
+<div class="form-group">
+    <label for="{{ name }}" class="form-label">
+        {{ label }}
+        {% if required %}<span class="required">*</span>{% endif %}
+    </label>
+    
+    <div class="input-wrapper has-icon password-wrapper">
+        <i class="fas fa-lock input-icon"></i>
+        <input 
+            type="password"
+            id="{{ name }}"
+            name="{{ name }}"
+            class="form-control {% if error %}error{% endif %} {{ class }}"
+            placeholder="{{ placeholder }}"
+            {% if required %}required{% endif %}
+        >
+        {% if show_toggle %}
+        <button type="button" class="password-toggle" onclick="togglePassword('{{ name }}')">
+            <i class="fas fa-eye" id="{{ name }}_toggle_icon"></i>
+        </button>
+        {% endif %}
+    </div>
+    
+    {% if error %}
+    <div class="form-error">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ error }}
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# Textarea with character counter #}
+{% macro textarea_input(name, label, value='', placeholder='', required=false, rows=4, max_length=500, error='', help_text='', class='') %}
+<div class="form-group">
+    <label for="{{ name }}" class="form-label">
+        {{ label }}
+        {% if required %}<span class="required">*</span>{% endif %}
+    </label>
+    
+    <textarea 
+        id="{{ name }}"
+        name="{{ name }}"
+        class="form-control textarea {% if error %}error{% endif %} {{ class }}"
+        placeholder="{{ placeholder }}"
+        rows="{{ rows }}"
+        {% if max_length %}maxlength="{{ max_length }}"{% endif %}
+        {% if required %}required{% endif %}
+        {% if max_length %}oninput="updateCharacterCount('{{ name }}', {{ max_length }})"{% endif %}
+    >{{ value }}</textarea>
+    
+    {% if max_length %}
+    <div class="character-count">
+        <span id="{{ name }}_count">{{ value|length if value else 0 }}</span> / {{ max_length }}
+    </div>
+    {% endif %}
+    
+    {% if error %}
+    <div class="form-error">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ error }}
+    </div>
+    {% endif %}
+    
+    {% if help_text %}
+    <div class="form-help">
+        <i class="fas fa-info-circle"></i>
+        {{ help_text }}
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# Checkbox with custom styling #}
+{% macro checkbox_input(name, label, checked=false, required=false, error='', class='') %}
+<div class="form-group form-checkbox">
+    <label class="checkbox-container">
+        <input 
+            type="checkbox" 
+            name="{{ name }}" 
+            id="{{ name }}"
+            {% if checked %}checked{% endif %}
+            {% if required %}required{% endif %}
+            class="{{ class }}"
+        >
+        <span class="checkmark"></span>
+        <span class="checkbox-label">
+            {{ label }}
+            {% if required %}<span class="required">*</span>{% endif %}
+        </span>
+    </label>
+    
+    {% if error %}
+    <div class="form-error">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ error }}
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# Radio button group #}
+{% macro radio_group(name, label, options, selected='', required=false, error='', class='') %}
+<div class="form-group">
+    <fieldset class="radio-fieldset">
+        <legend class="form-label">
+            {{ label }}
+            {% if required %}<span class="required">*</span>{% endif %}
+        </legend>
+        
+        <div class="radio-group {{ class }}">
+            {% for option in options %}
+            <label class="radio-container">
+                <input 
+                    type="radio" 
+                    name="{{ name }}" 
+                    value="{{ option.value }}"
+                    {% if option.value == selected %}checked{% endif %}
+                    {% if required %}required{% endif %}
+                >
+                <span class="radio-mark"></span>
+                <span class="radio-label">{{ option.label }}</span>
+            </label>
+            {% endfor %}
+        </div>
+        
+        {% if error %}
+        <div class="form-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            {{ error }}
+        </div>
+        {% endif %}
+    </fieldset>
+</div>
+{% endmacro %}
+
+{# Select dropdown #}
+{% macro select_input(name, label, options, selected='', placeholder='Choose an option', required=false, error='', help_text='', class='') %}
+<div class="form-group">
+    <label for="{{ name }}" class="form-label">
+        {{ label }}
+        {% if required %}<span class="required">*</span>{% endif %}
+    </label>
+    
+    <select 
+        id="{{ name }}"
+        name="{{ name }}"
+        class="form-control select {% if error %}error{% endif %} {{ class }}"
+        {% if required %}required{% endif %}
+    >
+        {% if placeholder %}
+        <option value="" {% if not selected %}selected{% endif %} disabled>{{ placeholder }}</option>
+        {% endif %}
+        
+        {% for option in options %}
+        <option 
+            value="{{ option.value }}" 
+            {% if option.value == selected %}selected{% endif %}
+        >
+            {{ option.label }}
+        </option>
+        {% endfor %}
+    </select>
+    
+    {% if error %}
+    <div class="form-error">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ error }}
+    </div>
+    {% endif %}
+    
+    {% if help_text %}
+    <div class="form-help">
+        <i class="fas fa-info-circle"></i>
+        {{ help_text }}
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# File input with preview #}
+{% macro file_input(name, label, accepted_types='*', max_size='5MB', required=false, error='', help_text='', show_preview=true, class='') %}
+<div class="form-group">
+    <label for="{{ name }}" class="form-label">
+        {{ label }}
+        {% if required %}<span class="required">*</span>{% endif %}
+    </label>
+    
+    <div class="file-input-wrapper">
+        <input 
+            type="file"
+            id="{{ name }}"
+            name="{{ name }}"
+            class="file-input {{ class }}"
+            {% if accepted_types != '*' %}accept="{{ accepted_types }}"{% endif %}
+            {% if required %}required{% endif %}
+            {% if show_preview %}onchange="previewFile('{{ name }}')"{% endif %}
+        >
+        
+        <label for="{{ name }}" class="file-input-label">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span class="file-input-text">
+                Choose file or drag here
+            </span>
+        </label>
+        
+        {% if show_preview %}
+        <div class="file-preview" id="{{ name }}_preview" style="display: none;">
+            <div class="file-preview-content">
+                <i class="fas fa-file"></i>
+                <span class="file-name"></span>
+                <button type="button" class="remove-file" onclick="removeFile('{{ name }}')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if help_text %}
+    <div class="form-help">
+        <i class="fas fa-info-circle"></i>
+        {{ help_text }} (Max size: {{ max_size }})
+    </div>
+    {% endif %}
+    
+    {% if error %}
+    <div class="form-error">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ error }}
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# Standard form action buttons #}
+{% macro form_actions(submit_text='Submit', submit_variant='primary', show_cancel=false, cancel_text='Cancel', cancel_action='', additional_buttons=[], class='') %}
+<div class="form-actions {{ class }}">
+    <button type="submit" class="btn btn-{{ submit_variant }} btn-lg">
+        <i class="fas fa-paper-plane"></i>
+        <span class="button-text">{{ submit_text }}</span>
+    </button>
+    
+    {% if show_cancel %}
+    <button 
+        type="button" 
+        class="btn btn-secondary btn-lg"
+        {% if cancel_action %}onclick="{{ cancel_action }}"{% else %}onclick="history.back()"{% endif %}
+    >
+        <i class="fas fa-times"></i>
+        <span class="button-text">{{ cancel_text }}</span>
+    </button>
+    {% endif %}
+    
+    {% for button in additional_buttons %}
+    <button 
+        type="{{ button.type or 'button' }}"
+        class="btn btn-{{ button.variant or 'secondary' }} btn-lg"
+        {% if button.action %}onclick="{{ button.action }}"{% endif %}
+        {% if button.id %}id="{{ button.id }}"{% endif %}
+    >
+        {% if button.icon %}<i class="{{ button.icon }}"></i>{% endif %}
+        <span class="button-text">{{ button.text }}</span>
+    </button>
+    {% endfor %}
+</div>
+{% endmacro %}
+
+<script>
+// Password toggle functionality
+function togglePassword(fieldName) {
+    const input = document.getElementById(fieldName);
+    const icon = document.getElementById(fieldName + '_toggle_icon');
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'fas fa-eye';
+    }
+}
+
+// Character counter functionality
+function updateCharacterCount(fieldName, maxLength) {
+    const textarea = document.getElementById(fieldName);
+    const counter = document.getElementById(fieldName + '_count');
+    
+    if (textarea && counter) {
+        const currentLength = textarea.value.length;
+        counter.textContent = currentLength;
+        
+        // Add warning class when approaching limit
+        if (currentLength > maxLength * 0.9) {
+            counter.classList.add('warning');
+        } else {
+            counter.classList.remove('warning');
+        }
+    }
+}
+
+// File preview functionality
+function previewFile(fieldName) {
+    const input = document.getElementById(fieldName);
+    const preview = document.getElementById(fieldName + '_preview');
+    
+    if (input.files && input.files[0] && preview) {
+        const file = input.files[0];
+        const fileName = preview.querySelector('.file-name');
+        
+        fileName.textContent = file.name;
+        preview.style.display = 'block';
+        
+        // Hide the file input label
+        const label = input.nextElementSibling;
+        if (label) {
+            label.style.display = 'none';
+        }
+    }
+}
+
+// Remove file functionality
+function removeFile(fieldName) {
+    const input = document.getElementById(fieldName);
+    const preview = document.getElementById(fieldName + '_preview');
+    const label = input.nextElementSibling;
+    
+    input.value = '';
+    if (preview) preview.style.display = 'none';
+    if (label) label.style.display = 'flex';
+}
+</script>
+
+<style>
+/* Additional styles for macro components */
+.password-wrapper {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    z-index: 2;
+}
+
+.password-toggle:hover {
+    color: var(--text-primary);
+}
+
+.character-count {
+    text-align: right;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+.character-count.warning {
+    color: #f59e0b;
+}
+
+.radio-fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.radio-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.radio-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.radio-mark {
+    height: 18px;
+    width: 18px;
+    background-color: var(--input-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    margin-right: 0.75rem;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.radio-container:hover .radio-mark {
+    border-color: var(--primary-color);
+}
+
+.radio-container input:checked ~ .radio-mark {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.radio-mark:after {
+    content: "";
+    position: absolute;
+    display: none;
+    top: 4px;
+    left: 4px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: white;
+}
+
+.radio-container input:checked ~ .radio-mark:after {
+    display: block;
+}
+
+.radio-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.file-input-wrapper {
+    position: relative;
+}
+
+.file-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.file-input-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    border: 2px dashed var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--input-bg);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.file-input-label:hover {
+    border-color: var(--primary-color);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.file-input-label i {
+    font-size: 2rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.file-input-text {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.file-preview {
+    margin-top: 1rem;
+}
+
+.file-preview-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+.file-preview-content i {
+    color: var(--primary-color);
+}
+
+.file-name {
+    flex: 1;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+}
+
+.remove-file {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+}
+
+.remove-file:hover {
+    color: #ef4444;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+    }
+}
+</style>

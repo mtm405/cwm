@@ -1,0 +1,22 @@
+<!--
+Code Editor Component
+Usage: {% include 'components/lesson/code-editor.html' with context %}
+Variables needed:
+- editor_id: unique identifier for the editor (e.g., "practice-editor")
+- default_code: default code to show in editor (optional)
+- output_id: ID for output div (optional, defaults to editor_id + "-output")
+
+Description: ACE code editor wrapper with run functionality
+-->
+<div class="code-editor-container">
+    <div class="code-editor-header">
+        <span>Python Code Editor</span>
+        <div class="editor-actions">
+            <button class="btn btn-sm btn-outline" onclick="runPracticeCode('{{ editor_id }}', '{{ output_id or (editor_id + '-output') }}')">
+                <i class="fas fa-play"></i> Run Code
+            </button>
+        </div>
+    </div>
+    <div id="{{ editor_id }}" class="code-editor">{{ default_code or "# Practice your Python skills here\n\nprint(\"Hello, World!\")" }}</div>
+    <div id="{{ output_id or (editor_id + '-output') }}" class="code-output"></div>
+</div>

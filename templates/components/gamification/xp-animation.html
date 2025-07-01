@@ -1,0 +1,234 @@
+<!--
+XP Animation Component
+Usage: {% include 'components/gamification/xp-animation.html' with xp_amount=50, target_element_id='stat-card-xp' %}
+Variables needed:
+- xp_amount: The amount of XP gained (required)
+- target_element_id: The ID of the element to animate from (optional)
+- animation_type: Type of animation ('float', 'burst', 'rain') (default: 'float')
+
+Description: Displays animated XP gain notifications with customizable effects
+-->
+
+<div class="xp-animation-container" id="xp-animation-{{ xp_amount }}-{{ loop.index0 if loop else 0 }}">
+    {% if animation_type == 'burst' %}
+        <!-- XP Burst Animation -->
+        <div class="xp-burst-effect">
+            <div class="xp-burst-center">
+                <span class="xp-amount-burst">+{{ xp_amount }} XP</span>
+                <div class="xp-particles">
+                    {% for i in range(8) %}
+                    <div class="xp-particle xp-particle-{{ i }}"></div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+    {% elif animation_type == 'rain' %}
+        <!-- XP Rain Animation -->
+        <div class="xp-rain-effect">
+            {% for i in range(5) %}
+            <div class="xp-rain-drop xp-rain-drop-{{ i }}">
+                <span class="xp-rain-amount">+{{ (xp_amount / 5)|round|int }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        
+    {% else %}
+        <!-- Default Float Animation -->
+        <div class="xp-float-effect">
+            <div class="xp-float-main">
+                <span class="xp-amount-text">+{{ xp_amount }}</span>
+                <span class="xp-label">XP</span>
+                <div class="xp-glow-effect"></div>
+            </div>
+            <div class="xp-sparkles">
+                {% for i in range(6) %}
+                <div class="xp-sparkle xp-sparkle-{{ i }}">✨</div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Level Up Animation (shown when user levels up) -->
+<div class="level-up-animation" id="level-up-animation" style="display: none;">
+    <div class="level-up-content">
+        <div class="level-up-icon">🎉</div>
+        <div class="level-up-text">
+            <h2>LEVEL UP!</h2>
+            <p>You've reached Level <span id="new-level">0</span>!</p>
+        </div>
+        <div class="level-up-effects">
+            <div class="level-up-rays"></div>
+            <div class="level-up-particles">
+                {% for i in range(12) %}
+                <div class="level-up-particle level-up-particle-{{ i }}"></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Achievement Unlock Animation -->
+<div class="achievement-unlock-animation" id="achievement-unlock-animation" style="display: none;">
+    <div class="achievement-unlock-content">
+        <div class="achievement-badge">
+            <div class="achievement-icon" id="achievement-icon">🏆</div>
+            <div class="achievement-shine"></div>
+        </div>
+        <div class="achievement-text">
+            <h3>Achievement Unlocked!</h3>
+            <p id="achievement-name">Achievement Name</p>
+            <p id="achievement-description">Achievement description here</p>
+        </div>
+        <div class="achievement-close-btn" onclick="closeAchievementAnimation()">×</div>
+    </div>
+</div>
+
+<!-- Streak Milestone Animation -->
+<div class="streak-milestone-animation" id="streak-milestone-animation" style="display: none;">
+    <div class="streak-milestone-content">
+        <div class="streak-fire-effect">
+            <div class="streak-flame">🔥</div>
+            <div class="streak-flame-bg"></div>
+        </div>
+        <div class="streak-text">
+            <h3><span id="streak-days">0</span> Day Streak!</h3>
+            <p>You're on fire! Keep it up!</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Global functions for controlling animations
+window.showXPAnimation = function(xpAmount, targetElementId = null, animationType = 'float') {
+    const container = document.createElement('div');
+    container.className = 'xp-animation-container';
+    
+    let animationHTML = '';
+    
+    if (animationType === 'burst') {
+        animationHTML = `
+            <div class="xp-burst-effect">
+                <div class="xp-burst-center">
+                    <span class="xp-amount-burst">+${xpAmount} XP</span>
+                    <div class="xp-particles">
+                        ${Array.from({length: 8}, (_, i) => `<div class="xp-particle xp-particle-${i}"></div>`).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    } else if (animationType === 'rain') {
+        const xpPerDrop = Math.round(xpAmount / 5);
+        animationHTML = `
+            <div class="xp-rain-effect">
+                ${Array.from({length: 5}, (_, i) => `
+                    <div class="xp-rain-drop xp-rain-drop-${i}">
+                        <span class="xp-rain-amount">+${xpPerDrop}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } else {
+        animationHTML = `
+            <div class="xp-float-effect">
+                <div class="xp-float-main">
+                    <span class="xp-amount-text">+${xpAmount}</span>
+                    <span class="xp-label">XP</span>
+                    <div class="xp-glow-effect"></div>
+                </div>
+                <div class="xp-sparkles">
+                    ${Array.from({length: 6}, (_, i) => `<div class="xp-sparkle xp-sparkle-${i}">✨</div>`).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
+    container.innerHTML = animationHTML;
+    
+    // Position the animation
+    if (targetElementId) {
+        const targetElement = document.getElementById(targetElementId);
+        if (targetElement) {
+            const rect = targetElement.getBoundingClientRect();
+            container.style.position = 'fixed';
+            container.style.left = `${rect.left + rect.width / 2}px`;
+            container.style.top = `${rect.top}px`;
+        }
+    } else {
+        container.style.position = 'fixed';
+        container.style.left = '50%';
+        container.style.top = '50%';
+        container.style.transform = 'translate(-50%, -50%)';
+    }
+    
+    container.style.zIndex = '1000';
+    container.style.pointerEvents = 'none';
+    
+    document.body.appendChild(container);
+    
+    // Remove after animation completes
+    setTimeout(() => {
+        if (document.body.contains(container)) {
+            document.body.removeChild(container);
+        }
+    }, 3000);
+};
+
+window.showLevelUpAnimation = function(newLevel) {
+    const animation = document.getElementById('level-up-animation');
+    const levelSpan = document.getElementById('new-level');
+    
+    if (animation && levelSpan) {
+        levelSpan.textContent = newLevel;
+        animation.style.display = 'flex';
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            animation.style.display = 'none';
+        }, 5000);
+    }
+};
+
+window.showAchievementAnimation = function(achievement) {
+    const animation = document.getElementById('achievement-unlock-animation');
+    const iconEl = document.getElementById('achievement-icon');
+    const nameEl = document.getElementById('achievement-name');
+    const descEl = document.getElementById('achievement-description');
+    
+    if (animation && iconEl && nameEl && descEl) {
+        iconEl.textContent = achievement.icon || '🏆';
+        nameEl.textContent = achievement.name || 'Achievement';
+        descEl.textContent = achievement.description || 'Great job!';
+        
+        animation.style.display = 'flex';
+        
+        // Auto-hide after 7 seconds
+        setTimeout(() => {
+            animation.style.display = 'none';
+        }, 7000);
+    }
+};
+
+window.closeAchievementAnimation = function() {
+    const animation = document.getElementById('achievement-unlock-animation');
+    if (animation) {
+        animation.style.display = 'none';
+    }
+};
+
+window.showStreakMilestoneAnimation = function(streakDays) {
+    const animation = document.getElementById('streak-milestone-animation');
+    const daysSpan = document.getElementById('streak-days');
+    
+    if (animation && daysSpan) {
+        daysSpan.textContent = streakDays;
+        animation.style.display = 'flex';
+        
+        // Auto-hide after 4 seconds
+        setTimeout(() => {
+            animation.style.display = 'none';
+        }, 4000);
+    }
+};
+</script>
