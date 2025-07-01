@@ -35,9 +35,18 @@
     <!-- Toast Notifications -->
     {% include 'components/common/toast-notifications.html' %}
     
-    <!-- Scripts -->
+    <!-- Scripts - Optimized Modular Structure -->
+    <!-- Core module system -->
+    <script src="{{ url_for('static', filename='js/modules/app-utils.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/theme-manager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/navigation-manager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/auth-manager.js') }}"></script>
+    
+    <!-- Modal management -->
     <script src="{{ url_for('static', filename='js/components/modal-manager.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    <!-- Main application entry point (optimized) -->
+    <script src="{{ url_for('static', filename='js/main-optimized.js') }}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

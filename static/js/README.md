@@ -6,12 +6,37 @@ Clean, modular JavaScript architecture for Code with Marco - Python Learning Pla
 ## 📁 **Directory Structure**
 ```
 static/js/
-├── main.js           # Global functionality & initialization
-├── components/       # Reusable UI components
-│   ├── dashboard.js  # Dashboard management & interactions
-│   └── quiz.js       # Quiz system functionality
+├── main.js           # Global functionality & initialization (39KB)
+├── components/       # Reusable UI components (12 files)
+│   ├── lesson-manager.js (41KB)      # Primary lesson system
+│   ├── content-renderer.js (40KB)    # Content rendering  
+│   ├── dashboard.js (24KB)           # Dashboard management
+│   ├── interactive-editor.js (23KB)  # Code editor
+│   ├── progress-tracker.js (22KB)    # Progress tracking
+│   ├── quiz.js (18KB)               # Quiz functionality
+│   ├── gamification-manager.js (18KB) # XP/rewards system
+│   └── [5 more optimized components]
+├── utils/            # Utility functions
+│   └── performance-monitor.js        # Performance monitoring
+├── archive/          # Legacy files (safely archived)
+│   ├── simple-lesson-integration.js  # Conflicting lesson system
+│   ├── firebase-dashboard.js         # Duplicate dashboard logic
+│   └── [2 more archived files]
 └── README.md         # This documentation
 ```
+
+## 🚨 **RECENT CLEANUP (June 30, 2025)**
+
+**✅ COMPLETED:**
+- **Deleted 4 empty files** (accessibility, performance, error-handler, compatibility)
+- **Archived 4 conflicting files** (simple lesson systems, firebase dashboard)
+- **Reduced from 20 to 12 active components** (-40% file count)
+- **Eliminated competing lesson systems** (now single lesson-manager.js)
+
+**🔧 NEXT PHASE:**
+- Consolidate 3 lesson files into 1 optimized lesson-core.js
+- Split main.js into focused core modules
+- Reduce lesson page JS load from 200KB to 80KB
 
 ## 📋 **File Responsibilities**
 
