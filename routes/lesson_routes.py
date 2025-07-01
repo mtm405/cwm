@@ -108,7 +108,7 @@ def lesson_view(lesson_id):
             current_app.logger.info("Skipping activity tracking (no Firebase or no user)")
         
         current_app.logger.info("Rendering lesson template")
-        return render_template('lesson_backup.html', 
+        return render_template('lesson.html', 
                              user=user, 
                              lesson=lesson_data,
                              lesson_progress=lesson_progress)
@@ -158,7 +158,7 @@ def lesson_fixed(lesson_id):
             current_app.logger.info("Skipping activity tracking (no Firebase or no user)")
         
         current_app.logger.info("Rendering lesson template")
-        return render_template('lesson_backup.html', 
+        return render_template('lesson.html', 
                              user=user, 
                              lesson=lesson_data,
                              lesson_progress=lesson_progress)
@@ -274,10 +274,11 @@ def lesson_debug(lesson_id):
         if not lesson_data:
             return "Lesson not found", 404
         
-        # Use simple debug template
-        return render_template('lesson_debug.html', 
+        # Use main lesson template for debug
+        return render_template('lesson.html', 
                              user=user, 
-                             lesson=lesson_data)
+                             lesson=lesson_data,
+                             lesson_progress={})
     except Exception as e:
         current_app.logger.error(f"Error in debug lesson route: {str(e)}")
         return f"Debug Error: {str(e)}", 500
