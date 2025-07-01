@@ -517,14 +517,11 @@ class LessonPageManager {
         this.updateLessonHeader();
         
         // Render content blocks
-        const contentBlocks = this.lessonData.content_blocks || [];
-        let contentHtml = '';
-        
+        // Ensure contentBlocks is an array before forEach
+        const contentBlocks = Array.isArray(this.lessonData.blocks) ? this.lessonData.blocks : [];
         contentBlocks.forEach((block, index) => {
-            contentHtml += this.contentRenderer.renderBlock(block, index);
+            contentContainer.innerHTML += this.contentRenderer.renderBlock(block, index);
         });
-        
-        contentContainer.innerHTML = contentHtml;
         
         // Initialize code editors for interactive blocks
         this.initializeCodeEditors();

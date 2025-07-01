@@ -1,13 +1,27 @@
-<!-- Base Scripts - Optimized Modular Structure -->
-<!-- Core module system -->
-<script src="{{ url_for('static', filename='js/modules/app-utils.js') }}"></script>
-<script src="{{ url_for('static', filename='js/modules/theme-manager.js') }}"></script>
-<script src="{{ url_for('static', filename='js/modules/navigation-manager.js') }}"></script>
-<script src="{{ url_for('static', filename='js/modules/auth-manager.js') }}"></script>
+<!-- 
+    WARNING: This file is deprecated and should not be included.
+    Scripts are now loaded directly in base.html to prevent duplicate loading.
+    Including this file will cause "already been declared" errors.
+    Use base.html script tags instead.
+-->
 
-<!-- Modal management -->
-<script src="{{ url_for('static', filename='js/components/modal-manager.js') }}"></script>
+<!-- Base Scripts - Phase 6 Optimized Structure -->
+<!-- DEPRECATED: Do not include this file - causes duplicate script loading -->
+<!--
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/constants.js') }}"></script>
+<script src="{{ url_for('static', filename='js/config.js') }}"></script>
+<script src="{{ url_for('static', filename='js/eventBus.js') }}"></script>
 
-<!-- Main application entry point (optimized) -->
-<script src="{{ url_for('static', filename='js/main-optimized.js') }}"></script>
+<!-- Module system -->
+<script src="{{ url_for('static', filename='js/moduleLoader.js') }}"></script>
 
+<!-- Core components -->
+<script src="{{ url_for('static', filename='js/components/BaseComponent.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/ModalComponent.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/NotificationComponent.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/ThemeController.js') }}"></script>
+
+<!-- Main application entry point -->
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+-->

@@ -161,6 +161,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Render games tab Wordle card if on dashboard
+    if (typeof ModernDashboardManager !== 'undefined') {
+        const mgr = new ModernDashboardManager();
+        if (typeof mgr.renderGamesTab === 'function') {
+            mgr.renderGamesTab();
+        }
+    }
+    
     // Initialize page-specific components
     const page = document.body.dataset.page;
     if (page === 'dashboard' && typeof ModernDashboardManager !== 'undefined') {

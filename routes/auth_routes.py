@@ -54,47 +54,36 @@ def verify_google_token(id_token: str) -> Optional[Dict[str, Any]]:
         logger.error(f"Error verifying Google token: {str(e)}")
         return None
 
-@auth_bp.route('/sessionLogin', methods=['POST'])
-def session_login():
-    """Handle Google OAuth login and create user session"""
+@auth_bp.route('/google/callback', methods=['POST'])
+def google_callback():
+    """Handle Google OAuth callback and create user session"""
     try:
         data = request.get_json()
-        if not data or 'idToken' not in data:
+        if not data or 'token' not in data:
             logger.error("No ID token provided in request")
             return jsonify({'success': False, 'error': 'ID token required'}), 400
         
-        id_token = data['idToken']
+        id_token = data['token']
         logger.info(f"Received ID token for verification (length: {len(id_token)})")
         
-        # Debug: Log first and last few characters of token (safely)
-        logger.debug(f"Token starts with: {id_token[:20]}...")
-        logger.debug(f"Token ends with: ...{id_token[-20:]}")
-        
         # Verify the ID token with Google OAuth
-        try:
-            logger.info("Attempting to verify ID token with Google OAuth API")
-            token_info = verify_google_token(id_token)
-            
-            if not token_info:
-                logger.error("Google token verification failed")
-                return jsonify({'success': False, 'error': 'Invalid token'}), 401
-            
-            logger.info("Google token verification successful")
-            
-            # Extract user information from Google token
-            user_id = token_info.get('sub')  # Google user ID
-            user_email = token_info.get('email')
-            user_name = token_info.get('name', user_email)
-            user_picture = token_info.get('picture', '')
-            email_verified = token_info.get('email_verified', 'false') == 'true'
-            
-            logger.info(f"Token verified successfully - User: {user_email}, Google ID: {user_id}")
-            logger.debug(f"Token info fields: {list(token_info.keys())}")
-            
-        except Exception as e:
-            logger.error(f"Google token verification failed with unexpected error: {str(e)}")
-            logger.error(f"Error type: {type(e).__name__}")
-            return jsonify({'success': False, 'error': 'Token verification failed'}), 401
+        logger.info("Attempting to verify ID token with Google OAuth API")
+        token_info = verify_google_token(id_token)
+        
+        if not token_info:
+            logger.error("Google token verification failed")
+            return jsonify({'success': False, 'error': 'Invalid token'}), 401
+        
+        logger.info("Google token verification successful")
+        
+        # Extract user information from Google token
+        user_id = token_info.get('sub')
+        user_email = token_info.get('email')
+        user_name = token_info.get('name', user_email)
+        user_picture = token_info.get('picture', '')
+        email_verified = token_info.get('email_verified', 'false') == 'true'
+        
+        logger.info(f"Token verified successfully - User: {user_email}, Google ID: {user_id}")
         
         # Get or create user in Firebase
         firebase_service = get_firebase_service()
@@ -175,7 +164,6 @@ def session_login():
                         'streak': user_data.get('streak', 0)
                     }
                 })
-                
             except Exception as e:
                 logger.error(f"Error managing user data: {str(e)}")
                 # Still set basic session even if user data fails
@@ -197,18 +185,26 @@ def session_login():
             session['authenticated'] = True
             
             return jsonify({'success': True, 'warning': 'Firebase unavailable'})
-        
+    except Exception as e:
+        logger.error(f"Google callback error: {str(e)}")
+        return jsonify({'success': False, 'error': 'Authentication failed'}), 500
+
+@auth_bp.route('/sessionLogin', methods=['POST'])
+def session_login():
+    """Handle Google OAuth login and create user session"""
+    try:
+        # Placeholder implementation
+        return jsonify({'success': True, 'message': 'Session login placeholder'})
     except Exception as e:
         logger.error(f"Session login error: {str(e)}")
-        return jsonify({'success': False, 'error': 'Authentication failed'}), 500
+        return jsonify({'success': False, 'error': 'Session login failed'}), 500
 
 @auth_bp.route('/logout', methods=['POST'])
 def logout():
     """Clear user session"""
     try:
-        user_email = session.get('user_email', 'unknown')
+        # Clear the session
         session.clear()
-        logger.info(f"User logged out: {user_email}")
         return jsonify({'success': True, 'message': 'Logged out successfully'})
     except Exception as e:
         logger.error(f"Logout error: {str(e)}")
@@ -218,49 +214,37 @@ def logout():
 def auth_status():
     """Get current authentication status"""
     try:
-        if session.get('authenticated'):
-            user_id = session.get('user_id')
-            firebase_service = get_firebase_service()
-            
-            if firebase_service and user_id:
-                user_data = firebase_service.get_user(user_id)
-                if user_data:
-                    return jsonify({
-                        'authenticated': True,
-                        'user': {
-                            'uid': user_id,
-                            'email': session.get('user_email'),
-                            'username': user_data.get('username'),
-                            'display_name': user_data.get('display_name'),
-                            'profile_picture': user_data.get('profile_picture'),
-                            'is_admin': user_data.get('is_admin', False),
-                            'xp': user_data.get('xp', 0),
-                            'level': user_data.get('level', 1),
-                            'pycoins': user_data.get('pycoins', 0),
-                            'streak': user_data.get('streak', 0)
-                        }
-                    })
-        
-        return jsonify({'authenticated': False})
-        
+        is_authenticated = session.get('authenticated', False)
+        return jsonify({
+            'authenticated': is_authenticated,
+            'user': {
+                'uid': session.get('user_id'),
+                'email': session.get('user_email'),
+                'name': session.get('user_name'),
+                'picture': session.get('user_picture'),
+                'is_admin': session.get('is_admin', False)
+            } if is_authenticated else None
+        })
     except Exception as e:
         logger.error(f"Auth status error: {str(e)}")
-        return jsonify({'authenticated': False})
+        return jsonify({'success': False, 'error': 'Failed to get auth status'}), 500
+
+@auth_bp.route('/api/user/profile')
 def get_user_profile():
     """Get current user profile information"""
     try:
         user_id = session.get('user_id')
         if not user_id:
-            return jsonify({'success': False, 'error': 'Not authenticated'}), 401
+            return jsonify({'success': False, 'error': 'User not authenticated'}), 401
         
         firebase_service = get_firebase_service()
         if firebase_service and firebase_service.is_available():
             user_data = firebase_service.get_user(user_id)
             if user_data:
-                # Remove sensitive data
-                user_data.pop('created_at', None)
-                user_data.pop('last_login', None)
-                return jsonify({'success': True, 'user': user_data})
+                return jsonify({
+                    'success': True,
+                    'user': user_data
+                })
         
         # Fallback to session data
         return jsonify({
@@ -279,43 +263,48 @@ def get_user_profile():
         
     except Exception as e:
         logger.error(f"Get user profile error: {str(e)}")
-        return jsonify({'success': False, 'error': 'Failed to get profile'}), 500
+        return jsonify({'success': False, 'error': 'Failed to get user profile'}), 500
 
 @auth_bp.route('/api/user/update', methods=['POST'])
 def update_user_profile():
     """Update user profile information"""
     try:
+        if not session.get('authenticated'):
+            return jsonify({'success': False, 'error': 'Authentication required'}), 401
+            
         user_id = session.get('user_id')
         if not user_id:
-            return jsonify({'success': False, 'error': 'Not authenticated'}), 401
-        
+            return jsonify({'success': False, 'error': 'User ID not found in session'}), 400
+            
         data = request.get_json()
         if not data:
             return jsonify({'success': False, 'error': 'No data provided'}), 400
-        
-        # Allow only safe fields to be updated
-        allowed_fields = ['username', 'theme']
-        update_data = {k: v for k, v in data.items() if k in allowed_fields}
-        
-        if not update_data:
-            return jsonify({'success': False, 'error': 'No valid fields to update'}), 400
-        
+            
         firebase_service = get_firebase_service()
         if firebase_service and firebase_service.is_available():
-            if firebase_service.update_user(user_id, update_data):
-                # Update session
-                if 'username' in update_data:
-                    session['user_name'] = update_data['username']
+            # Only allow updating certain fields
+            allowed_fields = ['username', 'display_name', 'bio']
+            update_data = {k: v for k, v in data.items() if k in allowed_fields}
+            
+            if not update_data:
+                return jsonify({'success': False, 'error': 'No valid fields to update'}), 400
                 
-                return jsonify({'success': True, 'message': 'Profile updated'})
+            # Add timestamp
+            update_data['updated_at'] = firebase_service.get_server_timestamp()
+            
+            # Update the user
+            success = firebase_service.update_user(user_id, update_data)
+            if success:
+                return jsonify({'success': True, 'message': 'Profile updated successfully'})
             else:
                 return jsonify({'success': False, 'error': 'Failed to update profile'}), 500
         else:
-            return jsonify({'success': False, 'error': 'Database not available'}), 503
-        
+            return jsonify({'success': False, 'error': 'Firebase service unavailable'}), 503
+            
     except Exception as e:
         logger.error(f"Update user profile error: {str(e)}")
         return jsonify({'success': False, 'error': 'Failed to update profile'}), 500
+
 def require_auth(f):
     """Decorator to require authentication"""
     from functools import wraps

@@ -1,10 +1,18 @@
 /* Modern Header Styles - Clean & Functional */
 
 /* Layout Reset for Modern Header */
-
+body {
+    margin: 0;
+    padding: 0;
+    padding-top: 70px; /* Account for fixed navbar height */
+}
 
 /* Global Layout Fixes */
-body 
+body .main-content {
+    margin-left: 0 !important;
+    padding-top: 0;
+    min-height: calc(100vh - 70px);
+}
 
 body .app-container {
     margin-left: 0 !important;

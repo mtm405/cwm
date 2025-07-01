@@ -166,6 +166,11 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Auth components -->
+<script src="{{ url_for('static', filename='js/auth/authService.js') }}"></script>
+<script src="{{ url_for('static', filename='js/auth/authController.js') }}"></script>
+<script src="{{ url_for('static', filename='js/auth/authEvents.js') }}"></script>
+
 <script>
 // Handle form submissions and validation
 document.addEventListener('DOMContentLoaded', function() {
@@ -255,4 +260,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<!-- Authentication specific JavaScript -->
+<script src="{{ url_for('static', filename='js/auth/authController.js') }}"></script>
+<script src="{{ url_for('static', filename='js/auth/authService.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/modal-manager.js') }}"></script>
 {% endblock %}

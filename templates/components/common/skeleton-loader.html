@@ -12,10 +12,50 @@ Description: Shows animated skeleton placeholders while content is loading
 -->
 <div class="skeleton-loader" data-component="{{ component_type }}">
     {% if component_type == 'dashboard-stats' %}
-        <div class="skeleton-pulse stat-card-skeleton"></div>
-        <div class="skeleton-pulse stat-card-skeleton"></div>
-        <div class="skeleton-pulse stat-card-skeleton"></div>
-        <div class="skeleton-pulse stat-card-skeleton"></div>
+        <div class="skeleton-pulse stat-card-skeleton">
+            <div class="skeleton-header">
+                <div class="skeleton-icon"></div>
+                <div class="skeleton-trend"></div>
+            </div>
+            <div class="skeleton-body">
+                <div class="skeleton-value"></div>
+                <div class="skeleton-label"></div>
+            </div>
+            <div class="skeleton-progress"></div>
+        </div>
+        <div class="skeleton-pulse stat-card-skeleton">
+            <div class="skeleton-header">
+                <div class="skeleton-icon"></div>
+                <div class="skeleton-trend"></div>
+            </div>
+            <div class="skeleton-body">
+                <div class="skeleton-value"></div>
+                <div class="skeleton-label"></div>
+            </div>
+            <div class="skeleton-progress"></div>
+        </div>
+        <div class="skeleton-pulse stat-card-skeleton">
+            <div class="skeleton-header">
+                <div class="skeleton-icon"></div>
+                <div class="skeleton-trend"></div>
+            </div>
+            <div class="skeleton-body">
+                <div class="skeleton-value"></div>
+                <div class="skeleton-label"></div>
+            </div>
+            <div class="skeleton-progress"></div>
+        </div>
+        <div class="skeleton-pulse stat-card-skeleton">
+            <div class="skeleton-header">
+                <div class="skeleton-icon"></div>
+                <div class="skeleton-trend"></div>
+            </div>
+            <div class="skeleton-body">
+                <div class="skeleton-value"></div>
+                <div class="skeleton-label"></div>
+            </div>
+            <div class="skeleton-progress"></div>
+        </div>
     {% elif component_type == 'exam-objectives' %}
         {% for i in range(6) %}
         <div class="skeleton-pulse objective-skeleton"></div>

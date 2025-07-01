@@ -1,0 +1,102 @@
+{# Modern Dashboard Macros for consistent component rendering #}
+
+{# Render a leaderboard item with proper styling #}
+{% macro render_leaderboard_item(user_data, index, current_user) %}
+    <div class="leaderboard-item-modern {% if current_user and user_data.username == current_user.username %}current-user{% endif %}">
+        <div class="leaderboard-rank">
+            {% if index <= 3 %}
+                <i class="fas fa-trophy rank-{{ index }}"></i>
+            {% else %}
+                {{ index }}
+            {% endif %}
+        </div>
+        <div class="leaderboard-avatar">
+            <img src="{{ user_data.profile_picture or '/static/img/default-avatar.svg' }}" alt="Avatar">
+            {% if current_user and user_data.username == current_user.username %}
+                <span class="you-badge">YOU</span>
+            {% endif %}
+        </div>
+        <div class="leaderboard-info">
+            <span class="username">{{ user_data.username }}</span>
+            <span class="level">Level {{ user_data.level }}</span>
+        </div>
+        <div class="leaderboard-stats">
+            <span class="xp-value">{{ user_data.xp }} XP</span>
+        </div>
+    </div>
+{% endmacro %}
+
+{# Render daily challenge content #}
+{% macro render_daily_challenge(challenge) %}
+    <div class="challenge-content-modern">
+        <div class="challenge-icon-large">
+            <i class="fas fa-code"></i>
+        </div>
+        <h4>{{ challenge.title }}</h4>
+        <p>{{ challenge.description }}</p>
+        
+        <div class="challenge-details">
+            <div class="detail-item">
+                <span class="label">Difficulty</span>
+                <span class="value">
+                    <span class="difficulty-badge difficulty-{{ challenge.difficulty|lower }}">
+                        {{ challenge.difficulty }}
+                    </span>
+                </span>
+            </div>
+            <div class="detail-item">
+                <span class="label">XP Reward</span>
+                <span class="value">+{{ challenge.xp_reward }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="label">Time</span>
+                <span class="value">{{ challenge.estimated_time }} mins</span>
+            </div>
+        </div>
+        
+        <button class="btn btn-primary challenge-start-btn" data-challenge-id="{{ challenge.id }}">
+            <i class="fas fa-play"></i> Start Challenge
+        </button>
+    </div>
+{% endmacro %}
+
+{# Render "no challenge" state #}
+{% macro render_no_challenge() %}
+    <div class="no-challenge-modern">
+        <div class="no-challenge-icon">
+            <i class="fas fa-calendar-times"></i>
+        </div>
+        <h3>No Challenge Today</h3>
+        <p>Check back tomorrow for a new coding challenge!</p>
+        <button class="btn btn-secondary">
+            <i class="fas fa-history"></i> View Previous Challenges
+        </button>
+    </div>
+{% endmacro %}
+
+{# Render a single activity item #}
+{% macro render_activity_item(activity) %}
+    <div class="activity-item-large">
+        <div class="activity-icon-large {{ activity.icon_class|default('primary') }}">
+            <i class="fas {{ activity.icon|default('fa-bell') }}"></i>
+        </div>
+        <div class="activity-content">
+            <h4>{{ activity.title }}</h4>
+            <p>{{ activity.description }}</p>
+            {% if activity.rewards %}
+            <div class="activity-rewards">
+                {% if activity.rewards.xp %}
+                <span class="reward-badge">+{{ activity.rewards.xp }} XP</span>
+                {% endif %}
+                {% if activity.rewards.pycoins %}
+                <span class="reward-badge">+{{ activity.rewards.pycoins }} PyCoins</span>
+                {% endif %}
+                {% if activity.rewards.badge %}
+                <span class="reward-badge special">🏆 {{ activity.rewards.badge }}</span>
+                {% endif %}
+            </div>
+            {% endif %}
+            <span class="activity-time">{{ activity.timestamp_text|default('Just now') }}</span>
+        </div>
+    </div>
+{% endmacro %}

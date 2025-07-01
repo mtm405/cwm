@@ -16,6 +16,77 @@
     background: var(--bg-primary);
 }
 
+/* ================================================
+   Modern Dashboard - Unified Card & Layout System
+   ================================================ */
+
+/* Main container for the dashboard content */
+.dashboard-container {
+    padding: 1.5rem;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* Unified Modern Card Style */
+.dashboard-card-modern {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Ensures child elements adhere to border-radius */
+}
+
+.dashboard-card-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    border-color: var(--primary-color-light);
+}
+
+/* Card Header */
+.card-header-modern {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header-modern h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.card-header-modern h3 i {
+    color: var(--primary-color);
+}
+
+/* Card Body */
+.card-body-modern {
+    padding: 1.5rem;
+    flex-grow: 1;
+}
+
+/* Card Footer */
+.card-footer-modern {
+    padding: 1rem 1.5rem;
+    background-color: var(--bg-secondary);
+    border-top: 1px solid var(--border-color-light);
+    text-align: center;
+}
+
+/* Remove padding for specific card bodies like lists */
+.card-body-modern.no-padding {
+    padding: 0;
+}
+
 /* ================================
    MODERN DASHBOARD HEADER
    ================================ */
@@ -489,6 +560,133 @@
 }
 
 /* ================================
+   MODERN ACTIVITY FEED STYLES
+   ================================ */
+
+.activity-card-modern .card-body {
+    padding: 0;
+}
+
+.activity-feed-modern {
+    padding: 15px;
+    max-height: 450px; /* Adjust height */
+    overflow-y: auto;
+    position: relative;
+}
+
+.activity-card-modern.loading .activity-feed-modern {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+}
+
+.activity-item-large {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color-light);
+}
+
+.activity-item-large:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+}
+
+.activity-icon-large {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: #fff;
+}
+
+.activity-icon-large.success { background-color: var(--success-color); }
+.activity-icon-large.primary { background-color: var(--primary-color); }
+.activity-icon-large.warning { background-color: var(--warning-color); }
+.activity-icon-large.gold { background-color: #FFD700; }
+.activity-icon-large.secondary { background-color: var(--secondary-text-color); }
+
+.activity-icon-large i {
+    font-size: 18px;
+}
+
+.activity-content {
+    flex-grow: 1;
+}
+
+.activity-content h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+    color: var(--primary-text-color);
+}
+
+.activity-content p {
+    font-size: 0.9rem;
+    color: var(--secondary-text-color);
+    margin: 0 0 8px 0;
+}
+
+.activity-time {
+    font-size: 0.8rem;
+    color: var(--tertiary-text-color);
+}
+
+.activity-rewards {
+    margin-top: 8px;
+}
+
+.reward-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 12px;
+    background-color: var(--background-color-light);
+    color: var(--secondary-text-color);
+    margin-right: 5px;
+}
+
+.reward-badge.special {
+    background-color: var(--primary-color-light);
+    color: var(--primary-color);
+}
+
+/* Empty and Error States */
+.activity-empty-state, .activity-error-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--secondary-text-color);
+}
+
+.activity-empty-state i, .activity-error-state i {
+    font-size: 40px;
+    margin-bottom: 15px;
+    color: var(--border-color-dark);
+}
+
+.activity-error-state i {
+    color: var(--danger-color);
+}
+
+.activity-empty-state h4, .activity-error-state h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-text-color);
+    margin-bottom: 5px;
+}
+
+.activity-empty-state p, .activity-error-state p {
+    font-size: 0.9rem;
+}
+
+/* ================================
    RESPONSIVE DESIGN
    ================================ */
 
@@ -627,4 +825,192 @@ body[data-page="dashboard"] .dashboard-container {
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+/* Main dashboard grid layout */
+.dashboard-main-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto;
+    gap: 1.5rem;
+}
+
+.grid-col-span-2 {
+    grid-column: span 2;
+}
+
+.grid-col-span-1 {
+    grid-column: span 1;
+}
+
+/* Refactor Activity Feed to use the modern card system */
+.activity-feed-modern {
+    max-height: 450px; /* Adjust height */
+    overflow-y: auto;
+    position: relative;
+}
+
+/* Remove redundant styles now handled by the card system */
+.activity-card-modern .card-body {
+    padding: 0; /* Keep this to allow the feed to touch the edges */
+}
+
+/* ==========================================
+   Modern Leaderboard Styles
+   ========================================== */
+
+.leaderboard-list-modern {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.leaderboard-item-modern {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    transition: background-color 0.2s ease;
+}
+
+.leaderboard-item-modern:hover {
+    background-color: var(--bg-secondary-hover);
+}
+
+.leaderboard-item-modern.current-user {
+    background-color: var(--primary-color-light);
+    border: 1px solid var(--primary-color);
+    position: relative;
+}
+
+.leaderboard-rank {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--secondary-text-color);
+    width: 40px;
+    text-align: center;
+}
+
+.leaderboard-rank .fa-trophy {
+    font-size: 1.5rem;
+}
+.leaderboard-rank .rank-1 { color: #FFD700; }
+.leaderboard-rank .rank-2 { color: #C0C0C0; }
+.leaderboard-rank .rank-3 { color: #CD7F32; }
+
+.leaderboard-avatar {
+    margin: 0 1rem;
+    position: relative;
+}
+
+.leaderboard-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color-dark);
+}
+
+.leaderboard-item-modern.current-user .you-badge {
+    position: absolute;
+    bottom: -5px;
+    right: -10px;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 8px;
+    text-transform: uppercase;
+}
+
+.leaderboard-info {
+    flex-grow: 1;
+}
+
+.leaderboard-info .username {
+    font-weight: 600;
+    color: var(--primary-text-color);
+}
+
+.leaderboard-info .level {
+    font-size: 0.85rem;
+    color: var(--secondary-text-color);
+    display: block;
+}
+
+.leaderboard-stats .xp-value {
+    font-weight: 600;
+    color: var(--primary-text-color);
+}
+
+/* ==========================================
+   Modern Daily Challenge Styles
+   ========================================== */
+
+.challenge-card-modern .card-body-modern {
+    text-align: center;
+}
+
+.challenge-icon-large {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.challenge-card-modern h4 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary-text-color);
+    margin-bottom: 0.5rem;
+}
+
+.challenge-card-modern p {
+    color: var(--secondary-text-color);
+    margin-bottom: 1.5rem;
+}
+
+.challenge-details {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.detail-item {
+    text-align: center;
+}
+
+.detail-item .label {
+    font-size: 0.8rem;
+    color: var(--tertiary-text-color);
+    text-transform: uppercase;
+}
+
+.detail-item .value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary-text-color);
+}
+
+.difficulty-badge {
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.difficulty-easy { background-color: var(--success-color-light); color: var(--success-color); }
+.difficulty-medium { background-color: var(--warning-color-light); color: var(--warning-color); }
+.difficulty-hard { background-color: var(--danger-color-light); color: var(--danger-color); }
+
+/* No Challenge State */
+.no-challenge-modern {
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.no-challenge-icon {
+    font-size: 3rem;
+    color: var(--border-color-dark);
+    margin-bottom: 1rem;
 }

@@ -51,7 +51,9 @@ window.LessonManager = class {
         container.innerHTML = '';
         
         // Render each content block
-        this.lessonData.content.forEach((block, index) => {
+        // Ensure contentBlocks is an array before forEach
+        const contentBlocks = Array.isArray(this.lessonData.content) ? this.lessonData.content : [];
+        contentBlocks.forEach((block, index) => {
             const blockElement = this.createContentBlock(block, index);
             container.appendChild(blockElement);
         });

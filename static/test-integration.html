@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module Integration Test - Code with Morais</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+        }
+        .test-section h2 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .status.success { background: #28a745; }
+        .status.warning { background: #ffc107; color: #000; }
+        .status.error { background: #dc3545; }
+        .status.info { background: #007bff; }
+        .module-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .module-item {
+            background: #3a3a3a;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .module-item.loaded { border-left: 3px solid #28a745; }
+        .module-item.failed { border-left: 3px solid #dc3545; }
+        .module-item.loading { border-left: 3px solid #ffc107; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .log-container {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Module Integration Test</h1>
+        <p>This page tests the new application orchestration system for Code with Morais.</p>
+        
+        <div class="test-section">
+            <h2>📊 Application Status</h2>
+            <div id="app-status" class="status info">Initializing...</div>
+            <div id="init-time"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>📦 Module Loading Status</h2>
+            <div id="module-status" class="status info">Loading modules...</div>
+            <div id="module-list" class="module-list"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔧 Test Actions</h2>
+            <button onclick="testThemeSwitch()">Test Theme Switch</button>
+            <button onclick="testEventBus()">Test Event Bus</button>
+            <button onclick="testModuleReload()">Test Module Reload</button>
+            <button onclick="showAppStatus()">Show App Status</button>
+            <button onclick="clearLogs()">Clear Logs</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔍 Debug Console</h2>
+            <div id="debug-log" class="log-container"></div>
+        </div>
+    </div>
+
+    <!-- Core infrastructure -->
+    <script src="/static/js/eventBus.js"></script>
+    <script src="/static/js/config.js"></script>
+    <script src="/static/js/constants.js"></script>
+    <script src="/static/js/utils.js"></script>
+    
+    <!-- Module loading system -->
+    <script src="/static/js/moduleLoader.js"></script>
+    
+    <!-- Application orchestration -->
+    <script src="/static/js/app.js"></script>
+    
+    <script>
+        // Debug logging
+        let debugLog = [];
+        const originalConsole = {
+            log: console.log,
+            warn: console.warn,
+            error: console.error
+        };
+        
+        function addToDebugLog(level, ...args) {
+            const timestamp = new Date().toLocaleTimeString();
+            const message = args.join(' ');
+            debugLog.push(`[${timestamp}] ${level.toUpperCase()}: ${message}`);
+            updateDebugDisplay();
+            
+            // Call original console method
+            originalConsole[level](...args);
+        }
+        
+        console.log = (...args) => addToDebugLog('log', ...args);
+        console.warn = (...args) => addToDebugLog('warn', ...args);
+        console.error = (...args) => addToDebugLog('error', ...args);
+        
+        function updateDebugDisplay() {
+            const logContainer = document.getElementById('debug-log');
+            logContainer.innerHTML = debugLog.slice(-50).join('\n');
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        function clearLogs() {
+            debugLog = [];
+            updateDebugDisplay();
+        }
+        
+        // Test application initialization
+        let app, moduleLoader;
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            const startTime = performance.now();
+            
+            try {
+                console.log('🚀 Starting module integration test...');
+                
+                // Update status
+                updateStatus('app-status', 'Initializing application...', 'info');
+                updateStatus('module-status', 'Loading modules...', 'info');
+                
+                // Create module loader
+                moduleLoader = new ModuleLoader();
+                console.log('✅ ModuleLoader created');
+                
+                // Load application modules
+                await moduleLoader.loadApplication();
+                console.log('✅ Modules loaded');
+                
+                // Update module status display
+                updateModuleDisplay();
+                
+                // Create and initialize app
+                app = new App();
+                await app.init();
+                console.log('✅ App initialized');
+                
+                // Calculate initialization time
+                const initTime = performance.now() - startTime;
+                document.getElementById('init-time').textContent = 
+                    `Initialized in ${initTime.toFixed(2)}ms`;
+                
+                // Update final status
+                updateStatus('app-status', 'Application ready!', 'success');
+                updateStatus('module-status', 'All modules loaded successfully', 'success');
+                
+                // Make available globally
+                window.testApp = app;
+                window.testModuleLoader = moduleLoader;
+                
+                console.log('✅ Integration test setup complete');
+                
+            } catch (error) {
+                console.error('❌ Integration test failed:', error);
+                updateStatus('app-status', `Failed: ${error.message}`, 'error');
+                updateStatus('module-status', 'Module loading failed', 'error');
+            }
+        });
+        
+        function updateStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+        
+        function updateModuleDisplay() {
+            const moduleList = document.getElementById('module-list');
+            const loadedModules = moduleLoader.getLoadedModules();
+            const loadingStatus = moduleLoader.getLoadingStatus();
+            
+            moduleList.innerHTML = '';
+            
+            // Show loaded modules
+            loadedModules.forEach(moduleName => {
+                const moduleItem = document.createElement('div');
+                moduleItem.className = 'module-item loaded';
+                moduleItem.innerHTML = `
+                    <strong>${moduleName}</strong><br>
+                    <small>✅ Loaded</small>
+                `;
+                moduleList.appendChild(moduleItem);
+            });
+            
+            // Show loading modules
+            loadingStatus.loading.forEach(moduleName => {
+                const moduleItem = document.createElement('div');
+                moduleItem.className = 'module-item loading';
+                moduleItem.innerHTML = `
+                    <strong>${moduleName}</strong><br>
+                    <small>⏳ Loading...</small>
+                `;
+                moduleList.appendChild(moduleItem);
+            });
+            
+            // Show failed modules
+            loadingStatus.failed.forEach(moduleName => {
+                const moduleItem = document.createElement('div');
+                moduleItem.className = 'module-item failed';
+                moduleItem.innerHTML = `
+                    <strong>${moduleName}</strong><br>
+                    <small>❌ Failed</small>
+                `;
+                moduleList.appendChild(moduleItem);
+            });
+        }
+        
+        // Test functions
+        function testThemeSwitch() {
+            console.log('🎨 Testing theme switch...');
+            
+            if (app) {
+                const themeManager = app.getModule('themeManager');
+                if (themeManager) {
+                    const currentTheme = themeManager.currentTheme;
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    themeManager.setTheme(newTheme);
+                    console.log(`✅ Theme switched from ${currentTheme} to ${newTheme}`);
+                } else {
+                    console.warn('⚠️ ThemeManager not available');
+                }
+            } else {
+                console.error('❌ App not initialized');
+            }
+        }
+        
+        function testEventBus() {
+            console.log('📡 Testing EventBus...');
+            
+            if (app && app.eventBus) {
+                // Create test event listener
+                app.eventBus.on('test:event', (data) => {
+                    console.log('✅ Event received:', data);
+                });
+                
+                // Emit test event
+                app.eventBus.emit('test:event', { 
+                    message: 'Hello from test!', 
+                    timestamp: Date.now() 
+                });
+                
+                console.log('✅ EventBus test completed');
+            } else {
+                console.error('❌ EventBus not available');
+            }
+        }
+        
+        function testModuleReload() {
+            console.log('🔄 Testing module reload...');
+            
+            if (moduleLoader) {
+                moduleLoader.reloadModule('themeManager').then(() => {
+                    console.log('✅ Module reload test completed');
+                    updateModuleDisplay();
+                }).catch(error => {
+                    console.error('❌ Module reload failed:', error);
+                });
+            } else {
+                console.error('❌ ModuleLoader not available');
+            }
+        }
+        
+        function showAppStatus() {
+            console.log('📊 App Status:', app ? app.getStatus() : 'App not initialized');
+        }
+    </script>
+</body>
+</html>

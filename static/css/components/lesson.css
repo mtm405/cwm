@@ -1904,10 +1904,7 @@
         --border-color: #4a4a4a;
     }
     
-    .lesson-header {
-        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-    }
-    
+
     .code-editor {
         background: #1e1e1e !important;
         color: #d4d4d4 !important;

@@ -73,7 +73,7 @@
                     tabindex="{{ '0' if loop.first else '-1' }}"
                     onclick="switchSubtopic({{ loop.index0 }})">
                 <i class="fas fa-{{ subtopic.icon or 'book' }}"></i>
-                <span class="tab-title">{{ subtopic.title }}</span>
+                <span class="tab-title">{{ subtopic.title|string }}</span>
                 <i class="fas fa-check-circle tab-check {{ 'completed' if subtopic.id in lesson_progress.completed_subtopics else '' }}"></i>
             </button>
             {% endfor %}
@@ -752,32 +752,326 @@ function testFirebaseIntegration() {
 }
 </script>
 
-<!-- 🚀 Lesson Template System Scripts - Optimized -->
-<!-- Core lesson system (consolidated from lesson-manager.js, content-renderer.js, lesson-integration.js) -->
-<script src="{{ url_for('static', filename='js/lesson-core.js') }}"></script>
+<!-- 🚀 Lesson Page Scripts - Orchestration Integration -->
+{% block extra_js %}
+<!-- Lesson-specific components -->
+<script src="{{ url_for('static', filename='js/quiz/QuizEngine.js') }}"></script>
+<script src="{{ url_for('static', filename='js/quiz/QuizController.js') }}"></script>
+<script src="{{ url_for('static', filename='js/quiz/QuizState.js') }}"></script>
+<script src="{{ url_for('static', filename='js/quiz/renderers/MultipleChoiceRenderer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/quiz/renderers/TrueFalseRenderer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/quiz/renderers/FillBlankRenderer.js') }}"></script>
 
-<!-- Supporting lesson components -->
-<script src="{{ url_for('static', filename='js/components/quiz.js') }}"></script>
-<script src="{{ url_for('static', filename='js/components/gamification-manager.js') }}"></script>
-<script src="{{ url_for('static', filename='js/components/progress-tracker.js') }}"></script>
-<script src="{{ url_for('static', filename='js/components/interactive-editor.js') }}"></script>
-<script src="{{ url_for('static', filename='js/components/xp-animation.js') }}"></script>
-<script src="{{ url_for('static', filename='js/components/lesson-test-suite.js') }}"></script>
+<!-- Editor components -->
+<script src="{{ url_for('static', filename='js/editor/editorService.js') }}"></script>
+<script src="{{ url_for('static', filename='js/editor/editorConfig.js') }}"></script>
+<script src="{{ url_for('static', filename='js/editor/codeSubmissionHandler.js') }}"></script>
+
+<!-- Lesson system components -->
+<script src="{{ url_for('static', filename='js/modules/lessonCore.js') }}"></script>
+<script src="{{ url_for('static', filename='js/modules/interactiveEditor.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/modal-manager.js') }}"></script>
 
 <script>
-// Pass server data to JavaScript
-window.lessonData = {{ lesson|tojson if lesson else '{}' }};
-window.lessonProgress = {{ lesson_progress|tojson if lesson_progress else '{}' }};
-window.currentUser = {{ user|tojson if user else '{}' }};
-window.lessonId = '{{ lesson.id if lesson else '' }}';
-
+// Use existing data objects from previous script
+// Avoid redefining global variables
 console.log('📚 Lesson data loaded:', window.lessonData);
 console.log('📊 Progress data loaded:', window.lessonProgress);
 
-// Initialize lesson integration when DOM is ready
+// Wait for application to be ready before initializing lesson-specific features
 document.addEventListener('DOMContentLoaded', function() {
-    if (window.lessonId && window.initializeLessonIntegration) {
-        console.log('🚀 Initializing comprehensive lesson system...');
+    // Wait for the app to be ready
+    if (window.CwMApp) {
+        initializeLessonFeatures();
+    } else {
+        // Listen for app ready event
+        document.addEventListener('app:ready', initializeLessonFeatures);
+        
+        // Fallback timeout
+        setTimeout(() => {
+            if (window.CwMApp) {
+                initializeLessonFeatures();
+            } else {
+                console.error('❌ Application not ready for lesson initialization');
+            }
+        }, 5000);
+    }
+});
+
+async function initializeLessonFeatures() {
+    try {
+        console.log('🚀 Initializing lesson-specific features...');
+        
+        const app = window.CwMApp;
+        const moduleLoader = window.CwMModuleLoader;
+        
+        // Load lesson-specific modules
+        const lessonModules = [
+            'lessonCore',
+            'quiz', 
+            'interactiveEditor',
+            'xpAnimation',
+            'lessonTestSuite'
+        ];
+        
+        // Try to load lesson modules (some may not exist yet)
+        for (const moduleName of lessonModules) {
+            try {
+                if (!moduleLoader.isModuleLoaded(moduleName)) {
+                    await moduleLoader.loadModule(moduleName);
+                }
+            } catch (error) {
+                console.warn(`⚠️ Could not load lesson module ${moduleName}:`, error.message);
+            }
+        }
+        
+        // Initialize lesson-specific functionality
+        await initializeLessonCore();
+        
+        console.log('✅ Lesson features initialized successfully');
+        
+    } catch (error) {
+        console.error('❌ Failed to initialize lesson features:', error);
+        
+        // Fallback to basic lesson functionality
+        initializeBasicLessonFunctionality();
+    }
+}
+
+async function initializeLessonCore() {
+    const app = window.CwMApp;
+    
+    // Get required modules
+    const editorService = app.getModule('editorService');
+    const progressTracker = app.getModule('progressTracker');
+    
+    // Initialize lesson progress tracking
+    if (progressTracker && window.lessonId) {
+        progressTracker.setCurrentLesson(window.lessonId, window.lessonProgress);
+    }
+    
+    // Initialize code editor if present
+    if (editorService) {
+        const codeContainers = document.querySelectorAll('.code-editor-container');
+        codeContainers.forEach(container => {
+            editorService.initializeEditor(container);
+        });
+    }
+    
+    // Set up lesson-specific event listeners
+    setupLessonEventListeners();
+    
+    // Initialize lesson content interactions
+    initializeLessonContent();
+    
+    // Emit lesson ready event
+    app.eventBus.emit('lesson:ready', {
+        lessonId: window.lessonId,
+        lessonData: window.lessonData,
+        progress: window.lessonProgress
+    });
+}
+
+function setupLessonEventListeners() {
+    const app = window.CwMApp;
+    
+    // Listen for lesson completion
+    app.eventBus.on('lesson:section:complete', (data) => {
+        updateLessonProgress(data);
+    });
+    
+    // Listen for code execution
+    app.eventBus.on('editor:code:executed', (data) => {
+        handleCodeExecution(data);
+    });
+    
+    // Listen for quiz completion
+    app.eventBus.on('quiz:completed', (data) => {
+        handleQuizCompletion(data);
+    });
+}
+
+function initializeLessonContent() {
+    // Initialize tabs
+    initializeTabs();
+    
+    // Initialize code blocks
+    initializeCodeBlocks();
+    
+    // Initialize quizzes
+    initializeQuizzes();
+    
+    // Initialize interactive elements
+    initializeInteractiveElements();
+}
+
+function initializeTabs() {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            const tabId = button.getAttribute('data-tab');
+            
+            // Update active states
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            button.classList.add('active');
+            const targetContent = document.getElementById(tabId);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+            
+            // Emit tab change event
+            if (window.CwMApp) {
+                window.CwMApp.eventBus.emit('lesson:tab:changed', { tabId });
+            }
+        });
+    });
+}
+
+function initializeCodeBlocks() {
+    const codeBlocks = document.querySelectorAll('.code-block');
+    
+    codeBlocks.forEach(block => {
+        // Add copy functionality
+        const copyBtn = block.querySelector('.copy-btn');
+        if (copyBtn) {
+            copyBtn.addEventListener('click', () => {
+                const code = block.querySelector('code').textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    showNotification('Code copied to clipboard!', 'success');
+                });
+            });
+        }
+    });
+}
+
+function initializeQuizzes() {
+    const quizContainers = document.querySelectorAll('.quiz-container');
+    
+    quizContainers.forEach(container => {
+        const quizId = container.getAttribute('data-quiz-id');
+        if (quizId && window.CwMApp) {
+            const quizEngine = window.CwMApp.getModule('quizEngine');
+            if (quizEngine) {
+                quizEngine.initializeQuiz(container, quizId);
+            }
+        }
+    });
+}
+
+function initializeInteractiveElements() {
+    // Initialize code execution buttons
+    const runButtons = document.querySelectorAll('.run-code-btn');
+    runButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const editorId = button.getAttribute('data-editor-id');
+            executeCode(editorId);
+        });
+    });
+    
+    // Initialize lesson navigation
+    const nextButton = document.querySelector('.next-lesson-btn');
+    const prevButton = document.querySelector('.prev-lesson-btn');
+    
+    if (nextButton) {
+        nextButton.addEventListener('click', () => navigateToNextLesson());
+    }
+    
+    if (prevButton) {
+        prevButton.addEventListener('click', () => navigateToPrevLesson());
+    }
+}
+
+function executeCode(editorId) {
+    if (window.CwMApp) {
+        const editorService = window.CwMApp.getModule('editorService');
+        if (editorService) {
+            editorService.executeCode(editorId);
+        }
+    }
+}
+
+function updateLessonProgress(data) {
+    const progressBar = document.getElementById('progress-fill');
+    const progressText = document.getElementById('progress-percentage');
+    
+    if (progressBar && progressText) {
+        progressBar.style.width = `${data.progress}%`;
+        progressText.textContent = `${data.progress}%`;
+    }
+    
+    // Update global state
+    if (window.CwMApp) {
+        window.CwMApp.updateGlobalState({
+            lessonProgress: data.progress
+        });
+    }
+}
+
+function handleCodeExecution(data) {
+    console.log('🏃 Code executed:', data);
+    
+    // Show execution results
+    const outputContainer = document.querySelector(`#output-${data.editorId}`);
+    if (outputContainer) {
+        outputContainer.innerHTML = data.output;
+        outputContainer.classList.add('show');
+    }
+}
+
+function handleQuizCompletion(data) {
+    console.log('✅ Quiz completed:', data);
+    
+    if (data.passed) {
+        showNotification('Quiz completed successfully!', 'success');
+        
+        // Update progress
+        updateLessonProgress({
+            progress: Math.min(100, (window.lessonProgress.progress || 0) + 20)
+        });
+    } else {
+        showNotification('Quiz needs more work. Try again!', 'warning');
+    }
+}
+
+function navigateToNextLesson() {
+    // Implementation depends on lesson navigation structure
+    console.log('🔄 Navigating to next lesson...');
+}
+
+function navigateToPrevLesson() {
+    // Implementation depends on lesson navigation structure
+    console.log('🔄 Navigating to previous lesson...');
+}
+
+function showNotification(message, type = 'info') {
+    if (window.CwMApp) {
+        const notificationComponent = window.CwMApp.getModule('notificationComponent');
+        if (notificationComponent) {
+            notificationComponent.show(message, type);
+        }
+    }
+}
+
+// Fallback basic functionality if app fails to load
+function initializeBasicLessonFunctionality() {
+    console.log('🔧 Initializing basic lesson functionality...');
+    
+    // Basic tab functionality
+    initializeTabs();
+    
+    // Basic code block copy functionality
+    initializeCodeBlocks();
+    
+    console.log('✅ Basic lesson functionality initialized');
+}
+</script>
+{% endblock %}
         window.initializeLessonIntegration(window.lessonId);
     } else {
         console.log('⚠️ Legacy lesson mode - some features may be limited');
@@ -924,8 +1218,9 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 // Current subtopic tracking
 let currentSubtopicIndex = 0;
-let subtopics = {{ lesson.subtopics | tojson }};
-let completedSubtopics = {{ lesson_progress.completed_subtopics | default([]) | tojson }};
+// Use safe default values if template variables aren't available at runtime
+let subtopics = window.lessonData && window.lessonData.subtopics ? window.lessonData.subtopics : [];
+let completedSubtopics = window.lessonProgress && window.lessonProgress.completed_subtopics ? window.lessonProgress.completed_subtopics : [];
 
 // Initialize ACE Editor when page loads
 document.addEventListener('DOMContentLoaded', function() {
@@ -952,6 +1247,8 @@ function switchLessonTab(subtopicId) {
 function updateCompleteButton() {
     const currentSubtopic = subtopics[currentSubtopicIndex];
     const btn = document.getElementById('complete-subtopic-btn');
+    
+    if (!btn) return; // Guard clause to prevent null reference error
     
     if (completedSubtopics.includes(currentSubtopic.id)) {
         btn.textContent = 'Γ£ô Completed';
@@ -1667,4 +1964,7 @@ function updateNavigationButtons() {
     }
 }
 </script>
+
+<!-- Emergency Bootstrapper - Ensures lesson content always loads -->
+<script src="{{ url_for('static', filename='js/emergency-bootstrapper.js') }}"></script>
 {% endblock %}

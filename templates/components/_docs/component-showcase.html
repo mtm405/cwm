@@ -449,8 +449,20 @@ is_valid, errors = validate_props('skeleton_loader', props)</code></pre>
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/components/prism.js') }}"></script>
-<script src="{{ url_for('static', filename='js/components/component-showcase.js') }}"></script>
+<!-- Syntax highlighting (external CDN) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+<!-- Component showcase logic -->
+<script>
+    // Component showcase functionality
+    class ComponentShowcase {
+        static init(options) {
+            console.log('🎨 Component Showcase initialized', options);
+            // Add your component showcase logic here
+        }
+    }
+</script>
 <script>
     // Initialize component showcase
     document.addEventListener('DOMContentLoaded', function() {

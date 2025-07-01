@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Code with Morais{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2 text-center">
+            <h1 class="display-4">Unlock Your Potential with Code</h1>
+            <p class="lead">Start your journey to becoming an IT Specialist today!</p>
+            <div class="card my-4">
+                <div class="card-body">
+                    <pre><code class="language-python" style="text-align: left;">
+# main.py
+import code_with_morais
+
+def start_journey():
+    student = Student(you)
+    
+    while student.learning:
+        student.earn_xp(100)
+        student.unlock_achievement()
+        student.level_up()
+        
+    return "🎓 IT Specialist Certified!"
+
+# Start your journey today!
+start_journey()
+                    </code></pre>
+                </div>
+            </div>
+            <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary btn-lg">Get Started</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

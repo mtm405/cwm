@@ -19,440 +19,454 @@ class XPAnimationSystem {
         // Track XP for level calculation
         this.currentXP = 0;
         this.currentLevel = 1;
-        this.xpToNextLevel = 100;
         
-        this.init();
+        console.log('✨ XP Animation System initialized');
     }
-    
-    init() {
+
+    /**
+     * Initialize the animation system
+     */
+    async init() {
         if (this.isInitialized) return;
         
         try {
-            this.loadUserData();
-            this.setupEventListeners();
-            this.createAnimationContainer();
+            // Add event listeners
+            document.addEventListener('xpEarned', (e) => this.handleXPEarned(e.detail));
+            document.addEventListener('levelUp', (e) => this.handleLevelUp(e.detail));
+            
+            // Add stylesheet if not already present
+            this.ensureStylesheet();
+            
+            // Add particle container
+            this.ensureParticleContainer();
             
             this.isInitialized = true;
-            console.log('✅ XP Animation System initialized');
+            console.log('✅ XP Animation System ready');
         } catch (error) {
-            console.error('❌ XP Animation System initialization failed:', error);
+            console.error('❌ Failed to initialize XP Animation System:', error);
         }
     }
-    
-    loadUserData() {
-        // Try to get user data from various sources
-        if (window.currentUser) {
-            this.currentXP = window.currentUser.xp || 0;
-            this.currentLevel = window.currentUser.level || 1;
-        } else {
-            // Try to get from dashboard elements
-            const xpElement = document.querySelector('[data-stat="xp"] .stat-value-large');
-            const levelElement = document.querySelector('[data-stat="level"] .stat-value-large');
+
+    /**
+     * Make sure our stylesheet is loaded
+     */
+    ensureStylesheet() {
+        if (document.querySelector('#xp-animations-css')) return;
+        
+        const style = document.createElement('style');
+        style.id = 'xp-animations-css';
+        style.textContent = `
+            .xp-float {
+                position: fixed;
+                color: #FFD700;
+                font-weight: bold;
+                pointer-events: none;
+                z-index: 9999;
+                text-shadow: 0 0 5px rgba(0,0,0,0.5);
+                animation: xpFloat var(--duration, 2s) ease-out forwards;
+                opacity: 0;
+            }
             
-            if (xpElement) this.currentXP = parseInt(xpElement.textContent) || 0;
-            if (levelElement) this.currentLevel = parseInt(levelElement.textContent) || 1;
-        }
-        
-        this.calculateXPToNextLevel();
-    }
-    
-    calculateXPToNextLevel() {
-        // Simple XP progression: level * 100 XP needed for next level
-        const xpForCurrentLevel = (this.currentLevel - 1) * 100;
-        const xpForNextLevel = this.currentLevel * 100;
-        this.xpToNextLevel = xpForNextLevel - this.currentXP;
-    }
-    
-    setupEventListeners() {
-        // Listen for custom XP events
-        document.addEventListener('xpGained', (event) => {
-            this.handleXPGain(event.detail);
-        });
-        
-        document.addEventListener('levelUp', (event) => {
-            this.handleLevelUp(event.detail);
-        });
-        
-        document.addEventListener('achievementUnlocked', (event) => {
-            this.handleAchievement(event.detail);
-        });
-    }
-    
-    createAnimationContainer() {
-        if (!document.getElementById('xp-animation-overlay')) {
-            const overlay = document.createElement('div');
-            overlay.id = 'xp-animation-overlay';
-            overlay.className = 'xp-animation-overlay';
-            overlay.style.cssText = `
+            @keyframes xpFloat {
+                0% { transform: translate(0, 0); opacity: 0; }
+                10% { opacity: 1; }
+                80% { opacity: 1; }
+                100% { transform: translate(0, -80px); opacity: 0; }
+            }
+            
+            .level-up-overlay {
                 position: fixed;
                 top: 0;
                 left: 0;
                 width: 100%;
                 height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+                pointer-events: none;
+                background: radial-gradient(circle, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.7) 100%);
+                opacity: 0;
+                transition: opacity 0.5s ease;
+            }
+            
+            .level-up-container {
+                text-align: center;
+                color: #fff;
+                transform: scale(0.5);
+                opacity: 0;
+                transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+            
+            .level-up-overlay.active {
+                opacity: 1;
+            }
+            
+            .level-up-overlay.active .level-up-container {
+                transform: scale(1);
+                opacity: 1;
+            }
+            
+            .level-up-title {
+                font-size: 48px;
+                margin-bottom: 20px;
+                color: #FFD700;
+                text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+            }
+            
+            .level-up-level {
+                font-size: 72px;
+                margin-bottom: 30px;
+            }
+            
+            .level-up-rewards {
+                font-size: 24px;
+                margin-bottom: 20px;
+            }
+            
+            .xp-particle {
+                position: absolute;
+                width: 8px;
+                height: 8px;
+                background: #FFD700;
+                border-radius: 50%;
+                pointer-events: none;
+            }
+            
+            .particle-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
                 pointer-events: none;
                 z-index: 9999;
-            `;
-            document.body.appendChild(overlay);
-        }
+            }
+            
+            .sparkle {
+                position: absolute;
+                width: 5px;
+                height: 5px;
+                border-radius: 50%;
+                background-color: #fff;
+                opacity: 0;
+                pointer-events: none;
+                z-index: 9998;
+            }
+        `;
+        
+        document.head.appendChild(style);
     }
-    
-    // Main XP gain handler
-    async handleXPGain(data) {
-        const { amount, source, position, animationType = 'float' } = data;
+
+    /**
+     * Ensure particle container exists
+     */
+    ensureParticleContainer() {
+        if (document.querySelector('.particle-container')) return;
         
-        if (!amount || amount <= 0) return;
-        
-        // Update internal XP tracking
-        const oldXP = this.currentXP;
-        this.currentXP += amount;
-        
-        // Check for level up
-        const oldLevel = this.currentLevel;
-        const newLevel = this.calculateLevel(this.currentXP);
-        
-        // Queue XP animation
-        this.queueAnimation({
-            type: 'xp-gain',
-            amount,
-            source,
-            position: position || this.getDefaultPosition(),
-            animationType
-        });
-        
-        // Queue level up animation if needed
-        if (newLevel > oldLevel) {
-            this.currentLevel = newLevel;
-            this.queueAnimation({
-                type: 'level-up',
-                oldLevel,
-                newLevel,
-                delay: 1000 // Delay after XP animation
-            });
-        }
-        
-        // Process animation queue
-        this.processAnimationQueue();
-        
-        // Show toast notification
-        if (window.achievementToastManager) {
-            window.achievementToastManager.showXPGain(amount, source);
-        }
+        const container = document.createElement('div');
+        container.className = 'particle-container';
+        document.body.appendChild(container);
     }
-    
-    calculateLevel(totalXP) {
-        // Simple level calculation: 100 XP per level
-        return Math.floor(totalXP / 100) + 1;
-    }
-    
-    getDefaultPosition() {
-        // Default to center-top of screen
-        return {
-            x: window.innerWidth / 2,
-            y: window.innerHeight * 0.3
-        };
-    }
-    
-    queueAnimation(animationData) {
+
+    /**
+     * Handle XP earned event
+     */
+    handleXPEarned(detail) {
+        if (!detail || !detail.amount) return;
+        
+        const amount = detail.amount;
+        const sourceElement = detail.sourceElement;
+        
+        // Add to animation queue
         this.animationQueue.push({
-            ...animationData,
-            id: Date.now() + Math.random(),
-            timestamp: Date.now()
+            type: 'xp',
+            amount,
+            sourceElement
         });
+        
+        // Process queue if not already processing
+        if (!this.isProcessing) {
+            this.processAnimationQueue();
+        }
     }
-    
+
+    /**
+     * Handle level up event
+     */
+    handleLevelUp(detail) {
+        if (!detail || !detail.level) return;
+        
+        // Add to animation queue with high priority
+        this.animationQueue.unshift({
+            type: 'levelUp',
+            level: detail.level,
+            rewards: detail.rewards || []
+        });
+        
+        // Process queue if not already processing
+        if (!this.isProcessing) {
+            this.processAnimationQueue();
+        }
+    }
+
+    /**
+     * Process animation queue
+     */
     async processAnimationQueue() {
-        if (this.isProcessing) return;
+        if (this.animationQueue.length === 0) {
+            this.isProcessing = false;
+            return;
+        }
+        
         this.isProcessing = true;
         
-        while (this.animationQueue.length > 0) {
-            const animation = this.animationQueue.shift();
-            
-            if (animation.delay) {
-                await this.sleep(animation.delay);
-            }
-            
-            await this.executeAnimation(animation);
-            await this.sleep(this.settings.animationDelay);
-        }
+        // Get next animation from queue
+        const animation = this.animationQueue.shift();
         
-        this.isProcessing = false;
-    }
-    
-    async executeAnimation(animation) {
         try {
-            switch (animation.type) {
-                case 'xp-gain':
-                    await this.animateXPGain(animation);
+            // Process based on type
+            switch(animation.type) {
+                case 'xp':
+                    await this.animateXP(animation.amount, animation.sourceElement);
                     break;
-                case 'level-up':
-                    await this.animateLevelUp(animation);
+                case 'levelUp':
+                    await this.animateLevelUp(animation.level, animation.rewards);
                     break;
-                case 'burst':
-                    await this.animateBurst(animation);
-                    break;
-                case 'sparkle':
-                    await this.animateSparkle(animation);
-                    break;
-                default:
-                    console.warn('Unknown animation type:', animation.type);
             }
         } catch (error) {
-            console.error('Animation execution failed:', error);
-        }
-    }
-    
-    async animateXPGain(animation) {
-        const { amount, position, animationType } = animation;
-        const overlay = document.getElementById('xp-animation-overlay');
-        
-        const element = document.createElement('div');
-        element.className = `xp-float-animation xp-${animationType}`;
-        element.innerHTML = `
-            <div class="xp-amount">+${amount}</div>
-            <div class="xp-label">XP</div>
-            <div class="xp-glow"></div>
-        `;
-        
-        // Position the element
-        element.style.left = `${position.x}px`;
-        element.style.top = `${position.y}px`;
-        element.style.transform = 'translate(-50%, -50%)';
-        
-        overlay.appendChild(element);
-        
-        // Animate
-        await this.sleep(50); // Brief delay for DOM update
-        
-        if (animationType === 'burst') {
-            await this.addBurstEffect(element, position);
-        } else if (animationType === 'sparkle') {
-            await this.addSparkleEffect(element, position);
+            console.error('Animation error:', error);
         }
         
-        // Float upward
-        element.style.transition = 'all 2s ease-out';
-        element.style.transform = 'translate(-50%, -150px)';
-        element.style.opacity = '0';
-        
-        // Clean up
+        // Process next in queue after a short delay
         setTimeout(() => {
-            if (overlay.contains(element)) {
-                overlay.removeChild(element);
-            }
-        }, 2000);
+            this.processAnimationQueue();
+        }, this.settings.animationDelay);
     }
-    
-    async addBurstEffect(parentElement, position) {
-        const overlay = document.getElementById('xp-animation-overlay');
+
+    /**
+     * Animate XP earned
+     */
+    async animateXP(amount, sourceElement) {
+        return new Promise(resolve => {
+            // Default position if no source element
+            let x = window.innerWidth / 2;
+            let y = window.innerHeight / 2;
+            
+            // Get position from source element if provided
+            if (sourceElement) {
+                const rect = sourceElement.getBoundingClientRect();
+                x = rect.left + rect.width / 2;
+                y = rect.top + rect.height / 2;
+            }
+            
+            // Create floating XP text
+            const xpElement = document.createElement('div');
+            xpElement.className = 'xp-float';
+            xpElement.textContent = `+${amount} XP`;
+            xpElement.style.setProperty('--duration', `${this.settings.xpFloatDuration}ms`);
+            xpElement.style.left = `${x}px`;
+            xpElement.style.top = `${y}px`;
+            
+            // Add to document
+            document.body.appendChild(xpElement);
+            
+            // Add particles
+            this.createXPBurst(x, y);
+            
+            // Remove after animation completes
+            setTimeout(() => {
+                xpElement.remove();
+                resolve();
+            }, this.settings.xpFloatDuration);
+        });
+    }
+
+    /**
+     * Create particle burst effect
+     */
+    createXPBurst(x, y) {
+        const container = document.querySelector('.particle-container');
+        if (!container) return;
         
+        // Create particles
         for (let i = 0; i < this.settings.burstParticleCount; i++) {
             const particle = document.createElement('div');
-            particle.className = 'xp-burst-particle';
+            particle.className = 'xp-particle';
             
-            const angle = (360 / this.settings.burstParticleCount) * i;
-            const distance = 60 + Math.random() * 40;
+            // Random position offset
+            const angle = (Math.random() * Math.PI * 2);
+            const distance = 30 + Math.random() * 70;
+            const finalX = Math.cos(angle) * distance;
+            const finalY = Math.sin(angle) * distance;
             
-            particle.style.left = `${position.x}px`;
-            particle.style.top = `${position.y}px`;
+            // Set initial position
+            particle.style.left = `${x}px`;
+            particle.style.top = `${y}px`;
             
-            overlay.appendChild(particle);
+            // Add to container
+            container.appendChild(particle);
             
-            // Animate particle
+            // Animate with random timing
+            const duration = 500 + Math.random() * 1000;
+            const delay = Math.random() * 200;
+            
             setTimeout(() => {
-                const endX = position.x + Math.cos(angle * Math.PI / 180) * distance;
-                const endY = position.y + Math.sin(angle * Math.PI / 180) * distance;
-                
-                particle.style.transition = 'all 1s ease-out';
-                particle.style.transform = `translate(-50%, -50%) translate(${endX - position.x}px, ${endY - position.y}px)`;
+                // Apply transition for movement
+                particle.style.transition = `transform ${duration}ms ease-out, opacity ${duration}ms ease-out`;
+                particle.style.transform = `translate(${finalX}px, ${finalY}px)`;
                 particle.style.opacity = '0';
                 
+                // Remove after animation
                 setTimeout(() => {
-                    if (overlay.contains(particle)) {
-                        overlay.removeChild(particle);
-                    }
-                }, 1000);
-            }, 50);
+                    particle.remove();
+                }, duration);
+            }, delay);
         }
     }
-    
-    async addSparkleEffect(parentElement, position) {
-        const overlay = document.getElementById('xp-animation-overlay');
-        
-        for (let i = 0; i < this.settings.sparkleCount; i++) {
-            const sparkle = document.createElement('div');
-            sparkle.className = 'xp-sparkle-particle';
-            sparkle.textContent = '✨';
+
+    /**
+     * Animate level up
+     */
+    async animateLevelUp(level, rewards = []) {
+        return new Promise(resolve => {
+            // Create level up overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'level-up-overlay';
             
-            const offsetX = (Math.random() - 0.5) * 100;
-            const offsetY = (Math.random() - 0.5) * 100;
+            // Create content
+            const rewardsText = rewards.length > 0 
+                ? `<div class="level-up-rewards">Rewards: ${rewards.join(', ')}</div>` 
+                : '';
             
-            sparkle.style.left = `${position.x + offsetX}px`;
-            sparkle.style.top = `${position.y + offsetY}px`;
-            sparkle.style.animationDelay = `${i * 0.1}s`;
-            
-            overlay.appendChild(sparkle);
-            
-            // Clean up
-            setTimeout(() => {
-                if (overlay.contains(sparkle)) {
-                    overlay.removeChild(sparkle);
-                }
-            }, 2000);
-        }
-    }
-    
-    async animateLevelUp(animation) {
-        const { newLevel } = animation;
-        
-        // Show full-screen level up animation
-        const overlay = document.getElementById('xp-animation-overlay');
-        
-        const levelUpElement = document.createElement('div');
-        levelUpElement.className = 'level-up-fullscreen';
-        levelUpElement.innerHTML = `
-            <div class="level-up-content">
-                <div class="level-up-rays"></div>
-                <div class="level-up-text">
-                    <h1>LEVEL UP!</h1>
-                    <h2>Level ${newLevel}</h2>
+            overlay.innerHTML = `
+                <div class="level-up-container">
+                    <div class="level-up-title">LEVEL UP!</div>
+                    <div class="level-up-level">Level ${level}</div>
+                    ${rewardsText}
                 </div>
-                <div class="level-up-celebration">🎉</div>
-            </div>
-        `;
-        
-        overlay.appendChild(levelUpElement);
-        
-        // Animate in
-        await this.sleep(100);
-        levelUpElement.classList.add('active');
-        
-        // Show toast
-        if (window.achievementToastManager) {
-            window.achievementToastManager.showLevelUp(newLevel);
-        }
-        
-        // Auto-remove after duration
-        setTimeout(() => {
-            levelUpElement.classList.remove('active');
+            `;
+            
+            // Add to document
+            document.body.appendChild(overlay);
+            
+            // Add sparkles
+            this.createSparkles();
+            
+            // Trigger animation
             setTimeout(() => {
-                if (overlay.contains(levelUpElement)) {
-                    overlay.removeChild(levelUpElement);
-                }
-            }, 500);
-        }, this.settings.levelUpDuration);
-    }
-    
-    async handleLevelUp(data) {
-        const { newLevel, oldLevel } = data;
-        
-        this.queueAnimation({
-            type: 'level-up',
-            newLevel,
-            oldLevel
+                overlay.classList.add('active');
+            }, 50);
+            
+            // Remove after duration
+            setTimeout(() => {
+                overlay.classList.remove('active');
+                
+                setTimeout(() => {
+                    overlay.remove();
+                    resolve();
+                }, 500);
+            }, this.settings.levelUpDuration);
         });
-        
-        this.processAnimationQueue();
     }
-    
-    async handleAchievement(data) {
-        // Trigger achievement animation and celebration
-        console.log('🏆 Achievement unlocked:', data);
+
+    /**
+     * Create sparkle effects
+     */
+    createSparkles() {
+        const container = document.querySelector('.particle-container');
+        if (!container) return;
         
-        if (window.achievementToastManager) {
-            window.achievementToastManager.showAchievement(data);
+        // Create multiple sparkles
+        for (let i = 0; i < this.settings.sparkleCount; i++) {
+            setTimeout(() => {
+                this.createSparkle(container);
+            }, i * 300);
         }
+    }
+
+    /**
+     * Create a single sparkle
+     */
+    createSparkle(container) {
+        // Create element
+        const sparkle = document.createElement('div');
+        sparkle.className = 'sparkle';
         
-        // Add special celebration effects
-        this.queueAnimation({
-            type: 'burst',
-            position: this.getDefaultPosition(),
-            amount: data.xp || 0
-        });
-    }
-    
-    // Utility methods
-    sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    
-    // Public API methods
-    triggerXPGain(amount, options = {}) {
-        const event = new CustomEvent('xpGained', {
-            detail: {
-                amount,
-                source: options.source || 'manual',
-                position: options.position || this.getDefaultPosition(),
-                animationType: options.animationType || 'float'
-            }
-        });
-        document.dispatchEvent(event);
-    }
-    
-    triggerLevelUp(newLevel, oldLevel = this.currentLevel) {
-        const event = new CustomEvent('levelUp', {
-            detail: { newLevel, oldLevel }
-        });
-        document.dispatchEvent(event);
-    }
-    
-    triggerAchievement(achievement) {
-        const event = new CustomEvent('achievementUnlocked', {
-            detail: achievement
-        });
-        document.dispatchEvent(event);
-    }
-    
-    // Get position relative to an element
-    getElementPosition(elementId) {
-        const element = document.getElementById(elementId);
-        if (!element) return this.getDefaultPosition();
+        // Random position
+        const x = Math.random() * window.innerWidth;
+        const y = Math.random() * window.innerHeight;
         
-        const rect = element.getBoundingClientRect();
-        return {
-            x: rect.left + rect.width / 2,
-            y: rect.top + rect.height / 2
-        };
+        // Random size
+        const size = 5 + Math.random() * 15;
+        
+        // Random color
+        const hue = Math.floor(Math.random() * 60) + 30; // Gold/yellow range
+        
+        // Set styles
+        sparkle.style.left = `${x}px`;
+        sparkle.style.top = `${y}px`;
+        sparkle.style.width = `${size}px`;
+        sparkle.style.height = `${size}px`;
+        sparkle.style.backgroundColor = `hsl(${hue}, 100%, 70%)`;
+        sparkle.style.boxShadow = `0 0 ${size}px ${size/2}px hsl(${hue}, 100%, 70%)`;
+        
+        // Add to container
+        container.appendChild(sparkle);
+        
+        // Animate
+        const duration = 1000 + Math.random() * 1000;
+        
+        requestAnimationFrame(() => {
+            sparkle.style.transition = `opacity ${duration}ms ease-in-out`;
+            sparkle.style.opacity = '1';
+            
+            setTimeout(() => {
+                sparkle.style.opacity = '0';
+                
+                setTimeout(() => {
+                    sparkle.remove();
+                }, duration);
+            }, duration / 2);
+        });
     }
-    
+
+    /**
+     * Manually trigger XP animation
+     */
+    showXPAnimation(amount, sourceElement = null) {
+        this.handleXPEarned({ amount, sourceElement });
+    }
+
+    /**
+     * Manually trigger level up animation
+     */
+    showLevelUpAnimation(level, rewards = []) {
+        this.handleLevelUp({ level, rewards });
+    }
+
+    /**
+     * Clean up resources
+     */
     destroy() {
-        const overlay = document.getElementById('xp-animation-overlay');
-        if (overlay) {
-            document.body.removeChild(overlay);
+        document.removeEventListener('xpEarned', this.handleXPEarned);
+        document.removeEventListener('levelUp', this.handleLevelUp);
+        
+        // Remove particle container
+        const container = document.querySelector('.particle-container');
+        if (container) {
+            container.remove();
         }
         
-        this.animationQueue = [];
-        this.isProcessing = false;
         this.isInitialized = false;
-        
-        console.log('🧹 XP Animation System destroyed');
     }
 }
 
-// Global initialization
-document.addEventListener('DOMContentLoaded', () => {
-    window.xpAnimationSystem = new XPAnimationSystem();
-});
-
-// Global helper functions for easy access
-window.triggerXPGain = (amount, options) => {
-    if (window.xpAnimationSystem) {
-        window.xpAnimationSystem.triggerXPGain(amount, options);
-    }
-};
-
-window.triggerLevelUp = (newLevel, oldLevel) => {
-    if (window.xpAnimationSystem) {
-        window.xpAnimationSystem.triggerLevelUp(newLevel, oldLevel);
-    }
-};
-
-window.triggerAchievement = (achievement) => {
-    if (window.xpAnimationSystem) {
-        window.xpAnimationSystem.triggerAchievement(achievement);
-    }
-};
+// Create global instance
+window.xpAnimation = new XPAnimationSystem();
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = XPAnimationSystem;
+    module.exports = { XPAnimationSystem };
 }

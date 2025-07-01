@@ -5,10 +5,11 @@ A gamified Python learning platform for teenagers
 import os
 import logging
 import re
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, flash, redirect, url_for
 from flask_caching import Cache
 from config import get_config, setup_logging
 from services.firebase_service import FirebaseService
+from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 
 # Get configuration based on environment
 config = get_config()
@@ -276,6 +277,23 @@ def health_check():
         logger.error(f"Health check failed: {str(e)}")
         return jsonify({'status': 'unhealthy', 'error': str(e)}), 500
 
+# Favicon route to prevent 404 errors
+@app.route('/favicon.ico')
+def favicon():
+    """Serve favicon to prevent 404 errors"""
+    from flask import send_from_directory, abort
+    import os
+    
+    favicon_path = os.path.join(app.root_path, 'static', 'favicon.ico')
+    if os.path.exists(favicon_path):
+        return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico')
+    else:
+        # Return 204 No Content to prevent browser from logging 404 error
+        from flask import Response
+        return Response(status=204)
+        from flask import Response
+        return Response(status=204)
+
 # Security headers middleware
 @app.after_request
 def add_security_headers(response):
@@ -336,6 +354,66 @@ def debug_test_token():
             })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/lesson/<lesson_id>')
+@login_required
+def lesson(lesson_id):
+    try:
+        # Get lesson data
+        lesson = firebase_service.get_lesson(lesson_id)
+        if not lesson:
+            flash('Lesson not found', 'error')
+            return redirect(url_for('lessons'))
+        
+        # Ensure lesson has proper structure
+        if 'blocks' not in lesson and 'content' in lesson:
+            # Transform content to blocks format
+            lesson['blocks'] = []
+            
+            # Handle different content formats
+            if isinstance(lesson['content'], str):
+                lesson['blocks'].append({
+                    'id': 'block-0',
+                    'type': 'text',
+                    'content': lesson['content']
+                })
+            elif isinstance(lesson['content'], list):
+                for i, item in enumerate(lesson['content']):
+                    if isinstance(item, dict):
+                        item['id'] = item.get('id', f'block-{i}')
+                        lesson['blocks'].append(item)
+                    else:
+                        lesson['blocks'].append({
+                            'id': f'block-{i}',
+                            'type': 'text',
+                            'content': str(item)
+                        })
+        
+        # Get user progress
+        user_progress = {}
+        if current_user.is_authenticated:
+            user_progress = firebase_service.get_user_lesson_progress(
+                current_user.id, lesson_id
+            ) or {}
+        
+        # Prepare current user data
+        current_user_data = None
+        if current_user.is_authenticated:
+            current_user_data = {
+                'id': current_user.id,
+                'email': current_user.email,
+                'display_name': current_user.display_name
+            }
+        
+        return render_template('lesson.html',
+                             lesson=lesson,
+                             user_progress=user_progress,
+                             current_user=current_user_data)
+    
+    except Exception as e:
+        logger.error(f"Error loading lesson {lesson_id}: {str(e)}")
+        flash('Error loading lesson', 'error')
+        return redirect(url_for('lessons'))
 
 # Main entry point
 if __name__ == '__main__':
