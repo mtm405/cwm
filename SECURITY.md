@@ -55,7 +55,7 @@ DANGEROUS_PATTERNS = [
 ```python
 # Structured logging with levels
 LOG_LEVEL = INFO  # DEBUG, INFO, WARNING, ERROR, CRITICAL
-LOG_FILE = app.log
+LOG_FILE = logs/app.log
 
 # Security event logging
 logger.warning(f"Security validation failed: {error_msg}")

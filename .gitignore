@@ -34,6 +34,7 @@ firebase_web_config.json
 *.pfx
 credentials.json
 client_secret*.json
+secure/
 
 # Cloudflare
 cloudflare-tunnel.yml
@@ -42,6 +43,7 @@ cloudflare-tunnel.yml
 # Logs
 *.log
 app.log
+logs/
 
 # IDE
 .vscode/

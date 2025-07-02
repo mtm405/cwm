@@ -1,23 +1,10 @@
 """
 Configuration settings for Code with Morais
-
-DEPRECATION NOTICE: This file is deprecated and will be removed in a future version.
-Please use the 'config' package instead:
-    from config import get_config, setup_logging, Config
 """
 import os
 import logging
-import warnings
 from typing import Optional
 from dotenv import load_dotenv
-
-# Show deprecation warning
-warnings.warn(
-    "The root config.py file is deprecated. "
-    "Please update your imports to use 'from config import ...' instead.",
-    DeprecationWarning,
-    stacklevel=2
-)
 
 # Load environment variables
 load_dotenv()
@@ -66,20 +53,15 @@ class Config:
     @classmethod
     def validate_firebase_config(cls) -> bool:
         """Validate that all required Firebase configuration is present."""
-        required_fields = [
-            'project_id', 'private_key_id', 'private_key', 
-            'client_email', 'client_id'
-        ]
-        
-        for field in required_fields:
-            if not cls.FIREBASE_CONFIG.get(field):
-                return False
-        return True
+        required_keys = ['project_id', 'private_key', 'client_email']
+        return all(cls.FIREBASE_CONFIG.get(key) for key in required_keys)
+
 
 class DevelopmentConfig(Config):
     """Development configuration."""
     DEBUG = True
     DEV_MODE = True
+
 
 class ProductionConfig(Config):
     """Production configuration."""
@@ -95,11 +77,13 @@ class ProductionConfig(Config):
         if cls.SECRET_KEY == 'dev-secret-key-change-in-production':
             raise ValueError("SECRET_KEY must be changed for production")
 
+
 class TestingConfig(Config):
     """Testing configuration."""
     TESTING = True
     DEV_MODE = True
     
+
 def get_config() -> Config:
     """Get configuration based on environment."""
     env = os.environ.get('FLASK_ENV', 'development').lower()
@@ -112,6 +96,7 @@ def get_config() -> Config:
         return TestingConfig()
     else:
         return DevelopmentConfig()
+
 
 def setup_logging(config: Config):
     """Set up application logging."""
@@ -145,7 +130,3 @@ def setup_logging(config: Config):
     if config.DEV_MODE:
         logging.getLogger('werkzeug').setLevel(logging.WARNING)
         logging.getLogger('urllib3').setLevel(logging.WARNING)
-
-# Legacy support - remove in Phase 2
-SECRET_KEY = Config.SECRET_KEY
-DEV_MODE = Config.DEV_MODE
