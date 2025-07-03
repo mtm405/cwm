@@ -1,0 +1,222 @@
+/**
+ * Main Lesson System - ES6 Module
+ * Single source of truth for lesson initialization
+ */
+
+import { LessonDataService } from './services/LessonDataService.js';
+import { LessonRenderer } from './components/LessonRenderer.js';
+import { LessonProgress } from './services/LessonProgress.js';
+import { LessonInteractions } from './components/LessonInteractions.js';
+
+export class LessonSystem {
+    constructor() {
+        this.lessonId = this.getLessonId();
+        this.dataService = new LessonDataService();
+        this.renderer = new LessonRenderer();
+        this.progress = new LessonProgress();
+        this.interactions = new LessonInteractions();
+        
+        this.lessonData = null;
+        this.userProgress = null;
+        this.currentUser = null;
+        
+        console.log(`🚀 LessonSystem initialized for lesson: ${this.lessonId}`);
+    }
+    
+    getLessonId() {
+        // Get from URL, meta tag, or global data
+        const urlParts = window.location.pathname.split('/');
+        const urlLessonId = urlParts[urlParts.length - 1];
+        
+        const metaLessonId = document.querySelector('meta[name="lesson-id"]')?.content;
+        const dataLessonId = window.lessonData?.id;
+        
+        return metaLessonId || dataLessonId || urlLessonId;
+    }
+    
+    async initialize() {
+        try {
+            console.log('📚 Initializing lesson system...');
+            
+            // Show loading state
+            this.renderer.showLoading();
+            
+            // Get current user
+            this.currentUser = this.getCurrentUser();
+            
+            // Fetch data from Firebase or use provided data
+            const [lessonData, userProgress] = await Promise.all([
+                this.dataService.fetchLesson(this.lessonId),
+                this.progress.fetchUserProgress(this.lessonId, this.currentUser?.id)
+            ]);
+            
+            this.lessonData = lessonData;
+            this.userProgress = userProgress;
+            
+            // Validate lesson data
+            if (!this.lessonData) {
+                throw new Error(`Lesson ${this.lessonId} not found`);
+            }
+            
+            // Transform lesson data to blocks if needed
+            this.lessonData = this.transformLessonData(this.lessonData);
+            
+            // Render the lesson
+            await this.renderer.renderLesson(this.lessonData, this.userProgress);
+            
+            // Initialize interactions
+            this.interactions.initialize(this.lessonData, this.userProgress);
+            
+            // Set up progress tracking
+            this.progress.initialize(this.lessonId, this.userProgress, this.currentUser?.id);
+            
+            // Update progress display
+            this.updateProgressDisplay();
+            
+            // Hide loading, show content
+            this.renderer.hideLoading();
+            
+            console.log('✅ Lesson system initialized successfully');
+            
+        } catch (error) {
+            console.error('❌ Lesson initialization failed:', error);
+            this.renderer.showError(error.message);
+            throw error;
+        }
+    }
+    
+    transformLessonData(lessonData) {
+        if (!lessonData) return null;
+        
+        // If blocks already exist, return as-is
+        if (lessonData.blocks && Array.isArray(lessonData.blocks)) {
+            return lessonData;
+        }
+        
+        // Transform legacy format to blocks
+        const blocks = [];
+        let blockOrder = 0;
+        
+        // Add content as text blocks
+        if (lessonData.content) {
+            blocks.push({
+                id: `${lessonData.id}-intro`,
+                type: 'text',
+                title: 'Introduction',
+                content: lessonData.content,
+                order: blockOrder++
+            });
+        }
+        
+        // Add code examples
+        if (lessonData.code_examples && Array.isArray(lessonData.code_examples)) {
+            lessonData.code_examples.forEach((example, index) => {
+                blocks.push({
+                    id: `${lessonData.id}-code-${index}`,
+                    type: 'code_example',
+                    title: example.title || `Code Example ${index + 1}`,
+                    code: example.code,
+                    language: example.language || 'python',
+                    explanation: example.explanation,
+                    order: blockOrder++
+                });
+            });
+        }
+        
+        // Add exercises
+        if (lessonData.exercises && Array.isArray(lessonData.exercises)) {
+            lessonData.exercises.forEach((exercise, index) => {
+                blocks.push({
+                    id: `${lessonData.id}-exercise-${index}`,
+                    type: 'interactive',
+                    title: exercise.title || `Exercise ${index + 1}`,
+                    instructions: exercise.instructions,
+                    starter_code: exercise.starter_code,
+                    language: exercise.language || 'python',
+                    tests: exercise.tests,
+                    order: blockOrder++
+                });
+            });
+        }
+        
+        // Add quiz
+        if (lessonData.quiz_id) {
+            blocks.push({
+                id: `${lessonData.id}-quiz`,
+                type: 'quiz',
+                title: 'Knowledge Check',
+                quiz_id: lessonData.quiz_id,
+                order: blockOrder++
+            });
+        }
+        
+        lessonData.blocks = blocks;
+        return lessonData;
+    }
+    
+    getCurrentUser() {
+        // Get current user from various sources
+        return window.currentUser || 
+               globalThis.currentUser || 
+               JSON.parse(localStorage.getItem('user_data') || 'null') ||
+               null;
+    }
+    
+    updateProgressDisplay() {
+        if (!this.lessonData || !this.userProgress) return;
+        
+        const totalBlocks = this.lessonData.blocks?.length || 0;
+        const completedBlocks = this.userProgress.completed_blocks?.length || 0;
+        const percentage = totalBlocks > 0 ? Math.round((completedBlocks / totalBlocks) * 100) : 0;
+        
+        // Update progress bar
+        const progressBar = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-percentage');
+        const blocksText = document.getElementById('completed-blocks-text');
+        
+        if (progressBar) progressBar.style.width = `${percentage}%`;
+        if (progressText) progressText.textContent = `${percentage}%`;
+        if (blocksText) blocksText.textContent = `${completedBlocks} of ${totalBlocks} blocks completed`;
+        
+        // Update lesson title if needed
+        const titleElement = document.querySelector('.lesson-title');
+        if (titleElement && this.lessonData.title) {
+            titleElement.innerHTML = `
+                <i class="fas fa-${this.lessonData.icon || 'code'}"></i>
+                ${this.lessonData.title}
+            `;
+        }
+    }
+    
+    // Event handlers for lesson interactions
+    async markBlockComplete(blockId) {
+        return await this.progress.markBlockComplete(blockId);
+    }
+    
+    async executeCode(blockId, code) {
+        return await this.interactions.executeCode(blockId, code);
+    }
+    
+    async saveProgress() {
+        return await this.progress.saveProgress();
+    }
+    
+    // Debugging helper
+    getDebugInfo() {
+        return {
+            lessonId: this.lessonId,
+            lessonData: this.lessonData,
+            userProgress: this.userProgress,
+            currentUser: this.currentUser,
+            initialized: !!(this.lessonData && this.userProgress)
+        };
+    }
+}
+
+// Auto-initialize when DOM is ready if not loaded as module
+if (typeof window !== 'undefined' && !window.lessonSystemInitialized) {
+    window.lessonSystemInitialized = true;
+    
+    // Make LessonSystem available globally for debugging
+    window.LessonSystem = LessonSystem;
+}

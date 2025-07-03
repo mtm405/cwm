@@ -2,7 +2,7 @@
 Dashboard API routes for Code with Morais
 Provides API endpoints for dashboard data with Firebase integration
 """
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, jsonify, request, current_app, session
 from models.user import get_current_user, get_user_progress
 from models.lesson import get_all_lessons, calculate_overall_progress
 from models.activity import get_recent_activity, track_activity
@@ -299,24 +299,106 @@ def get_leaderboard():
         from config import get_config
         config = get_config()
         
+        # Get current user for marking
+        current_user_uid = None
+        if 'user' in session:
+            current_user_uid = session['user'].get('uid')
+        
         if config.DEV_MODE:
             leaderboard = [
-                {'username': 'DevUser', 'xp': 1500, 'level': 5},
-                {'username': 'AlexPython', 'xp': 1200, 'level': 4},
-                {'username': 'CodeMaster', 'xp': 1000, 'level': 3},
-                {'username': 'PyNinja', 'xp': 850, 'level': 3},
-                {'username': 'ScriptKid', 'xp': 750, 'level': 2}
+                {
+                    'uid': 'dev-user-1',
+                    'username': 'DevUser', 
+                    'display_name': 'Dev User',
+                    'xp': 1500, 
+                    'level': 5,
+                    'pycoins': 2500,
+                    'avatar_url': None,
+                    'is_current_user': current_user_uid == 'dev-user-1'
+                },
+                {
+                    'uid': 'alex-python',
+                    'username': 'AlexPython', 
+                    'display_name': 'Alex Python',
+                    'xp': 1200, 
+                    'level': 4,
+                    'pycoins': 2000,
+                    'avatar_url': None,
+                    'is_current_user': current_user_uid == 'alex-python'
+                },
+                {
+                    'uid': 'code-master',
+                    'username': 'CodeMaster', 
+                    'display_name': 'Code Master',
+                    'xp': 1000, 
+                    'level': 3,
+                    'pycoins': 1800,
+                    'avatar_url': None,
+                    'is_current_user': current_user_uid == 'code-master'
+                },
+                {
+                    'uid': 'py-ninja',
+                    'username': 'PyNinja', 
+                    'display_name': 'Python Ninja',
+                    'xp': 850, 
+                    'level': 3,
+                    'pycoins': 1500,
+                    'avatar_url': None,
+                    'is_current_user': current_user_uid == 'py-ninja'
+                },
+                {
+                    'uid': 'script-kid',
+                    'username': 'ScriptKid', 
+                    'display_name': 'Script Kid',
+                    'xp': 750, 
+                    'level': 2,
+                    'pycoins': 1200,
+                    'avatar_url': '/static/img/default-avatar.svg',
+                    'is_current_user': current_user_uid == 'script-kid'
+                }
             ]
+            
+            # If current user is not in the mock data, add them at a reasonable position
+            if current_user_uid and not any(user['is_current_user'] for user in leaderboard):
+                current_user = session.get('user', {})
+                user_xp = current_user.get('xp', 100)
+                current_user_entry = {
+                    'uid': current_user_uid,
+                    'username': current_user.get('username', 'You'),
+                    'display_name': current_user.get('display_name', current_user.get('username', 'You')),
+                    'xp': user_xp,
+                    'level': current_user.get('level', 1),
+                    'pycoins': current_user.get('pycoins', 0),
+                    'avatar_url': current_user.get('profile_picture') or '/static/img/default-avatar.svg',
+                    'is_current_user': True
+                }
+                
+                # Insert user in correct position based on XP
+                inserted = False
+                for i, user in enumerate(leaderboard):
+                    if user_xp > user['xp']:
+                        leaderboard.insert(i, current_user_entry)
+                        inserted = True
+                        break
+                
+                if not inserted:
+                    leaderboard.append(current_user_entry)
+                    
         else:
             # Get from Firebase
             firebase_service = current_app.config.get('firebase_service')
             if firebase_service and firebase_service.is_available():
                 leaderboard = firebase_service.get_leaderboard(10)
+                
+                # Mark current user
+                for user in leaderboard:
+                    user['is_current_user'] = user.get('uid') == current_user_uid
             else:
                 leaderboard = []
         
         return jsonify({
-            'leaderboard': leaderboard,
+            'success': True,
+            'users': leaderboard,  # Changed from 'leaderboard' to 'users' to match frontend
             'timestamp': datetime.now().isoformat()
         })
         
@@ -469,4 +551,132 @@ def refresh_dashboard():
         return jsonify({
             'success': False,
             'error': 'Failed to refresh dashboard data'
+        }), 500
+
+@dashboard_api_bp.route('/ping')
+def ping():
+    """Simple ping endpoint to check server availability"""
+    return jsonify({'status': 'ok', 'timestamp': datetime.now().isoformat()})
+
+@dashboard_api_bp.route('/suggestions')
+def get_personalized_suggestions():
+    """Get personalized learning suggestions for the user"""
+    try:
+        user = get_current_user()
+        user_id = user['uid'] if user else 'dev-user-001'
+        
+        # Get user's progress and preferences
+        user_progress = get_user_progress(user_id)
+        all_lessons = get_all_lessons()
+        
+        # Find learning paths and recommendations based on user's progress
+        completed_lessons_count = len([p for p in user_progress.values() if p.get('completed', False)])
+        total_lessons = len(all_lessons)
+        
+        # Get time of day
+        hour = datetime.now().hour
+        time_based_suggestions = []
+        
+        if hour >= 5 and hour < 12:
+            time_based_suggestions = [
+                "Start your morning with a quick Python challenge",
+                "Morning is perfect for learning new concepts",
+                "Fresh mind, fresh code - let's start with a new lesson"
+            ]
+        elif hour >= 12 and hour < 17:
+            time_based_suggestions = [
+                "Take a midday break with some Python practice",
+                "Afternoon is great for problem-solving",
+                "Power through your afternoon with a coding session"
+            ]
+        elif hour >= 17 and hour < 22:
+            time_based_suggestions = [
+                "Wind down your day with some relaxed coding",
+                "Evening is perfect for reviewing what you've learned",
+                "Solidify today's knowledge with a quick review"
+            ]
+        else:
+            time_based_suggestions = [
+                "Night owl coding session? Let's make progress!",
+                "Late night is great for focused learning",
+                "Quiet hours are perfect for deep concentration"
+            ]
+        
+        # Find incomplete lessons
+        incomplete_lessons = []
+        for lesson in all_lessons:
+            lesson_id = lesson.get('id')
+            if lesson_id not in user_progress or not user_progress[lesson_id].get('completed', False):
+                incomplete_lessons.append({
+                    'id': lesson_id,
+                    'title': lesson.get('title', 'Untitled Lesson'),
+                    'description': lesson.get('description', ''),
+                    'difficulty': lesson.get('difficulty', 'beginner')
+                })
+        
+        # Find lessons in progress (started but not completed)
+        in_progress_lessons = []
+        for lesson_id, progress in user_progress.items():
+            if progress.get('progress', 0) > 0 and not progress.get('completed', False):
+                lesson = next((l for l in all_lessons if l.get('id') == lesson_id), None)
+                if lesson:
+                    in_progress_lessons.append({
+                        'id': lesson_id,
+                        'title': lesson.get('title', 'Untitled Lesson'),
+                        'description': lesson.get('description', ''),
+                        'progress': progress.get('progress', 0)
+                    })
+        
+        # Calculate progress-based suggestions
+        progress_percentage = (completed_lessons_count / total_lessons * 100) if total_lessons > 0 else 0
+        progress_suggestions = []
+        
+        if progress_percentage < 25:
+            progress_suggestions = [
+                "You're just getting started - keep up the momentum!",
+                "Building foundations is important - keep learning!",
+                "The beginning of your Python journey looks promising"
+            ]
+        elif progress_percentage < 50:
+            progress_suggestions = [
+                "You're making great progress - keep it up!",
+                "You're on your way to Python mastery",
+                "Keep the learning streak going strong"
+            ]
+        elif progress_percentage < 75:
+            progress_suggestions = [
+                "You're well on your way to becoming a Python pro",
+                "Your dedication is paying off - you've learned a lot!",
+                "You're in the advanced territory now"
+            ]
+        else:
+            progress_suggestions = [
+                "You're almost a Python master!",
+                "Impressive progress - you're near completion",
+                "You've come so far - just a little more to go!"
+            ]
+        
+        # Prepare personalized suggestions
+        import random
+        suggestions = {
+            'time_based': random.choice(time_based_suggestions),
+            'progress_based': random.choice(progress_suggestions),
+            'next_lessons': incomplete_lessons[:3],
+            'in_progress_lessons': in_progress_lessons[:3],
+            'progress_percentage': progress_percentage,
+            'completed_lessons_count': completed_lessons_count,
+            'total_lessons': total_lessons,
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        return jsonify(suggestions)
+        
+    except Exception as e:
+        logger.error(f"Error getting personalized suggestions: {str(e)}")
+        return jsonify({
+            'time_based': "Ready to continue your Python journey?",
+            'progress_based': "Keep learning and growing!",
+            'next_lessons': [],
+            'in_progress_lessons': [],
+            'error': str(e)
         }), 500

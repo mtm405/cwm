@@ -3,7 +3,7 @@ Authentication routes for Code with Morais
 Handles Google OAuth authentication and user sessions
 """
 import os
-from flask import Blueprint, request, jsonify, session, current_app
+from flask import Blueprint, request, jsonify, session, current_app, render_template
 from firebase_admin import auth as firebase_auth
 import logging
 from typing import Optional, Dict, Any
@@ -218,21 +218,18 @@ def auth_status():
             'success': True,
             'authenticated': is_authenticated,
             'user_id': user_id,
-            'session_keys': list(session.keys())
-        })
-    except Exception as e:
-        logger.error(f"Auth status error: {str(e)}")
-        return jsonify({'success': False, 'error': 'Failed to get auth status'}), 500
-        return jsonify({
-            'authenticated': is_authenticated,
             'user': {
                 'uid': session.get('user_id'),
                 'email': session.get('user_email'),
                 'name': session.get('user_name'),
                 'picture': session.get('user_picture'),
                 'is_admin': session.get('is_admin', False)
-            } if is_authenticated else None
+            } if is_authenticated else None,
+            'session_keys': list(session.keys())
         })
+    except Exception as e:
+        logger.error(f"Auth status error: {str(e)}")
+        return jsonify({'success': False, 'error': 'Failed to get auth status'}), 500
     except Exception as e:
         logger.error(f"Auth status error: {str(e)}")
         return jsonify({'success': False, 'error': 'Failed to get auth status'}), 500
@@ -359,3 +356,22 @@ def get_current_user_from_session() -> Optional[Dict[str, Any]]:
 def auth_test():
     """Simple test endpoint to verify auth blueprint is working"""
     return jsonify({'message': 'Auth blueprint is working!', 'status': 'ok'})
+
+@auth_bp.route('/debug')
+def auth_debug():
+    """Debug page for authentication issues"""
+    try:
+        # Get current user
+        from routes.main_routes import get_current_user
+        user = get_current_user()
+        
+        # Pass essential authentication parameters
+        google_client_id = os.environ.get('GOOGLE_CLIENT_ID', '')
+        
+        # Get configuration from current app
+        config_data = current_app.config
+        
+        return render_template('auth-debug.html', user=user, google_client_id=google_client_id, config=config_data)
+    except Exception as e:
+        logger.error(f"Error rendering auth debug page: {str(e)}")
+        return jsonify({'error': str(e)}), 500

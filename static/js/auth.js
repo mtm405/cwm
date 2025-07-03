@@ -1,3 +1,7 @@
+// DEPRECATED: This file is now replaced by auth/authController.js and auth/authService.js
+// See new architecture in static/js/auth/
+// This file is kept for backward compatibility only. Remove after migration is complete.
+
 /* global google */
 
 // Minimal AuthService for Google OAuth only

@@ -121,11 +121,11 @@ class ComponentInfo:
     def get_example_usage(self) -> str:
         """Get example Jinja2 template usage"""
         if not self.examples:
-            return f"{% include '{self.template_path}' %}"
+            return f"{{% include '{self.template_path}' %}}"
         
         example = self.examples[0]
         props_str = ", ".join([f"{k}={repr(v)}" for k, v in example.items()])
-        return f"{% include '{self.template_path}' with {props_str} %}"
+        return f"{{% include '{self.template_path}' with {props_str} %}}"
 
 
 class ComponentRegistry:

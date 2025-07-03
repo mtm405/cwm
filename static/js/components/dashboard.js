@@ -8,7 +8,8 @@
  * - Simplified loading state management
  */
 
-import '../../js/games/WordleGame.js';
+// Import Wordle game functionality (commented out for now)
+// import '../../js/games/WordleGame.js';
 
 class ModernDashboardManager {
     constructor() {
@@ -33,8 +34,15 @@ class ModernDashboardManager {
             
             this.setupEventListeners();
             await this.loadDashboardData();
+            
+            // Load the daily challenge by default
+            this.loadDailyChallenge();
+            
             this.initializeAnimations();
             this.startAutoRefresh();
+            
+            // Check for URL parameters (e.g., ?tab=leaderboard)
+            this.handleUrlParameters();
             
             this.initialized = true;
             console.log('✅ Modern Dashboard initialized successfully');
@@ -191,19 +199,18 @@ class ModernDashboardManager {
         });
 
         // Initialize the first tab as active if none are active
-        if (!document.querySelector('.nav-tab.active')) {
-            const firstTab = tabButtons[0];
-            if (firstTab) {
-                firstTab.classList.add('active');
-                firstTab.setAttribute('aria-selected', 'true');
-                
-                const firstTabId = firstTab.dataset.tab || 'overview';
-                const firstPane = document.getElementById(`${firstTabId}-tab`);
-                if (firstPane) {
-                    firstPane.classList.add('active');
-                    firstPane.style.display = 'block';
+        if (!document.querySelector('.nav-tab.active')) {                const firstTab = tabButtons[0];
+                if (firstTab) {
+                    firstTab.classList.add('active');
+                    firstTab.setAttribute('aria-selected', 'true');
+                    
+                    const firstTabId = 'challenge'; // Always set 'challenge' as default
+                    const firstPane = document.getElementById(`${firstTabId}-tab`);
+                    if (firstPane) {
+                        firstPane.classList.add('active');
+                        firstPane.style.display = 'block';
+                    }
                 }
-            }
         }
 
         // Handle URL hash on page load
@@ -215,6 +222,44 @@ class ModernDashboardManager {
             );
             if (targetButton) {
                 targetButton.click();
+            }
+        }
+
+        // Handle URL parameters for tab selection
+        this.handleUrlParameters();
+    }
+
+    handleUrlParameters() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab');
+        
+        if (tabParam) {
+            console.log(`📋 URL parameter found for tab: ${tabParam}`);
+            // Find tab button with matching data-tab attribute or text content
+            const tabButtons = document.querySelectorAll('.nav-tab[data-tab], .nav-tab');
+            
+            let targetButton = null;
+            tabButtons.forEach(button => {
+                const tabId = button.dataset.tab || button.textContent.toLowerCase().trim();
+                if (tabId === tabParam.toLowerCase() || 
+                    tabId.includes(tabParam.toLowerCase())) {
+                    targetButton = button;
+                }
+            });
+            
+            if (targetButton) {
+                // Simulate click on the target tab
+                setTimeout(() => {
+                    targetButton.click();
+                }, 300); // Small delay to ensure DOM is ready
+            } else if (tabParam.toLowerCase() === 'leaderboard') {
+                // Special case - if leaderboard tab is requested but not found
+                // This is for backward compatibility with older code that may have used a modal
+                setTimeout(() => {
+                    if (typeof window.openLeaderboardModal === 'function') {
+                        window.openLeaderboardModal();
+                    }
+                }, 300);
             }
         }
     }
@@ -290,7 +335,8 @@ class ModernDashboardManager {
             await Promise.all([
                 this.loadExamObjectives(),
                 this.loadActivityFeed(),
-                this.loadDailyChallenge()
+                this.loadDailyChallenge(),
+                this.loadPersonalizedSuggestion()
             ]);
 
             console.log('✅ Dashboard data loaded successfully');
@@ -329,13 +375,213 @@ class ModernDashboardManager {
             // Update immediately to prevent flash, but only if it's currently showing "Student" or default text
             const currentText = welcomeElement.textContent;
             if (currentText.includes('Student') || currentText.includes('Welcome back')) {
-                welcomeElement.textContent = `${timeOfDay}, ${displayName}! 🚀`;
+                // Use HTML to include a Font Awesome icon instead of emoji
+                welcomeElement.innerHTML = `${timeOfDay}, ${displayName}! <i class="fas fa-laptop-code"></i>`;
             }
         }
 
         const subtitleElement = document.querySelector('.dashboard-subtitle');
-        if (subtitleElement && !subtitleElement.textContent.trim()) {
+        if (subtitleElement && !subtitleElement.querySelector('.suggestion-text')) {
             subtitleElement.textContent = `Ready to continue your Python journey?`;
+        }
+    }
+    
+    async updateDashboardSubtitle(user) {
+        const subtitleElement = document.querySelector('.dashboard-subtitle');
+        if (!subtitleElement) return;
+        
+        // Add loading state
+        subtitleElement.classList.add('loading');
+        subtitleElement.textContent = 'Getting personalized suggestions';
+        
+        try {
+            // Try to fetch a personalized suggestion from the API
+            let suggestionText = 'Ready to continue your Python journey?';
+            let suggestionUrl = '/lessons';
+            let recommendationType = 'default';
+            
+            // First try the dedicated suggestions API
+            try {
+                const suggestionsResponse = await fetch('/api/dashboard/suggestions');
+                if (suggestionsResponse.ok) {
+                    const suggestionsData = await suggestionsResponse.json();
+                    
+                    // Randomly choose between time-based and progress-based suggestions
+                    if (Math.random() > 0.5 && suggestionsData.time_based) {
+                        suggestionText = suggestionsData.time_based;
+                        recommendationType = 'time';
+                    } else if (suggestionsData.progress_based) {
+                        suggestionText = suggestionsData.progress_based;
+                        recommendationType = 'progress';
+                    }
+                    
+                    // If there are in-progress lessons, suggest continuing one
+                    if (suggestionsData.in_progress_lessons && 
+                        suggestionsData.in_progress_lessons.length > 0 &&
+                        Math.random() > 0.3) {
+                        
+                        const lesson = suggestionsData.in_progress_lessons[0];
+                        suggestionText = `Continue "${lesson.title}" (${lesson.progress}% complete)`;
+                        suggestionUrl = `/lesson/${lesson.id}`;
+                        recommendationType = 'continue';
+                    }
+                    // Otherwise if there are next lessons, suggest starting one
+                    else if (suggestionsData.next_lessons && 
+                             suggestionsData.next_lessons.length > 0 &&
+                             Math.random() > 0.3) {
+                        
+                        const lesson = suggestionsData.next_lessons[0];
+                        suggestionText = `Start learning "${lesson.title}"`;
+                        suggestionUrl = `/lesson/${lesson.id}`;
+                        recommendationType = 'new';
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to fetch suggestions:', error);
+                
+                // Fallback to next-lesson API if suggestions API fails
+                try {
+                    const response = await fetch('/api/dashboard/next-lesson');
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.next_lesson) {
+                            const lesson = data.next_lesson;
+                            suggestionText = `Continue with "${lesson.title}"`;
+                            suggestionUrl = `/lesson/${lesson.id}`;
+                            recommendationType = 'next';
+                        }
+                    }
+                } catch (nextError) {
+                    console.warn('Failed to fetch next lesson:', nextError);
+                }
+            }
+            
+            // Create the enhanced subtitle with suggestion
+            subtitleElement.classList.remove('loading');
+            
+            // Different HTML structure based on recommendation type
+            if (recommendationType === 'continue' || recommendationType === 'new' || recommendationType === 'next') {
+                subtitleElement.innerHTML = `
+                    Ready to <a href="${suggestionUrl}" class="suggestion-text">${suggestionText}</a>
+                `;
+            } else {
+                subtitleElement.innerHTML = `
+                    <span class="suggestion-text">${suggestionText}</span>
+                `;
+            }
+            
+            // Add click event to the suggestion text if it's a link
+            const suggestionLink = subtitleElement.querySelector('a.suggestion-text');
+            if (suggestionLink) {
+                suggestionLink.addEventListener('click', (e) => {
+                    // Track suggestion click event
+                    if (typeof trackEvent === 'function') {
+                        trackEvent('suggestion_click', { 
+                            type: recommendationType,
+                            text: suggestionText,
+                            url: suggestionUrl
+                        });
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error updating dashboard subtitle:', error);
+            // Fallback to default text
+            subtitleElement.classList.remove('loading');
+            subtitleElement.textContent = `Ready to continue your Python journey?`;
+        }
+    }
+
+    /**
+     * Load personalized learning suggestion from API
+     */
+    async loadPersonalizedSuggestion() {
+        try {
+            console.log('🔮 Loading personalized suggestion...');
+            const subtitleElement = document.querySelector('.dashboard-subtitle');
+            
+            if (subtitleElement) {
+                // Show loading state
+                subtitleElement.classList.add('loading');
+                subtitleElement.innerHTML = 'Finding the perfect next step for you';
+                
+                // Fetch suggestion from API
+                const response = await fetch('/api/recommendations/next-steps');
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('✅ Received personalized suggestion:', data);
+                
+                // Store suggestion for later use
+                this.personalizedSuggestion = data;
+                
+                // Update subtitle with suggestion
+                this.updateSubtitleWithSuggestion(data);
+            }
+        } catch (error) {
+            console.error('Error loading personalized suggestion:', error);
+            // Set default subtitle text
+            const subtitleElement = document.querySelector('.dashboard-subtitle');
+            if (subtitleElement) {
+                subtitleElement.classList.remove('loading');
+                subtitleElement.textContent = 'Ready to continue your Python journey?';
+            }
+        }
+    }
+    
+    /**
+     * Update subtitle with personalized suggestion
+     */
+    updateSubtitleWithSuggestion(suggestion) {
+        const subtitleElement = document.querySelector('.dashboard-subtitle');
+        if (!subtitleElement) return;
+        
+        // Remove loading state
+        subtitleElement.classList.remove('loading');
+        
+        // Create suggestion HTML with icon
+        const suggestionText = suggestion.suggestion || 'Ready to continue your Python journey?';
+        const suggestionIcon = suggestion.icon || 'fas fa-laptop-code';
+        const actionUrl = suggestion.action_url || '#';
+        
+        // Update with enhanced HTML
+        subtitleElement.innerHTML = `
+            <a href="${actionUrl}" class="suggestion-text">
+                <i class="${suggestionIcon}"></i> ${suggestionText}
+            </a>
+        `;
+        
+        // Add click event if not a direct link (for special actions)
+        if (actionUrl === '#' || actionUrl === '/dashboard') {
+            const linkElement = subtitleElement.querySelector('.suggestion-text');
+            if (linkElement) {
+                linkElement.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.handleSuggestionClick(suggestion);
+                });
+            }
+        }
+    }
+    
+    /**
+     * Handle suggestion click for special actions
+     */
+    handleSuggestionClick(suggestion) {
+        // Handle different suggestion types
+        switch(suggestion.suggestion_type) {
+            case 'challenge':
+                // Switch to challenge tab
+                document.querySelector('[data-tab="challenge"]')?.click();
+                break;
+            case 'motivation':
+                // Show a motivational message
+                this.showToast(suggestion.suggestion, 'info');
+                break;
+            default:
+                // Default to lessons page
+                window.location.href = '/lessons';
         }
     }
 
@@ -810,8 +1056,136 @@ class ModernDashboardManager {
     }
 
     async loadLeaderboard() {
-        console.log('Loading leaderboard...');
-        // TODO: Implement leaderboard loading
+        console.log('🏆 Loading leaderboard...');
+        
+        const loadingContainer = document.querySelector('.leaderboard-loading');
+        const contentContainer = document.querySelector('.leaderboard-content');
+        const errorContainer = document.querySelector('.leaderboard-error');
+        const leaderboardList = document.querySelector('.leaderboard-list');
+        
+        if (!loadingContainer || !contentContainer || !leaderboardList) {
+            console.warn('Leaderboard containers not found.');
+            return;
+        }
+
+        // Show loading state
+        loadingContainer.style.display = 'flex';
+        contentContainer.style.display = 'none';
+        errorContainer.style.display = 'none';
+
+        try {
+            const response = await fetch('/api/dashboard/leaderboard');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log('✅ Leaderboard data received:', data);
+            
+            // Hide loading, show content
+            loadingContainer.style.display = 'none';
+            contentContainer.style.display = 'block';
+            contentContainer.classList.add('loaded');
+            
+            // Clear existing content
+            leaderboardList.innerHTML = '';
+            
+            if (!data || !data.users || data.users.length === 0) {
+                this.showEmptyLeaderboardState(leaderboardList);
+                return;
+            }
+            
+            // Render each user
+            data.users.forEach((user, index) => {
+                const userHTML = this.createLeaderboardItemHTML(user, index + 1);
+                leaderboardList.insertAdjacentHTML('beforeend', userHTML);
+            });
+            
+            // Setup filter functionality
+            this.setupLeaderboardFilters();
+            
+        } catch (error) {
+            console.error('❌ Error loading leaderboard:', error);
+            loadingContainer.style.display = 'none';
+            errorContainer.style.display = 'flex';
+        }
+    }
+    
+    showEmptyLeaderboardState(container) {
+        container.innerHTML = `
+            <div class="leaderboard-empty-state" style="text-align: center; padding: 3rem;">
+                <i class="fas fa-trophy" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+                <h4 style="color: var(--text-primary); margin-bottom: 0.5rem;">No Rankings Yet</h4>
+                <p style="color: var(--text-secondary);">Be the first to complete lessons and climb the leaderboard!</p>
+            </div>
+        `;
+    }
+    
+    createLeaderboardItemHTML(user, rank) {
+        const isCurrentUser = user.is_current_user || false;
+        const rankClass = rank <= 3 ? `rank-${rank}` : '';
+        
+        // Generate avatar or placeholder
+        let avatarHTML;
+        if (user.avatar_url) {
+            avatarHTML = `<img src="${user.avatar_url}" alt="${user.username}'s avatar">`;
+        } else {
+            const initial = user.username ? user.username.charAt(0).toUpperCase() : 'U';
+            avatarHTML = `<div class="avatar-placeholder">${initial}</div>`;
+        }
+        
+        // Add "You" badge for current user
+        const youBadge = isCurrentUser ? '<span class="you-badge">YOU</span>' : '';
+        
+        return `
+            <div class="leaderboard-item ${isCurrentUser ? 'current-user' : ''}">
+                <div class="leaderboard-rank ${rankClass}">
+                    ${rank <= 3 ? this.getRankIcon(rank) : rank}
+                </div>
+                <div class="leaderboard-avatar">
+                    ${avatarHTML}
+                    ${youBadge}
+                </div>
+                <div class="leaderboard-info">
+                    <div class="leaderboard-username">${user.display_name || user.username}</div>
+                    <div class="leaderboard-level">Level ${user.level || 1}</div>
+                </div>
+                <div class="leaderboard-stats">
+                    <div class="leaderboard-xp">${user.xp || 0}</div>
+                    <div class="leaderboard-xp-label">XP</div>
+                </div>
+            </div>
+        `;
+    }
+    
+    getRankIcon(rank) {
+        switch (rank) {
+            case 1: return '<i class="fas fa-crown"></i>';
+            case 2: return '<i class="fas fa-medal"></i>';
+            case 3: return '<i class="fas fa-award"></i>';
+            default: return rank;
+        }
+    }
+    
+    setupLeaderboardFilters() {
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons
+                filterBtns.forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                btn.classList.add('active');
+                
+                // TODO: Implement filter logic
+                const filter = btn.dataset.filter;
+                console.log(`Filtering leaderboard by: ${filter}`);
+                
+                // For now, just reload with the same data
+                // In the future, you could pass the filter to the API
+            });
+        });
     }
 
     async loadActivityFeed() {
@@ -1072,7 +1446,26 @@ window.refreshDashboard = function() {
 };
 
 // --- GLOBALS for legacy compatibility ---
+window.loadLeaderboardData = function() {
+    if (window.dashboardManager && typeof window.dashboardManager.loadLeaderboard === 'function') {
+        window.dashboardManager.loadLeaderboard();
+    } else {
+        console.warn('Dashboard manager not available');
+    }
+};
+
 window.openLeaderboardModal = function() {
+    // Check if we're on the dashboard page
+    const isDashboardPage = document.body.classList.contains('dashboard-page') || 
+                           document.body.dataset.page === 'dashboard' ||
+                           window.location.pathname.includes('dashboard');
+                           
+    if (!isDashboardPage) {
+        // Redirect to dashboard with leaderboard tab parameter
+        window.location.href = '/dashboard?tab=leaderboard';
+        return;
+    }
+    
     // Try to use ModalManager if available, else fallback
     if (window.ModalManager && typeof window.ModalManager.showModal === 'function') {
         window.ModalManager.showModal('leaderboard-modal');
@@ -1083,7 +1476,13 @@ window.openLeaderboardModal = function() {
             modal.style.display = 'flex';
             requestAnimationFrame(() => modal.classList.add('active'));
         } else {
-            alert('Leaderboard modal not found.');
+            // Try selecting the leaderboard tab instead
+            const leaderboardTab = document.querySelector('.nav-tab[data-tab="leaderboard"]');
+            if (leaderboardTab) {
+                leaderboardTab.click();
+            } else {
+                alert('Leaderboard not found. Please try again from the dashboard.');
+            }
         }
     }
 };

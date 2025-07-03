@@ -1,3 +1,7 @@
+// DEPRECATED: This file is now replaced by core/main.js and core/app.js
+// See new architecture in static/js/core/
+// This file is kept for backward compatibility only. Remove after migration is complete.
+
 // static/js/app-module.js
 // Modern ES6 module version for progressive enhancement
 

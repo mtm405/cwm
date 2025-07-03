@@ -257,6 +257,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<!-- Authentication specific JavaScript -->
-<!-- Authentication specific JavaScript - using ES6 modules now -->
+<!-- Modular JS: Auth system -->
+<script src="{{ url_for('static', filename='js/core/app.js') }}" type="module"></script>
+<script src="{{ url_for('static', filename='js/auth/authController.js') }}" type="module"></script>
 {% endblock %}

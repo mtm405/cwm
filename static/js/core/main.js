@@ -13,133 +13,6 @@
  */
 
 // ==========================================
-// GOOGLE AUTH CALLBACK - MUST BE FIRST
-// ==========================================
-
-// Global Google credential handler - must be available immediately
-function handleCredentialResponse(response) {
-    console.log('🔐 Google Sign-In response received');
-    
-    if (!response || !response.credential) {
-        console.error('Invalid Google Sign-In response');
-        return;
-    }
-    
-    const idToken = response.credential;
-    
-    // Show loading state
-    const authButtons = document.querySelectorAll('.g_id_signin');
-    authButtons.forEach(btn => {
-        if (btn) {
-            btn.style.opacity = '0.6';
-            btn.style.pointerEvents = 'none';
-        }
-    });
-    
-    // Send token to backend
-    fetch('/auth/google/callback', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify({ token: idToken })
-    })
-    .then(response => {
-        console.log('Backend response status:', response.status);
-        return response.json();
-    })
-    .then(data => {
-        console.log('Backend response:', data);
-        if (data.success) {
-            console.log('✅ Authentication successful');
-            
-            // Show success feedback
-            if (typeof showToast === 'function') {
-                showToast('Login successful! Redirecting...', 'success');
-            }
-            
-            // Store user data if available
-            if (data.user) {
-                window.currentUser = data.user;
-                console.log('User data stored:', data.user);
-            }
-            
-            // Verify session was set by making a quick auth status check
-            fetch('/auth/status')
-                .then(response => response.json())
-                .then(authStatus => {
-                    console.log('Auth status check:', authStatus);
-                    
-                    // Redirect to dashboard with a small delay to ensure session is set
-                    const redirectUrl = data.redirect_url || '/dashboard';
-                    console.log('Redirecting to:', redirectUrl);
-                    
-                    setTimeout(() => {
-                        console.log('Performing redirect...');
-                        try {
-                            window.location.href = redirectUrl;
-                        } catch (error) {
-                            console.error('Redirect failed, trying location.replace:', error);
-                            try {
-                                window.location.replace(redirectUrl);
-                            } catch (error2) {
-                                console.error('Location.replace also failed:', error2);
-                                // Last resort - reload the page and let the server handle the redirect
-                                window.location.reload();
-                            }
-                        }
-                    }, 500);
-                })
-                .catch(authError => {
-                    console.warn('Auth status check failed, proceeding with redirect anyway:', authError);
-                    const redirectUrl = data.redirect_url || '/dashboard';
-                    setTimeout(() => {
-                        window.location.href = redirectUrl;
-                    }, 500);
-                });
-        } else {
-            console.error('❌ Authentication failed:', data.error);
-            if (typeof showToast === 'function') {
-                showToast(data.error || 'Authentication failed', 'error');
-            } else {
-                alert('Authentication failed: ' + (data.error || 'Unknown error'));
-            }
-            
-            // Re-enable buttons
-            authButtons.forEach(btn => {
-                if (btn) {
-                    btn.style.opacity = '1';
-                    btn.style.pointerEvents = 'auto';
-                }
-            });
-        }
-    })
-    .catch(error => {
-        console.error('❌ Network error during authentication:', error);
-        if (typeof showToast === 'function') {
-            showToast('Network error. Please try again.', 'error');
-        } else {
-            alert('Network error. Please check your connection and try again.');
-        }
-        
-        // Re-enable buttons
-        authButtons.forEach(btn => {
-            if (btn) {
-                btn.style.opacity = '1';
-                btn.style.pointerEvents = 'auto';
-            }
-        });
-    });
-}
-
-// Make function globally available immediately
-window.handleCredentialResponse = handleCredentialResponse;
-if (typeof globalThis !== 'undefined') {
-    globalThis.handleCredentialResponse = handleCredentialResponse;
-}
-
-// ==========================================
 // CORE APPLICATION INITIALIZATION
 // ==========================================
 
@@ -148,6 +21,9 @@ class MainApp {
         this.initialized = false;
         this.managers = {};
         this.init();
+        
+        // Track Firebase availability
+        this.firebaseAvailable = false;
     }
     
     /**
@@ -159,6 +35,9 @@ class MainApp {
         console.log('🚀 Initializing Code with Morais application...');
         
         try {
+            // Check Firebase availability
+            await this.checkFirebaseAvailability();
+            
             // Initialize core managers
             await this.initializeManagers();
             
@@ -176,6 +55,66 @@ class MainApp {
             
         } catch (error) {
             console.error('❌ Application initialization failed:', error);
+        }
+    }
+    
+    /**
+     * Check if Firebase is available
+     */
+    async checkFirebaseAvailability() {
+        try {
+            const response = await fetch('/api/firebase-status');
+            const data = await response.json();
+            this.firebaseAvailable = data.firebase_available === true;
+            console.log(`🔥 Firebase availability: ${this.firebaseAvailable}`);
+            
+            // Add status indicator to the DOM
+            if (!this.firebaseAvailable) {
+                // Show a warning in development mode
+                console.warn('⚠️ Firebase is not available - using mock data');
+                
+                // Add a notification for lesson pages
+                if (document.body.dataset.page === 'lesson') {
+                    const notification = document.createElement('div');
+                    notification.className = 'dev-mode-notification';
+                    notification.innerHTML = `
+                        <div class="dev-mode-notification-content">
+                            <i class="fas fa-database"></i>
+                            <span>Development Mode: Using mock lesson data</span>
+                        </div>
+                    `;
+                    document.body.appendChild(notification);
+                    
+                    // Add styling for the notification
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        .dev-mode-notification {
+                            position: fixed;
+                            bottom: 15px;
+                            left: 15px;
+                            background: rgba(255, 193, 7, 0.9);
+                            color: #000;
+                            padding: 8px 15px;
+                            border-radius: 8px;
+                            font-size: 0.85rem;
+                            z-index: 9999;
+                            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                        }
+                        .dev-mode-notification-content {
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                        }
+                        .dev-mode-notification i {
+                            font-size: 1rem;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+            }
+        } catch (error) {
+            console.error('Error checking Firebase availability:', error);
+            this.firebaseAvailable = false;
         }
     }
     
@@ -224,23 +163,69 @@ class MainApp {
      * Initialize dashboard-specific functionality
      */
     initializeDashboard() {
-        // Dashboard functionality is handled by components/dashboard.js
-        if (typeof ModernDashboardManager !== 'undefined') {
-            this.managers.dashboard = new ModernDashboardManager();
-            this.managers.dashboard.init();
-        }
+        console.log('📊 Dashboard page detected - dashboard.js will handle initialization');
         
-        // Initialize dashboard-specific features
-        this.initializeDailyChallengeTimer();
-        this.initializeActivityFeed();
+        // The dashboard is now initialized directly in dashboard.html
+        // This method is kept for compatibility and future enhancements
     }
     
     /**
      * Initialize lesson page (lesson-core.js handles the heavy lifting)
      */
     initializeLessonPage() {
-        // Lesson functionality is handled by lesson-core.js
         console.log('📚 Lesson page detected - lesson-core.js will handle initialization');
+        
+        // Add error handling for lesson loading
+        const lessonContainer = document.querySelector('.lesson-container');
+        const lessonContent = document.querySelector('.lesson-content');
+        
+        if (lessonContainer && window.lessonData === undefined) {
+            console.error('❌ Lesson data not available');
+            
+            // Show an error message if lesson data is missing
+            if (lessonContent) {
+                lessonContent.innerHTML = `
+                    <div class="error-container">
+                        <div class="error-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <h2>Lesson Loading Error</h2>
+                        <p>There was a problem loading the lesson content. This could be because:</p>
+                        <ul>
+                            <li>The lesson ID is invalid</li>
+                            <li>Firebase connection is not available</li>
+                            <li>Mock data for this lesson ID doesn't exist</li>
+                        </ul>
+                        <a href="/lessons" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Back to Lessons</a>
+                    </div>
+                `;
+                
+                // Add error styling
+                const style = document.createElement('style');
+                style.textContent = `
+                    .error-container {
+                        text-align: center;
+                        padding: 2rem;
+                        background: var(--bg-card);
+                        border-radius: 12px;
+                        margin: 2rem auto;
+                        max-width: 600px;
+                    }
+                    .error-icon {
+                        font-size: 3rem;
+                        color: var(--danger-color);
+                        margin-bottom: 1rem;
+                    }
+                    .error-container ul {
+                        text-align: left;
+                        margin: 1rem auto;
+                        max-width: 400px;
+                    }
+                    .error-container .btn {
+                        margin-top: 1.5rem;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
     }
     
     /**
@@ -544,10 +529,10 @@ class MainApp {
      */
     async loadLeaderboardData() {
         try {
-            const response = await fetch('/api/leaderboard');
+            const response = await fetch('/api/dashboard/leaderboard');
             const data = await response.json();
             
-            if (data.success) {
+            if (data.success && data.leaderboard) {
                 this.renderLeaderboard(data.leaderboard);
             } else {
                 this.showLeaderboardError('Failed to load leaderboard data');
@@ -666,6 +651,42 @@ function performSearch() {
     window.location.href = `/lessons?search=${encodeURIComponent(query)}`;
 }
 
+// Live Clock Functionality
+function updateLiveClock() {
+    const clockElement = document.getElementById('live-clock');
+    if (!clockElement) return;
+    
+    const timeDisplay = clockElement.querySelector('.time-display');
+    const periodDisplay = clockElement.querySelector('.period-display');
+    
+    if (!timeDisplay || !periodDisplay) return;
+    
+    const now = new Date();
+    let hours = now.getHours();
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+    const period = hours >= 12 ? 'PM' : 'AM';
+    
+    // Convert to 12-hour format
+    hours = hours % 12;
+    hours = hours ? hours : 12; // 0 should be displayed as 12
+    
+    timeDisplay.textContent = `${hours}:${minutes}:${seconds}`;
+    periodDisplay.textContent = period;
+}
+
+// Initialize and update the clock every second
+function initializeLiveClock() {
+    updateLiveClock();
+    setInterval(updateLiveClock, 1000);
+}
+
+function showClockOptions() {
+    console.log('Clock options clicked');
+    // Future enhancement: show a dropdown with clock options
+    // For now just log a message
+}
+
 function openLeaderboardModal() {
     if (window.mainApp) {
         window.mainApp.openLeaderboardModal();
@@ -684,12 +705,8 @@ function refreshDashboard() {
     }
 }
 
-// Global sign out function for auth
-function signOut() {
-    if (window.appManagers && window.appManagers.auth) {
-        window.appManagers.auth.signOut();
-    }
-}
+// Note: Global signOut function is provided by the isolated Google Auth module
+// No need to redefine it here to avoid conflicts
 
 // ==========================================
 // APPLICATION BOOTSTRAP
@@ -698,11 +715,102 @@ function signOut() {
 // Initialize application when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
     window.mainApp = new MainApp();
+    
+    // Initialize live clock
+    initializeLiveClock();
 });
 
 // Handle Google Identity Services if available
 if (typeof google !== 'undefined' && google.accounts) {
     console.log('🔐 Google Identity Services available');
+    
+    // Initialize Google Auth if not already initialized
+    if (window.GoogleAuth && !window.GoogleAuth.isInitialized) {
+        console.log('🔐 Initializing Google Auth from main.js...');
+        window.GoogleAuth.init();
+    }
 }
 
 console.log('📦 Main application module loaded - optimized version');
+
+// ==========================================
+// USER DROPDOWN FUNCTIONALITY
+// ==========================================
+
+/**
+ * Toggle user dropdown menu
+ * @param {Event} event - Click event
+ */
+function toggleUserDropdown(event) {
+    event.stopPropagation();
+    const dropdown = document.getElementById('userDropdown');
+    const menu = document.getElementById('userDropdownMenu');
+    
+    if (!dropdown || !menu) return;
+    
+    const isActive = dropdown.classList.contains('active');
+    
+    // Close all other dropdowns first
+    closeAllDropdowns();
+    
+    if (!isActive) {
+        dropdown.classList.add('active');
+        console.log('🔽 User dropdown opened');
+        
+        // Ensure menu is visible and accessible
+        menu.style.opacity = '1';
+        menu.style.visibility = 'visible';
+        menu.style.transform = 'translateY(0) scale(1)';
+    }
+}
+
+/**
+ * Close all dropdown menus
+ */
+function closeAllDropdowns() {
+    const dropdowns = document.querySelectorAll('.user-dropdown-modern');
+    dropdowns.forEach(dropdown => {
+        dropdown.classList.remove('active');
+        
+        // Find and hide the dropdown menu
+        const menu = dropdown.querySelector('.dropdown-menu-modern');
+        if (menu) {
+            menu.style.opacity = '';
+            menu.style.visibility = '';
+            menu.style.transform = '';
+        }
+    });
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const userDropdown = document.getElementById('userDropdown');
+    
+    if (userDropdown && !userDropdown.contains(event.target)) {
+        closeAllDropdowns();
+    }
+});
+
+// Close dropdown when pressing Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeAllDropdowns();
+    }
+});
+
+// ==========================================
+// GLOBAL FUNCTION DEFINITIONS
+// ==========================================
+
+// Make all manager functions globally available
+window.toggleSearch = toggleSearch;
+window.performSearch = performSearch;
+window.openLeaderboardModal = openLeaderboardModal;
+window.closeLeaderboardModal = closeLeaderboardModal;
+window.refreshDashboard = refreshDashboard;
+window.updateLiveClock = updateLiveClock;
+window.initializeLiveClock = initializeLiveClock;
+window.showClockOptions = showClockOptions;
+
+// Application initialization flag
+window.applicationLoaded = true;

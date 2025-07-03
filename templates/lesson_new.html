@@ -1,0 +1,234 @@
+{% extends "base/layout.html" %}
+
+{% block title %}{{ lesson.title if lesson else "Lesson" }} - Code with Morais{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/lesson-content-blocks.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/lesson.css') }}">
+<style>
+/* Loading states */
+.content-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    text-align: center;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Error state styling */
+.error-container {
+    text-align: center;
+    padding: 2rem;
+    background: var(--bg-card);
+    border-radius: 12px;
+    margin: 2rem auto;
+    max-width: 600px;
+}
+
+.error-icon {
+    font-size: 3rem;
+    color: var(--danger-color);
+    margin-bottom: 1rem;
+}
+
+.error-title {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.error-content {
+    color: var(--text-secondary);
+}
+
+.error-container .btn {
+    margin-top: 1rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .lesson-container {
+        padding: 1rem;
+    }
+    
+    .lesson-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .lesson-meta {
+        text-align: center;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="lesson-container">
+    <!-- Lesson Header -->
+    <header class="lesson-header">
+        <a href="/lessons" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Back to Lessons
+        </a>
+        
+        <div class="lesson-header-content">
+            <div class="lesson-meta">
+                <h1 class="lesson-title">
+                    <i class="fas fa-{{ lesson.icon if lesson and lesson.icon else 'code' }}"></i>
+                    {{ lesson.title if lesson else 'Loading...' }}
+                </h1>
+                
+                {% if lesson %}
+                <div class="lesson-badges">
+                    <span class="difficulty-badge difficulty-{{ lesson.difficulty or 'beginner' }}">
+                        {{ lesson.difficulty or 'Beginner' }}
+                    </span>
+                    {% if lesson.estimated_time %}
+                    <span class="time-badge">
+                        <i class="fas fa-clock"></i>
+                        {{ lesson.estimated_time }} min
+                    </span>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="progress-section">
+                <div class="progress-header">
+                    <span class="progress-text">Progress</span>
+                    <span class="progress-percentage" id="progress-percentage">0%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="progress-stats">
+                    <span id="completed-blocks-text">0 of 0 blocks completed</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="lesson-content-wrapper">
+        <!-- Loading State -->
+        <div id="content-loading" class="content-loading">
+            <div class="loading-spinner"></div>
+            <p>Loading lesson content...</p>
+        </div>
+        
+        <!-- Lesson Content -->
+        <div id="lesson-content" class="lesson-content" style="display: none;">
+            <div id="lesson-content-container" class="content-blocks-container">
+                <!-- Blocks will be rendered here by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Error Fallback -->
+        <div id="lesson-fallback" class="fallback-content" style="display: none;">
+            <div class="error-container">
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="error-title">Unable to Load Lesson</h3>
+                <div class="error-content">
+                    <p>We encountered an error while loading this lesson. Please check your connection and try again.</p>
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-refresh"></i> Retry
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Navigation Footer -->
+    <footer class="lesson-navigation">
+        <div class="nav-buttons">
+            <button id="prev-lesson-btn" class="btn btn-secondary" style="display: none;">
+                <i class="fas fa-arrow-left"></i> Previous Lesson
+            </button>
+            <button id="next-lesson-btn" class="btn btn-primary" style="display: none;">
+                Next Lesson <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </footer>
+</div>
+
+<!-- Set lesson data for JavaScript -->
+<script>
+// Inject lesson data from backend
+window.lessonData = {{ lesson | tojson if lesson else 'null' }};
+window.lessonProgress = {{ lesson_progress | tojson if lesson_progress else '{}' }};
+window.currentUser = {{ current_user | tojson if current_user else 'null' }};
+
+// Set lesson ID meta tag
+{% if lesson %}
+document.querySelector('meta[name="lesson-id"]')?.setAttribute('content', '{{ lesson.id }}') || 
+document.head.appendChild(Object.assign(document.createElement('meta'), {
+    name: 'lesson-id',
+    content: '{{ lesson.id }}'
+}));
+{% endif %}
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+
+<!-- ACE Editor for code blocks -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/mode-python.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/theme-monokai.js"></script>
+
+<!-- Main Lesson System (ES6 Module) -->
+<script type="module">
+import { LessonSystem } from '{{ url_for("static", filename="js/lesson/lessonSystem.js") }}';
+
+// Initialize lesson system when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 Initializing lesson system...');
+    
+    try {
+        const lessonSystem = new LessonSystem();
+        lessonSystem.initialize().then(() => {
+            console.log('✅ Lesson system initialized successfully');
+            
+            // Make available globally for debugging
+            window.lessonSystem = lessonSystem;
+        }).catch(error => {
+            console.error('❌ Failed to initialize lesson system:', error);
+            
+            // Show error state
+            document.getElementById('content-loading').style.display = 'none';
+            document.getElementById('lesson-fallback').style.display = 'block';
+        });
+    } catch (error) {
+        console.error('❌ Critical error initializing lesson system:', error);
+        
+        // Show error state
+        document.getElementById('content-loading').style.display = 'none';
+        document.getElementById('lesson-fallback').style.display = 'block';
+    }
+});
+</script>
+{% endblock %}

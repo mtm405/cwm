@@ -12,12 +12,12 @@
     <header class="modern-dashboard-header">
         <div class="header-content">
             <div class="welcome-section">
-                <h1 id="welcome-message">Welcome back! 🚀</h1>
+                <h1 id="welcome-message">Welcome back! <i class="fas fa-code"></i></h1>
                 <p class="dashboard-subtitle">Ready to continue your Python journey?</p>
             </div>
             <div class="header-actions">
                 <a href="/lessons" class="btn btn-primary"><i class="fas fa-book"></i> Continue Learning</a>
-                <a href="#challenge" class="btn btn-outline" onclick="document.querySelector('[data-tab=challenge]').click()"><i class="fas fa-trophy"></i> Daily Challenge</a>
+                <button class="btn btn-outline" onclick="openScheduleModal()"><i class="fas fa-calendar-alt"></i> Schedule</button>
             </div>
         </div>
         
@@ -34,15 +34,15 @@
                     }
                     const greeting = getTimeBasedGreeting();
                     const firstName = '{{ user.first_name or (user.display_name.split(" ")[0] if user.display_name else user.username) or "Guest" }}';
-                    welcomeMsg.innerHTML = `${greeting}, ${firstName}! 🚀`;
+                    welcomeMsg.innerHTML = `${greeting}, ${firstName}! <i class="fas fa-code"></i>`;
                 }
             })();
         </script>
         
         <nav class="dashboard-nav">
             <div class="nav-tabs-container">
-                {{ tab_button('challenge', 'fas fa-bolt', 'Daily Challenge') }}
-                {{ tab_button('overview', 'fas fa-chart-line', 'Overview', true) }}
+                {{ tab_button('challenge', 'fas fa-bolt', 'Daily Challenge', true) }}
+                {{ tab_button('overview', 'fas fa-chart-line', 'Overview') }}
                 {{ tab_button('leaderboard', 'fas fa-trophy', 'Leaderboard') }}
                 {{ tab_button('vocabulary', 'fas fa-book', 'Vocabulary') }}
                 {{ tab_button('games', 'fas fa-gamepad', 'Games') }}
@@ -56,12 +56,28 @@
     <!-- Tab Content Sections -->
     <div class="tab-content">
         
+        <!-- Challenge Tab -->
+        <div class="tab-pane active" id="challenge-tab">
+            <div class="dashboard-card-modern challenge-card-modern">
+                <div class="card-header-modern">
+                    <h3><i class="fas fa-calendar-day"></i> Daily Challenge</h3>
+                </div>
+                <div class="card-body-modern">
+                    {% if daily_challenge %}
+                        {{ render_daily_challenge(daily_challenge) }}
+                    {% else %}
+                        {{ render_no_challenge() }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
         <!-- Overview Tab -->
-        <div class="tab-pane active" id="overview-tab">
+        <div class="tab-pane" id="overview-tab">
             <div class="dashboard-main-grid">
-                <!-- Left Column: Stats and other main content -->
+                <!-- Stats Section -->
                 <div class="grid-col-span-2">
-                    <!-- Modern Stats Cards -->
+                    <!-- Modern Stats Cards with fixed grid -->
                     <div id="stats-content" class="stats-grid-modern">
                         {{ cached_stat_card(type='primary', icon='fas fa-star', value=user.get('xp', 0), label='Total XP', data_stat='xp', user_id=user.get('id', 'anonymous')) }}
                         {{ cached_stat_card(type='success', icon='fas fa-coins', value=user.get('pycoins', 0), label='PyCoins', data_stat='pycoins', user_id=user.get('id', 'anonymous')) }}
@@ -86,25 +102,36 @@
             </div>
         </div>
         
-        <!-- Challenge Tab -->
-        <div class="tab-pane" id="challenge-tab">
-            <div class="dashboard-card-modern challenge-card-modern">
-                <div class="card-header-modern">
-                    <h3><i class="fas fa-calendar-day"></i> Daily Challenge</h3>
-                </div>
-                <div class="card-body-modern">
-                    {% if daily_challenge %}
-                        {{ render_daily_challenge(daily_challenge) }}
-                    {% else %}
-                        {{ render_no_challenge() }}
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        
         <!-- Leaderboard Tab -->
         <div class="tab-pane" id="leaderboard-tab">
-            {% include 'components/modals/leaderboard-modal.html' %}
+            <div class="leaderboard-section">
+                <div class="dashboard-card-modern leaderboard-card-modern">
+                    <div class="card-header-modern">
+                        <h3><i class="fas fa-trophy"></i> Leaderboard</h3>
+                        <div class="leaderboard-filters">
+                            <button class="filter-btn active" data-filter="all">All Time</button>
+                            <button class="filter-btn" data-filter="weekly">This Week</button>
+                            <button class="filter-btn" data-filter="monthly">This Month</button>
+                        </div>
+                    </div>
+                    <div class="card-body-modern no-padding">
+                        <div class="leaderboard-loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading leaderboard...</p>
+                        </div>
+                        <div class="leaderboard-content" style="display: none;">
+                            <div class="leaderboard-list">
+                                <!-- Leaderboard items will be loaded here -->
+                            </div>
+                        </div>
+                        <div class="leaderboard-error" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>Failed to load leaderboard. Please try again.</p>
+                            <button class="btn btn-primary" onclick="loadLeaderboardData()">Retry</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Vocabulary Tab -->
@@ -126,7 +153,120 @@
         </div>
         
     </div> <!-- End of tab-content -->
-</div>
 
-<!-- Dashboard functionality is now handled by the main app.js module -->
+    <!-- Schedule Modal -->
+    <div id="schedule-modal" class="modal-overlay">
+        <div class="modal-backdrop" onclick="closeScheduleModal()"></div>
+        <div class="modal-content modal-md">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-calendar-alt"></i> Class Schedule
+                </h3>
+                <button class="modal-close" onclick="closeScheduleModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="class-schedule-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Period</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="period-number">1</span></td>
+                                <td>8:00 AM - 8:55 AM</td>
+                            </tr>
+                            <tr>
+                                <td><span class="period-number">2</span></td>
+                                <td>9:00 AM - 9:55 AM</td>
+                            </tr>
+                            <tr>
+                                <td><span class="period-number">3</span></td>
+                                <td>10:00 AM - 10:55 AM</td>
+                            </tr>
+                            <tr>
+                                <td><span class="period-number">4</span></td>
+                                <td>11:00 AM - 11:55 AM</td>
+                            </tr>
+                            <tr class="lunch-period">
+                                <td><span class="period-label">Lunch</span></td>
+                                <td>12:00 PM - 12:30 PM</td>
+                            </tr>
+                            <tr>
+                                <td><span class="period-number">5</span></td>
+                                <td>12:35 PM - 1:30 PM</td>
+                            </tr>
+                            <tr>
+                                <td><span class="period-number">6</span></td>
+                                <td>1:35 PM - 2:30 PM</td>
+                            </tr>
+                            <tr>
+                                <td><span class="period-number">7</span></td>
+                                <td>2:35 PM - 3:30 PM</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Dashboard-specific JavaScript -->
+<script src="{{ url_for('static', filename='js/components/dashboard.js') }}"></script>
+<script src="{{ url_for('static', filename='js/modules/tab-system.js') }}"></script>
+<script>
+// Initialize dashboard after loading
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof ModernDashboardManager !== 'undefined') {
+        window.dashboardManager = new ModernDashboardManager();
+        window.dashboardManager.init();
+    }
+});
+
+// Schedule Modal Functions
+function openScheduleModal() {
+    const modal = document.getElementById('schedule-modal');
+    if (modal) {
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        modal.classList.add('active');
+        
+        // Add animation to table rows
+        const rows = modal.querySelectorAll('tbody tr');
+        rows.forEach((row, index) => {
+            row.style.opacity = '0';
+            row.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                row.style.transition = 'all 0.3s ease';
+                row.style.opacity = '1';
+                row.style.transform = 'translateY(0)';
+            }, 100 + (index * 50)); // Staggered animation
+        });
+    }
+}
+
+function closeScheduleModal() {
+    const modal = document.getElementById('schedule-modal');
+    if (modal) {
+        document.body.style.overflow = ''; // Restore scrolling
+        modal.classList.remove('active');
+        
+        // Reset animations for next open
+        setTimeout(() => {
+            if (!modal.classList.contains('active')) {
+                const rows = modal.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    row.style.transition = 'none';
+                    row.style.opacity = '0';
+                    row.style.transform = 'translateY(20px)';
+                });
+            }
+        }, 300);
+    }
+}
+</script>
 {% endblock %}

@@ -49,11 +49,35 @@ def fix_mime_types(response):
 
 # Initialize caching
 app.config.update(config.TEMPLATE_CACHE_CONFIG)
-cache = Cache(app)
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 logger.info("Template caching initialized")
 
 # Make cache available to templates
 app.jinja_env.globals['cache'] = cache
+
+# Add template filters
+@app.template_filter('markdown')
+def markdown_filter(text):
+    """Simple markdown filter for basic formatting"""
+    if not text:
+        return ""
+    
+    # Simple markdown processing
+    import re
+    
+    # Convert **bold** to <strong>
+    text = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', text)
+    
+    # Convert *italic* to <em>
+    text = re.sub(r'\*(.*?)\*', r'<em>\1</em>', text)
+    
+    # Convert `code` to <code>
+    text = re.sub(r'`(.*?)`', r'<code>\1</code>', text)
+    
+    # Convert line breaks to <br>
+    text = text.replace('\n', '<br>')
+    
+    return text
 
 # Initialize Firebase service
 firebase_service = None
@@ -99,18 +123,28 @@ else:
 
 # Register blueprints with error handling
 try:
+    # Import and register all route blueprints
     from routes.main_routes import main_bp
-    from routes.lesson_routes import lesson_bp
-    from routes.lesson_api import lesson_api_bp
-    from routes.dashboard_api import dashboard_api_bp
     from routes.auth_routes import auth_bp
+    from routes.lesson_routes import lesson_bp
+    from routes.dashboard_api import dashboard_api_bp
+    from routes.lesson_api import lesson_api_bp
+    from routes.docs_routes import docs_bp
+    from routes.firebase_check import firebase_check_bp
+    from routes.system_api import system_api_bp
+    from routes.recommendation_api import recommendation_api_bp
     
     app.register_blueprint(main_bp)
-    app.register_blueprint(lesson_bp)
-    app.register_blueprint(lesson_api_bp)
-    app.register_blueprint(dashboard_api_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')
-    logger.info("Blueprints registered successfully (including auth)")
+    app.register_blueprint(lesson_bp)
+    app.register_blueprint(dashboard_api_bp)
+    app.register_blueprint(lesson_api_bp)
+    app.register_blueprint(docs_bp)
+    app.register_blueprint(firebase_check_bp)
+    app.register_blueprint(system_api_bp)
+    app.register_blueprint(recommendation_api_bp)
+    
+    logger.info("Blueprints registered successfully")
 except Exception as e:
     logger.error(f"Failed to register blueprints: {str(e)}")
     raise
@@ -389,65 +423,18 @@ def debug_test_token():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/lesson/<lesson_id>')
-@login_required
-def lesson(lesson_id):
-    try:
-        # Get lesson data
-        lesson = firebase_service.get_lesson(lesson_id)
-        if not lesson:
-            flash('Lesson not found', 'error')
-            return redirect(url_for('lessons'))
-        
-        # Ensure lesson has proper structure
-        if 'blocks' not in lesson and 'content' in lesson:
-            # Transform content to blocks format
-            lesson['blocks'] = []
-            
-            # Handle different content formats
-            if isinstance(lesson['content'], str):
-                lesson['blocks'].append({
-                    'id': 'block-0',
-                    'type': 'text',
-                    'content': lesson['content']
-                })
-            elif isinstance(lesson['content'], list):
-                for i, item in enumerate(lesson['content']):
-                    if isinstance(item, dict):
-                        item['id'] = item.get('id', f'block-{i}')
-                        lesson['blocks'].append(item)
-                    else:
-                        lesson['blocks'].append({
-                            'id': f'block-{i}',
-                            'type': 'text',
-                            'content': str(item)
-                        })
-        
-        # Get user progress
-        user_progress = {}
-        if current_user.is_authenticated:
-            user_progress = firebase_service.get_user_lesson_progress(
-                current_user.id, lesson_id
-            ) or {}
-        
-        # Prepare current user data
-        current_user_data = None
-        if current_user.is_authenticated:
-            current_user_data = {
-                'id': current_user.id,
-                'email': current_user.email,
-                'display_name': current_user.display_name
-            }
-        
-        return render_template('lesson.html',
-                             lesson=lesson,
-                             user_progress=user_progress,
-                             current_user=current_user_data)
-    
-    except Exception as e:
-        logger.error(f"Error loading lesson {lesson_id}: {str(e)}")
-        flash('Error loading lesson', 'error')
-        return redirect(url_for('lessons'))
+# Lesson route moved to lesson_routes.py blueprint for ES6 modular system
+# @app.route('/lesson/<lesson_id>')
+# @login_required 
+# def lesson(lesson_id):
+#     # This route has been moved to routes/lesson_routes.py
+#     # to support the new ES6 modular lesson system
+#     pass
+
+@app.route('/test_logout')
+def test_logout_page():
+    """Test page for logout functionality"""
+    return render_template('test_logout.html')
 
 # Main entry point
 if __name__ == '__main__':

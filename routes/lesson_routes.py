@@ -2,6 +2,7 @@
 Lesson routes for Code with Morais
 """
 import traceback
+from datetime import datetime
 from flask import Blueprint, render_template, request, jsonify, session, current_app
 from models.user import get_current_user, get_user_progress
 from models.lesson import get_lesson, get_all_lessons, calculate_overall_progress
@@ -119,7 +120,7 @@ def lesson_view(lesson_id):
 
 @lesson_bp.route('/lesson/<lesson_id>')
 def lesson_fixed(lesson_id):
-    """Individual lesson page"""
+    """Individual lesson page with Firebase block transformation"""
     try:
         current_app.logger.info(f"=== LESSON ROUTE STARTED for lesson_id: {lesson_id} ===")
         
@@ -140,6 +141,16 @@ def lesson_fixed(lesson_id):
         
         current_app.logger.info(f"Lesson title: {lesson_data.get('title', 'No title')}")
         
+        # CRITICAL FIX: Only transform to blocks if requested by frontend
+        firebase_service = current_app.config.get('firebase_service')
+        if (
+            firebase_service and firebase_service.is_available() and not lesson_data.get('blocks')
+            and request.args.get('format') == 'blocks'
+        ):
+            current_app.logger.info("🔄 Transforming Firebase lesson data to blocks format (on request)...")
+            lesson_data = transform_lesson_to_blocks(lesson_data)
+            current_app.logger.info(f"✅ Transformation complete. Blocks created: {len(lesson_data.get('blocks', []))}")
+        
         # Get user progress for this lesson
         current_app.logger.info("Loading user progress")
         user_progress = get_user_progress(user['uid'] if user else 'dev-user-001')
@@ -147,7 +158,6 @@ def lesson_fixed(lesson_id):
         current_app.logger.info(f"User progress for lesson: {lesson_progress}")
         
         # Track lesson start if Firebase is available
-        firebase_service = current_app.config.get('firebase_service')
         if user and firebase_service and firebase_service.is_available():
             current_app.logger.info("Tracking lesson start activity")
             track_activity(user['uid'], 'lesson_started', {
@@ -316,7 +326,34 @@ def api_get_lesson(lesson_id):
             current_app.logger.error(f"Lesson {lesson_id} not found via API")
             return jsonify({'error': 'Lesson not found'}), 404
         
-        current_app.logger.info(f"API returning lesson data for: {lesson_data.get('title', 'Unknown')}")
+        # Ensure lesson data is in blocks format for API consumers
+        if not lesson_data.get('blocks') or not isinstance(lesson_data['blocks'], list):
+            lesson_data = transform_lesson_to_blocks(lesson_data)
+            
+        # Create default blocks if there are none
+        if not lesson_data.get('blocks') or len(lesson_data.get('blocks', [])) == 0:
+            current_app.logger.info(f"Creating default blocks for lesson {lesson_id}")
+            lesson_data['blocks'] = [
+                {
+                    'id': 'intro-block',
+                    'type': 'text',
+                    'title': 'Introduction',
+                    'content': lesson_data.get('description', 'Welcome to this lesson!'),
+                    'order': 0
+                }
+            ]
+            
+            # If there's content, add it as a block
+            if lesson_data.get('content'):
+                lesson_data['blocks'].append({
+                    'id': 'content-block',
+                    'type': 'text',
+                    'title': 'Content',
+                    'content': lesson_data.get('content'),
+                    'order': 1
+                })
+        
+        current_app.logger.info(f"API returning lesson data for: {lesson_data.get('title', 'Unknown')} with {len(lesson_data.get('blocks', []))} blocks")
         return jsonify(lesson_data)
         
     except Exception as e:
@@ -374,3 +411,156 @@ def api_execute_code():
     except Exception as e:
         current_app.logger.error(f"Error in code execution: {str(e)}")
         return jsonify({'error': 'Execution failed'}), 500
+
+def transform_lesson_to_blocks(lesson_data):
+    """Transform Firebase lesson format to unified block structure for frontend"""
+    current_app.logger.info("🔄 Starting lesson transformation to blocks...")
+    
+    if not lesson_data:
+        return lesson_data
+    
+    # If blocks already exist, return as-is
+    if lesson_data.get('blocks') and isinstance(lesson_data['blocks'], list):
+        current_app.logger.info("✅ Lesson already has blocks structure")
+        return lesson_data
+
+    blocks = []
+    block_id_counter = 0
+    
+    # 1. Convert content string to text blocks
+    if lesson_data.get('content') and isinstance(lesson_data['content'], str):
+        current_app.logger.info("📝 Converting content string to text blocks...")
+        
+        # Split content into meaningful sections
+        content_sections = lesson_data['content'].split('\n\n')
+        for section in content_sections:
+            section = section.strip()
+            if section:  # Only add non-empty sections
+                blocks.append({
+                    'id': f'text-{block_id_counter}',
+                    'type': 'text',
+                    'content': section,
+                    'order': block_id_counter,
+                    'completed': False
+                })
+                block_id_counter += 1
+        
+        current_app.logger.info(f"📝 Created {len([b for b in blocks if b['type'] == 'text'])} text blocks")
+    
+    # 2. Convert code_examples to code blocks
+    if lesson_data.get('code_examples') and isinstance(lesson_data['code_examples'], list):
+        current_app.logger.info("💻 Converting code examples to code blocks...")
+        
+        for example in lesson_data['code_examples']:
+            blocks.append({
+                'id': f'code-{block_id_counter}',
+                'type': 'code_example',
+                'title': example.get('title', f'Code Example {block_id_counter}'),
+                'code': example.get('code', ''),
+                'explanation': example.get('explanation', ''),
+                'language': example.get('language', 'python'),
+                'order': block_id_counter,
+                'completed': False,
+                'interactive': True,
+                'can_run': True,
+                'can_copy': True
+            })
+            block_id_counter += 1
+        
+        current_app.logger.info(f"💻 Created {len([b for b in blocks if b['type'] == 'code_example'])} code blocks")
+    
+    # 3. Convert exercises to interactive blocks
+    if lesson_data.get('exercises') and isinstance(lesson_data['exercises'], list):
+        current_app.logger.info("🚀 Converting exercises to interactive blocks...")
+        
+        for exercise in lesson_data['exercises']:
+            blocks.append({
+                'id': f'exercise-{block_id_counter}',
+                'type': 'interactive',
+                'title': exercise.get('title', f'Exercise {block_id_counter}'),
+                'description': exercise.get('description', ''),
+                'instructions': exercise.get('instructions', exercise.get('description', '')),
+                'starter_code': exercise.get('starter_code', ''),
+                'solution': exercise.get('solution', ''),
+                'hints': exercise.get('hints', []),
+                'test_cases': exercise.get('tests', []),
+                'order': block_id_counter,
+                'completed': False,
+                'interactive': True,
+                'requires_completion': True,
+                'editor_settings': {
+                    'language': 'python',
+                    'theme': 'monokai',
+                    'fontSize': 14,
+                    'showLineNumbers': True
+                }
+            })
+            block_id_counter += 1
+        
+        current_app.logger.info(f"🚀 Created {len([b for b in blocks if b['type'] == 'interactive'])} interactive blocks")
+    
+    # 4. Add quiz block if quiz_id exists
+    if lesson_data.get('quiz_id'):
+        current_app.logger.info("🧠 Adding quiz block...")
+        
+        blocks.append({
+            'id': f'quiz-{lesson_data["quiz_id"]}',
+            'type': 'quiz',
+            'quiz_id': lesson_data['quiz_id'],
+            'title': 'Knowledge Check',
+            'description': 'Test your understanding of this lesson',
+            'order': block_id_counter,
+            'completed': False,
+            'interactive': True,
+            'requires_completion': True,
+            'scoring': {
+                'passing_score': 70,
+                'max_attempts': 3,
+                'show_correct_answers': True
+            }
+        })
+        block_id_counter += 1
+        
+        current_app.logger.info("🧠 Created quiz block")
+    
+    # 5. Add navigation blocks for better UX
+    if len(blocks) > 0:
+        # Add lesson summary block at the end
+        blocks.append({
+            'id': 'lesson-summary',
+            'type': 'summary',
+            'title': 'Lesson Summary',
+            'description': f'You have completed {lesson_data.get("title", "this lesson")}!',
+            'order': block_id_counter,
+            'completed': False,
+            'summary_points': [
+                f'Completed {len([b for b in blocks if b["type"] == "text"])} concept sections',
+                f'Practiced with {len([b for b in blocks if b["type"] == "code_example"])} code examples',
+                f'Solved {len([b for b in blocks if b["type"] == "interactive"])} exercises'
+            ],
+            'rewards': {
+                'xp': lesson_data.get('xp_reward', 50),
+                'pycoins': lesson_data.get('pycoins_reward', 10)
+            }
+        })
+        block_id_counter += 1
+
+    # Sort blocks by order to ensure proper sequence
+    blocks.sort(key=lambda x: x.get('order', 0))
+    
+    # Add metadata to lesson
+    lesson_data.update({
+        'blocks': blocks,
+        'total_blocks': len(blocks),
+        'interactive_blocks': len([b for b in blocks if b.get('interactive', False)]),
+        'estimated_completion_time': len(blocks) * 2,  # 2 minutes per block estimate
+        'block_types': list(set(block['type'] for block in blocks)),
+        'transformation_timestamp': datetime.now().isoformat(),
+        'version': '2.0'
+    })
+    
+    current_app.logger.info(f"✅ Transformation complete! Created {len(blocks)} total blocks:")
+    for block in blocks:
+        current_app.logger.info(f"  - {block['type']}: {block.get('title', block.get('id'))}")
+    
+    return lesson_data

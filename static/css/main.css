@@ -11,15 +11,24 @@
 
 /* Essential Components Only - No Conflicts */
 @import url('components/dashboard-fixed.css');  /* Consolidated dashboard styles */
+@import url('components/dashboard-enhancements.css');  /* Dashboard visual polish */
+@import url('components/welcome-enhancements.css');  /* Enhanced welcome message */
 @import url('components/header-modern.css');    /* Modern header & navbar */
-@import url('components/buttons.css');          /* Button styles */
+@import url('components/buttons.css');          /* Basic button styles */
+@import url('components/buttons-enhanced.css'); /* Enhanced button styling */
+@import url('components/refresh-button-enhanced.css'); /* Enhanced refresh button */
+@import url('components/auth-enhanced.css');    /* Authentication form styles */
 @import url('components/cards.css');            /* Card components */
+@import url('components/modal.css');            /* Modal component styling */
+@import url('components/schedule.css');         /* Schedule table styling */
 @import url('components/skeleton.css');         /* Skeleton loader components */
+@import url('components/tab-system.css');       /* Isolated tab system component */
 @import url('components/notifications.css');    /* Notification system */
 @import url('components/responsive-enhancements.css'); /* Mobile-first responsive enhancements */
 
 /* Page-Specific Styles */
 @import url('pages/lesson.css');                /* Lesson page components */
+@import url('components/lesson.css');           /* Lesson components */
 
 /* Utilities - Load Last */
 @import url('utils/helpers.css');

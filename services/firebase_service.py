@@ -452,13 +452,13 @@ class FirebaseService:
             if date_str is None:
                 date_str = datetime.now().strftime('%Y-%m-%d')
             
-            challenges_ref = self.db.collection('daily_challenges')
-            query = challenges_ref.where('date', '==', date_str).limit(1)
+            # Direct document fetch by ID (date) instead of query
+            challenge_ref = self.db.collection('daily_challenges').document(date_str)
+            challenge = challenge_ref.get()
             
-            challenges = list(query.stream())
-            if challenges:
-                challenge_data = challenges[0].to_dict()
-                challenge_data['id'] = challenges[0].id
+            if challenge.exists:
+                challenge_data = challenge.to_dict()
+                challenge_data['id'] = challenge.id
                 logger.debug(f"Found daily challenge for {date_str}")
                 return challenge_data
             else:

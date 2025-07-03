@@ -81,6 +81,34 @@ def get_lesson_api(lesson_id):
         if lesson.get('quiz_id'):
             quiz_data = get_quiz(lesson['quiz_id'])
         
+        # Ensure lesson has blocks
+        if not lesson.get('blocks') or not isinstance(lesson.get('blocks'), list):
+            from routes.lesson_routes import transform_lesson_to_blocks
+            lesson = transform_lesson_to_blocks(lesson)
+            
+        # Create default blocks if there are none
+        if not lesson.get('blocks') or len(lesson.get('blocks', [])) == 0:
+            logger.info(f"Creating default blocks for lesson {lesson_id}")
+            lesson['blocks'] = [
+                {
+                    'id': 'intro-block',
+                    'type': 'text',
+                    'title': 'Introduction',
+                    'content': lesson.get('description', 'Welcome to this lesson!'),
+                    'order': 0
+                }
+            ]
+            
+            # If there's content, add it as a block
+            if lesson.get('content'):
+                lesson['blocks'].append({
+                    'id': 'content-block',
+                    'type': 'text',
+                    'title': 'Content',
+                    'content': lesson.get('content'),
+                    'order': 1
+                })
+        
         enhanced_lesson = {
             'id': lesson_id,
             'title': lesson.get('title', ''),
@@ -94,6 +122,7 @@ def get_lesson_api(lesson_id):
             'prerequisites': lesson.get('prerequisites', []),
             'tags': lesson.get('tags', []),
             'code_examples': lesson.get('code_examples', []),
+            'blocks': lesson.get('blocks', []),
             'quiz': quiz_data,
             'progress': {
                 'percentage': lesson_progress.get('progress', 0),

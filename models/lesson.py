@@ -168,16 +168,35 @@ def get_lesson(lesson_id: str) -> Optional[Dict[str, Any]]:
             return lesson_data
         else:
             logger.warning(f"Lesson {lesson_id} not found in Firebase, trying mock data")
+    else:
+        logger.warning(f"Firebase not available, using mock data for lesson {lesson_id}")
     
     # Fallback to mock data
     lesson_data = get_mock_lesson(lesson_id)
     if lesson_data:
         _enhance_lesson_data(lesson_data)
-        logger.info(f"Loaded lesson {lesson_id} from mock data")
+        logger.info(f"Loaded mock lesson {lesson_id}")
         return lesson_data
     
-    logger.error(f"Lesson {lesson_id} not found anywhere")
-    return None
+    # If we reach here, no data was found
+    logger.error(f"Lesson {lesson_id} not found in either Firebase or mock data")
+    
+    # Return a basic error lesson as last resort
+    return {
+        'id': lesson_id,
+        'title': 'Lesson Not Found',
+        'description': 'This lesson could not be found in our database.',
+        'error': True,
+        'content': [
+            {
+                'type': 'text',
+                'content': '# Lesson Not Found\n\nWe apologize, but the lesson you are looking for could not be found. This could be because:\n\n* The lesson ID is invalid\n* Firebase connection is not available\n* Mock data for this lesson ID does not exist\n\nPlease try another lesson or contact support if you believe this is an error.'
+            }
+        ],
+        'subtopics': [
+            {'id': 'error', 'title': 'Error', 'order': 1}
+        ]
+    }
 
 def get_all_lessons() -> List[Dict[str, Any]]:
     """Get all lessons from Firebase or mock"""

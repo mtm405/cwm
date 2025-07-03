@@ -1,209 +1,29 @@
 {% extends "base/layout.html" %}
-{% from "macros/lesson.html" import tab_button, code_block, back_link, progress_bar %}
 
 {% block title %}{{ lesson.title if lesson else "Lesson" }} - Code with Morais{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/lesson-content-blocks.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/lesson.css') }}">
 <style>
-/* Additional inline styles for lesson page specific adjustments */
-.lesson-container {
-    line-height: 1.8;
-}
-
-.text-block h1, .text-block h2, .text-block h3 {
-    color: var(--primary-color);
-    margin: 1rem 0;
-}
-
-.code-example {
-    background-color: var(--bg-secondary);
-}
-
-.code-header {
-    background-color: var(--bg-primary);
-    margin: -2rem -2rem 1rem -2rem;
-    padding: 1rem 2rem;
-    border-radius: 12px 12px 0 0;
-    font-weight: 500;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.btn-copy {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    padding: 0.5rem;
-    transition: color 0.3s ease;
-}
-
-.btn-copy:hover {
-    color: var(--primary-color);
-}
-
-.code-example pre {
-    background-color: transparent;
-    margin: 0;
-    padding: 0;
-    overflow-x: auto;
-}
-
-.code-example code {
-    font-family: 'Fira Code', 'Consolas', monospace;
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-.interactive-challenge h3 {
-    color: var(--secondary-color);
-    margin-bottom: 1rem;
-}
-
-.code-output {
-    margin-top: 1rem;
-    padding: 1rem;
-    background-color: var(--bg-secondary);
-    border-radius: 8px;
-    min-height: 50px;
-    font-family: monospace;
-}
-
-.output-success {
-    color: var(--success-color);
-}
-
-.output-success .rewards {
-    background-color: var(--success-color);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    margin: 0.5rem 0;
-    font-weight: bold;
-}
-
-.output-error {
-    color: var(--error-color);
-}
-
-.quiz-container {
-    margin: 2rem 0;
-    padding: 2rem;
-    background-color: var(--bg-secondary);
-    border-radius: 12px;
-    border: 2px solid var(--primary-color);
-}
-
-.quiz-question {
-    font-size: 1.1rem;
-    font-weight: 500;
-    margin-bottom: 1rem;
-    color: var(--text-primary);
-}
-
-.quiz-options {
-    list-style: none;
-    padding: 0;
-}
-
-.quiz-option {
-    margin: 0.5rem 0;
-    padding: 1rem;
-    background-color: var(--bg-primary);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-}
-
-.quiz-option:hover {
-    background-color: var(--bg-hover);
-    border-color: var(--primary-color);
-}
-
-.quiz-option.selected {
-    background-color: var(--primary-color);
-    color: white;
-}
-
-.quiz-option.correct {
-    background-color: var(--success-color);
-    color: white;
-}
-
-.quiz-option.incorrect {
-    background-color: var(--error-color);
-    color: white;
-}
-
-.lesson-progress-bar {
-    width: 100%;
-    height: 8px;
-    background-color: var(--bg-secondary);
-    border-radius: 4px;
-    margin: 1rem 0;
-    overflow: hidden;
-}
-
-.lesson-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-    border-radius: 4px;
-    transition: width 0.5s ease;
-}
-
-.block-completed {
-    opacity: 0.7;
-    transform: scale(0.98);
-    transition: all 0.3s ease;
-}
-
-.next-lesson-card {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    padding: 2rem;
-    border-radius: 12px;
-    text-align: center;
-    margin: 2rem 0;
-}
-
-.next-lesson-card h3 {
-    margin: 0 0 1rem 0;
-    color: white;
-}
-
-.btn-next-lesson {
-    background-color: white;
-    color: var(--primary-color);
-    border: none;
-    padding: 1rem 2rem;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-next-lesson:hover {
-    background-color: var(--bg-secondary);
-    transform: translateY(-2px);
-}
-
 /* Loading states */
 .content-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
     text-align: center;
-    padding: 3rem;
 }
 
 .loading-spinner {
     width: 40px;
     height: 40px;
-    border: 4px solid var(--bg-secondary);
-    border-top: 4px solid var(--primary-color);
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
     border-radius: 50%;
     animation: spin 1s linear infinite;
-    margin: 0 auto 1rem auto;
+    margin-bottom: 1rem;
 }
 
 @keyframes spin {
@@ -211,19 +31,48 @@
     100% { transform: rotate(360deg); }
 }
 
+/* Error state styling */
+.error-container {
+    text-align: center;
+    padding: 2rem;
+    background: var(--bg-card);
+    border-radius: 12px;
+    margin: 2rem auto;
+    max-width: 600px;
+}
+
+.error-icon {
+    font-size: 3rem;
+    color: var(--danger-color);
+    margin-bottom: 1rem;
+}
+
+.error-title {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.error-content {
+    color: var(--text-secondary);
+}
+
+.error-container .btn {
+    margin-top: 1rem;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
+    .lesson-container {
+        padding: 1rem;
+    }
+    
     .lesson-header {
-        padding: 1rem;
+        flex-direction: column;
+        gap: 1rem;
     }
     
-    .content-block {
-        margin: 1rem 0;
-        padding: 1rem;
-    }
-    
-    .code-editor {
-        height: 200px;
+    .lesson-meta {
+        text-align: center;
     }
 }
 </style>
@@ -231,1031 +80,207 @@
 
 {% block content %}
 <div class="lesson-container">
-    <!-- 🎯 LESSON HEADER SECTION -->
+    <!-- Lesson Header -->
     <header class="lesson-header">
-        {% include 'components/lesson/back-link.html' %}
+        <a href="/lessons" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Back to Lessons
+        </a>
         
         <div class="lesson-header-content">
             <div class="lesson-meta">
                 <h1 class="lesson-title">
-                    <i class="fas fa-{{ lesson.icon or 'code' }}"></i>
-                    {{ lesson.title }}
+                    <i class="fas fa-{{ lesson.icon if lesson and lesson.icon else 'code' }}"></i>
+                    {{ lesson.title if lesson else 'Loading...' }}
                 </h1>
+                
+                {% if lesson %}
                 <div class="lesson-badges">
-                    <span class="difficulty-badge {{ lesson.difficulty or 'beginner' }}">
-                        {{ (lesson.difficulty or 'beginner')|title }}
+                    <span class="difficulty-badge difficulty-{{ lesson.difficulty or 'beginner' }}">
+                        {{ lesson.difficulty or 'Beginner' }}
                     </span>
+                    {% if lesson.estimated_time %}
                     <span class="time-badge">
-                        <i class="fas fa-clock"></i> {{ lesson.estimated_time or 30 }}min
-                    </span>
-                    <span class="xp-badge">
-                        <i class="fas fa-star"></i> {{ lesson.xp_reward or 100 }} XP
-                    </span>
-                    {% if lesson.coin_reward %}
-                    <span class="coin-badge">
-                        <i class="fas fa-coins"></i> {{ lesson.coin_reward }} 🪙
+                        <i class="fas fa-clock"></i>
+                        {{ lesson.estimated_time }} min
                     </span>
                     {% endif %}
                 </div>
+                {% endif %}
             </div>
             
-            <!-- 📊 PROGRESS BAR SECTION -->
+            <!-- Progress Bar -->
             <div class="progress-section">
                 <div class="progress-header">
                     <span class="progress-text">Progress</span>
-                    <span class="progress-percentage" id="progress-percentage">{{ lesson_progress.progress or 0 }}%</span>
+                    <span class="progress-percentage" id="progress-percentage">0%</span>
                 </div>
                 <div class="progress-bar-container">
-                    <div class="progress-bar" id="lesson-progress-bar">
-                        <div class="progress-fill" id="progress-fill" style="width: {{ lesson_progress.progress or 0 }}%"></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
                     </div>
                 </div>
                 <div class="progress-stats">
-                    <span class="completed-blocks" id="completed-blocks-text">
-                        {{ lesson_progress.completed_blocks|length or 0 }} of {{ lesson.blocks|length or 0 }} blocks completed
-                    </span>
-                    <span class="earned-rewards" id="earned-rewards">
-                        {% if lesson_progress.xp_earned %}+{{ lesson_progress.xp_earned }} XP{% endif %}
-                        {% if lesson_progress.coins_earned %}+{{ lesson_progress.coins_earned }} 🪙{% endif %}
-                    </span>
+                    <span id="completed-blocks-text">0 of 0 blocks completed</span>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- 🗂️ SUBTOPIC NAVIGATION (conditional) -->
-    {% if lesson.subtopics %}
-    <nav class="subtopic-navigation" role="tablist">
-        <div class="subtopic-tabs">
-            {% for subtopic in lesson.subtopics %}
-            <button class="subtopic-tab {{ 'active' if loop.first else '' }}" 
-                    data-subtopic="{{ subtopic.id }}"
-                    role="tab"
-                    aria-selected="{{ 'true' if loop.first else 'false' }}"
-                    tabindex="{{ '0' if loop.first else '-1' }}"
-                    onclick="switchSubtopic({{ loop.index0 }})">
-                <i class="fas fa-{{ subtopic.icon or 'book' }}"></i>
-                <span class="tab-title">{{ subtopic.title|string }}</span>
-                <i class="fas fa-check-circle tab-check {{ 'completed' if subtopic.id in lesson_progress.completed_subtopics else '' }}"></i>
-            </button>
-            {% endfor %}
-        </div>
-    </nav>
-    {% endif %}
-
-    <!-- 📚 MAIN CONTENT AREA -->
+    <!-- Main Content Area -->
     <main class="lesson-content-wrapper">
-        
-        <!-- Loading Skeleton -->
+        <!-- Loading State -->
         <div id="content-loading" class="content-loading">
-            {% set component_type = 'lesson-content' %}
-            {% include 'components/common/skeleton-loader.html' %}
+            <div class="loading-spinner"></div>
+            <p>Loading lesson content...</p>
         </div>
         
-        <!-- Dynamic Content Container -->
+        <!-- Lesson Content -->
         <div id="lesson-content" class="lesson-content" style="display: none;">
-            <!-- Content blocks will be dynamically rendered here by JavaScript -->
             <div id="lesson-content-container" class="content-blocks-container">
-                <!-- Placeholder for dynamic content blocks -->
+                <!-- Blocks will be rendered here by JavaScript -->
             </div>
         </div>
         
-        <!-- Emergency Fallback Content -->
-        <div id="fallback-content" class="fallback-content" style="display: none;">
-            <div class="alert alert-warning">
-                <h4>📶 Connection Issue</h4>
-                <p>Having trouble loading the lesson? We've saved your progress locally.</p>
-                <button onclick="retryLoadContent()" class="btn btn-primary">
-                    <i class="fas fa-refresh"></i> Try Again
-                </button>
+        <!-- Error Fallback -->
+        <div id="lesson-fallback" class="fallback-content" style="display: none;">
+            <div class="error-container">
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="error-title">Unable to Load Lesson</h3>
+                <div class="error-content">
+                    <p>We encountered an error while loading this lesson. Please check your connection and try again.</p>
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-refresh"></i> Retry
+                    </button>
+                </div>
             </div>
         </div>
-        
     </main>
 
-    <!-- 🎯 LESSON NAVIGATION FOOTER -->
+    <!-- Navigation Footer -->
     <footer class="lesson-navigation">
         <div class="nav-buttons">
-            {% if lesson.subtopics %}
-            <!-- Previous Subtopic Button -->
-            <button id="prev-btn" class="nav-btn prev-btn" 
-                    onclick="previousSubtopic()" 
-                    style="display: flex;">
-                <i class="fas fa-arrow-left"></i>
-                <span class="nav-text">Previous</span>
+            <button id="prev-lesson-btn" class="btn btn-secondary" style="display: none;">
+                <i class="fas fa-arrow-left"></i> Previous Lesson
             </button>
-            {% elif prev_lesson %}
-            <a href="{{ url_for('lesson.lesson', lesson_id=prev_lesson.id) }}" 
-               class="nav-btn prev-btn">
-                <i class="fas fa-arrow-left"></i>
-                <span class="nav-text">
-                    <small>Previous</small>
-                    <strong>{{ prev_lesson.title|truncate(30) }}</strong>
-                </span>
-            </a>
-            {% endif %}
-            
-            <div class="nav-center">
-                <button id="lesson-menu-btn" class="lesson-menu-btn" onclick="toggleLessonMenu()">
-                    <i class="fas fa-list"></i>
-                    <span>Lesson Menu</span>
-                </button>
-            </div>
-            
-            {% if lesson.subtopics %}
-            <!-- Next Subtopic Button -->
-            <button id="next-btn" class="nav-btn next-btn" 
-                    onclick="nextSubtopic()"
-                    style="display: flex;">
-                <span class="nav-text">Next</span>
-                <i class="fas fa-arrow-right"></i>
+            <button id="next-lesson-btn" class="btn btn-primary" style="display: none;">
+                Next Lesson <i class="fas fa-arrow-right"></i>
             </button>
-            {% elif next_lesson %}
-            <a href="{{ url_for('lesson.lesson', lesson_id=next_lesson.id) }}" 
-               class="nav-btn next-btn" 
-               id="next-lesson-btn">
-                <span class="nav-text">
-                    <small>Next</small>
-                    <strong>{{ next_lesson.title|truncate(30) }}</strong>
-                </span>
-                <i class="fas fa-arrow-right"></i>
-            </a>
-            {% endif %}
         </div>
     </footer>
-
 </div>
 
-<!-- 🎉 CELEBRATION MODALS -->
-<div id="celebration-container"></div>
-
-<!-- 💡 HELP MODAL -->
-<div id="help-modal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>💡 Need Help?</h3>
-            <button class="modal-close" onclick="closeHelpModal()">&times;</button>
-        </div>
-        <div class="modal-body" id="help-content">
-            <!-- Dynamic help content -->
-        </div>
-    </div>
-</div>
-
-<!-- 📋 LESSON MENU SIDEBAR -->
-<div id="lesson-menu-sidebar" class="lesson-menu-sidebar">
-    <div class="sidebar-header">
-        <h3>📚 Lesson Progress</h3>
-        <button onclick="toggleLessonMenu()" class="sidebar-close">
-            <i class="fas fa-times"></i>
-        </button>
-    </div>
-    <div class="sidebar-content">
-        <!-- Dynamic lesson menu content -->
-    </div>
-</div>
-<!-- JavaScript for Dynamic Content Rendering -->
+<!-- Set lesson data for JavaScript -->
 <script>
-// Lesson data from backend (Firebase integration) - use globalThis for ES6 compatibility
-globalThis.lessonData = {{ lesson | tojson | safe }};
-globalThis.lessonProgress = {{ lesson_progress | tojson | safe }};
-globalThis.currentUser = {{ user | tojson | safe }};
+// Inject lesson data from backend
+window.lessonData = {{ lesson | tojson if lesson else 'null' }};
+window.lessonProgress = {{ lesson_progress | tojson if lesson_progress else '{}' }};
+window.currentUser = {{ current_user | tojson if current_user else 'null' }};
 
-// CRITICAL FIX: Initialize missing global variables
-globalThis.editors = {};
-globalThis.currentSubtopic = 0;
-
-// CRITICAL FIX: Transform lesson data to expected structure
-function transformLessonDataToBlocks(lesson) {
-    if (!lesson) return null;
-    
-    // If blocks already exist, return as is
-    if (lesson.blocks && Array.isArray(lesson.blocks)) {
-        return lesson;
-    }
-    
-    console.log('📦 Transforming lesson data to blocks structure...');
-    
-    // Create blocks array
-    lesson.blocks = [];
-    let blockOrder = 0;
-    
-    // 1. Create introduction block from main content
-    if (lesson.content) {
-        lesson.blocks.push({
-            id: `${lesson.id}-intro`,
-            type: 'text',
-            title: 'Introduction',
-            content: lesson.content,
-            order: blockOrder++,
-            subtopic_index: 0
-        });
-    }
-    
-    // 2. Add code examples as blocks
-    if (lesson.code_examples && Array.isArray(lesson.code_examples)) {
-        lesson.code_examples.forEach((example, index) => {
-            lesson.blocks.push({
-                id: `${lesson.id}-code-${index}`,
-                type: 'code_example',
-                title: example.title || `Example ${index + 1}`,
-                code: example.code,
-                explanation: example.explanation,
-                language: 'python',
-                order: blockOrder++,
-                subtopic_index: 0
-            });
-        });
-    }
-    
-    // 3. Add exercises as interactive blocks
-    if (lesson.exercises && Array.isArray(lesson.exercises)) {
-        lesson.exercises.forEach((exercise, index) => {
-            lesson.blocks.push({
-                id: `${lesson.id}-exercise-${index}`,
-                type: 'interactive',
-                title: exercise.title,
-                instructions: exercise.description,
-                starter_code: exercise.starter_code,
-                solution: exercise.solution,
-                hints: exercise.hints,
-                language: 'python',
-                order: blockOrder++,
-                subtopic_index: 1,  // Put in Practice subtopic
-                challenge_type: 'Exercise',
-                difficulty: lesson.difficulty
-            });
-        });
-    }
-    
-    // 4. Add quiz block if quiz_id exists
-    if (lesson.quiz_id) {
-        lesson.blocks.push({
-            id: `${lesson.id}-quiz`,
-            type: 'quiz',
-            quiz_id: lesson.quiz_id,
-            title: 'Knowledge Check',
-            description: 'Test your understanding of this lesson',
-            order: blockOrder++,
-            subtopic_index: 2  // Put in Assessment subtopic
-        });
-    }
-    
-    // 5. Fix subtopics structure
-    if (!lesson.subtopics || lesson.subtopics.length === 0) {
-        lesson.subtopics = ['Introduction', 'Practice', 'Assessment'];
-    } else if (lesson.subtopics && Array.isArray(lesson.subtopics)) {
-        lesson.subtopics = lesson.subtopics.map((subtopic, index) => {
-            // If subtopic is just a string, keep as string for template compatibility
-            if (typeof subtopic === 'string') {
-                return subtopic;
-            }
-            return subtopic.title || subtopic;
-        });
-    }
-    
-    console.log(`✅ Lesson data transformed: ${lesson.blocks.length} blocks created`);
-    return lesson;
-}
-
-// Apply transformation immediately
-globalThis.lessonData = transformLessonDataToBlocks(globalThis.lessonData);
-
-// Normalize lesson data immediately after loading - Phase 3 Enhancement
-if (globalThis.DataStructureNormalizer && globalThis.lessonData) {
-    try {
-        console.log('🔧 Normalizing lesson data structure...');
-        const validation = globalThis.DataStructureNormalizer.validateLessonData(globalThis.lessonData);
-        
-        if (validation.warnings.length > 0) {
-            console.warn('⚠️ Lesson data validation warnings:', validation.warnings);
-        }
-        
-        if (validation.errors.length > 0) {
-            console.error('❌ Lesson data validation errors:', validation.errors);
-            // Use comprehensive normalizer for error recovery
-            globalThis.lessonData = globalThis.DataStructureNormalizer.normalizeLessonDataComprehensive(globalThis.lessonData);
-        } else {
-            globalThis.lessonData = globalThis.DataStructureNormalizer.normalizeLessonData(globalThis.lessonData);
-        }
-        console.log('✅ Lesson data normalized successfully');
-    } catch (error) {
-        console.error('❌ Error normalizing lesson data:', error);
-        // Continue with original data if normalization fails
-    }
-} else if (!globalThis.DataStructureNormalizer) {
-    console.warn('⚠️ DataStructureNormalizer not available, data may be unstable');
-}
-
-// InitializationQueue (ES6 module) handles all timing coordination
-// No inline initialization needed - handled by the ES6 module
-
-function initializeLesson() {
-    console.log('🚀 Initializing lesson page...');
-    
-    try {
-        // Validate required elements
-        const requiredElements = ['lesson-content-container'];
-        const missingElements = requiredElements.filter(id => !document.getElementById(id));
-        
-        if (missingElements.length > 0) {
-            throw new Error(`Required elements not found: ${missingElements.join(', ')}`);
-        }
-        
-        // Safely hide loading and show content
-        const loadingElement = document.getElementById('content-loading');
-        const contentElement = document.getElementById('lesson-content');
-        
-        if (loadingElement) {
-            loadingElement.style.display = 'none';
-        }
-        if (contentElement) {
-            contentElement.style.display = 'block';
-        }
-        
-        // Ensure lesson data is properly structured
-        if (!globalThis.lessonData) {
-            throw new Error('No lesson data available');
-        }
-        
-        // Initialize progress if not exists
-        if (!globalThis.lessonProgress) {
-            globalThis.lessonProgress = {
-                completed_blocks: [],
-                progress: 0,
-                current_block: 0
-            };
-        }
-        if (!globalThis.lessonProgress.completed_blocks) {
-            globalThis.lessonProgress.completed_blocks = [];
-        }
-        
-        // Test Firebase data structure and integration
-        testFirebaseIntegration();
-        
-        // Render content based on structure
-        if (globalThis.lessonData.subtopics && globalThis.lessonData.subtopics.length > 0) {
-            console.log('📑 Rendering subtopic-based lesson...');
-            globalThis.currentSubtopic = 0;
-            renderSubtopic(0);
-        } else if (globalThis.lessonData.blocks && globalThis.lessonData.blocks.length > 0) {
-            console.log('📄 Rendering single-page lesson...');
-            renderLessonContent(globalThis.lessonData.blocks);
-        } else {
-            console.warn('⚠️ No structured content found, attempting legacy render...');
-            renderLegacyContent(globalThis.lessonData.content || 'No content available');
-        }
-        
-        // Update progress display
-        updateProgressDisplay();
-        
-        console.log('✅ Lesson initialization complete');
-        
-    } catch (error) {
-        console.error('❌ Failed to initialize lesson:', error);
-        showFallbackContent();
-    }
-}
-
-// This function is replaced by the comprehensive renderSubtopic below
-
-function renderLessonBlocks(blocks) {
-    const container = document.getElementById('lesson-content-container');
-    container.innerHTML = '';
-    
-    blocks.forEach((block, index) => {
-        const blockElement = createBlockElement(block, index);
-        container.appendChild(blockElement);
-    });
-    
-    // Initialize any interactive elements
-    initializeInteractiveElements();
-}
-
-function createBlockElement(block, index) {
-    // Phase 3 Fix: Enhanced data validation for block creation
-    if (!block) {
-        console.warn('⚠️ Null block at index:', index);
-        return null;
-    }
-    
-    const article = document.createElement('article');
-    article.className = `content-block ${block.type || 'unknown'}-block`;
-    article.id = `block-${block.id || index}`;
-    article.dataset.blockId = block.id || index;
-    article.dataset.blockType = block.type || 'text';
-    
-    // Add completion status with safe access
-    const isCompleted = globalThis.lessonProgress?.completed_blocks && 
-                       Array.isArray(globalThis.lessonProgress.completed_blocks) &&
-                       globalThis.lessonProgress.completed_blocks.includes(block.id);
-    if (isCompleted) {
-        article.classList.add('completed');
-    }
-    
-    // Render based on block type with fallback
-    try {
-        switch(block.type) {
-            case 'text':
-                article.innerHTML = createTextBlockHTML(block);
-                break;
-            case 'code_example':
-                article.innerHTML = createCodeExampleHTML(block);
-                break;
-            case 'interactive':
-                article.innerHTML = createInteractiveBlockHTML(block);
-                break;
-            case 'quiz':
-                article.innerHTML = createQuizBlockHTML(block);
-                break;
-            default:
-                console.warn('⚠️ Unknown block type:', block.type);
-                article.innerHTML = createDefaultBlockHTML(block);
-        }
-    } catch (error) {
-        console.error('❌ Error creating block element:', error);
-        article.innerHTML = `<div class="error-block">Error rendering block: ${error.message}</div>`;
-    }
-    
-    return article;
-}
-
-function createTextBlockHTML(block) {
-    return `
-        <div class="block-header">
-            <div class="block-icon">
-                <i class="fas fa-book-open"></i>
-            </div>
-            <div class="block-meta">
-                <span class="block-type">Reading</span>
-                <span class="block-progress-indicator" id="progress-${block.id}">
-                    <i class="fas fa-circle"></i>
-                </span>
-            </div>
-        </div>
-        
-        <div class="block-content">
-            <div class="text-content">
-                ${block.content || ''}
-            </div>
-            
-            ${block.key_points ? `
-            <div class="key-points">
-                <h4>🔑 Key Points:</h4>
-                <ul>
-                    ${block.key_points.map(point => `<li>${point}</li>`).join('')}
-                </ul>
-            </div>
-            ` : ''}
-        </div>
-        
-        <div class="block-actions">
-            <button onclick="markBlockComplete('${block.id}')" 
-                    class="btn btn-success complete-btn">
-                <i class="fas fa-check"></i> Mark as Read
-            </button>
-        </div>
-    `;
-}
-
-function createCodeExampleHTML(block) {
-    return `
-        <div class="block-header">
-            <div class="block-icon">
-                <i class="fas fa-code"></i>
-            </div>
-            <div class="code-meta">
-                <span class="language-badge">${(block.language || 'python').toUpperCase()}</span>
-                <button class="btn-copy" onclick="copyCodeBlock('${block.id}')">
-                    <i class="fas fa-copy"></i> Copy
-                </button>
-            </div>
-        </div>
-        
-        <div class="code-container">
-            <div class="code-header">
-                <span class="code-title">${block.title || 'Example Code'}</span>
-            </div>
-            
-            <pre class="code-content" id="code-${block.id}"><code class="language-${block.language || 'python'}">${block.code || ''}</code></pre>
-            
-            ${block.explanation ? `
-            <div class="code-explanation">
-                <h5>💡 Explanation:</h5>
-                <p>${block.explanation}</p>
-            </div>
-            ` : ''}
-        </div>
-    `;
-}
-
-function createInteractiveBlockHTML(block) {
-    return `
-        <div class="block-header">
-            <div class="block-icon">
-                <i class="fas fa-laptop-code"></i>
-            </div>
-            <div class="challenge-meta">
-                <span class="challenge-type">${block.challenge_type || 'Code Challenge'}</span>
-                <span class="difficulty">${block.difficulty || 'Beginner'}</span>
-            </div>
-        </div>
-        
-        <div class="challenge-content">
-            <div class="challenge-instructions">
-                <h4>🎯 Your Challenge:</h4>
-                <p>${block.instructions || ''}</p>
-                
-                ${block.requirements ? `
-                <div class="requirements">
-                    <h5>📋 Requirements:</h5>
-                    <ul>
-                        ${block.requirements.map(req => `<li>${req}</li>`).join('')}
-                    </ul>
-                </div>
-                ` : ''}
-            </div>
-            
-            <div class="code-editor-wrapper">
-                <div class="editor-toolbar">
-                    <span class="editor-label">${block.language || 'Python'} Editor</span>
-                    <div class="editor-actions">
-                        <button onclick="getHint('${block.id}')" class="btn btn-sm btn-hint">
-                            <i class="fas fa-lightbulb"></i> Hint (5 🪙)
-                        </button>
-                        <button onclick="resetCode('${block.id}')" class="btn btn-sm btn-reset">
-                            <i class="fas fa-undo"></i> Reset
-                        </button>
-                    </div>
-                </div>
-                
-                <div id="editor-${block.id}" class="code-editor">${block.starter_code || ''}</div>
-                
-                <div class="editor-footer">
-                    <button onclick="runInteractiveCode('${block.id}')" 
-                            class="btn btn-primary run-btn">
-                        <i class="fas fa-play"></i> Run Code
-                    </button>
-                    <button onclick="showSolution('${block.id}')" 
-                            class="btn btn-outline solution-btn">
-                        <i class="fas fa-eye"></i> Show Solution
-                    </button>
-                </div>
-            </div>
-            
-            <div class="output-section">
-                <div class="output-header">
-                    <i class="fas fa-terminal"></i> Output & Results
-                </div>
-                <div id="output-${block.id}" class="ide-output"></div>
-                
-                ${block.tests ? `
-                <div class="test-results" id="tests-${block.id}">
-                    <h5>🧪 Test Results:</h5>
-                    <div class="test-list">
-                        <!-- Test results will be populated here -->
-                    </div>
-                </div>
-                ` : ''}
-            </div>
-        </div>
-    `;
-}
-
-function createQuizBlockHTML(block) {
-    return `
-        <div class="block-header">
-            <div class="block-icon">
-                <i class="fas fa-brain"></i>
-            </div>
-            <div class="quiz-meta">
-                <span class="quiz-type">Knowledge Check</span>
-            </div>
-        </div>
-        
-        <div class="quiz-content">
-            <div class="quiz-intro">
-                <h4>🧠 Test Your Understanding</h4>
-                <p>${block.description || 'Complete this quiz to test your knowledge.'}</p>
-            </div>
-            
-            <div id="quiz-${block.quiz_id || block.id}" data-quiz-id="${block.quiz_id || block.id}">
-                <div class="spinner">Loading quiz...</div>
-            </div>
-        </div>
-    `;
-}
-
-function createDefaultBlockHTML(block) {
-    return `
-        <div class="block-header">
-            <div class="block-icon">
-                <i class="fas fa-question"></i>
-            </div>
-            <div class="block-meta">
-                <span class="block-type">Unknown Block Type: ${block.type}</span>
-            </div>
-        </div>
-        
-        <div class="block-content">
-            <p>This block type (${block.type}) is not yet supported.</p>
-            <pre>${JSON.stringify(block, null, 2)}</pre>
-        </div>
-    `;
-}
-
-// Utility functions
-function showNotification(message, type = 'info') {
-    console.log(`${type.toUpperCase()}: ${message}`);
-    
-    // Create simple notification if no notification system exists
-    if (typeof showToast === 'function') {
-        showToast(message, type);
-    } else {
-        // Fallback notification
-        const notification = document.createElement('div');
-        notification.className = `notification notification-${type}`;
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
-            color: white;
-            padding: 1rem;
-            border-radius: 8px;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        `;
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        
-        // Animate in
-        setTimeout(() => notification.style.opacity = '1', 100);
-        
-        // Auto remove
-        setTimeout(() => {
-            notification.style.opacity = '0';
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
-    }
-}
-
-function showFallbackContent() {
-    const fallbackElement = document.getElementById('fallback-content');
-    const contentElement = document.getElementById('lesson-content');
-    
-    if (fallbackElement) {
-        fallbackElement.style.display = 'block';
-    }
-    if (contentElement) {
-        contentElement.style.display = 'none';
-    }
-    
-    console.warn('⚠️ Showing fallback content due to initialization failure');
-}
-
-function retryLoadContent() {
-    const fallbackElement = document.getElementById('fallback-content');
-    const loadingElement = document.getElementById('content-loading');
-    
-    if (fallbackElement) {
-        fallbackElement.style.display = 'none';
-    }
-    if (loadingElement) {
-        loadingElement.style.display = 'block';
-    }
-    
-    setTimeout(() => {
-        initializeLesson();
-    }, 1000);
-}
-
-function renderLegacyContent(content) {
-    const container = document.getElementById('lesson-content-container');
-    if (!container) return;
-    
-    container.innerHTML = `
-        <div class="content-block text-block">
-            <div class="block-header">
-                <div class="block-icon">
-                    <i class="fas fa-book"></i>
-                </div>
-                <div class="block-meta">
-                    <span class="block-type">Lesson Content</span>
-                </div>
-            </div>
-            <div class="block-content">
-                <div class="text-content">
-                    ${typeof content === 'string' ? content.replace(/\n/g, '<br>') : 'No content available'}
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-function updateProgressDisplay() {
-    const totalBlocks = globalThis.lessonData.blocks ? globalThis.lessonData.blocks.length : 0;
-    const completedBlocks = globalThis.lessonProgress.completed_blocks ? 
-        globalThis.lessonProgress.completed_blocks.length : 0;
-    const progress = totalBlocks > 0 ? Math.round((completedBlocks / totalBlocks) * 100) : 0;
-    
-    // Update progress bar if it exists
-    const progressBar = document.getElementById('progress-fill');
-    const progressText = document.getElementById('progress-percentage');
-    const completedText = document.getElementById('completed-blocks-text');
-    
-    if (progressBar) {
-        progressBar.style.width = progress + '%';
-    }
-    if (progressText) {
-        progressText.textContent = progress + '%';
-    }
-    if (completedText) {
-        completedText.textContent = `${completedBlocks} of ${totalBlocks} blocks completed`;
-    }
-    
-    // Update lesson progress
-    globalThis.lessonProgress.progress = progress;
-}
-
-function initializeInteractiveElements() {
-    // Initialize ACE editors for interactive blocks
-    document.querySelectorAll('.code-editor').forEach(editor => {
-        if (editor.id && typeof ace !== 'undefined') {
-            try {
-                const aceEditor = ace.edit(editor.id);
-                aceEditor.setTheme('ace/theme/monokai');
-                aceEditor.session.setMode('ace/mode/python');
-                aceEditor.setOptions({
-                    showPrintMargin: false,
-                    fontSize: 14
-                });
-                globalThis.editors[editor.id] = aceEditor;
-            } catch (error) {
-                console.warn('Failed to initialize ACE editor for', editor.id, error);
-            }
-        }
-    });
-    
-    // Initialize quiz systems
-    document.querySelectorAll('[data-quiz-id]').forEach(quizElement => {
-        // Quiz initialization would go here
-        console.log('Quiz element found:', quizElement.dataset.quizId);
-    });
-}
-
-// Global function to toggle lesson menu
-function toggleLessonMenu() {
-    const sidebar = document.getElementById('lesson-menu-sidebar');
-    if (sidebar) {
-        sidebar.classList.toggle('active');
-    } else {
-        console.warn('⚠️ Lesson menu sidebar not found');
-    }
-}
+// Set lesson ID meta tag
+{% if lesson %}
+document.querySelector('meta[name="lesson-id"]')?.setAttribute('content', '{{ lesson.id }}') || 
+document.head.appendChild(Object.assign(document.createElement('meta'), {
+    name: 'lesson-id',
+    content: '{{ lesson.id }}'
+}));
+{% endif %}
 </script>
-
 {% endblock %}
 
-<!-- 🚀 Lesson Page Scripts - ES6 Modules -->
 {% block extra_js %}
-<!-- 🛡️ Error Recovery System - Load first for maximum coverage -->
-<script src="{{ url_for('static', filename='js/utils/errorRecoverySystem.js') }}"></script>
-<script src="{{ url_for('static', filename='js/utils/errorRecoveryIntegration.js') }}"></script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
 
-<!-- Data Structure Utils - Load first to ensure availability -->
-<script src="{{ url_for('static', filename='js/utils/dataStructureNormalizer.js') }}"></script>
-
-<!-- Quiz components - Load as ES6 modules -->
-<script type="module" src="{{ url_for('static', filename='js/quiz/QuizEngine.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='js/quiz/QuizController.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='js/quiz/QuizState.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='js/quiz/renderers/MultipleChoiceRenderer.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='js/quiz/renderers/TrueFalseRenderer.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='js/quiz/renderers/FillBlankRenderer.js') }}"></script>
-
-<!-- Editor components - Convert to modules or use UMD pattern -->
-<script type="module" src="{{ url_for('static', filename='js/editor/codeSubmissionHandler.js') }}"></script>
-
-<!-- Module Initializer - Handles ES6 module initialization -->
-<script type="module" src="{{ url_for('static', filename='js/core/moduleInitializer.js') }}"></script>
-
-<!-- Initialization Queue - ES6 Module for proper timing coordination -->
-<script type="module" src="{{ url_for('static', filename='js/core/initializationQueue.js') }}"></script>
-
-<!-- Phase 8: Test Suite - Load in development mode -->
-<script type="module" src="{{ url_for('static', filename='js/core/LessonSystemTest.js') }}"></script>
-{% endblock %}
-
+<!-- Initialize Firebase -->
 <script>
-// Current subtopic tracking
-let currentSubtopicIndex = 0;
-// Use safe default values if template variables aren't available at runtime
-let subtopics = window.lessonData && window.lessonData.subtopics ? window.lessonData.subtopics : [];
-let completedSubtopics = window.lessonProgress && window.lessonProgress.completed_subtopics ? window.lessonProgress.completed_subtopics : [];
-
-// Initialize ACE Editor - handled by InitializationQueue
-// Editor initialization will be handled by the main initialization queue
-
-function switchLessonTab(subtopicId) {
-    // Update active tab
-    document.querySelectorAll('.lesson-tab').forEach(tab => {
-        tab.classList.remove('active');
-        if (tab.getAttribute('data-subtopic-id') === subtopicId) {
-            tab.classList.add('active');
-            currentSubtopicIndex = subtopics.findIndex(s => s.id === subtopicId);
-        }
-    });
-    
-    // Update content (in a real app, this would load subtopic-specific content)
-    updateCompleteButton();
-}
-
-function updateCompleteButton() {
-    const currentSubtopic = subtopics[currentSubtopicIndex];
-    const btn = document.getElementById('complete-subtopic-btn');
-    
-    if (!btn) return; // Guard clause to prevent null reference error
-    
-    if (completedSubtopics.includes(currentSubtopic.id)) {
-        btn.textContent = 'Γ£ô Completed';
-        btn.disabled = true;
-    } else {
-        btn.textContent = 'Mark as Complete';
-        btn.disabled = false;
-    }
-}
-
-async function completeCurrentSubtopic() {
-    const currentSubtopic = subtopics[currentSubtopicIndex];
-    
+// Initialize Firebase when SDK is loaded
+window.initFirebase = async function() {
     try {
-        const response = await fetch('/api/lesson/complete-subtopic', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                lesson_id: '{{ lesson.id }}',
-                subtopic_id: currentSubtopic.id
-            })
-        });
+        // Check if Firebase SDK is available
+        if (typeof firebase === 'undefined') {
+            console.warn('⚠️ Firebase SDK not loaded');
+            return false;
+        }
         
-        const result = await response.json();
+        // Get Firebase configuration from backend
+        const response = await fetch('/api/firebase-config');
+        const data = await response.json();
         
-        if (result.success) {
-            // Update UI
-            completedSubtopics.push(currentSubtopic.id);
-            
-            // Update progress bar
-            document.getElementById('progress-percentage').textContent = result.new_progress + '%';
-            document.getElementById('lesson-progress-fill').style.width = result.new_progress + '%';
-            
-            // Update tab check mark
-            const tab = document.querySelector(`[data-subtopic-id="${currentSubtopic.id}"]`);
-            const checkIcon = tab.querySelector('.tab-check');
-            checkIcon.classList.add('completed');
-            
-            // Update button
-            updateCompleteButton();
-            
-            // Show reward notification
-            showNotification(`Subtopic completed! +${result.xp_earned} XP earned! ≡ƒÄë`);
-            
-            if (result.lesson_completed) {
-                setTimeout(() => {
-                    showNotification('Lesson completed! Great job! ≡ƒÅå');
-                }, 1000);
+        if (data && !data.error) {
+            // Initialize Firebase with backend config
+            if (firebase.apps.length === 0) {
+                firebase.initializeApp(data);
+                console.log('✅ Firebase initialized successfully');
+            } else {
+                console.log('✅ Firebase already initialized');
             }
+            return true;
+        } else {
+            console.warn('⚠️ Firebase not available from backend:', data.error || 'No config');
+            return false;
         }
     } catch (error) {
-        console.error('Error completing subtopic:', error);
-        showNotification('Error saving progress. Please try again.', 'error');
+        console.error('❌ Firebase initialization failed:', error);
+        return false;
     }
-}
-
-function previousSubtopic() {
-    if (currentSubtopicIndex > 0) {
-        const prevSubtopic = subtopics[currentSubtopicIndex - 1];
-        switchLessonTab(prevSubtopic.id);
-    }
-}
-
-function nextSubtopic() {
-    if (currentSubtopicIndex < subtopics.length - 1) {
-        const nextSubtopic = subtopics[currentSubtopicIndex + 1];
-        switchLessonTab(nextSubtopic.id);
-    }
-}
-
-function copyCode(button) {
-    const codeBlock = button.closest('.code-example').querySelector('code');
-    const text = codeBlock.textContent;
-    
-    navigator.clipboard.writeText(text).then(() => {
-        const originalHTML = button.innerHTML;
-        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
-        setTimeout(() => {
-            button.innerHTML = originalHTML;
-        }, 2000);
-    });
-}
-
-/**
- * Debug function to check authentication state
- * Add this to your console to check auth state
- */
-window.debugAuth = function() {
-    console.log('=== Auth Debug Info ===');
-    console.log('Token in localStorage:', localStorage.getItem('auth_token'));
-    
-    // Check if authService exists and get its properties
-    if (window.authService) {
-        console.log('AuthService available:', !!window.authService);
-        console.log('Token in authService:', window.authService.token);
-        console.log('Current User:', window.authService.currentUser);
-        console.log('Is Authenticated:', window.authService.isAuthenticated());
-        console.log('Is Initialized:', window.authService.initialized);
-    } else {
-        console.log('AuthService not available');
-    }
-    
-    // Check global user objects
-    console.log('globalThis.currentUser:', globalThis.currentUser);
-    console.log('window.currentUser:', window.currentUser);
-    
-    // Check other auth managers
-    if (window.authManager) {
-        console.log('AuthManager available:', !!window.authManager);
-        console.log('AuthManager user:', window.authManager.getCurrentUser());
-        console.log('AuthManager authenticated:', window.authManager.isUserAuthenticated());
-    }
-    
-    // Check session storage
-    console.log('SessionStorage auth_token:', sessionStorage.getItem('auth_token'));
-    console.log('LocalStorage user data:', localStorage.getItem('user_data'));
-    
-    return {
-        authService: window.authService,
-        authManager: window.authManager,
-        currentUser: globalThis.currentUser || window.currentUser,
-        localStorage: {
-            auth_token: localStorage.getItem('auth_token'),
-            user_data: localStorage.getItem('user_data')
-        },
-        sessionStorage: {
-            auth_token: sessionStorage.getItem('auth_token')
-        }
-    };
 };
 
-// Make it available globally for easy access
-globalThis.debugAuth = window.debugAuth;
+// Initialize Firebase immediately
+window.initFirebase();
+</script>
 
-// Auto-run once for immediate debugging (can be commented out in production)
-if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.includes('dev')) {
-    console.log('🔧 Running auth debug in development mode...');
-    setTimeout(() => {
-        try {
-            debugAuth();
-        } catch (error) {
-            console.error('Error running debug auth:', error);
-        }
-    }, 1000);
-}
+<!-- ACE Editor for code blocks -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/mode-python.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/theme-monokai.js"></script>
 
-// Initialize lesson when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('📄 DOM loaded, initializing lesson...');
+<!-- Main Lesson System (ES6 Module) -->
+<script type="module">
+import { LessonSystem } from '{{ url_for("static", filename="js/lesson/lessonSystem.js") }}';
+
+// Initialize lesson system when DOM is ready
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🚀 Initializing lesson system...');
     
-    // Wait a bit for all scripts to load
-    setTimeout(() => {
-        try {
-            initializeLesson();
-        } catch (error) {
-            console.error('❌ Failed to initialize lesson:', error);
-            showFallbackContent();
+    try {
+        // Wait a bit for Firebase to initialize
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        const lessonSystem = new LessonSystem();
+        await lessonSystem.initialize();
+        
+        console.log('✅ Lesson system initialized successfully');
+        
+        // Make available globally for debugging
+        window.lessonSystem = lessonSystem;
+        
+        // Initialize test system if in debug mode
+        if (window.location.search.includes('test=true')) {
+            const { LessonSystemTest } = await import('{{ url_for("static", filename="js/lesson/debug/lessonSystemTest.js") }}');
+            const tester = new LessonSystemTest();
+            await tester.runAllTests();
         }
-    }, 100);
-});
-
-// Also set up a fallback initialization
-window.addEventListener('load', function() {
-    // Check if already initialized
-    const container = document.getElementById('lesson-content-container');
-    if (container && container.children.length === 0) {
-        console.log('⚠️ Lesson not initialized, attempting now...');
-        setTimeout(() => {
-            try {
-                initializeLesson();
-            } catch (error) {
-                console.error('❌ Fallback initialization failed:', error);
-                showFallbackContent();
+        
+    } catch (error) {
+        console.error('❌ Failed to initialize lesson system:', error);
+        
+        // Show error state
+        const loading = document.getElementById('content-loading');
+        const fallback = document.getElementById('lesson-fallback');
+        
+        if (loading) loading.style.display = 'none';
+        if (fallback) {
+            fallback.style.display = 'block';
+            const errorText = fallback.querySelector('.alert p');
+            if (errorText) {
+                errorText.textContent = `Failed to initialize lesson system: ${error.message}`;
             }
-        }, 500);
+        }
     }
 });
-
-console.log('✅ Lesson initialization scripts loaded');
 </script>
+{% endblock %}

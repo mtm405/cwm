@@ -217,7 +217,7 @@ def component_test_api(component_name):
         
         # Generate test code
         props_str = ", ".join([f"{k}={repr(v)}" for k, v in test_props.items()])
-        test_code = f"{% include '{component.template_path}' with {props_str} %}"
+        test_code = f"{{% include '{component.template_path}' with {props_str} %}}"
         
         # TODO: Implement actual component rendering
         # For now, return the code that would be used

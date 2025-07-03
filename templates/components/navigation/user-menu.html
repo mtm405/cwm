@@ -15,18 +15,18 @@
 
 <!-- User Profile -->
 <div class="user-profile-modern">
-    <div class="user-dropdown-modern">
+    <div class="user-dropdown-modern" id="userDropdown" onclick="toggleUserDropdown(event)">
         <img src="{{ user.profile_picture or '/static/img/default-avatar.png' }}" alt="Profile" class="user-avatar-modern">
         <span class="user-name-modern">{{ user.display_name or user.username or user.email }}</span>
         <i class="fas fa-chevron-down dropdown-arrow"></i>
-        <div class="dropdown-menu-modern">
+        <div class="dropdown-menu-modern" id="userDropdownMenu">
             <a href="/profile"><i class="fas fa-user"></i> Profile</a>
             <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
             {% if user.is_admin %}
             <a href="/admin"><i class="fas fa-shield-alt"></i> Admin</a>
             {% endif %}
             <hr class="dropdown-divider">
-            <button onclick="signOut()" class="sign-out-btn-modern"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+            <button onclick="signOut(); event.preventDefault();" class="sign-out-btn-modern"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
         </div>
     </div>
 </div>
