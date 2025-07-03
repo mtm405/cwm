@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Handling Test</title>
+    <style>
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        .test-btn {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+        }
+        .test-btn:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🚨 Error Handling Test</h1>
+        
+        <div class="test-section">
+            <h3>API Error Scenarios</h3>
+            <button class="test-btn" onclick="testInvalidLessonId()">Test Invalid Lesson ID</button>
+            <button class="test-btn" onclick="testNetworkError()">Test Network Error</button>
+            <button class="test-btn" onclick="testMalformedData()">Test Malformed Data</button>
+            <div id="api-results" class="result" style="display: none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Lesson System Error Handling</h3>
+            <button class="test-btn" onclick="testLessonSystemError()">Test Lesson System Error</button>
+            <button class="test-btn" onclick="testProgressError()">Test Progress Error</button>
+            <div id="system-results" class="result" style="display: none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Offline Functionality</h3>
+            <button class="test-btn" onclick="testOfflineMode()">Test Offline Mode</button>
+            <div id="offline-results" class="result" style="display: none;"></div>
+        </div>
+    </div>
+    
+    <script>
+        async function testInvalidLessonId() {
+            try {
+                const response = await fetch('/api/lessons/invalid-lesson-id');
+                const data = await response.json();
+                
+                showResult('api-results', 
+                    response.ok ? 'UNEXPECTED: Got valid response for invalid lesson' : 
+                    `✅ EXPECTED: Got error ${response.status} for invalid lesson`,
+                    response.ok ? 'error' : 'success'
+                );
+            } catch (error) {
+                showResult('api-results', `✅ EXPECTED: Network error - ${error.message}`, 'success');
+            }
+        }
+        
+        async function testNetworkError() {
+            try {
+                const response = await fetch('/api/lessons/test', { 
+                    signal: AbortSignal.timeout(1) // Force timeout
+                });
+                showResult('api-results', 'UNEXPECTED: Request should have timed out', 'error');
+            } catch (error) {
+                showResult('api-results', `✅ EXPECTED: Network timeout - ${error.message}`, 'success');
+            }
+        }
+        
+        async function testMalformedData() {
+            try {
+                const response = await fetch('/api/lessons/python-basics-01');
+                const text = await response.text();
+                
+                // Try to parse as JSON to check if it's malformed
+                try {
+                    JSON.parse(text);
+                    showResult('api-results', '✅ EXPECTED: Valid JSON response', 'success');
+                } catch (parseError) {
+                    showResult('api-results', `❌ ISSUE: Malformed JSON - ${parseError.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('api-results', `❌ ISSUE: Network error - ${error.message}`, 'error');
+            }
+        }
+        
+        async function testLessonSystemError() {
+            try {
+                // Test lesson system with invalid data
+                if (window.lessonSystem) {
+                    // Try to load invalid lesson
+                    await window.lessonSystem.loadLesson('invalid-lesson');
+                    showResult('system-results', 'UNEXPECTED: Should have thrown error', 'error');
+                } else {
+                    showResult('system-results', '⚠️ Lesson system not available for testing', 'error');
+                }
+            } catch (error) {
+                showResult('system-results', `✅ EXPECTED: Lesson system error handled - ${error.message}`, 'success');
+            }
+        }
+        
+        async function testProgressError() {
+            try {
+                const response = await fetch('/api/lessons/invalid-lesson/progress', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ invalid: 'data' })
+                });
+                
+                showResult('system-results', 
+                    response.ok ? 'UNEXPECTED: Progress save should have failed' : 
+                    `✅ EXPECTED: Progress error ${response.status}`,
+                    response.ok ? 'error' : 'success'
+                );
+            } catch (error) {
+                showResult('system-results', `✅ EXPECTED: Progress error - ${error.message}`, 'success');
+            }
+        }
+        
+        async function testOfflineMode() {
+            // Simulate offline by trying to access a resource that doesn't exist
+            try {
+                const response = await fetch('/offline-test-endpoint');
+                showResult('offline-results', 
+                    response.ok ? 'UNEXPECTED: Offline endpoint should not exist' : 
+                    `✅ EXPECTED: Offline simulation - ${response.status}`,
+                    response.ok ? 'error' : 'success'
+                );
+            } catch (error) {
+                showResult('offline-results', `✅ EXPECTED: Offline mode error - ${error.message}`, 'success');
+            }
+        }
+        
+        function showResult(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `result ${type}`;
+            element.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
