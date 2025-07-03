@@ -100,6 +100,30 @@
 </style>
 
 <script>
+// Set up global configuration for authentication
+window.CONFIG = {
+    API_BASE_URL: '/api',
+    DEBUG: true,
+    GOOGLE_CLIENT_ID: '{{ google_client_id }}',
+    APP_NAME: 'Code with Morais'
+};
+
+console.log('🔐 Homepage CONFIG initialized:', window.CONFIG);
+
+// Initialize Google Auth when everything is ready
+function initializeGoogleAuth() {
+    if (window.GoogleAuth && window.CONFIG && window.CONFIG.GOOGLE_CLIENT_ID) {
+        console.log('🔄 Initializing Google Auth from homepage');
+        window.GoogleAuth.init();
+    } else {
+        console.log('⏳ Waiting for Google Auth module to load...');
+        setTimeout(initializeGoogleAuth, 100);
+    }
+}
+
+// Start initialization
+initializeGoogleAuth();
+
 // Intersection Observer for scroll animations
 document.addEventListener('DOMContentLoaded', function() {
     const observerOptions = {

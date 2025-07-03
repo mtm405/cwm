@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Code Editor Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .code-editor {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .buttons {
+            margin: 20px 0;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 10px 10px 0;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .output {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border: 1px solid #e9ecef;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Enhanced Code Editor Test</h1>
+        <p>This page tests the Enhanced Code Editor integration with Phase 3 features.</p>
+        
+        <div id="status" class="status info">
+            Initializing...
+        </div>
+        
+        <div id="editor-test-1" class="code-editor"># Write your Python code here
+print("Hello, World!")
+
+# Try some variables
+name = "Student"
+print(f"Welcome, {name}!")
+
+# Do some math
+result = 2 + 2
+print(f"2 + 2 = {result}")
+</div>
+        
+        <div class="buttons">
+            <button id="run-btn-test-1" class="btn run-btn" data-block-id="test-1">
+                ▶️ Run Code
+            </button>
+            <button id="reset-btn-test-1" class="btn reset-btn" data-block-id="test-1">
+                🔄 Reset
+            </button>
+            <button id="hint-btn-test-1" class="btn hint-btn" data-block-id="test-1">
+                💡 Hint
+            </button>
+        </div>
+        
+        <div id="output-test-1" class="output" style="display: none;">
+            <div class="output-content"></div>
+        </div>
+        
+        <div id="tests-test-1" class="tests" style="display: none;"></div>
+        
+        <div id="hint-test-1" class="hint" style="display: none;"></div>
+        
+        <hr>
+        
+        <h3>Test Console</h3>
+        <div id="console-output" style="background: #2d3748; color: #e2e8f0; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; height: 200px; overflow-y: auto; white-space: pre-wrap;"></div>
+        
+        <div class="buttons">
+            <button onclick="testEnhancedEditor()" class="btn">🔍 Test Enhanced Editor</button>
+            <button onclick="testFallbackEditor()" class="btn">🔄 Test Fallback Editor</button>
+            <button onclick="clearConsole()" class="btn">🧹 Clear Console</button>
+        </div>
+    </div>
+
+    <!-- ACE Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/mode-python.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/theme-monokai.js"></script>
+
+    <script type="module">
+        import { EnhancedCodeEditor } from '/static/js/lesson/components/EnhancedCodeEditor.js';
+        import { LessonInteractions } from '/static/js/lesson/components/LessonInteractions.js';
+
+        const consoleOutput = document.getElementById('console-output');
+        const statusDiv = document.getElementById('status');
+        
+        function logToConsole(message) {
+            console.log(message);
+            consoleOutput.textContent += new Date().toLocaleTimeString() + ': ' + message + '\n';
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        function updateStatus(message, type = 'info') {
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+        
+        window.clearConsole = function() {
+            consoleOutput.textContent = '';
+        };
+        
+        // Override console methods to capture output
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            logToConsole('LOG: ' + args.join(' '));
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            logToConsole('ERROR: ' + args.join(' '));
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            logToConsole('WARN: ' + args.join(' '));
+        };
+        
+        // Global test functions
+        window.testEnhancedEditor = async function() {
+            logToConsole('🔍 Testing Enhanced Code Editor...');
+            
+            try {
+                const editor = new EnhancedCodeEditor('editor-test-1', 'test-1', {
+                    starterCode: '# Enhanced Editor Test\nprint("Hello from Enhanced Editor!")',
+                    tests: [
+                        {
+                            name: 'Print Test',
+                            code: 'print("Hello from Enhanced Editor!")',
+                            expected: 'Hello from Enhanced Editor!'
+                        }
+                    ],
+                    hints: [
+                        'Try using print() to display text',
+                        'Remember to use quotes around strings'
+                    ]
+                });
+                
+                await editor.initialize();
+                logToConsole('✅ Enhanced Code Editor initialized successfully');
+                updateStatus('Enhanced Editor Ready', 'success');
+                
+                // Store globally for testing
+                window.testEditor = editor;
+                
+            } catch (error) {
+                logToConsole('❌ Enhanced Editor failed: ' + error.message);
+                updateStatus('Enhanced Editor Failed', 'error');
+            }
+        };
+        
+        window.testFallbackEditor = async function() {
+            logToConsole('🔄 Testing Fallback Editor via LessonInteractions...');
+            
+            try {
+                const interactions = new LessonInteractions();
+                
+                // Mock lesson data
+                const lessonData = {
+                    blocks: [
+                        {
+                            id: 'test-1',
+                            type: 'code',
+                            starter_code: '# Fallback Editor Test\nprint("Hello from Fallback!")',
+                            tests: [],
+                            hints: []
+                        }
+                    ]
+                };
+                
+                interactions.initialize(lessonData, null);
+                logToConsole('✅ LessonInteractions initialized successfully');
+                updateStatus('Fallback System Ready', 'success');
+                
+                // Store globally for testing
+                window.testInteractions = interactions;
+                
+            } catch (error) {
+                logToConsole('❌ Fallback system failed: ' + error.message);
+                updateStatus('Fallback System Failed', 'error');
+            }
+        };
+        
+        // Auto-test when page loads
+        document.addEventListener('DOMContentLoaded', async () => {
+            logToConsole('🚀 Enhanced Code Editor Test Page Loaded');
+            
+            // Test if ACE is available
+            if (typeof ace !== 'undefined') {
+                logToConsole('✅ ACE Editor is available');
+            } else {
+                logToConsole('❌ ACE Editor is not available');
+            }
+            
+            // Test if modules can be imported
+            try {
+                logToConsole('✅ ES6 modules imported successfully');
+                updateStatus('Modules Loaded', 'success');
+                
+                // Auto-test the enhanced editor
+                await testEnhancedEditor();
+                
+            } catch (error) {
+                logToConsole('❌ Module import failed: ' + error.message);
+                updateStatus('Module Import Failed', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

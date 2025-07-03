@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 3 Enhanced Editor Test - Session 1</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #2d2d2d;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #4FC3F7;
+            margin-bottom: 10px;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .status.success { background: #1B5E20; color: #4CAF50; }
+        .status.error { background: #B71C1C; color: #F44336; }
+        .status.info { background: #0D47A1; color: #2196F3; }
+        .editor-container {
+            margin: 30px 0;
+            border: 2px solid #444;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .editor-header {
+            background: #333;
+            padding: 12px 20px;
+            border-bottom: 1px solid #555;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .editor-title {
+            color: #4FC3F7;
+            font-weight: 600;
+        }
+        .editor-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #4FC3F7;
+            color: #000;
+        }
+        .btn-primary:hover {
+            background: #29B6F6;
+        }
+        .btn-secondary {
+            background: #666;
+            color: #fff;
+        }
+        .btn-secondary:hover {
+            background: #777;
+        }
+        .editor-content {
+            height: 300px;
+            position: relative;
+        }
+        .output-container {
+            margin-top: 20px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .output-header {
+            background: #333;
+            padding: 10px 20px;
+            border-bottom: 1px solid #555;
+            color: #4FC3F7;
+            font-weight: 600;
+        }
+        .output-content {
+            background: #1a1a1a;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            min-height: 100px;
+            white-space: pre-wrap;
+        }
+        .controls {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        #console {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Phase 3: Enhanced Code Editor - Session 1</h1>
+            <p>Testing interactive code execution with advanced features</p>
+        </div>
+
+        <div id="status" class="status info">
+            Initializing Enhanced Code Editor...
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-secondary" onclick="testBasicFunctionality()">Test Basic Functions</button>
+            <button class="btn btn-secondary" onclick="testCodeExecution()">Test Code Execution</button>
+            <button class="btn btn-secondary" onclick="testHintSystem()">Test Hints</button>
+            <button class="btn btn-secondary" onclick="clearConsole()">Clear Console</button>
+        </div>
+
+        <!-- Code Editor Container -->
+        <div class="editor-container">
+            <div class="editor-header">
+                <div class="editor-title">🐍 Enhanced Python Editor</div>
+                <div class="editor-actions">
+                    <button class="btn btn-primary" onclick="runCode()">▶️ Run Code</button>
+                    <button class="btn btn-secondary" onclick="getHint()">💡 Get Hint</button>
+                    <button class="btn btn-secondary" onclick="resetCode()">🔄 Reset</button>
+                </div>
+            </div>
+            <div class="editor-content">
+                <div id="enhanced-editor"></div>
+            </div>
+        </div>
+
+        <!-- Output Container -->
+        <div class="output-container">
+            <div class="output-header">📋 Output</div>
+            <div id="output" class="output-content">Ready to run your code...</div>
+        </div>
+
+        <!-- Console -->
+        <div id="console"></div>
+    </div>
+
+    <!-- Load ACE Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.22.0/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.22.0/mode-python.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.22.0/theme-monokai.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.22.0/ext-language_tools.js"></script>
+
+    <script type="module">
+        import { EnhancedCodeEditor } from '/static/js/lesson/components/EnhancedCodeEditor.js';
+
+        let codeEditor = null;
+
+        // Console logging
+        const consoleDiv = document.getElementById('console');
+        function logToConsole(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#ff6b6b' : type === 'success' ? '#51cf66' : '#74c0fc';
+            consoleDiv.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+            console.log(message);
+        }
+
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+
+        function clearConsole() {
+            consoleDiv.innerHTML = '';
+        }
+
+        // Initialize Enhanced Code Editor
+        async function initializeEditor() {
+            try {
+                updateStatus('Initializing Enhanced Code Editor...', 'info');
+                logToConsole('🚀 Starting Enhanced Code Editor initialization');
+
+                const editorOptions = {
+                    language: 'python',
+                    theme: 'monokai',
+                    fontSize: 14,
+                    enableAutocompletion: true,
+                    enableTests: true,
+                    enableHints: true,
+                    enableSyntaxValidation: true,
+                    enableMobileOptimization: true,
+                    starterCode: `# Phase 3: Enhanced Code Editor Test
+# Session 1: Interactive Features Integration
+
+def greet(name):
+    """Enhanced greeting function with emojis"""
+    return f"Hello, {name}! Welcome to Phase 3! 🚀"
+
+def calculate_sum(numbers):
+    """Calculate sum with validation"""
+    if not numbers:
+        return 0
+    return sum(numbers)
+
+# Test the functions
+name = "Python Developer"
+message = greet(name)
+print(message)
+
+# Test calculations
+test_numbers = [1, 2, 3, 4, 5, 10]
+total = calculate_sum(test_numbers)
+print(f"Sum of {test_numbers} = {total}")
+
+# Show some advanced features
+import math
+print(f"Square root of {total}: {math.sqrt(total):.2f}")`,
+                    tests: [
+                        {
+                            name: 'Function Definition Test',
+                            code: 'assert callable(greet), "greet function should be defined"',
+                            description: 'Checks if greet function is defined'
+                        },
+                        {
+                            name: 'Return Value Test',
+                            code: 'assert "Hello" in greet("Test"), "greet should return a greeting"',
+                            description: 'Checks if greet returns proper greeting'
+                        },
+                        {
+                            name: 'Sum Function Test',
+                            code: 'assert calculate_sum([1, 2, 3]) == 6, "calculate_sum should work correctly"',
+                            description: 'Checks if calculate_sum works correctly'
+                        }
+                    ],
+                    hints: [
+                        'Try defining functions with docstrings for better documentation',
+                        'Use f-strings for modern string formatting',
+                        'Remember to import modules when using advanced functions',
+                        'Test your functions with different inputs'
+                    ],
+                    onCompletion: (result) => {
+                        logToConsole(`✅ Code execution completed: ${result.success ? 'Success' : 'Failed'}`, 'success');
+                        displayOutput(result);
+                    },
+                    onError: (error) => {
+                        logToConsole(`❌ Code execution error: ${error.message}`, 'error');
+                        displayOutput({ success: false, error: error.message });
+                    }
+                };
+
+                codeEditor = new EnhancedCodeEditor('enhanced-editor', 'test-block', editorOptions);
+                await codeEditor.initialize();
+
+                updateStatus('Enhanced Code Editor ready! 🎉', 'success');
+                logToConsole('✅ Enhanced Code Editor initialized successfully');
+                
+                // Make editor globally available for testing
+                window.codeEditor = codeEditor;
+
+            } catch (error) {
+                console.error('Failed to initialize editor:', error);
+                updateStatus(`Failed to initialize: ${error.message}`, 'error');
+                logToConsole(`❌ Initialization failed: ${error.message}`, 'error');
+            }
+        }
+
+        function displayOutput(result) {
+            const outputDiv = document.getElementById('output');
+            
+            if (result.success) {
+                outputDiv.innerHTML = `<div style="color: #51cf66">✅ Execution successful!</div>
+<div style="margin-top: 10px"><strong>Output:</strong></div>
+<div style="background: #000; padding: 10px; border-radius: 4px; margin-top: 5px">${result.output || 'No output'}</div>`;
+                
+                if (result.execution_time) {
+                    outputDiv.innerHTML += `<div style="margin-top: 10px; color: #888; font-size: 12px">Execution time: ${result.execution_time}ms</div>`;
+                }
+            } else {
+                outputDiv.innerHTML = `<div style="color: #ff6b6b">❌ Execution failed!</div>
+<div style="margin-top: 10px"><strong>Error:</strong></div>
+<div style="background: #2d1616; padding: 10px; border-radius: 4px; margin-top: 5px; color: #ff9999">${result.error || 'Unknown error'}</div>`;
+            }
+        }
+
+        // Test functions
+        window.testBasicFunctionality = function() {
+            logToConsole('🧪 Testing basic functionality...', 'info');
+            
+            if (!codeEditor) {
+                logToConsole('❌ Code editor not initialized', 'error');
+                return;
+            }
+
+            logToConsole('✅ Editor instance exists', 'success');
+            logToConsole('✅ Editor initialized: ' + codeEditor.initialized, 'success');
+            logToConsole('✅ Editor has ACE instance: ' + !!codeEditor.editor, 'success');
+            logToConsole('✅ Code value length: ' + (codeEditor.editor ? codeEditor.editor.getValue().length : 0), 'info');
+        };
+
+        window.testCodeExecution = async function() {
+            logToConsole('🧪 Testing code execution...', 'info');
+            
+            if (!codeEditor) {
+                logToConsole('❌ Code editor not initialized', 'error');
+                return;
+            }
+
+            try {
+                await codeEditor.runCode();
+                logToConsole('✅ Code execution test completed', 'success');
+            } catch (error) {
+                logToConsole(`❌ Code execution test failed: ${error.message}`, 'error');
+            }
+        };
+
+        window.testHintSystem = function() {
+            logToConsole('🧪 Testing hint system...', 'info');
+            
+            if (!codeEditor) {
+                logToConsole('❌ Code editor not initialized', 'error');
+                return;
+            }
+
+            try {
+                codeEditor.showHint();
+                logToConsole('✅ Hint system test completed', 'success');
+            } catch (error) {
+                logToConsole(`❌ Hint system test failed: ${error.message}`, 'error');
+            }
+        };
+
+        window.runCode = async function() {
+            if (codeEditor) {
+                await codeEditor.runCode();
+            } else {
+                logToConsole('❌ Code editor not available', 'error');
+            }
+        };
+
+        window.getHint = function() {
+            if (codeEditor) {
+                codeEditor.showHint();
+            } else {
+                logToConsole('❌ Code editor not available', 'error');
+            }
+        };
+
+        window.resetCode = function() {
+            if (codeEditor) {
+                codeEditor.reset();
+                logToConsole('🔄 Code editor reset', 'info');
+            } else {
+                logToConsole('❌ Code editor not available', 'error');
+            }
+        };
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            logToConsole('📄 DOM loaded, initializing Enhanced Code Editor...', 'info');
+            initializeEditor();
+        });
+
+        // Expose functions globally for easy testing
+        window.clearConsole = clearConsole;
+    </script>
+</body>
+</html>
