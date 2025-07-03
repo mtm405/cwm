@@ -14,12 +14,20 @@ export function renderLessonBlocks(blocks, lessonProgress) {
 function createBlockElement(block, index, lessonProgress) {
     if (!block) return null;
     const article = document.createElement('article');
-    article.className = `content-block ${block.type || 'unknown'}-block`;
+    article.className = `lesson-block ${block.type || 'unknown'}-block`;
     article.id = `block-${block.id || index}`;
     article.dataset.blockId = block.id || index;
     article.dataset.blockType = block.type || 'text';
     const isCompleted = lessonProgress?.completed_blocks && Array.isArray(lessonProgress.completed_blocks) && lessonProgress.completed_blocks.includes(block.id);
-    if (isCompleted) article.classList.add('completed');
+    if (isCompleted) {
+        article.classList.add('completed');
+        article.setAttribute('data-completion-status', 'completed');
+    } else {
+        article.setAttribute('data-completion-status', 'incomplete');
+    }
+    // Add assessment requirement attribute
+    article.setAttribute('data-assessment-required', block.assessment_required || 'false');
+    
     // Render based on block type
     switch(block.type) {
         case 'text':
@@ -42,33 +50,41 @@ function createBlockElement(block, index, lessonProgress) {
 
 function createTextBlockHTML(block) {
     return `
-        <div class="block-header">
-            <div class="block-icon">
-                <i class="fas fa-book-open"></i>
+        <div class="lesson-block-header">
+            <div class="block-type-indicator">
+                <div class="block-icon text-block-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <span class="block-type-label">Reading</span>
             </div>
-            <div class="block-meta">
-                <span class="block-type">Reading</span>
-                <span class="block-progress-indicator" id="progress-${block.id}">
-                    <i class="fas fa-circle"></i>
-                </span>
+            <div class="block-progress-container">
+                <div class="progress-indicator" id="progress-${block.id}">
+                    <div class="progress-status incomplete">
+                        <i class="fas fa-circle-o"></i>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="block-content">
+        <div class="lesson-block-content">
             <div class="text-content">
                 ${block.content || ''}
             </div>
             ${block.key_points ? `
-            <div class="key-points">
-                <h4>🔑 Key Points:</h4>
-                <ul>
-                    ${block.key_points.map(point => `<li>${point}</li>`).join('')}
+            <div class="key-points-section">
+                <h4 class="key-points-header">
+                    <i class="fas fa-key"></i>
+                    Key Points
+                </h4>
+                <ul class="key-points-list">
+                    ${block.key_points.map(point => `<li class="key-point">${point}</li>`).join('')}
                 </ul>
             </div>
             ` : ''}
         </div>
-        <div class="block-actions">
-            <button class="btn btn-success complete-btn">
-                <i class="fas fa-check"></i> Mark as Read
+        <div class="lesson-block-actions">
+            <button class="action-btn primary complete-btn" data-block-id="${block.id}">
+                <i class="fas fa-check"></i>
+                <span>Mark as Read</span>
             </button>
         </div>
     `;
@@ -76,89 +92,134 @@ function createTextBlockHTML(block) {
 
 function createCodeExampleHTML(block) {
     return `
-        <div class="block-header">
-            <div class="block-icon">
-                <i class="fas fa-code"></i>
+        <div class="lesson-block-header">
+            <div class="block-type-indicator">
+                <div class="block-icon code-block-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <span class="block-type-label">Code Example</span>
             </div>
             <div class="code-meta">
-                <span class="language-badge">${(block.language || 'python').toUpperCase()}</span>
-                <button class="btn-copy">
-                    <i class="fas fa-copy"></i> Copy
+                <span class="language-badge ${(block.language || 'python').toLowerCase()}">${(block.language || 'python').toUpperCase()}</span>
+                <button class="action-btn secondary copy-btn" data-block-id="${block.id}">
+                    <i class="fas fa-copy"></i>
+                    <span>Copy</span>
                 </button>
             </div>
         </div>
-        <div class="code-container">
-            <div class="code-header">
-                <span class="code-title">${block.title || 'Example Code'}</span>
+        <div class="lesson-block-content">
+            <div class="code-container">
+                <div class="code-header">
+                    <span class="code-title">${block.title || 'Example Code'}</span>
+                </div>
+                <div class="code-block-wrapper">
+                    <pre class="code-content" id="code-${block.id}"><code class="language-${block.language || 'python'}">${block.code || ''}</code></pre>
+                </div>
+                ${block.explanation ? `
+                <div class="code-explanation">
+                    <div class="explanation-header">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>Explanation</span>
+                    </div>
+                    <div class="explanation-content">
+                        <p>${block.explanation}</p>
+                    </div>
+                </div>
+                ` : ''}
             </div>
-            <pre class="code-content" id="code-${block.id}"><code class="language-${block.language || 'python'}">${block.code || ''}</code></pre>
-            ${block.explanation ? `
-            <div class="code-explanation">
-                <h5>💡 Explanation:</h5>
-                <p>${block.explanation}</p>
-            </div>
-            ` : ''}
+        </div>
+        <div class="lesson-block-actions">
+            <button class="action-btn primary complete-btn" data-block-id="${block.id}">
+                <i class="fas fa-check"></i>
+                <span>Mark as Understood</span>
+            </button>
         </div>
     `;
 }
 
 function createInteractiveBlockHTML(block) {
     return `
-        <div class="block-header">
-            <div class="block-icon">
-                <i class="fas fa-laptop-code"></i>
+        <div class="lesson-block-header">
+            <div class="block-type-indicator">
+                <div class="block-icon interactive-block-icon">
+                    <i class="fas fa-laptop-code"></i>
+                </div>
+                <span class="block-type-label">Code Challenge</span>
             </div>
             <div class="challenge-meta">
-                <span class="challenge-type">${block.challenge_type || 'Code Challenge'}</span>
-                <span class="difficulty">${block.difficulty || 'Beginner'}</span>
+                <span class="challenge-type-badge">${block.challenge_type || 'Coding'}</span>
+                <span class="difficulty-badge ${(block.difficulty || 'beginner').toLowerCase()}">${block.difficulty || 'Beginner'}</span>
             </div>
         </div>
-        <div class="challenge-content">
-            <div class="challenge-instructions">
-                <h4>🎯 Your Challenge:</h4>
-                <p>${block.instructions || ''}</p>
-                ${block.requirements ? `
-                <div class="requirements">
-                    <h5>📋 Requirements:</h5>
-                    <ul>
-                        ${block.requirements.map(req => `<li>${req}</li>`).join('')}
-                    </ul>
+        <div class="lesson-block-content">
+            <div class="challenge-content">
+                <div class="challenge-instructions">
+                    <div class="instructions-header">
+                        <i class="fas fa-bullseye"></i>
+                        <span>Your Challenge</span>
+                    </div>
+                    <div class="instructions-content">
+                        <p>${block.instructions || ''}</p>
+                    </div>
+                    ${block.requirements ? `
+                    <div class="requirements-section">
+                        <div class="requirements-header">
+                            <i class="fas fa-list-check"></i>
+                            <span>Requirements</span>
+                        </div>
+                        <ul class="requirements-list">
+                            ${block.requirements.map(req => `<li class="requirement">${req}</li>`).join('')}
+                        </ul>
+                    </div>
+                    ` : ''}
                 </div>
-                ` : ''}
-            </div>
-            <div class="code-editor-wrapper">
-                <div class="editor-toolbar">
-                    <span class="editor-label">${block.language || 'Python'} Editor</span>
-                    <div class="editor-actions">
-                        <button class="btn btn-sm btn-hint">
-                            <i class="fas fa-lightbulb"></i> Hint (5 🪙)
+                <div class="code-editor-container">
+                    <div class="editor-toolbar">
+                        <span class="editor-label">
+                            <i class="fas fa-code"></i>
+                            ${block.language || 'Python'} Editor
+                        </span>
+                        <div class="editor-actions">
+                            <button class="action-btn secondary hint-btn" data-block-id="${block.id}">
+                                <i class="fas fa-lightbulb"></i>
+                                <span>Hint (5 🪙)</span>
+                            </button>
+                            <button class="action-btn secondary reset-btn" data-block-id="${block.id}">
+                                <i class="fas fa-undo"></i>
+                                <span>Reset</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="code-editor-wrapper">
+                        <div id="editor-${block.id}" class="code-editor" data-language="${block.language || 'python'}">${block.starter_code || ''}</div>
+                    </div>
+                    <div class="editor-footer">
+                        <button class="action-btn primary run-btn" data-block-id="${block.id}">
+                            <i class="fas fa-play"></i>
+                            <span>Run Code</span>
                         </button>
-                        <button class="btn btn-sm btn-reset">
-                            <i class="fas fa-undo"></i> Reset
+                        <button class="action-btn outline solution-btn" data-block-id="${block.id}">
+                            <i class="fas fa-eye"></i>
+                            <span>Show Solution</span>
                         </button>
                     </div>
                 </div>
-                <div id="editor-${block.id}" class="code-editor">${block.starter_code || ''}</div>
-                <div class="editor-footer">
-                    <button class="btn btn-primary run-btn">
-                        <i class="fas fa-play"></i> Run Code
-                    </button>
-                    <button class="btn btn-outline solution-btn">
-                        <i class="fas fa-eye"></i> Show Solution
-                    </button>
+                <div class="output-section">
+                    <div class="output-header">
+                        <i class="fas fa-terminal"></i>
+                        <span>Output & Results</span>
+                    </div>
+                    <div id="output-${block.id}" class="code-output"></div>
+                    ${block.tests ? `
+                    <div class="test-results-section" id="tests-${block.id}">
+                        <div class="test-header">
+                            <i class="fas fa-flask"></i>
+                            <span>Test Results</span>
+                        </div>
+                        <div class="test-list"></div>
+                    </div>
+                    ` : ''}
                 </div>
-            </div>
-            <div class="output-section">
-                <div class="output-header">
-                    <i class="fas fa-terminal"></i> Output & Results
-                </div>
-                <div id="output-${block.id}" class="ide-output"></div>
-                ${block.tests ? `
-                <div class="test-results" id="tests-${block.id}">
-                    <h5>🧪 Test Results:</h5>
-                    <div class="test-list"></div>
-                </div>
-                ` : ''}
             </div>
         </div>
     `;
@@ -166,21 +227,34 @@ function createInteractiveBlockHTML(block) {
 
 function createQuizBlockHTML(block) {
     return `
-        <div class="block-header">
-            <div class="block-icon">
-                <i class="fas fa-brain"></i>
+        <div class="lesson-block-header">
+            <div class="block-type-indicator">
+                <div class="block-icon quiz-block-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <span class="block-type-label">Knowledge Check</span>
             </div>
             <div class="quiz-meta">
-                <span class="quiz-type">Knowledge Check</span>
+                <span class="quiz-type-badge">Assessment</span>
             </div>
         </div>
-        <div class="quiz-content">
-            <div class="quiz-intro">
-                <h4>🧠 Test Your Understanding</h4>
-                <p>${block.description || 'Complete this quiz to test your knowledge.'}</p>
-            </div>
-            <div id="quiz-${block.quiz_id || block.id}" data-quiz-id="${block.quiz_id || block.id}">
-                <div class="spinner">Loading quiz...</div>
+        <div class="lesson-block-content">
+            <div class="quiz-content">
+                <div class="quiz-intro">
+                    <div class="quiz-intro-header">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Test Your Understanding</span>
+                    </div>
+                    <div class="quiz-intro-content">
+                        <p>${block.description || 'Complete this quiz to test your knowledge and mark this section as complete.'}</p>
+                    </div>
+                </div>
+                <div class="quiz-container" id="quiz-${block.quiz_id || block.id}" data-quiz-id="${block.quiz_id || block.id}">
+                    <div class="quiz-loading">
+                        <div class="loading-spinner"></div>
+                        <span>Loading quiz...</span>
+                    </div>
+                </div>
             </div>
         </div>
     `;
@@ -188,17 +262,105 @@ function createQuizBlockHTML(block) {
 
 function createDefaultBlockHTML(block) {
     return `
-        <div class="block-header">
-            <div class="block-icon">
-                <i class="fas fa-question"></i>
-            </div>
-            <div class="block-meta">
-                <span class="block-type">Unknown Block Type: ${block.type}</span>
+        <div class="lesson-block-header">
+            <div class="block-type-indicator">
+                <div class="block-icon unknown-block-icon">
+                    <i class="fas fa-question"></i>
+                </div>
+                <span class="block-type-label">Unknown Block Type: ${block.type}</span>
             </div>
         </div>
-        <div class="block-content">
-            <p>This block type (${block.type}) is not yet supported.</p>
-            <pre>${JSON.stringify(block, null, 2)}</pre>
+        <div class="lesson-block-content">
+            <div class="unknown-block-content">
+                <p>This block type (${block.type}) is not yet supported.</p>
+                <details>
+                    <summary>Block Data</summary>
+                    <pre class="block-data">${JSON.stringify(block, null, 2)}</pre>
+                </details>
+            </div>
         </div>
     `;
+}
+
+// Progress animation utilities
+export function updateBlockProgress(blockId, progressData) {
+    const blockElement = document.getElementById(`block-${blockId}`);
+    const progressIndicator = document.getElementById(`progress-${blockId}`);
+    
+    if (!blockElement || !progressIndicator) return;
+    
+    const progressStatus = progressIndicator.querySelector('.progress-status');
+    const progressIcon = progressStatus.querySelector('i');
+    
+    if (progressData.completed) {
+        // Animate completion
+        blockElement.classList.add('completing');
+        progressStatus.classList.remove('incomplete');
+        progressStatus.classList.add('complete');
+        progressIcon.className = 'fas fa-check-circle';
+        
+        // Add completion animation
+        setTimeout(() => {
+            blockElement.classList.remove('completing');
+            blockElement.classList.add('completed');
+            blockElement.setAttribute('data-completion-status', 'completed');
+        }, 500);
+    } else {
+        // Reset to incomplete state
+        blockElement.classList.remove('completed', 'completing');
+        blockElement.setAttribute('data-completion-status', 'incomplete');
+        progressStatus.classList.remove('complete');
+        progressStatus.classList.add('incomplete');
+        progressIcon.className = 'fas fa-circle-o';
+    }
+}
+
+export function showBlockFeedback(blockId, feedbackType, message) {
+    const blockElement = document.getElementById(`block-${blockId}`);
+    if (!blockElement) return;
+    
+    // Remove existing feedback
+    const existingFeedback = blockElement.querySelector('.block-feedback');
+    if (existingFeedback) {
+        existingFeedback.remove();
+    }
+    
+    // Create new feedback element
+    const feedbackElement = document.createElement('div');
+    feedbackElement.className = `block-feedback ${feedbackType}`;
+    feedbackElement.innerHTML = `
+        <div class="feedback-content">
+            <i class="fas fa-${feedbackType === 'success' ? 'check' : feedbackType === 'error' ? 'times' : 'info'}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    // Insert feedback
+    const blockActions = blockElement.querySelector('.lesson-block-actions');
+    if (blockActions) {
+        blockActions.insertBefore(feedbackElement, blockActions.firstChild);
+    }
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        feedbackElement.remove();
+    }, 3000);
+}
+
+export function highlightBlockRequirements(blockId, requirements) {
+    const blockElement = document.getElementById(`block-${blockId}`);
+    if (!blockElement) return;
+    
+    blockElement.classList.add('requirements-highlighted');
+    
+    // Add requirement indicators
+    requirements.forEach(requirement => {
+        const indicator = document.createElement('div');
+        indicator.className = 'requirement-indicator';
+        indicator.innerHTML = `
+            <i class="fas fa-exclamation-circle"></i>
+            <span>${requirement}</span>
+        `;
+        blockElement.appendChild(indicator);
+    });
 }

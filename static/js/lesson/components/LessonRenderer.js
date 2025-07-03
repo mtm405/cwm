@@ -80,7 +80,7 @@ export class LessonRenderer {
     
     async createBlockElement(block, userProgress) {
         const article = document.createElement('article');
-        article.className = `content-block ${block.type}-block`;
+        article.className = `lesson-block ${block.type}-block`;
         article.id = `block-${block.id}`;
         article.dataset.blockId = block.id;
         article.dataset.blockType = block.type;
@@ -89,7 +89,13 @@ export class LessonRenderer {
         const isCompleted = userProgress?.completed_blocks?.includes(block.id);
         if (isCompleted) {
             article.classList.add('completed');
+            article.setAttribute('data-completion-status', 'completed');
+        } else {
+            article.setAttribute('data-completion-status', 'incomplete');
         }
+        
+        // Add assessment requirement attribute
+        article.setAttribute('data-assessment-required', block.assessment_required || 'false');
         
         // Render based on type
         const renderer = this.blockRenderers[block.type] || this.blockRenderers.default;
@@ -100,105 +106,130 @@ export class LessonRenderer {
     
     renderTextBlock(block) {
         return `
-            <div class="block-header">
-                <div class="block-icon">
-                    <i class="fas fa-book-open"></i>
+            <div class="lesson-block-header">
+                <div class="block-type-indicator">
+                    <div class="block-icon text-block-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <span class="block-type-label">Reading</span>
                 </div>
-                <div class="block-meta">
-                    <span class="block-type">Reading</span>
-                    <span class="block-title">${block.title || 'Content'}</span>
-                </div>
-                <div class="block-actions">
-                    <span class="block-progress-indicator" id="progress-${block.id}">
-                        <i class="fas fa-circle"></i>
-                    </span>
+                <div class="block-progress-container">
+                    <div class="progress-indicator" id="progress-${block.id}">
+                        <div class="progress-status incomplete">
+                            <i class="fas fa-circle-o"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="block-content">
+            <div class="lesson-block-content">
                 <div class="text-content">${this.processContent(block.content || '')}</div>
-                <div class="block-footer">
-                    <button class="btn btn-success complete-btn" data-block-id="${block.id}">
-                        <i class="fas fa-check"></i> Mark as Read
-                    </button>
-                </div>
+            </div>
+            <div class="lesson-block-actions">
+                <button class="action-btn primary complete-btn" data-block-id="${block.id}">
+                    <i class="fas fa-check"></i>
+                    <span>Mark as Read</span>
+                </button>
             </div>
         `;
     }
     
     renderCodeBlock(block) {
         return `
-            <div class="block-header">
-                <div class="block-icon">
-                    <i class="fas fa-code"></i>
+            <div class="lesson-block-header">
+                <div class="block-type-indicator">
+                    <div class="block-icon code-block-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <span class="block-type-label">Code Example</span>
                 </div>
-                <div class="block-meta">
-                    <span class="block-type">Code Example</span>
-                    <span class="block-title">${block.title || 'Code Example'}</span>
-                </div>
-                <div class="block-actions">
-                    <span class="language-badge">${(block.language || 'python').toUpperCase()}</span>
-                    <button class="btn-copy" data-block-id="${block.id}" title="Copy code">
+                <div class="code-meta">
+                    <span class="language-badge ${(block.language || 'python').toLowerCase()}">${(block.language || 'python').toUpperCase()}</span>
+                    <button class="action-btn secondary copy-btn" data-block-id="${block.id}" title="Copy code">
                         <i class="fas fa-copy"></i>
+                        <span>Copy</span>
                     </button>
                 </div>
             </div>
-            <div class="block-content">
+            <div class="lesson-block-content">
                 <div class="code-container">
-                    <pre class="code-content"><code class="language-${block.language || 'python'}">${this.escapeHtml(block.code || '')}</code></pre>
+                    <div class="code-block-wrapper">
+                        <pre class="code-content"><code class="language-${block.language || 'python'}">${this.escapeHtml(block.code || '')}</code></pre>
+                    </div>
                 </div>
                 ${block.explanation ? `
                 <div class="code-explanation">
-                    <h4>Explanation:</h4>
-                    <p>${block.explanation}</p>
+                    <div class="explanation-header">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>Explanation</span>
+                    </div>
+                    <div class="explanation-content">
+                        <p>${block.explanation}</p>
+                    </div>
                 </div>
                 ` : ''}
-                <div class="block-footer">
-                    <button class="btn btn-success complete-btn" data-block-id="${block.id}">
-                        <i class="fas fa-check"></i> Mark as Understood
-                    </button>
-                </div>
+            </div>
+            <div class="lesson-block-actions">
+                <button class="action-btn primary complete-btn" data-block-id="${block.id}">
+                    <i class="fas fa-check"></i>
+                    <span>Mark as Understood</span>
+                </button>
             </div>
         `;
     }
     
     renderInteractiveBlock(block) {
         return `
-            <div class="block-header">
-                <div class="block-icon">
-                    <i class="fas fa-laptop-code"></i>
+            <div class="lesson-block-header">
+                <div class="block-type-indicator">
+                    <div class="block-icon interactive-block-icon">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <span class="block-type-label">Code Challenge</span>
                 </div>
-                <div class="block-meta">
-                    <span class="block-type">Code Challenge</span>
-                    <span class="block-title">${block.title || 'Exercise'}</span>
-                </div>
-                <div class="block-actions">
-                    <span class="language-badge">${(block.language || 'python').toUpperCase()}</span>
+                <div class="challenge-meta">
+                    <span class="language-badge ${(block.language || 'python').toLowerCase()}">${(block.language || 'python').toUpperCase()}</span>
+                    <span class="difficulty-badge ${(block.difficulty || 'beginner').toLowerCase()}">${block.difficulty || 'Beginner'}</span>
                 </div>
             </div>
-            <div class="block-content">
-                <div class="challenge-instructions">
-                    <h4><i class="fas fa-target"></i> Your Challenge:</h4>
-                    <p>${block.instructions || 'Complete the code below.'}</p>
-                </div>
-                <div class="code-editor-wrapper">
-                    <div class="editor-header">
-                        <span class="editor-title">Code Editor</span>
-                        <div class="editor-controls">
-                            <button class="btn btn-secondary reset-btn" data-block-id="${block.id}" title="Reset code">
-                                <i class="fas fa-undo"></i> Reset
-                            </button>
-                            <button class="btn btn-primary run-btn" data-block-id="${block.id}" title="Run code">
-                                <i class="fas fa-play"></i> Run Code
-                            </button>
+            <div class="lesson-block-content">
+                <div class="challenge-content">
+                    <div class="challenge-instructions">
+                        <div class="instructions-header">
+                            <i class="fas fa-bullseye"></i>
+                            <span>Your Challenge</span>
+                        </div>
+                        <div class="instructions-content">
+                            <p>${block.instructions || 'Complete the code below.'}</p>
                         </div>
                     </div>
-                    <div id="editor-${block.id}" class="code-editor" data-language="${block.language || 'python'}">${this.escapeHtml(block.starter_code || '# Write your code here')}</div>
-                </div>
-                <div id="output-${block.id}" class="code-output" style="display: none;">
-                    <div class="output-header">
-                        <i class="fas fa-terminal"></i> Output
+                    <div class="code-editor-container">
+                        <div class="editor-toolbar">
+                            <span class="editor-label">
+                                <i class="fas fa-code"></i>
+                                Code Editor
+                            </span>
+                            <div class="editor-actions">
+                                <button class="action-btn secondary reset-btn" data-block-id="${block.id}" title="Reset code">
+                                    <i class="fas fa-undo"></i>
+                                    <span>Reset</span>
+                                </button>
+                                <button class="action-btn primary run-btn" data-block-id="${block.id}" title="Run code">
+                                    <i class="fas fa-play"></i>
+                                    <span>Run Code</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="code-editor-wrapper">
+                            <div id="editor-${block.id}" class="code-editor" data-language="${block.language || 'python'}">${this.escapeHtml(block.starter_code || '# Write your code here')}</div>
+                        </div>
                     </div>
-                    <div class="output-content"></div>
+                    <div class="output-section" id="output-${block.id}" style="display: none;">
+                        <div class="output-header">
+                            <i class="fas fa-terminal"></i>
+                            <span>Output</span>
+                        </div>
+                        <div class="output-content"></div>
+                    </div>
                 </div>
             </div>
         `;
@@ -206,29 +237,39 @@ export class LessonRenderer {
     
     renderQuizBlock(block) {
         return `
-            <div class="block-header">
-                <div class="block-icon">
-                    <i class="fas fa-brain"></i>
+            <div class="lesson-block-header">
+                <div class="block-type-indicator">
+                    <div class="block-icon quiz-block-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <span class="block-type-label">Knowledge Check</span>
                 </div>
-                <div class="block-meta">
-                    <span class="block-type">Knowledge Check</span>
-                    <span class="block-title">${block.title || 'Quiz'}</span>
-                </div>
-                <div class="block-actions">
-                    <span class="quiz-progress-indicator" id="quiz-progress-${block.id}">
-                        <i class="fas fa-circle"></i>
-                    </span>
+                <div class="quiz-meta">
+                    <span class="quiz-type-badge">Assessment</span>
+                    <div class="progress-indicator" id="quiz-progress-${block.id}">
+                        <div class="progress-status incomplete">
+                            <i class="fas fa-circle-o"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="block-content">
-                <div class="quiz-intro">
-                    <p>${block.description || 'Test your knowledge with this quiz.'}</p>
-                </div>
-                <div class="quiz-container">
-                    <div id="quiz-${block.quiz_id}" data-quiz-id="${block.quiz_id}" data-block-id="${block.id}">
-                        <div class="quiz-loading">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <span>Loading quiz questions...</span>
+            <div class="lesson-block-content">
+                <div class="quiz-content">
+                    <div class="quiz-intro">
+                        <div class="quiz-intro-header">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Test Your Understanding</span>
+                        </div>
+                        <div class="quiz-intro-content">
+                            <p>${block.description || 'Test your knowledge with this quiz.'}</p>
+                        </div>
+                    </div>
+                    <div class="quiz-container">
+                        <div id="quiz-${block.quiz_id}" data-quiz-id="${block.quiz_id}" data-block-id="${block.id}">
+                            <div class="quiz-loading">
+                                <div class="loading-spinner"></div>
+                                <span>Loading quiz questions...</span>
+                            </div>
                         </div>
                     </div>
                 </div>

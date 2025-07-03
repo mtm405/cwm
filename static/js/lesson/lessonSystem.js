@@ -7,6 +7,7 @@ import { LessonDataService } from './services/LessonDataService.js';
 import { LessonRenderer } from './components/LessonRenderer.js';
 import { LessonProgress } from './services/LessonProgress.js';
 import { LessonInteractions } from './components/LessonInteractions.js';
+import { renderLessonBlocks, updateBlockProgress, showBlockFeedback } from './lessonRenderer.js';
 
 export class LessonSystem {
     constructor() {

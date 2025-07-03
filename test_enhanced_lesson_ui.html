@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Lesson UI Test - Code with Morais</title>
+    <link rel="stylesheet" href="/static/css/base/variables.css">
+    <link rel="stylesheet" href="/static/css/base/reset.css">
+    <link rel="stylesheet" href="/static/css/base/typography.css">
+    <link rel="stylesheet" href="/static/css/components/lesson-content-blocks.css">
+    <link rel="stylesheet" href="/static/css/components/lesson-blocks-enhanced.css">
+    <link rel="stylesheet" href="/static/css/components/lesson-block-types.css">
+    <link rel="stylesheet" href="/static/css/components/lesson-progress-enhanced.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: var(--font-family-base);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-header {
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .test-section {
+            margin-bottom: 3rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+        }
+        
+        .lesson-content-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .demo-controls {
+            background: var(--bg-card);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .demo-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .demo-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>Enhanced Lesson Block UI Test</h1>
+            <p>Testing the new enhanced lesson block designs and animations</p>
+        </div>
+        
+        <div class="demo-controls">
+            <button class="demo-btn" onclick="simulateCompletion()">
+                <i class="fas fa-check"></i> Simulate Completion
+            </button>
+            <button class="demo-btn" onclick="simulateProgress()">
+                <i class="fas fa-spinner"></i> Simulate Progress
+            </button>
+            <button class="demo-btn" onclick="resetBlocks()">
+                <i class="fas fa-undo"></i> Reset All
+            </button>
+            <button class="demo-btn" onclick="toggleDarkMode()">
+                <i class="fas fa-moon"></i> Toggle Dark Mode
+            </button>
+        </div>
+        
+        <div class="test-section">
+            <div class="section-title">Text Block</div>
+            <div class="lesson-content-container" id="text-section">
+                <article class="lesson-block text-block" id="block-text-1" data-block-id="text-1" data-block-type="text" data-completion-status="incomplete">
+                    <div class="lesson-block-header">
+                        <div class="block-type-indicator">
+                            <div class="block-icon text-block-icon">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <span class="block-type-label">Reading</span>
+                        </div>
+                        <div class="block-progress-container">
+                            <div class="progress-indicator" id="progress-text-1">
+                                <div class="progress-status incomplete">
+                                    <i class="fas fa-circle-o"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lesson-block-content">
+                        <div class="text-content">
+                            <h3>Introduction to Python Variables</h3>
+                            <p>Variables in Python are containers that store data values. Unlike other programming languages, Python has no command for declaring a variable.</p>
+                            <p>A variable is created the moment you first assign a value to it. Python is dynamically typed, meaning you don't need to declare the type of variable.</p>
+                        </div>
+                        <div class="key-points-section">
+                            <h4 class="key-points-header">
+                                <i class="fas fa-key"></i>
+                                Key Points
+                            </h4>
+                            <ul class="key-points-list">
+                                <li class="key-point">Variables are created when you assign a value</li>
+                                <li class="key-point">Python is dynamically typed</li>
+                                <li class="key-point">Variable names are case-sensitive</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="lesson-block-actions">
+                        <button class="action-btn primary complete-btn" data-block-id="text-1">
+                            <i class="fas fa-check"></i>
+                            <span>Mark as Read</span>
+                        </button>
+                    </div>
+                </article>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <div class="section-title">Code Example Block</div>
+            <div class="lesson-content-container" id="code-section">
+                <article class="lesson-block code_example-block" id="block-code-1" data-block-id="code-1" data-block-type="code_example" data-completion-status="incomplete">
+                    <div class="lesson-block-header">
+                        <div class="block-type-indicator">
+                            <div class="block-icon code-block-icon">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <span class="block-type-label">Code Example</span>
+                        </div>
+                        <div class="code-meta">
+                            <span class="language-badge python">PYTHON</span>
+                            <button class="action-btn secondary copy-btn" data-block-id="code-1">
+                                <i class="fas fa-copy"></i>
+                                <span>Copy</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="lesson-block-content">
+                        <div class="code-container">
+                            <div class="code-header">
+                                <span class="code-title">Variable Assignment</span>
+                            </div>
+                            <div class="code-block-wrapper">
+                                <pre class="code-content"><code class="language-python"># Creating variables
+name = "Alice"
+age = 25
+height = 5.6
+is_student = True
+
+# Printing variables
+print(f"Name: {name}")
+print(f"Age: {age}")
+print(f"Height: {height}")
+print(f"Is student: {is_student}")</code></pre>
+                            </div>
+                        </div>
+                        <div class="code-explanation">
+                            <div class="explanation-header">
+                                <i class="fas fa-lightbulb"></i>
+                                <span>Explanation</span>
+                            </div>
+                            <div class="explanation-content">
+                                <p>This example shows how to create different types of variables in Python. Notice how we don't need to declare the type explicitly.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lesson-block-actions">
+                        <button class="action-btn primary complete-btn" data-block-id="code-1">
+                            <i class="fas fa-check"></i>
+                            <span>Mark as Understood</span>
+                        </button>
+                    </div>
+                </article>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <div class="section-title">Interactive Challenge Block</div>
+            <div class="lesson-content-container" id="interactive-section">
+                <article class="lesson-block interactive-block" id="block-interactive-1" data-block-id="interactive-1" data-block-type="interactive" data-completion-status="incomplete">
+                    <div class="lesson-block-header">
+                        <div class="block-type-indicator">
+                            <div class="block-icon interactive-block-icon">
+                                <i class="fas fa-laptop-code"></i>
+                            </div>
+                            <span class="block-type-label">Code Challenge</span>
+                        </div>
+                        <div class="challenge-meta">
+                            <span class="challenge-type-badge">Coding</span>
+                            <span class="difficulty-badge beginner">Beginner</span>
+                        </div>
+                    </div>
+                    <div class="lesson-block-content">
+                        <div class="challenge-content">
+                            <div class="challenge-instructions">
+                                <div class="instructions-header">
+                                    <i class="fas fa-bullseye"></i>
+                                    <span>Your Challenge</span>
+                                </div>
+                                <div class="instructions-content">
+                                    <p>Create variables for your personal information and print them using f-strings.</p>
+                                </div>
+                                <div class="requirements-section">
+                                    <div class="requirements-header">
+                                        <i class="fas fa-list-check"></i>
+                                        <span>Requirements</span>
+                                    </div>
+                                    <ul class="requirements-list">
+                                        <li class="requirement">Create a name variable with your name</li>
+                                        <li class="requirement">Create an age variable with your age</li>
+                                        <li class="requirement">Print both using f-strings</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="code-editor-container">
+                                <div class="editor-toolbar">
+                                    <span class="editor-label">
+                                        <i class="fas fa-code"></i>
+                                        Python Editor
+                                    </span>
+                                    <div class="editor-actions">
+                                        <button class="action-btn secondary hint-btn" data-block-id="interactive-1">
+                                            <i class="fas fa-lightbulb"></i>
+                                            <span>Hint (5 🪙)</span>
+                                        </button>
+                                        <button class="action-btn secondary reset-btn" data-block-id="interactive-1">
+                                            <i class="fas fa-undo"></i>
+                                            <span>Reset</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="code-editor-wrapper">
+                                    <div id="editor-interactive-1" class="code-editor" data-language="python"># Write your code here
+name = 
+age = 
+
+# Print your variables here</div>
+                                </div>
+                                <div class="editor-footer">
+                                    <button class="action-btn primary run-btn" data-block-id="interactive-1">
+                                        <i class="fas fa-play"></i>
+                                        <span>Run Code</span>
+                                    </button>
+                                    <button class="action-btn outline solution-btn" data-block-id="interactive-1">
+                                        <i class="fas fa-eye"></i>
+                                        <span>Show Solution</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="output-section">
+                                <div class="output-header">
+                                    <i class="fas fa-terminal"></i>
+                                    <span>Output & Results</span>
+                                </div>
+                                <div id="output-interactive-1" class="code-output"></div>
+                                <div class="test-results-section" id="tests-interactive-1">
+                                    <div class="test-header">
+                                        <i class="fas fa-flask"></i>
+                                        <span>Test Results</span>
+                                    </div>
+                                    <div class="test-list"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <div class="section-title">Quiz Block</div>
+            <div class="lesson-content-container" id="quiz-section">
+                <article class="lesson-block quiz-block" id="block-quiz-1" data-block-id="quiz-1" data-block-type="quiz" data-completion-status="incomplete">
+                    <div class="lesson-block-header">
+                        <div class="block-type-indicator">
+                            <div class="block-icon quiz-block-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <span class="block-type-label">Knowledge Check</span>
+                        </div>
+                        <div class="quiz-meta">
+                            <span class="quiz-type-badge">Assessment</span>
+                        </div>
+                    </div>
+                    <div class="lesson-block-content">
+                        <div class="quiz-content">
+                            <div class="quiz-intro">
+                                <div class="quiz-intro-header">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span>Test Your Understanding</span>
+                                </div>
+                                <div class="quiz-intro-content">
+                                    <p>Complete this quiz to test your knowledge of Python variables and mark this section as complete.</p>
+                                </div>
+                            </div>
+                            <div class="quiz-container" id="quiz-quiz-1" data-quiz-id="quiz-1">
+                                <div class="quiz-loading">
+                                    <div class="loading-spinner"></div>
+                                    <span>Loading quiz...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <div class="section-title">Completed Blocks</div>
+            <div class="lesson-content-container" id="completed-section">
+                <article class="lesson-block text-block completed" id="block-completed-1" data-block-id="completed-1" data-block-type="text" data-completion-status="completed">
+                    <div class="lesson-block-header">
+                        <div class="block-type-indicator">
+                            <div class="block-icon text-block-icon">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <span class="block-type-label">Reading</span>
+                        </div>
+                        <div class="block-progress-container">
+                            <div class="progress-indicator" id="progress-completed-1">
+                                <div class="progress-status complete">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lesson-block-content">
+                        <div class="text-content">
+                            <h3>Python Data Types</h3>
+                            <p>This block is already completed. Notice the visual differences!</p>
+                        </div>
+                    </div>
+                    <div class="lesson-block-actions">
+                        <button class="action-btn primary complete-btn" data-block-id="completed-1" disabled>
+                            <i class="fas fa-check"></i>
+                            <span>Completed</span>
+                        </button>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Demo functions
+        function simulateCompletion() {
+            const blocks = document.querySelectorAll('.lesson-block:not(.completed)');
+            blocks.forEach(block => {
+                const progressIndicator = block.querySelector('.progress-indicator .progress-status');
+                const progressIcon = progressIndicator.querySelector('i');
+                const completeBtn = block.querySelector('.complete-btn');
+                
+                // Animate completion
+                block.classList.add('completing');
+                progressIndicator.classList.remove('incomplete');
+                progressIndicator.classList.add('complete');
+                progressIcon.className = 'fas fa-check-circle';
+                
+                setTimeout(() => {
+                    block.classList.remove('completing');
+                    block.classList.add('completed');
+                    block.setAttribute('data-completion-status', 'completed');
+                    if (completeBtn) {
+                        completeBtn.disabled = true;
+                        completeBtn.querySelector('span').textContent = 'Completed';
+                    }
+                }, 500);
+            });
+        }
+        
+        function simulateProgress() {
+            const blocks = document.querySelectorAll('.lesson-block');
+            blocks.forEach((block, index) => {
+                setTimeout(() => {
+                    block.classList.add('progress-highlight');
+                    setTimeout(() => {
+                        block.classList.remove('progress-highlight');
+                    }, 1000);
+                }, index * 200);
+            });
+        }
+        
+        function resetBlocks() {
+            const blocks = document.querySelectorAll('.lesson-block:not(#block-completed-1)');
+            blocks.forEach(block => {
+                const progressIndicator = block.querySelector('.progress-indicator .progress-status');
+                const progressIcon = progressIndicator.querySelector('i');
+                const completeBtn = block.querySelector('.complete-btn');
+                
+                block.classList.remove('completed', 'completing', 'progress-highlight');
+                block.setAttribute('data-completion-status', 'incomplete');
+                progressIndicator.classList.remove('complete');
+                progressIndicator.classList.add('incomplete');
+                progressIcon.className = 'fas fa-circle-o';
+                
+                if (completeBtn) {
+                    completeBtn.disabled = false;
+                    const span = completeBtn.querySelector('span');
+                    if (span.textContent === 'Completed') {
+                        span.textContent = span.textContent.replace('Completed', 'Mark as Read');
+                    }
+                }
+            });
+        }
+        
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+        
+        // Add click handlers for action buttons
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.classList.contains('complete-btn')) {
+                    const blockId = this.dataset.blockId;
+                    const block = document.getElementById(`block-${blockId}`);
+                    const progressIndicator = block.querySelector('.progress-indicator .progress-status');
+                    const progressIcon = progressIndicator.querySelector('i');
+                    
+                    // Animate completion
+                    block.classList.add('completing');
+                    progressIndicator.classList.remove('incomplete');
+                    progressIndicator.classList.add('complete');
+                    progressIcon.className = 'fas fa-check-circle';
+                    
+                    setTimeout(() => {
+                        block.classList.remove('completing');
+                        block.classList.add('completed');
+                        block.setAttribute('data-completion-status', 'completed');
+                        this.disabled = true;
+                        this.querySelector('span').textContent = 'Completed';
+                    }, 500);
+                }
+            });
+        });
+        
+        // Add some CSS for the progress highlight effect
+        const style = document.createElement('style');
+        style.textContent = `
+            .lesson-block.progress-highlight {
+                transform: scale(1.02);
+                box-shadow: 0 8px 32px var(--primary-color-alpha);
+                border-color: var(--primary-color);
+            }
+            
+            .lesson-block.completing {
+                animation: completionPulse 0.5s ease-in-out;
+            }
+            
+            @keyframes completionPulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
