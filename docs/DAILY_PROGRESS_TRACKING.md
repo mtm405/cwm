@@ -28,11 +28,26 @@
 
 **Target**: Progress persists across page reloads ✅
 
-### **Day 2 Goals**
-- [ ] **1.1.3** Fix progress loading on page initialization
-- [ ] **1.2.1** Fix overall progress bar calculation
-- [ ] **1.2.2** Fix progress bar UI updates
-- [ ] Test complete Phase 1 functionality
+### **Day 2 Goals - PHASE 2: Visual/UI Improvements**
+- [ ] **2.1.1** Create unified CSS framework for lesson blocks
+  - [ ] Design consistent block headers with icons and meta info
+  - [ ] Implement modern card-based layout system
+  - [ ] Add hover states and transitions
+  - [ ] Create responsive design for mobile
+
+- [ ] **2.1.2** Enhanced progress indicators and animations
+  - [ ] Redesign progress bars with smooth animations
+  - [ ] Add completion celebrations and micro-interactions
+  - [ ] Implement block completion animations
+  - [ ] Add visual feedback for assessment states
+
+- [ ] **2.1.3** Improved assessment feedback UI
+  - [ ] Design assessment result modals/notifications
+  - [ ] Create retry attempt indicators
+  - [ ] Add score visualization components
+  - [ ] Implement error state designs
+
+**Target**: Modern, unified visual experience across all lesson blocks ✅
 
 **Target**: Progress system fully working ✅
 

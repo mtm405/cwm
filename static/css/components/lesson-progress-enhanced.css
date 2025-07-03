@@ -1,0 +1,607 @@
+/**
+ * Enhanced Progress System - Phase 2 UI Improvements
+ * Modern progress bars, animations, and visual feedback
+ * Code with Morais - July 3, 2025
+ */
+
+/* ================================
+   LESSON PROGRESS BAR
+   ================================ */
+.lesson-progress-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--block-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.theme-dark .lesson-progress-container {
+    background: rgba(31, 41, 55, 0.95);
+}
+
+.lesson-progress-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, 
+        var(--primary-color, #6366f1) 0%, 
+        var(--assessment-success) 50%, 
+        var(--quiz-accent) 100%
+    );
+    border-radius: 12px 12px 0 0;
+}
+
+.progress-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.progress-title {
+    font-size: 1.125rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary, #1f2937);
+    margin: 0;
+}
+
+.progress-stats {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary, #6b7280);
+}
+
+.progress-percentage {
+    font-size: 1.5rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--primary-color, #6366f1);
+    margin: 0;
+}
+
+.progress-bar-wrapper {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: rgba(229, 231, 235, 0.8);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+
+.theme-dark .progress-bar {
+    background: rgba(75, 85, 99, 0.8);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, 
+        var(--primary-color, #6366f1) 0%, 
+        var(--assessment-success) 100%
+    );
+    border-radius: 6px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -50%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.3), 
+        transparent
+    );
+    animation: progress-shine 2s infinite;
+}
+
+@keyframes progress-shine {
+    0% { left: -50%; }
+    100% { left: 100%; }
+}
+
+.progress-milestones {
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.milestone {
+    width: 8px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px solid var(--primary-color, #6366f1);
+    border-radius: 50%;
+    transition: all var(--animation-normal);
+}
+
+.milestone.reached {
+    background: var(--assessment-success);
+    border-color: var(--assessment-success);
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+.progress-details {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.875rem;
+}
+
+.blocks-completed {
+    color: var(--text-secondary, #6b7280);
+}
+
+.assessment-summary {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.assessment-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.assessment-stat.quiz {
+    color: var(--quiz-accent);
+}
+
+.assessment-stat.code {
+    color: var(--interactive-accent);
+}
+
+.assessment-stat.reading {
+    color: var(--text-accent);
+}
+
+/* ================================
+   BLOCK PROGRESS INDICATORS
+   ================================ */
+.block-progress-indicator {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    transition: all var(--animation-normal);
+    cursor: pointer;
+}
+
+.block-progress-indicator:hover {
+    transform: scale(1.1);
+}
+
+.block-progress-indicator.not-started {
+    background: rgba(156, 163, 175, 0.2);
+    color: #9ca3af;
+    border: 2px solid #d1d5db;
+}
+
+.block-progress-indicator.in-progress {
+    background: rgba(251, 191, 36, 0.2);
+    color: var(--assessment-pending);
+    border: 2px solid var(--assessment-pending);
+    animation: pulse-pending 2s infinite;
+}
+
+.block-progress-indicator.completed {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--assessment-success);
+    border: 2px solid var(--assessment-success);
+    animation: completion-bounce 0.6s ease-out;
+}
+
+.block-progress-indicator.failed {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--assessment-error);
+    border: 2px solid var(--assessment-error);
+}
+
+.block-progress-indicator.locked {
+    background: rgba(156, 163, 175, 0.1);
+    color: #9ca3af;
+    border: 2px solid #e5e7eb;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Progress indicator animations */
+@keyframes pulse-pending {
+    0%, 100% { 
+        box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7);
+    }
+    50% { 
+        box-shadow: 0 0 0 8px rgba(251, 191, 36, 0);
+    }
+}
+
+@keyframes completion-bounce {
+    0%, 20%, 60%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-8px);
+    }
+    80% {
+        transform: translateY(-4px);
+    }
+}
+
+/* ================================
+   ASSESSMENT PROGRESS RINGS
+   ================================ */
+.assessment-progress-ring {
+    position: relative;
+    width: 48px;
+    height: 48px;
+}
+
+.assessment-progress-ring svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.assessment-progress-ring .ring-bg {
+    fill: none;
+    stroke: rgba(229, 231, 235, 0.8);
+    stroke-width: 4;
+}
+
+.assessment-progress-ring .ring-progress {
+    fill: none;
+    stroke: var(--primary-color, #6366f1);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 126; /* 2 * π * 20 */
+    stroke-dashoffset: 126;
+    transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.assessment-progress-ring.success .ring-progress {
+    stroke: var(--assessment-success);
+}
+
+.assessment-progress-ring.warning .ring-progress {
+    stroke: var(--assessment-warning);
+}
+
+.assessment-progress-ring.error .ring-progress {
+    stroke: var(--assessment-error);
+}
+
+.assessment-progress-ring .ring-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary, #1f2937);
+}
+
+/* ================================
+   COMPLETION CELEBRATIONS
+   ================================ */
+.completion-celebration {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--block-bg);
+    border: 2px solid var(--assessment-success);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    animation: celebration-appear 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    max-width: 400px;
+    width: 90vw;
+}
+
+.completion-celebration.lesson-complete {
+    border-color: var(--quiz-accent);
+}
+
+.celebration-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: celebration-bounce 1s infinite;
+}
+
+.celebration-title {
+    font-size: 1.5rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--assessment-success);
+    margin: 0 0 0.5rem 0;
+}
+
+.celebration-message {
+    color: var(--text-secondary, #6b7280);
+    margin: 0 0 1.5rem 0;
+    line-height: 1.6;
+}
+
+.celebration-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.celebration-stat {
+    text-align: center;
+}
+
+.celebration-stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--primary-color, #6366f1);
+}
+
+.celebration-stat-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary, #6b7280);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.celebration-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+@keyframes celebration-appear {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8) rotate(-10deg);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    }
+}
+
+@keyframes celebration-bounce {
+    0%, 20%, 60%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    80% {
+        transform: translateY(-5px);
+    }
+}
+
+/* ================================
+   STREAK INDICATORS
+   ================================ */
+.streak-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, 
+        rgba(245, 158, 11, 0.1) 0%, 
+        rgba(251, 191, 36, 0.1) 100%
+    );
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: var(--font-weight-medium);
+    color: var(--assessment-warning);
+}
+
+.streak-indicator.fire {
+    animation: streak-fire 2s infinite;
+}
+
+@keyframes streak-fire {
+    0%, 100% { 
+        box-shadow: 0 0 5px rgba(245, 158, 11, 0.3);
+    }
+    50% { 
+        box-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+    }
+}
+
+.streak-icon {
+    font-size: 1rem;
+}
+
+.streak-count {
+    font-weight: var(--font-weight-bold);
+}
+
+/* ================================
+   TIME TRACKING
+   ================================ */
+.time-tracker {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: rgba(99, 102, 241, 0.05);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.time-tracker-icon {
+    color: var(--primary-color, #6366f1);
+    font-size: 1rem;
+}
+
+.time-spent {
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary, #1f2937);
+}
+
+.time-estimate {
+    color: var(--text-secondary, #6b7280);
+}
+
+.time-efficiency {
+    margin-left: auto;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-semibold);
+}
+
+.time-efficiency.excellent {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--assessment-success);
+}
+
+.time-efficiency.good {
+    background: rgba(251, 191, 36, 0.2);
+    color: var(--assessment-pending);
+}
+
+.time-efficiency.needs-improvement {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--assessment-error);
+}
+
+/* ================================
+   RESPONSIVE PROGRESS DESIGN
+   ================================ */
+@media (max-width: 768px) {
+    .lesson-progress-container {
+        padding: 1rem;
+    }
+    
+    .progress-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .progress-stats {
+        align-self: stretch;
+        justify-content: space-between;
+    }
+    
+    .progress-details {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .assessment-summary {
+        align-self: stretch;
+        justify-content: space-between;
+    }
+    
+    .completion-celebration {
+        padding: 1.5rem;
+    }
+    
+    .celebration-actions {
+        flex-direction: column;
+    }
+    
+    .celebration-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ================================
+   ACCESSIBILITY ENHANCEMENTS
+   ================================ */
+.block-progress-indicator:focus {
+    outline: 2px solid var(--primary-color, #6366f1);
+    outline-offset: 2px;
+}
+
+.block-progress-indicator[aria-label]::after {
+    content: attr(aria-label);
+    position: absolute;
+    bottom: -2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--text-primary, #1f2937);
+    color: var(--block-bg);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--animation-fast);
+}
+
+.block-progress-indicator:hover::after,
+.block-progress-indicator:focus::after {
+    opacity: 1;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .progress-fill,
+    .ring-progress,
+    .block-progress-indicator,
+    .celebration-icon,
+    .streak-indicator {
+        animation: none;
+        transition: none;
+    }
+    
+    .progress-fill::after {
+        display: none;
+    }
+}
+
+/* ================================
+   PRINT STYLES
+   ================================ */
+@media print {
+    .lesson-progress-container {
+        background: white;
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+    
+    .completion-celebration {
+        display: none;
+    }
+    
+    .block-progress-indicator {
+        background: white !important;
+        border-color: #000 !important;
+        color: #000 !important;
+    }
+}
