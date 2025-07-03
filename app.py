@@ -133,6 +133,7 @@ try:
     from routes.firebase_check import firebase_check_bp
     from routes.system_api import system_api_bp
     from routes.recommendation_api import recommendation_api_bp
+    from routes.profile_routes_api import profile_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')
@@ -143,6 +144,7 @@ try:
     app.register_blueprint(firebase_check_bp)
     app.register_blueprint(system_api_bp)
     app.register_blueprint(recommendation_api_bp)
+    app.register_blueprint(profile_bp)
     
     logger.info("Blueprints registered successfully")
 except Exception as e:

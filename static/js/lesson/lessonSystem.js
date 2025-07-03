@@ -44,6 +44,9 @@ export class LessonSystem {
             // Get current user
             this.currentUser = this.getCurrentUser();
             
+            // Load quiz system first
+            await this.loadQuizSystem();
+            
             // Fetch data from Firebase or use provided data
             const [lessonData, userProgress] = await Promise.all([
                 this.dataService.fetchLesson(this.lessonId),
@@ -70,6 +73,9 @@ export class LessonSystem {
             // Set up progress tracking
             this.progress.initialize(this.lessonId, this.userProgress, this.currentUser?.id);
             
+            // Set up quiz event listeners
+            this.setupQuizEventListeners();
+            
             // Update progress display
             this.updateProgressDisplay();
             
@@ -82,6 +88,228 @@ export class LessonSystem {
             console.error('❌ Lesson initialization failed:', error);
             this.renderer.showError(error.message);
             throw error;
+        }
+    }
+    
+    async loadQuizSystem() {
+        try {
+            console.log('🧠 Loading quiz system components...');
+            
+            // Check if quiz system is already loaded
+            if (window.QuizEngine && window.QuizController && window.QuizState) {
+                console.log('✅ Quiz system already loaded');
+                return;
+            }
+            
+            // Load quiz system scripts
+            const quizScripts = [
+                '/static/js/quiz/QuizState.js',
+                '/static/js/quiz/QuizEngine.js',
+                '/static/js/quiz/QuizController.js'
+            ];
+            
+            for (const scriptPath of quizScripts) {
+                await this.loadScript(scriptPath);
+            }
+            
+            // Verify quiz system is loaded
+            if (window.QuizEngine && window.QuizController && window.QuizState) {
+                console.log('✅ Quiz system loaded successfully');
+                
+                // Initialize quiz analytics if available
+                this.initializeQuizAnalytics();
+            } else {
+                console.warn('⚠️ Quiz system components not found after loading');
+            }
+            
+        } catch (error) {
+            console.error('❌ Failed to load quiz system:', error);
+            console.log('📚 Continuing with basic quiz fallback...');
+        }
+    }
+    
+    async loadScript(src) {
+        return new Promise((resolve, reject) => {
+            // Check if script is already loaded
+            if (document.querySelector(`script[src="${src}"]`)) {
+                resolve();
+                return;
+            }
+            
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+    }
+    
+    initializeQuizAnalytics() {
+        // Set up quiz analytics tracking
+        if (window.QuizEngine) {
+            const originalTrackEvent = window.QuizEngine.prototype.trackEvent;
+            
+            window.QuizEngine.prototype.trackEvent = function(eventName, data) {
+                // Call original tracking
+                if (originalTrackEvent) {
+                    originalTrackEvent.call(this, eventName, data);
+                }
+                
+                // Add lesson context
+                const lessonContext = {
+                    ...data,
+                    lessonId: window.lessonSystem?.lessonId,
+                    userId: window.lessonSystem?.currentUser?.id,
+                    timestamp: Date.now()
+                };
+                
+                // Send to analytics
+                window.lessonSystem?.trackEvent(`quiz_${eventName}`, lessonContext);
+            };
+        }
+    }
+    
+    setupQuizEventListeners() {
+        // Listen for quiz completion events
+        document.addEventListener('quizCompleted', (event) => {
+            const { blockId, quizId, results } = event.detail;
+            console.log(`🎉 Quiz completed: ${quizId} in block ${blockId}`);
+            
+            // Update lesson progress
+            this.handleQuizCompletion(blockId, results);
+        });
+        
+        // Listen for quiz errors
+        document.addEventListener('quizError', (event) => {
+            const { blockId, quizId, error } = event.detail;
+            console.error(`❌ Quiz error: ${quizId} in block ${blockId}:`, error);
+            
+            // Handle quiz error
+            this.handleQuizError(blockId, error);
+        });
+        
+        // Listen for quiz progress updates
+        document.addEventListener('quizProgress', (event) => {
+            const { blockId, progress } = event.detail;
+            console.log(`📊 Quiz progress: block ${blockId}`, progress);
+            
+            // Update UI progress
+            this.updateQuizProgress(blockId, progress);
+        });
+    }
+    
+    async handleQuizCompletion(blockId, results) {
+        try {
+            // Mark block as completed if quiz was passed
+            if (results.passed) {
+                await this.markBlockComplete(blockId);
+            }
+            
+            // Update quiz-specific progress
+            await this.updateQuizResults(blockId, results);
+            
+            // Save progress
+            await this.saveProgress();
+            
+            // Update progress display
+            this.updateProgressDisplay();
+            
+            // Show completion notification
+            this.showCompletionNotification(blockId, results);
+            
+        } catch (error) {
+            console.error('❌ Failed to handle quiz completion:', error);
+        }
+    }
+    
+    async updateQuizResults(blockId, results) {
+        try {
+            // Update quiz results in progress data
+            if (!this.userProgress.quizResults) {
+                this.userProgress.quizResults = {};
+            }
+            
+            this.userProgress.quizResults[blockId] = {
+                score: results.score,
+                passed: results.passed,
+                attempts: (this.userProgress.quizResults[blockId]?.attempts || 0) + 1,
+                bestScore: Math.max(
+                    results.score,
+                    this.userProgress.quizResults[blockId]?.bestScore || 0
+                ),
+                completedAt: Date.now()
+            };
+            
+            console.log(`📊 Updated quiz results for block ${blockId}`);
+            
+        } catch (error) {
+            console.error('❌ Failed to update quiz results:', error);
+        }
+    }
+    
+    handleQuizError(blockId, error) {
+        // Log error for debugging
+        console.error(`Quiz error in block ${blockId}:`, error);
+        
+        // Track error event
+        this.trackEvent('quiz_error', {
+            blockId: blockId,
+            error: error.message || error,
+            timestamp: Date.now()
+        });
+        
+        // Show user-friendly error message
+        this.showNotification('error', 'Quiz Error', 'An error occurred with the quiz. Please try again.');
+    }
+    
+    updateQuizProgress(blockId, progress) {
+        // Update progress indicators in UI
+        const progressElement = document.getElementById(`quiz-progress-${blockId}`);
+        if (progressElement) {
+            const percentage = Math.round((progress.current / progress.total) * 100);
+            progressElement.style.setProperty('--progress', `${percentage}%`);
+            progressElement.title = `Quiz Progress: ${percentage}%`;
+        }
+    }
+    
+    showCompletionNotification(blockId, results) {
+        const message = results.passed 
+            ? `🎉 Quiz completed successfully! Score: ${Math.round(results.score)}%`
+            : `📚 Quiz completed. Score: ${Math.round(results.score)}%. Keep learning!`;
+        
+        this.showNotification(results.passed ? 'success' : 'info', 'Quiz Completed', message);
+    }
+    
+    showNotification(type, title, message) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <h5>${title}</h5>
+                <p>${message}</p>
+                <button class="notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
+            </div>
+        `;
+        
+        // Add to page
+        document.body.appendChild(notification);
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 5000);
+    }
+    
+    trackEvent(eventName, data) {
+        // Basic event tracking
+        console.log(`📊 Event: ${eventName}`, data);
+        
+        // Send to analytics service if available
+        if (window.analytics && typeof window.analytics.track === 'function') {
+            window.analytics.track(eventName, data);
         }
     }
     

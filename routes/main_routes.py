@@ -110,5 +110,31 @@ def test_google_signin():
     google_client_id = os.environ.get('GOOGLE_CLIENT_ID')
     return render_template('test-google-signin.html', google_client_id=google_client_id)
 
+@main_bp.route('/profile')
+def profile():
+    """User profile page"""
+    user = get_current_user()
+    
+    # Redirect to login if no user
+    from config import get_config
+    config = get_config()
+    if not user and not config.DEV_MODE:
+        return redirect(url_for('main.index'))
+    
+    # For development mode, create a mock user if needed
+    if config.DEV_MODE and not user:
+        user = {
+            'uid': 'dev_user_001',
+            'email': 'dev@example.com',
+            'display_name': 'Development User',
+            'bio': 'This is a development user for testing purposes',
+            'avatar_url': None,
+            'profile_public': True,
+            'show_progress': True,
+            'show_achievements': True
+        }
+    
+    return render_template('profile.html', user=user)
+
 # Note: /lessons route moved to lesson_routes.py for better organization
 # Note: /lesson/<lesson_id> route also moved to lesson_routes.py for proper data handling

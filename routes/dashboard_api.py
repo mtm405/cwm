@@ -9,6 +9,7 @@ from models.activity import get_recent_activity, track_activity
 from services.firebase_service import FirebaseService
 from config import get_config
 from datetime import datetime, timedelta
+from typing import Dict, List, Optional
 import logging
 
 logger = logging.getLogger(__name__)
@@ -680,3 +681,324 @@ def get_personalized_suggestions():
             'in_progress_lessons': [],
             'error': str(e)
         }), 500
+
+@dashboard_api_bp.route('/ai-recommendations')
+def get_ai_recommendations():
+    """Get AI-powered personalized learning recommendations"""
+    try:
+        user = get_current_user()
+        if not user:
+            return jsonify({
+                'recommendations': [],
+                'guest_mode': True,
+                'message': 'Login to get personalized recommendations'
+            })
+        
+        user_id = user['uid']
+        
+        # Get user progress and lessons
+        user_progress = get_user_progress(user_id)
+        all_lessons = get_all_lessons()
+        
+        # Simple recommendations without AI engine
+        recommendations = _get_simple_recommendations(user_progress, all_lessons)
+        
+        # Simple learning insights
+        learning_insights = _get_simple_learning_insights(user_progress, all_lessons)
+        
+        # Format recommendations for frontend
+        formatted_recommendations = []
+        for rec in recommendations:
+            formatted_recommendations.append({
+                'id': rec.get('lesson_id'),
+                'title': rec.get('display_title'),
+                'description': rec.get('display_description'),
+                'reason': rec.get('reason'),
+                'confidence': rec.get('confidence', 0.5),
+                'priority': rec.get('priority', 'medium'),
+                'type': rec.get('type', 'general'),
+                'estimated_time': rec.get('estimated_time', 30),
+                'xp_reward': rec.get('xp_reward', 50),
+                'score': rec.get('score', 0.5),
+                'url': f"/lesson/{rec.get('lesson_id')}"
+            })
+        
+        logger.info(f"Generated {len(formatted_recommendations)} AI recommendations for user {user_id}")
+        
+        return jsonify({
+            'recommendations': formatted_recommendations,
+            'insights': learning_insights,
+            'user_analysis': {
+                'completion_rate': learning_insights.get('completion_rate', 0),
+                'consistency_score': learning_insights.get('consistency_score', 0),
+                'preferred_difficulty': learning_insights.get('preferred_difficulty', 'beginner'),
+                'active_hours': learning_insights.get('active_hours', 'morning'),
+                'strengths': learning_insights.get('strengths', []),
+                'skill_gaps': learning_insights.get('skill_gaps', [])
+            },
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting AI recommendations: {str(e)}")
+        return jsonify({
+            'error': 'Failed to generate recommendations',
+            'recommendations': [],
+            'insights': {},
+            'user_analysis': {}
+        }), 500
+
+@dashboard_api_bp.route('/learning-insights')
+def get_learning_insights():
+    """Get detailed learning insights and analytics"""
+    try:
+        user = get_current_user()
+        if not user:
+            return jsonify({
+                'insights': {},
+                'guest_mode': True,
+                'message': 'Login to view learning insights'
+            })
+        
+        user_id = user['uid']
+        
+        # Get user progress and lessons
+        user_progress = get_user_progress(user_id)
+        all_lessons = get_all_lessons()
+        
+        # Simple learning insights without AI engine
+        learning_insights = _get_simple_learning_insights(user_progress, all_lessons)
+        
+        # Add additional analytics
+        analytics_data = {
+            'progress_trends': _calculate_progress_trends(user_progress),
+            'learning_streaks': _calculate_learning_streaks(user_progress),
+            'performance_metrics': _calculate_performance_metrics(user_progress, all_lessons),
+            'time_analytics': _calculate_time_analytics(user_progress)
+        }
+        
+        return jsonify({
+            'insights': learning_insights,
+            'analytics': analytics_data,
+            'user_profile': learning_insights,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting learning insights: {str(e)}")
+        return jsonify({
+            'error': 'Failed to generate learning insights',
+            'insights': {},
+            'analytics': {}
+        }), 500
+
+def _calculate_progress_trends(user_progress: Dict) -> Dict:
+    """Calculate user's progress trends over time"""
+    trends = {
+        'weekly_progress': 0,
+        'monthly_progress': 0,
+        'acceleration': 'stable',
+        'projected_completion': None
+    }
+    
+    try:
+        # Get completed lessons with timestamps
+        completed_lessons = []
+        for lesson_id, progress in user_progress.items():
+            if progress.get('completed', False) and progress.get('last_accessed'):
+                try:
+                    completion_time = datetime.fromisoformat(progress['last_accessed'])
+                    completed_lessons.append(completion_time)
+                except:
+                    pass
+        
+        if len(completed_lessons) > 1:
+            completed_lessons.sort()
+            
+            # Calculate recent progress
+            now = datetime.now()
+            week_ago = now - timedelta(weeks=1)
+            month_ago = now - timedelta(weeks=4)
+            
+            weekly_completions = len([dt for dt in completed_lessons if dt >= week_ago])
+            monthly_completions = len([dt for dt in completed_lessons if dt >= month_ago])
+            
+            trends['weekly_progress'] = weekly_completions
+            trends['monthly_progress'] = monthly_completions
+            
+            # Determine acceleration
+            if len(completed_lessons) > 2:
+                recent_rate = weekly_completions / 1  # per week
+                historical_rate = len(completed_lessons) / max(1, (now - completed_lessons[0]).days / 7)
+                
+                if recent_rate > historical_rate * 1.2:
+                    trends['acceleration'] = 'accelerating'
+                elif recent_rate < historical_rate * 0.8:
+                    trends['acceleration'] = 'decelerating'
+                else:
+                    trends['acceleration'] = 'stable'
+    
+    except Exception as e:
+        logger.error(f"Error calculating progress trends: {str(e)}")
+    
+    return trends
+
+def _calculate_learning_streaks(user_progress: Dict) -> Dict:
+    """Calculate learning streaks and consistency metrics"""
+    streaks = {
+        'current_streak': 0,
+        'longest_streak': 0,
+        'consistency_score': 0,
+        'active_days': 0
+    }
+    
+    try:
+        # Get all activity dates
+        activity_dates = set()
+        for lesson_id, progress in user_progress.items():
+            if progress.get('last_accessed'):
+                try:
+                    date = datetime.fromisoformat(progress['last_accessed']).date()
+                    activity_dates.add(date)
+                except:
+                    pass
+        
+        if activity_dates:
+            sorted_dates = sorted(activity_dates)
+            streaks['active_days'] = len(sorted_dates)
+            
+            # Calculate current streak
+            current_date = datetime.now().date()
+            current_streak = 0
+            check_date = current_date
+            
+            while check_date in activity_dates:
+                current_streak += 1
+                check_date -= timedelta(days=1)
+            
+            streaks['current_streak'] = current_streak
+            
+            # Calculate longest streak
+            longest_streak = 0
+            current_streak = 0
+            
+            for i in range(1, len(sorted_dates)):
+                if (sorted_dates[i] - sorted_dates[i-1]).days == 1:
+                    current_streak += 1
+                else:
+                    longest_streak = max(longest_streak, current_streak)
+                    current_streak = 0
+            
+            streaks['longest_streak'] = max(longest_streak, current_streak)
+            
+            # Calculate consistency score (0-1)
+            if len(sorted_dates) > 1:
+                total_days = (sorted_dates[-1] - sorted_dates[0]).days + 1
+                streaks['consistency_score'] = len(sorted_dates) / total_days
+    
+    except Exception as e:
+        logger.error(f"Error calculating learning streaks: {str(e)}")
+    
+    return streaks
+
+def _calculate_performance_metrics(user_progress: Dict, all_lessons: List) -> Dict:
+    """Calculate performance metrics"""
+    metrics = {
+        'completion_rate': 0,
+        'average_progress': 0,
+        'efficiency_score': 0,
+        'difficulty_distribution': {}
+    }
+    
+    try:
+        total_lessons = len(all_lessons)
+        completed_lessons = len([p for p in user_progress.values() if p.get('completed', False)])
+        
+        if total_lessons > 0:
+            metrics['completion_rate'] = completed_lessons / total_lessons
+        
+        # Calculate average progress
+        all_progress = [p.get('progress', 0) for p in user_progress.values()]
+        if all_progress:
+            metrics['average_progress'] = sum(all_progress) / len(all_progress)
+        
+        # Calculate efficiency score (completion rate vs time spent)
+        time_spent = sum(p.get('time_spent', 0) for p in user_progress.values())
+        if time_spent > 0:
+            metrics['efficiency_score'] = (completed_lessons * 30) / time_spent  # 30 min baseline
+        
+        # Difficulty distribution
+        difficulty_counts = {'beginner': 0, 'intermediate': 0, 'advanced': 0}
+        for lesson in all_lessons:
+            lesson_id = lesson.get('id')
+            if lesson_id in user_progress and user_progress[lesson_id].get('completed', False):
+                difficulty = lesson.get('difficulty', 'beginner')
+                difficulty_counts[difficulty] = difficulty_counts.get(difficulty, 0) + 1
+        
+        metrics['difficulty_distribution'] = difficulty_counts
+    
+    except Exception as e:
+        logger.error(f"Error calculating performance metrics: {str(e)}")
+    
+    return metrics
+
+def _calculate_time_analytics(user_progress: Dict) -> Dict:
+    """Calculate time-based analytics"""
+    analytics = {
+        'total_time_spent': 0,
+        'average_session_time': 0,
+        'most_active_hour': None,
+        'learning_velocity': 0
+    }
+    
+    try:
+        # Total time spent
+        total_time = sum(p.get('time_spent', 0) for p in user_progress.values())
+        analytics['total_time_spent'] = total_time
+        
+        # Average session time
+        completed_lessons = [p for p in user_progress.values() if p.get('completed', False)]
+        if completed_lessons:
+            session_times = [p.get('time_spent', 0) for p in completed_lessons if p.get('time_spent', 0) > 0]
+            if session_times:
+                analytics['average_session_time'] = sum(session_times) / len(session_times)
+        
+        # Most active hour
+        access_hours = []
+        for progress in user_progress.values():
+            if progress.get('last_accessed'):
+                try:
+                    hour = datetime.fromisoformat(progress['last_accessed']).hour
+                    access_hours.append(hour)
+                except:
+                    pass
+        
+        if access_hours:
+            from collections import Counter
+            hour_counts = Counter(access_hours)
+            analytics['most_active_hour'] = hour_counts.most_common(1)[0][0]
+        
+        # Learning velocity (lessons per week)
+        if len(completed_lessons) > 1:
+            first_completion = None
+            last_completion = None
+            
+            for progress in completed_lessons:
+                if progress.get('last_accessed'):
+                    try:
+                        completion_time = datetime.fromisoformat(progress['last_accessed'])
+                        if first_completion is None or completion_time < first_completion:
+                            first_completion = completion_time
+                        if last_completion is None or completion_time > last_completion:
+                            last_completion = completion_time
+                    except:
+                        pass
+            
+            if first_completion and last_completion:
+                weeks = max(1, (last_completion - first_completion).days / 7)
+                analytics['learning_velocity'] = len(completed_lessons) / weeks
+    
+    except Exception as e:
+        logger.error(f"Error calculating time analytics: {str(e)}")
+    
+    return analytics

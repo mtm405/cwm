@@ -214,10 +214,18 @@ export class LessonRenderer {
                     <span class="block-type">Knowledge Check</span>
                     <span class="block-title">${block.title || 'Quiz'}</span>
                 </div>
+                <div class="block-actions">
+                    <span class="quiz-progress-indicator" id="quiz-progress-${block.id}">
+                        <i class="fas fa-circle"></i>
+                    </span>
+                </div>
             </div>
             <div class="block-content">
+                <div class="quiz-intro">
+                    <p>${block.description || 'Test your knowledge with this quiz.'}</p>
+                </div>
                 <div class="quiz-container">
-                    <div id="quiz-${block.quiz_id}" data-quiz-id="${block.quiz_id}">
+                    <div id="quiz-${block.quiz_id}" data-quiz-id="${block.quiz_id}" data-block-id="${block.id}">
                         <div class="quiz-loading">
                             <i class="fas fa-spinner fa-spin"></i>
                             <span>Loading quiz questions...</span>

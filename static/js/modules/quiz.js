@@ -3,7 +3,7 @@
  * Core quiz functionality for lesson and standalone quizzes
  */
 
-class QuizModule {
+export class QuizModule {
     constructor(options = {}) {
         this.options = {
             autoSave: true,

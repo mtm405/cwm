@@ -478,6 +478,128 @@ def get_next_lesson(lesson_id):
         logger.error(f"Error getting next lesson recommendations: {str(e)}")
         return jsonify({'error': 'Failed to get recommendations'}), 500
 
+# Add quiz API endpoint
+@lesson_api_bp.route('/quiz/<quiz_id>')
+def get_quiz_api(quiz_id):
+    """Get quiz data by ID"""
+    try:
+        quiz_data = get_quiz(quiz_id)
+        
+        if not quiz_data:
+            return jsonify({'error': 'Quiz not found'}), 404
+        
+        # Don't expose correct answers - they'll be validated server-side
+        sanitized_quiz = {
+            'id': quiz_data.get('id'),
+            'title': quiz_data.get('title'),
+            'description': quiz_data.get('description'),
+            'difficulty': quiz_data.get('difficulty'),
+            'time_limit': quiz_data.get('time_limit'),
+            'xp_reward': quiz_data.get('xp_reward'),
+            'pycoins_reward': quiz_data.get('pycoins_reward'),
+            'questions': []
+        }
+        
+        # Sanitize questions (remove correct answers)
+        for question in quiz_data.get('questions', []):
+            sanitized_question = {
+                'id': question.get('id'),
+                'type': question.get('type'),
+                'question': question.get('question'),
+                'options': question.get('options', []),
+                'code_template': question.get('code_template'),
+                'sample_solution': question.get('sample_solution')
+            }
+            sanitized_quiz['questions'].append(sanitized_question)
+        
+        return jsonify(sanitized_quiz)
+        
+    except Exception as e:
+        logger.error(f"Error getting quiz {quiz_id}: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+@lesson_api_bp.route('/quiz/<quiz_id>/submit', methods=['POST'])
+def submit_quiz_api(quiz_id):
+    """Submit quiz answers for validation"""
+    try:
+        user = get_current_user()
+        user_id = user['uid'] if user else 'dev-user-001'
+        
+        if not request.is_json:
+            return jsonify({'error': 'Request must be JSON'}), 400
+        
+        data = request.json
+        answers = data.get('answers', {})
+        
+        # Get quiz data with correct answers
+        quiz_data = get_quiz(quiz_id)
+        if not quiz_data:
+            return jsonify({'error': 'Quiz not found'}), 404
+        
+        # Validate answers and calculate score
+        total_questions = len(quiz_data.get('questions', []))
+        correct_answers = 0
+        results = []
+        
+        for question in quiz_data.get('questions', []):
+            question_id = question.get('id')
+            user_answer = answers.get(question_id)
+            correct_answer = question.get('correct_answer')
+            
+            is_correct = False
+            if question.get('type') == 'multiple_choice':
+                is_correct = user_answer == correct_answer
+            elif question.get('type') == 'code_completion':
+                # For code completion, we'll do a simple string comparison
+                # In a real system, you'd want more sophisticated validation
+                is_correct = user_answer and user_answer.strip() != ''
+            
+            if is_correct:
+                correct_answers += 1
+            
+            results.append({
+                'question_id': question_id,
+                'correct': is_correct,
+                'explanation': question.get('explanation', '')
+            })
+        
+        # Calculate final score
+        score = (correct_answers / total_questions) * 100 if total_questions > 0 else 0
+        passing_score = quiz_data.get('passing_score', 70)
+        passed = score >= passing_score
+        
+        # Update user progress
+        lesson_id = quiz_data.get('lesson_id')
+        if lesson_id:
+            current_progress = get_user_progress(user_id).get(lesson_id, {})
+            current_progress['quiz_completed'] = passed
+            current_progress['quiz_score'] = score
+            current_progress['quiz_attempts'] = current_progress.get('quiz_attempts', 0) + 1
+            
+            update_lesson_progress(user_id, lesson_id, current_progress)
+        
+        # Award XP and coins if passed
+        rewards = {}
+        if passed:
+            rewards = {
+                'xp': quiz_data.get('xp_reward', 0),
+                'pycoins': quiz_data.get('pycoins_reward', 0)
+            }
+        
+        return jsonify({
+            'score': score,
+            'passed': passed,
+            'passing_score': passing_score,
+            'correct_answers': correct_answers,
+            'total_questions': total_questions,
+            'results': results,
+            'rewards': rewards
+        })
+        
+    except Exception as e:
+        logger.error(f"Error submitting quiz {quiz_id}: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
+
 # Helper functions
 def calculate_block_rewards(block_type, lesson_id):
     """Calculate XP and PyCoins rewards for completing a block"""

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson System Test</title>
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .test-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .test-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .test-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .editor-container {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 20px 0;
+            min-height: 300px;
+        }
+        .quiz-container {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 20px 0;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔧 Lesson System Emergency Fix Test</h1>
+        <p>Testing the fixes for the lesson system components.</p>
+        
+        <div id="test-results"></div>
+        
+        <h2>Code Editor Test</h2>
+        <div class="editor-container">
+            <div id="test-editor" style="height: 300px;"></div>
+        </div>
+        
+        <h2>Quiz Module Test</h2>
+        <div class="quiz-container" data-quiz-id="test-quiz">
+            <div id="quiz-test-area">
+                <p>Quiz module test area</p>
+            </div>
+        </div>
+        
+        <h2>Console Log</h2>
+        <div id="console-log" style="background: #f8f9fa; padding: 15px; border-radius: 5px; white-space: pre-wrap; font-family: monospace; max-height: 400px; overflow-y: auto;"></div>
+    </div>
+
+    <!-- External Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/mode-python.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/theme-monokai.js"></script>
+
+    <script type="module">
+        // Capture console logs
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        const consoleLogElement = document.getElementById('console-log');
+        
+        function appendToConsole(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? 'red' : type === 'warn' ? 'orange' : 'black';
+            consoleLogElement.innerHTML += `<span style="color: ${color}">[${timestamp}] ${message}</span>\n`;
+            consoleLogElement.scrollTop = consoleLogElement.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            appendToConsole(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            appendToConsole(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            appendToConsole(args.join(' '), 'warn');
+        };
+
+        // Test runner
+        class LessonSystemTester {
+            constructor() {
+                this.results = [];
+                this.resultsContainer = document.getElementById('test-results');
+            }
+            
+            addResult(test, success, message) {
+                this.results.push({ test, success, message });
+                this.updateResults();
+            }
+            
+            updateResults() {
+                this.resultsContainer.innerHTML = this.results.map(result => {
+                    const className = result.success ? 'test-success' : 'test-error';
+                    const icon = result.success ? '✅' : '❌';
+                    return `<div class="test-result ${className}">${icon} ${result.test}: ${result.message}</div>`;
+                }).join('');
+            }
+            
+            async runTests() {
+                console.log('🚀 Starting lesson system tests...');
+                
+                // Test 1: Enhanced Code Editor
+                await this.testCodeEditor();
+                
+                // Test 2: Quiz Module
+                await this.testQuizModule();
+                
+                // Test 3: Integration
+                await this.testIntegration();
+                
+                console.log('✅ All tests completed');
+            }
+            
+            async testCodeEditor() {
+                try {
+                    const { EnhancedCodeEditor } = await import('/static/js/lesson/components/EnhancedCodeEditor.js');
+                    
+                    const editor = new EnhancedCodeEditor('test-editor', 'test-block', {
+                        language: 'python',
+                        starterCode: '# Test code\nprint("Hello, World!")'
+                    });
+                    
+                    await editor.initialize();
+                    
+                    // Test if setupAccessibility method exists
+                    if (typeof editor.setupAccessibility === 'function') {
+                        this.addResult('Code Editor - setupAccessibility', true, 'Method exists and is callable');
+                    } else {
+                        this.addResult('Code Editor - setupAccessibility', false, 'Method is missing');
+                    }
+                    
+                    // Test if setupErrorHighlighting method exists
+                    if (typeof editor.setupErrorHighlighting === 'function') {
+                        this.addResult('Code Editor - setupErrorHighlighting', true, 'Method exists and is callable');
+                    } else {
+                        this.addResult('Code Editor - setupErrorHighlighting', false, 'Method is missing');
+                    }
+                    
+                    // Test if editor initialized
+                    if (editor.initialized) {
+                        this.addResult('Code Editor - Initialization', true, 'Editor initialized successfully');
+                    } else {
+                        this.addResult('Code Editor - Initialization', false, 'Editor failed to initialize');
+                    }
+                    
+                } catch (error) {
+                    this.addResult('Code Editor', false, `Failed to load: ${error.message}`);
+                }
+            }
+            
+            async testQuizModule() {
+                try {
+                    const { QuizModule } = await import('/static/js/modules/quiz.js');
+                    
+                    const quiz = new QuizModule({
+                        autoSave: true,
+                        showFeedback: true
+                    });
+                    
+                    await quiz.init();
+                    
+                    if (quiz.initialized) {
+                        this.addResult('Quiz Module - Initialization', true, 'Quiz module initialized successfully');
+                    } else {
+                        this.addResult('Quiz Module - Initialization', false, 'Quiz module failed to initialize');
+                    }
+                    
+                    this.addResult('Quiz Module - Import', true, 'Quiz module imported successfully');
+                    
+                } catch (error) {
+                    this.addResult('Quiz Module', false, `Failed to load: ${error.message}`);
+                }
+            }
+            
+            async testIntegration() {
+                try {
+                    const { LessonInteractions } = await import('/static/js/lesson/components/LessonInteractions.js');
+                    
+                    const interactions = new LessonInteractions();
+                    
+                    // Test mock lesson data
+                    const mockLessonData = {
+                        id: 'test-lesson',
+                        title: 'Test Lesson',
+                        blocks: []
+                    };
+                    
+                    interactions.initialize(mockLessonData, {});
+                    
+                    if (interactions.initialized) {
+                        this.addResult('Integration - LessonInteractions', true, 'LessonInteractions initialized successfully');
+                    } else {
+                        this.addResult('Integration - LessonInteractions', false, 'LessonInteractions failed to initialize');
+                    }
+                    
+                } catch (error) {
+                    this.addResult('Integration', false, `Failed to test: ${error.message}`);
+                }
+            }
+        }
+        
+        // Run tests when page loads
+        document.addEventListener('DOMContentLoaded', async () => {
+            const tester = new LessonSystemTester();
+            await tester.runTests();
+        });
+    </script>
+</body>
+</html>

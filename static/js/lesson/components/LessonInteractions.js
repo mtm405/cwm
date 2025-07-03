@@ -501,46 +501,863 @@ export class LessonInteractions {
         return false;
     }
     
-    initializeQuizzes() {
+    async initializeQuizzes() {
         const quizElements = document.querySelectorAll('[data-quiz-id]');
         
-        quizElements.forEach(quizElement => {
-            const quizId = quizElement.dataset.quizId;
-            this.loadQuiz(quizId, quizElement);
-        });
+        if (quizElements.length === 0) {
+            console.log('🧠 No quizzes found in lesson');
+            return;
+        }
         
-        console.log(`🧠 Initialized ${quizElements.length} quizzes`);
+        // Initialize quiz controllers map
+        this.quizControllers = new Map();
+        
+        // Load advanced quiz system
+        try {
+            // Check if QuizEngine and QuizController are available
+            if (!window.QuizEngine || !window.QuizController) {
+                console.warn('⚠️ Advanced quiz system not available, falling back to basic implementation');
+                await this.initializeFallbackQuizzes(quizElements);
+                return;
+            }
+            
+            console.log('🧠 Initializing advanced quiz system...');
+            
+            // Load each quiz with advanced system
+            for (const quizElement of quizElements) {
+                const quizId = quizElement.dataset.quizId;
+                const blockId = quizElement.dataset.blockId;
+                
+                await this.loadAdvancedQuiz(quizId, blockId, quizElement);
+            }
+            
+            console.log(`🧠 Initialized ${quizElements.length} advanced quizzes`);
+            
+        } catch (error) {
+            console.error('❌ Failed to initialize advanced quiz system:', error);
+            // Fallback to basic quiz placeholders
+            await this.initializeFallbackQuizzes(quizElements);
+        }
     }
     
-    async loadQuiz(quizId, quizElement) {
+    async loadAdvancedQuiz(quizId, blockId, quizElement) {
         try {
-            // This would normally load quiz from API/Firebase
-            console.log(`🔄 Loading quiz: ${quizId}`);
+            console.log(`🔄 Loading advanced quiz: ${quizId}`);
             
-            // Placeholder quiz content
-            quizElement.innerHTML = `
-                <div class="quiz-placeholder">
-                    <h4>Quiz: ${quizId}</h4>
-                    <p>Quiz system not yet implemented.</p>
-                    <button class="btn btn-primary complete-btn" data-block-id="${quizId}">
-                        Continue
+            // Load quiz data from API
+            const response = await fetch(`/api/quiz/${quizId}`);
+            
+            if (!response.ok) {
+                throw new Error(`Failed to load quiz: ${response.statusText}`);
+            }
+            
+            const quizData = await response.json();
+            
+            // Create quiz controller container
+            const quizContainer = document.createElement('div');
+            quizContainer.className = 'advanced-quiz-container';
+            quizContainer.id = `quiz-container-${blockId}`;
+            
+            // Replace loading content
+            quizElement.innerHTML = '';
+            quizElement.appendChild(quizContainer);
+            
+            // Initialize QuizController
+            const quizController = new window.QuizController(`quiz-container-${blockId}`, {
+                showProgress: true,
+                showTimer: true,
+                showHints: true,
+                allowNavigation: true,
+                animateTransitions: true,
+                keyboardShortcuts: true,
+                autoAdvance: false
+            });
+            
+            // Load quiz data into controller
+            await quizController.loadQuiz(quizData, {
+                autoSave: true,
+                analytics: true,
+                submitResults: true,
+                lessonId: this.lessonData?.id,
+                blockId: blockId
+            });
+            
+            // Set up event listeners for lesson integration
+            this.setupAdvancedQuizListeners(quizController, blockId, quizData);
+            
+            // Store controller reference
+            this.quizControllers.set(blockId, quizController);
+            
+            console.log(`✅ Advanced quiz loaded: ${quizId}`);
+            
+        } catch (error) {
+            console.error(`❌ Failed to load advanced quiz ${quizId}:`, error);
+            this.renderQuizError(quizElement, error.message);
+        }
+    }
+    
+    setupAdvancedQuizListeners(quizController, blockId, quizData) {
+        // Listen for quiz completion
+        quizController.on('quiz:completed', (results) => {
+            console.log(`🎉 Quiz completed for block ${blockId}:`, results);
+            
+            // Mark block as completed if passed
+            if (results.passed) {
+                this.markBlockComplete(blockId);
+            }
+            
+            // Update progress
+            this.updateQuizProgress(blockId, results);
+            
+            // Show completion feedback
+            this.showQuizCompletionFeedback(blockId, results);
+            
+            // Emit custom event
+            this.emitCustomEvent('quizCompleted', {
+                blockId: blockId,
+                quizId: quizData.id,
+                results: results,
+                timestamp: Date.now()
+            });
+        });
+        
+        // Listen for quiz errors
+        quizController.on('quiz:error', (error) => {
+            console.error(`❌ Quiz error for block ${blockId}:`, error);
+            
+            // Show error feedback
+            this.showUserFeedback('error', `Quiz error: ${error.message || error}`);
+            
+            // Emit custom event
+            this.emitCustomEvent('quizError', {
+                blockId: blockId,
+                quizId: quizData.id,
+                error: error.message || error,
+                timestamp: Date.now()
+            });
+        });
+        
+        // Listen for quiz progress updates
+        quizController.on('quiz:progress', (progress) => {
+            console.log(`📊 Quiz progress for block ${blockId}:`, progress);
+            
+            // Update UI progress indicators
+            this.updateQuizProgressIndicator(blockId, progress);
+        });
+        
+        // Listen for answer submissions
+        quizController.on('quiz:answer_submitted', (data) => {
+            console.log(`📝 Answer submitted for block ${blockId}:`, data);
+            
+            // Auto-save progress
+            this.saveProgress();
+        });
+    }
+    
+    updateQuizProgress(blockId, results) {
+        // Update quiz progress indicator
+        const progressIndicator = document.getElementById(`quiz-progress-${blockId}`);
+        if (progressIndicator) {
+            if (results.passed) {
+                progressIndicator.innerHTML = '<i class="fas fa-check-circle"></i>';
+                progressIndicator.style.color = '#10b981';
+            } else {
+                progressIndicator.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+                progressIndicator.style.color = '#f59e0b';
+            }
+        }
+        
+        // Update block element
+        const blockElement = document.getElementById(`block-${blockId}`);
+        if (blockElement) {
+            if (results.passed) {
+                blockElement.classList.add('completed');
+                blockElement.classList.add('quiz-passed');
+            } else {
+                blockElement.classList.add('quiz-attempted');
+            }
+        }
+    }
+    
+    updateQuizProgressIndicator(blockId, progress) {
+        const progressIndicator = document.getElementById(`quiz-progress-${blockId}`);
+        if (progressIndicator) {
+            const percentage = Math.round((progress.current / progress.total) * 100);
+            progressIndicator.title = `Quiz Progress: ${percentage}%`;
+            
+            // Update indicator based on progress
+            if (percentage === 100) {
+                progressIndicator.innerHTML = '<i class="fas fa-check-circle"></i>';
+                progressIndicator.style.color = '#10b981';
+            } else if (percentage > 0) {
+                progressIndicator.innerHTML = '<i class="fas fa-clock"></i>';
+                progressIndicator.style.color = '#f59e0b';
+            }
+        }
+    }
+    
+    showQuizCompletionFeedback(blockId, results) {
+        const message = results.passed 
+            ? `🎉 Quiz completed successfully! Score: ${Math.round(results.score)}%`
+            : `📚 Quiz completed. Score: ${Math.round(results.score)}%. Keep learning!`;
+        
+        const type = results.passed ? 'success' : 'warning';
+        
+        this.showUserFeedback(type, message);
+        
+        // Show rewards if earned
+        if (results.passed && results.rewards) {
+            const rewardMessage = [];
+            if (results.rewards.xp) rewardMessage.push(`+${results.rewards.xp} XP`);
+            if (results.rewards.pycoins) rewardMessage.push(`+${results.rewards.pycoins} PyCoins`);
+            
+            if (rewardMessage.length > 0) {
+                setTimeout(() => {
+                    this.showUserFeedback('success', `🏆 Rewards earned: ${rewardMessage.join(', ')}`);
+                }, 2000);
+            }
+        }
+    }
+    
+    renderQuiz(quizData, quizElement, blockId) {
+        // Clear loading state
+        quizElement.innerHTML = '';
+        
+        // Create quiz overview
+        const quizOverview = document.createElement('div');
+        quizOverview.className = 'quiz-overview';
+        quizOverview.innerHTML = `
+            <div class="quiz-header">
+                <h4><i class="fas fa-brain"></i> ${quizData.title}</h4>
+                <div class="quiz-meta">
+                    <span class="quiz-questions-count">
+                        <i class="fas fa-question-circle"></i>
+                        ${quizData.questions.length} questions
+                    </span>
+                    ${quizData.time_limit ? `
+                        <span class="quiz-time-limit">
+                            <i class="fas fa-clock"></i>
+                            ${quizData.time_limit} seconds
+                        </span>
+                    ` : ''}
+                    <span class="quiz-difficulty">
+                        <i class="fas fa-star"></i>
+                        ${quizData.difficulty}
+                    </span>
+                </div>
+            </div>
+            <div class="quiz-description">
+                <p>${quizData.description}</p>
+            </div>
+            <div class="quiz-rewards">
+                <span class="reward-item">
+                    <i class="fas fa-star"></i>
+                    ${quizData.xp_reward || 0} XP
+                </span>
+                <span class="reward-item">
+                    <i class="fas fa-coins"></i>
+                    ${quizData.pycoins_reward || 0} PyCoins
+                </span>
+            </div>
+            <div class="quiz-actions">
+                <button class="btn btn-primary start-quiz-btn" data-quiz-id="${quizData.id}" data-block-id="${blockId}">
+                    <i class="fas fa-play"></i> Start Quiz
+                </button>
+            </div>
+        `;
+        
+        quizElement.appendChild(quizOverview);
+        
+        // Set up quiz start handler
+        const startBtn = quizOverview.querySelector('.start-quiz-btn');
+        startBtn.addEventListener('click', () => this.startQuiz(quizData, quizElement, blockId));
+    }
+    
+    renderQuizError(quizElement, errorMessage) {
+        quizElement.innerHTML = `
+            <div class="quiz-error">
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h4>Quiz Load Error</h4>
+                <p>${errorMessage}</p>
+                <button class="btn btn-secondary retry-quiz-btn">
+                    <i class="fas fa-refresh"></i> Retry
+                </button>
+            </div>
+        `;
+    }
+    
+    async startQuiz(quizData, quizElement, blockId) {
+        try {
+            // Clear overview and show quiz questions
+            quizElement.innerHTML = '';
+            
+            // Create quiz interface
+            const quizInterface = document.createElement('div');
+            quizInterface.className = 'quiz-interface';
+            quizInterface.innerHTML = `
+                <div class="quiz-header">
+                    <h4>${quizData.title}</h4>
+                    <div class="quiz-progress">
+                        <span class="current-question">1</span> / <span class="total-questions">${quizData.questions.length}</span>
+                    </div>
+                </div>
+                <div class="quiz-content">
+                    <div class="quiz-questions" id="quiz-questions-${blockId}"></div>
+                </div>
+                <div class="quiz-controls">
+                    <button class="btn btn-secondary prev-question-btn" disabled>
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button class="btn btn-primary next-question-btn">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button class="btn btn-success submit-quiz-btn" style="display: none;">
+                        <i class="fas fa-check"></i> Submit Quiz
                     </button>
                 </div>
             `;
             
+            quizElement.appendChild(quizInterface);
+            
+            // Initialize quiz state
+            this.currentQuiz = {
+                data: quizData,
+                blockId: blockId,
+                currentQuestion: 0,
+                answers: {},
+                element: quizElement
+            };
+            
+            // Render first question
+            this.renderQuestion(0);
+            
+            // Set up controls
+            this.setupQuizControls();
+            
         } catch (error) {
-            console.error(`❌ Failed to load quiz ${quizId}:`, error);
-            quizElement.innerHTML = `
-                <div class="quiz-error">
-                    <p>Failed to load quiz. Please try again later.</p>
-                </div>
-            `;
+            console.error('❌ Failed to start quiz:', error);
+            this.renderQuizError(quizElement, 'Failed to start quiz');
         }
     }
     
-    handleQuizAnswer(optionElement) {
-        // Quiz answer handling would go here
-        console.log('Quiz answer selected:', optionElement);
+    renderQuestion(questionIndex) {
+        const quiz = this.currentQuiz;
+        const question = quiz.data.questions[questionIndex];
+        const questionsContainer = document.getElementById(`quiz-questions-${quiz.blockId}`);
+        
+        if (!question || !questionsContainer) return;
+        
+        // Update progress
+        const currentSpan = quiz.element.querySelector('.current-question');
+        if (currentSpan) currentSpan.textContent = questionIndex + 1;
+        
+        // Render question based on type
+        let questionHtml = '';
+        
+        if (question.type === 'multiple_choice') {
+            questionHtml = `
+                <div class="question-content">
+                    <h5 class="question-title">Question ${questionIndex + 1}</h5>
+                    <p class="question-text">${question.question}</p>
+                    <div class="question-options">
+                        ${question.options.map((option, index) => `
+                            <label class="option-label">
+                                <input type="radio" name="question-${question.id}" value="${index}">
+                                <span class="option-text">${option}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        } else if (question.type === 'code_completion') {
+            questionHtml = `
+                <div class="question-content">
+                    <h5 class="question-title">Question ${questionIndex + 1}</h5>
+                    <p class="question-text">${question.question}</p>
+                    <div class="code-question">
+                        <pre class="code-template">${question.code_template}</pre>
+                        <div class="code-input-area">
+                            <textarea class="code-input" placeholder="Enter your code here..." 
+                                      data-question-id="${question.id}"></textarea>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        questionsContainer.innerHTML = questionHtml;
+        
+        // Restore previous answer if exists
+        const savedAnswer = quiz.answers[question.id];
+        if (savedAnswer !== undefined) {
+            if (question.type === 'multiple_choice') {
+                const radio = questionsContainer.querySelector(`input[value="${savedAnswer}"]`);
+                if (radio) radio.checked = true;
+            } else if (question.type === 'code_completion') {
+                const textarea = questionsContainer.querySelector('.code-input');
+                if (textarea) textarea.value = savedAnswer;
+            }
+        }
+        
+        // Set up answer change listeners
+        this.setupQuestionListeners(questionIndex);
+    }
+    
+    setupQuestionListeners(questionIndex) {
+        const quiz = this.currentQuiz;
+        const question = quiz.data.questions[questionIndex];
+        const questionsContainer = document.getElementById(`quiz-questions-${quiz.blockId}`);
+        
+        if (question.type === 'multiple_choice') {
+            const radios = questionsContainer.querySelectorAll(`input[name="question-${question.id}"]`);
+            radios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    quiz.answers[question.id] = parseInt(e.target.value);
+                    this.updateQuizControls();
+                });
+            });
+        } else if (question.type === 'code_completion') {
+            const textarea = questionsContainer.querySelector('.code-input');
+            if (textarea) {
+                textarea.addEventListener('input', (e) => {
+                    quiz.answers[question.id] = e.target.value;
+                    this.updateQuizControls();
+                });
+            }
+        }
+    }
+    
+    setupQuizControls() {
+        const quiz = this.currentQuiz;
+        const prevBtn = quiz.element.querySelector('.prev-question-btn');
+        const nextBtn = quiz.element.querySelector('.next-question-btn');
+        const submitBtn = quiz.element.querySelector('.submit-quiz-btn');
+        
+        prevBtn.addEventListener('click', () => this.prevQuestion());
+        nextBtn.addEventListener('click', () => this.nextQuestion());
+        submitBtn.addEventListener('click', () => this.submitQuiz());
+        
+        this.updateQuizControls();
+    }
+    
+    updateQuizControls() {
+        const quiz = this.currentQuiz;
+        const prevBtn = quiz.element.querySelector('.prev-question-btn');
+        const nextBtn = quiz.element.querySelector('.next-question-btn');
+        const submitBtn = quiz.element.querySelector('.submit-quiz-btn');
+        
+        // Update button states
+        prevBtn.disabled = quiz.currentQuestion === 0;
+        
+        const isLastQuestion = quiz.currentQuestion === quiz.data.questions.length - 1;
+        nextBtn.style.display = isLastQuestion ? 'none' : 'inline-block';
+        submitBtn.style.display = isLastQuestion ? 'inline-block' : 'none';
+    }
+    
+    prevQuestion() {
+        const quiz = this.currentQuiz;
+        if (quiz.currentQuestion > 0) {
+            quiz.currentQuestion--;
+            this.renderQuestion(quiz.currentQuestion);
+        }
+    }
+    
+    nextQuestion() {
+        const quiz = this.currentQuiz;
+        if (quiz.currentQuestion < quiz.data.questions.length - 1) {
+            quiz.currentQuestion++;
+            this.renderQuestion(quiz.currentQuestion);
+        }
+    }
+    
+    async submitQuiz() {
+        const quiz = this.currentQuiz;
+        
+        try {
+            // Show loading state
+            const submitBtn = quiz.element.querySelector('.submit-quiz-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            
+            // Submit to API
+            const response = await fetch(`/api/quiz/${quiz.data.id}/submit`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    answers: quiz.answers
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Failed to submit quiz: ${response.statusText}`);
+            }
+            
+            const result = await response.json();
+            
+            // Show results
+            this.showQuizResults(result);
+            
+            // Mark block as completed if passed
+            if (result.passed) {
+                this.markBlockComplete(quiz.blockId);
+            }
+            
+        } catch (error) {
+            console.error('❌ Failed to submit quiz:', error);
+            this.showQuizError('Failed to submit quiz. Please try again.');
+        }
+    }
+    
+    showQuizResults(result) {
+        const quiz = this.currentQuiz;
+        
+        quiz.element.innerHTML = `
+            <div class="quiz-results">
+                <div class="results-header">
+                    <div class="score-circle ${result.passed ? 'passed' : 'failed'}">
+                        <span class="score-value">${Math.round(result.score)}%</span>
+                    </div>
+                    <h4>${result.passed ? 'Congratulations!' : 'Keep Learning!'}</h4>
+                    <p>${result.passed ? 'You passed the quiz!' : 'You can try again to improve your score.'}</p>
+                </div>
+                
+                <div class="results-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Score</span>
+                        <span class="stat-value">${Math.round(result.score)}%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Correct</span>
+                        <span class="stat-value">${result.correct_answers}/${result.total_questions}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Passing</span>
+                        <span class="stat-value">${result.passing_score}%</span>
+                    </div>
+                </div>
+                
+                ${result.passed && result.rewards && (result.rewards.xp || result.rewards.pycoins) ? `
+                    <div class="rewards-earned">
+                        <h5><i class="fas fa-trophy"></i> Rewards Earned</h5>
+                        <div class="rewards-list">
+                            ${result.rewards.xp ? `
+                                <span class="reward-item">
+                                    <i class="fas fa-star"></i>
+                                    ${result.rewards.xp} XP
+                                </span>
+                            ` : ''}
+                            ${result.rewards.pycoins ? `
+                                <span class="reward-item">
+                                    <i class="fas fa-coins"></i>
+                                    ${result.rewards.pycoins} PyCoins
+                                </span>
+                            ` : ''}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                <div class="results-actions">
+                    <button class="btn btn-secondary review-answers-btn">
+                        <i class="fas fa-eye"></i> Review Answers
+                    </button>
+                    ${!result.passed ? `
+                        <button class="btn btn-primary retry-quiz-btn">
+                            <i class="fas fa-refresh"></i> Try Again
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+        
+        // Set up result actions
+        const reviewBtn = quiz.element.querySelector('.review-answers-btn');
+        const retryBtn = quiz.element.querySelector('.retry-quiz-btn');
+        
+        if (reviewBtn) {
+            reviewBtn.addEventListener('click', () => this.showAnswerReview(result));
+        }
+        
+        if (retryBtn) {
+            retryBtn.addEventListener('click', () => this.retryQuiz());
+        }
+    }
+    
+    showAnswerReview(result) {
+        const quiz = this.currentQuiz;
+        
+        // Create review interface
+        const reviewHtml = `
+            <div class="answer-review">
+                <div class="review-header">
+                    <h4><i class="fas fa-eye"></i> Answer Review</h4>
+                    <button class="btn btn-secondary back-to-results-btn">
+                        <i class="fas fa-arrow-left"></i> Back to Results
+                    </button>
+                </div>
+                <div class="review-content">
+                    ${result.results.map((questionResult, index) => {
+                        const question = quiz.data.questions[index];
+                        const userAnswer = quiz.answers[question.id];
+                        
+                        return `
+                            <div class="review-question ${questionResult.correct ? 'correct' : 'incorrect'}">
+                                <div class="question-header">
+                                    <span class="question-number">Q${index + 1}</span>
+                                    <span class="question-status">
+                                        <i class="fas fa-${questionResult.correct ? 'check' : 'times'}"></i>
+                                        ${questionResult.correct ? 'Correct' : 'Incorrect'}
+                                    </span>
+                                </div>
+                                <p class="question-text">${question.question}</p>
+                                
+                                ${question.type === 'multiple_choice' ? `
+                                    <div class="answer-options">
+                                        ${question.options.map((option, optionIndex) => {
+                                            const isUserAnswer = userAnswer === optionIndex;
+                                            const isCorrect = question.correct_answer === optionIndex;
+                                            
+                                            return `
+                                                <div class="option-review ${isUserAnswer ? 'user-answer' : ''} ${isCorrect ? 'correct-answer' : ''}">
+                                                    <span class="option-text">${option}</span>
+                                                    ${isUserAnswer ? '<span class="answer-indicator">Your answer</span>' : ''}
+                                                    ${isCorrect ? '<span class="correct-indicator">Correct</span>' : ''}
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                ` : `
+                                    <div class="code-answer-review">
+                                        <div class="user-code">
+                                            <h6>Your Answer:</h6>
+                                            <pre>${userAnswer || 'No answer provided'}</pre>
+                                        </div>
+                                    </div>
+                                `}
+                                
+                                ${questionResult.explanation ? `
+                                    <div class="explanation">
+                                        <h6>Explanation:</h6>
+                                        <p>${questionResult.explanation}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+        
+        quiz.element.innerHTML = reviewHtml;
+        
+        // Set up back button
+        const backBtn = quiz.element.querySelector('.back-to-results-btn');
+        backBtn.addEventListener('click', () => this.showQuizResults(result));
+    }
+    
+    retryQuiz() {
+        const quiz = this.currentQuiz;
+        
+        // Reset quiz state
+        quiz.currentQuestion = 0;
+        quiz.answers = {};
+        
+        // Restart quiz
+        this.startQuiz(quiz.data, quiz.element, quiz.blockId);
+    }
+    
+    showQuizError(message) {
+        const quiz = this.currentQuiz;
+        
+        quiz.element.innerHTML = `
+            <div class="quiz-error">
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h4>Quiz Error</h4>
+                <p>${message}</p>
+            </div>
+        `;
+    }
+    
+    async initializeFallbackQuizzes(quizElements) {
+        console.log('🔄 Initializing fallback quiz system...');
+        
+        try {
+            // Try to load the basic quiz module
+            const { QuizModule } = await import('/static/js/modules/quiz.js');
+            this.quizModule = new QuizModule({
+                autoSave: true,
+                showFeedback: true,
+                animateTransitions: true
+            });
+            
+            await this.quizModule.init();
+            
+            // Load each quiz with basic system
+            for (const quizElement of quizElements) {
+                const quizId = quizElement.dataset.quizId;
+                const blockId = quizElement.dataset.blockId;
+                
+                await this.loadBasicQuiz(quizId, blockId, quizElement);
+            }
+            
+            console.log(`🧠 Initialized ${quizElements.length} basic quizzes`);
+            
+        } catch (error) {
+            console.error('❌ Failed to initialize basic quiz system:', error);
+            
+            // Last resort: simple placeholder quizzes
+            quizElements.forEach(quizElement => {
+                const quizId = quizElement.dataset.quizId;
+                const blockId = quizElement.dataset.blockId;
+                
+                quizElement.innerHTML = `
+                    <div class="quiz-placeholder">
+                        <h4>Quiz: ${quizId}</h4>
+                        <p>Quiz system temporarily unavailable.</p>
+                        <button class="btn btn-primary complete-btn" data-block-id="${blockId}">
+                            Continue
+                        </button>
+                    </div>
+                `;
+            });
+            
+            console.log(`🧠 Initialized ${quizElements.length} placeholder quizzes`);
+        }
+    }
+    
+    async loadBasicQuiz(quizId, blockId, quizElement) {
+        try {
+            console.log(`🔄 Loading basic quiz: ${quizId}`);
+            
+            // Load quiz data from API
+            const response = await fetch(`/api/quiz/${quizId}`);
+            
+            if (!response.ok) {
+                throw new Error(`Failed to load quiz: ${response.statusText}`);
+            }
+            
+            const quizData = await response.json();
+            
+            // Render quiz with the loaded data using basic system
+            this.renderBasicQuiz(quizData, quizElement, blockId);
+            
+        } catch (error) {
+            console.error(`❌ Failed to load basic quiz ${quizId}:`, error);
+            this.renderQuizError(quizElement, error.message);
+        }
+    }
+    
+    renderBasicQuiz(quizData, quizElement, blockId) {
+        // Clear loading state
+        quizElement.innerHTML = '';
+        
+        // Create quiz overview
+        const quizOverview = document.createElement('div');
+        quizOverview.className = 'quiz-overview';
+        quizOverview.innerHTML = `
+            <div class="quiz-header">
+                <h4><i class="fas fa-brain"></i> ${quizData.title}</h4>
+                <div class="quiz-meta">
+                    <span class="quiz-questions-count">
+                        <i class="fas fa-question-circle"></i>
+                        ${quizData.questions.length} questions
+                    </span>
+                    ${quizData.time_limit ? `
+                        <span class="quiz-time-limit">
+                            <i class="fas fa-clock"></i>
+                            ${quizData.time_limit} seconds
+                        </span>
+                    ` : ''}
+                    <span class="quiz-difficulty">
+                        <i class="fas fa-star"></i>
+                        ${quizData.difficulty}
+                    </span>
+                </div>
+            </div>
+            <div class="quiz-description">
+                <p>${quizData.description}</p>
+            </div>
+            <div class="quiz-rewards">
+                <span class="reward-item">
+                    <i class="fas fa-star"></i>
+                    ${quizData.xp_reward || 0} XP
+                </span>
+                <span class="reward-item">
+                    <i class="fas fa-coins"></i>
+                    ${quizData.pycoins_reward || 0} PyCoins
+                </span>
+            </div>
+            <div class="quiz-actions">
+                <button class="btn btn-primary start-quiz-btn" data-quiz-id="${quizData.id}" data-block-id="${blockId}">
+                    <i class="fas fa-play"></i> Start Quiz
+                </button>
+            </div>
+        `;
+        
+        quizElement.appendChild(quizOverview);
+        
+        // Set up quiz start handler
+        const startBtn = quizOverview.querySelector('.start-quiz-btn');
+        startBtn.addEventListener('click', () => this.startBasicQuiz(quizData, quizElement, blockId));
+    }
+    
+    async startBasicQuiz(quizData, quizElement, blockId) {
+        try {
+            // Clear overview and show quiz questions
+            quizElement.innerHTML = '';
+            
+            // Create quiz interface
+            const quizInterface = document.createElement('div');
+            quizInterface.className = 'quiz-interface';
+            quizInterface.innerHTML = `
+                <div class="quiz-header">
+                    <h4>${quizData.title}</h4>
+                    <div class="quiz-progress">
+                        <span class="current-question">1</span> / <span class="total-questions">${quizData.questions.length}</span>
+                    </div>
+                </div>
+                <div class="quiz-content">
+                    <div class="quiz-questions" id="quiz-questions-${blockId}"></div>
+                </div>
+                <div class="quiz-controls">
+                    <button class="btn btn-secondary prev-question-btn" disabled>
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button class="btn btn-primary next-question-btn">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button class="btn btn-success submit-quiz-btn" style="display: none;">
+                        <i class="fas fa-check"></i> Submit Quiz
+                    </button>
+                </div>
+            `;
+            
+            quizElement.appendChild(quizInterface);
+            
+            // Initialize quiz state
+            this.currentQuiz = {
+                data: quizData,
+                blockId: blockId,
+                currentQuestion: 0,
+                answers: {},
+                element: quizElement
+            };
+            
+            // Render first question
+            this.renderQuestion(0);
+            
+            // Set up controls
+            this.setupQuizControls();
+            
+        } catch (error) {
+            console.error('❌ Failed to start basic quiz:', error);
+            this.renderQuizError(quizElement, 'Failed to start quiz');
+        }
     }
     
     handleBlockCompleted(event) {

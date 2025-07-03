@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - ES6 Learning Platform</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="profile-header">
+            <div class="profile-header-content">
+                <div class="profile-avatar-section">
+                    <div class="profile-avatar-container">
+                        <img id="profileAvatar" src="{{ user.avatar_url or '/static/img/default-avatar.png' }}" 
+                             alt="Profile Avatar" class="profile-avatar">
+                        <button id="changeAvatarBtn" class="change-avatar-btn">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="profile-info-section">
+                    <div class="profile-basic-info">
+                        <h1 id="profileDisplayName">{{ user.display_name or user.email }}</h1>
+                        <p id="profileBio" class="profile-bio">{{ user.bio or 'No bio available' }}</p>
+                        <div class="profile-stats-quick">
+                            <div class="stat-item">
+                                <span class="stat-value" id="quickLessonsCompleted">0</span>
+                                <span class="stat-label">Lessons</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="quickAchievements">0</span>
+                                <span class="stat-label">Achievements</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="quickStreak">0</span>
+                                <span class="stat-label">Day Streak</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-actions">
+                        <button id="editProfileBtn" class="btn btn-primary">
+                            <i class="fas fa-edit"></i>
+                            Edit Profile
+                        </button>
+                        <button id="shareProfileBtn" class="btn btn-secondary">
+                            <i class="fas fa-share"></i>
+                            Share
+                        </button>
+                        <button id="settingsBtn" class="btn btn-secondary">
+                            <i class="fas fa-cog"></i>
+                            Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <nav class="profile-nav">
+            <div class="nav-container">
+                <button class="nav-btn active" data-section="overview">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Overview
+                </button>
+                <button class="nav-btn" data-section="progress">
+                    <i class="fas fa-chart-line"></i>
+                    Progress
+                </button>
+                <button class="nav-btn" data-section="achievements">
+                    <i class="fas fa-trophy"></i>
+                    Achievements
+                </button>
+                <button class="nav-btn" data-section="activity">
+                    <i class="fas fa-history"></i>
+                    Activity
+                </button>
+                <button class="nav-btn" data-section="social">
+                    <i class="fas fa-users"></i>
+                    Social
+                </button>
+            </div>
+        </nav>
+
+        <main class="profile-main">
+            <!-- Overview Section -->
+            <section id="overview-section" class="profile-section active">
+                <div class="section-grid">
+                    <div class="overview-card">
+                        <h3>Recent Activity</h3>
+                        <div id="recentActivity" class="activity-list">
+                            <!-- Activity items will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="overview-card">
+                        <h3>Learning Progress</h3>
+                        <div id="learningProgress" class="progress-overview">
+                            <!-- Progress items will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="overview-card">
+                        <h3>Recent Achievements</h3>
+                        <div id="recentAchievements" class="achievements-overview">
+                            <!-- Achievement items will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Progress Section -->
+            <section id="progress-section" class="profile-section">
+                <div id="progressVisualization">
+                    <!-- Progress visualization will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Achievements Section -->
+            <section id="achievements-section" class="profile-section">
+                <div id="achievementSystem">
+                    <!-- Achievement system will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Activity Section -->
+            <section id="activity-section" class="profile-section">
+                <div class="activity-feed">
+                    <div class="activity-header">
+                        <h3>Activity Feed</h3>
+                        <div class="activity-filters">
+                            <button class="filter-btn active" data-filter="all">All</button>
+                            <button class="filter-btn" data-filter="lessons">Lessons</button>
+                            <button class="filter-btn" data-filter="achievements">Achievements</button>
+                            <button class="filter-btn" data-filter="code">Code</button>
+                        </div>
+                    </div>
+                    <div id="activityFeed" class="activity-timeline">
+                        <!-- Activity timeline will be populated by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Social Section -->
+            <section id="social-section" class="profile-section">
+                <div class="social-grid">
+                    <div class="social-card">
+                        <h3>Friends</h3>
+                        <div id="friendsList" class="friends-list">
+                            <!-- Friends will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="social-card">
+                        <h3>Leaderboard</h3>
+                        <div id="leaderboard" class="leaderboard-list">
+                            <!-- Leaderboard will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="social-card">
+                        <h3>Shared Progress</h3>
+                        <div id="sharedProgress" class="shared-progress">
+                            <!-- Shared progress will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Edit Profile Modal -->
+        <div id="editProfileModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Edit Profile</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="editProfileForm">
+                        <div class="form-group">
+                            <label for="displayName">Display Name</label>
+                            <input type="text" id="displayName" name="display_name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bio">Bio</label>
+                            <textarea id="bio" name="bio" rows="3" maxlength="500"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="location">Location</label>
+                            <input type="text" id="location" name="location">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="website">Website</label>
+                            <input type="url" id="website" name="website">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Privacy Settings</label>
+                            <div class="privacy-options">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="profilePublic" name="profile_public">
+                                    <span>Make profile public</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="showProgress" name="show_progress">
+                                    <span>Show learning progress</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="showAchievements" name="show_achievements">
+                                    <span>Show achievements</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelEditBtn">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Avatar Upload Modal -->
+        <div id="avatarUploadModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Change Avatar</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="avatar-upload-section">
+                        <div class="upload-methods">
+                            <div class="upload-method">
+                                <h4>Upload Image</h4>
+                                <input type="file" id="avatarFileInput" accept="image/*">
+                                <div class="upload-preview">
+                                    <img id="avatarPreview" src="" alt="Avatar Preview" style="display: none;">
+                                </div>
+                            </div>
+                            
+                            <div class="upload-method">
+                                <h4>Choose from Gallery</h4>
+                                <div class="avatar-gallery">
+                                    <!-- Pre-made avatars will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="upload-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelAvatarBtn">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="saveAvatarBtn">Save Avatar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span>Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/profile/ProfileManager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/profile/AchievementSystem.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/profile/ProgressVisualization.js') }}"></script>
+    
+    <script>
+        // Initialize profile page
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileManager = new ProfileManager();
+            profileManager.initialize();
+        });
+    </script>
+</body>
+</html>
