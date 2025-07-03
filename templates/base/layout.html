@@ -1,10 +1,25 @@
+<!--
+Template: Base Layout (ACTIVE)
+Purpose: Main base template for all pages except homepage
+Features: 
+- Conditional navbar (hidden on homepage using request.endpoint)
+- Responsive layout with sidebar support
+- Toast notifications
+- Modular head and component includes
+Parent: None
+Used by: All pages except homepage
+Last updated: July 2, 2025
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     {% include 'base/head.html' %}
 </head>
 <body class="theme-dark" data-page="{% block page_name %}{% endblock %}">
-    {% include 'components/navigation/navbar.html' %}
+    <!-- Navbar: Hidden on homepage (main.index), visible everywhere else -->
+    {% if request.endpoint != 'main.index' %}
+        {% include 'components/navigation/navbar.html' %}
+    {% endif %}
     
     <!-- Main Content Area -->
     <div class="app-container">
@@ -18,7 +33,7 @@
     <!-- Toast Notifications -->
     {% include 'components/common/toast-notifications.html' %}
     
-    {% include 'base/scripts.html' %}
+    <!-- Scripts are now loaded directly in base.html to prevent duplicate loading -->
     {% block extra_js %}{% endblock %}
 </body>
 </html>

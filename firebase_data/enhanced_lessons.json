@@ -1,0 +1,415 @@
+{
+  "lessons": {
+    "python-basics-01": {
+      "id": "python-basics-01",
+      "title": "Python Basics: Getting Started",
+      "description": "Learn the fundamentals of Python programming language. This introductory lesson covers variables, basic syntax, and your first Python program.",
+      "content": "# Python Basics: Getting Started\n\nWelcome to your first Python lesson! In this lesson, you'll learn the fundamentals of Python programming.\n\n## What is Python?\n\nPython is a high-level, interpreted programming language known for its simplicity and readability. It's perfect for beginners and powerful enough for advanced applications.\n\n## Your First Python Program\n\nLet's start with the traditional \"Hello, World!\" program:\n\n```python\nprint(\"Hello, World!\")\n```\n\n## Variables\n\nVariables are containers for storing data values:\n\n```python\nname = \"João\"\nage = 16\nprint(f\"Hello, my name is {name} and I am {age} years old.\")\n```\n\n## Basic Data Types\n\n- **Strings**: Text data (`\"Hello\"`)\n- **Integers**: Whole numbers (`42`)\n- **Floats**: Decimal numbers (`3.14`)\n- **Booleans**: True or False values\n\n## Practice Exercise\n\nCreate a variable with your name and print a greeting message.",
+      "order": 1,
+      "difficulty": "beginner",
+      "estimated_time": 30,
+      "prerequisites": [],
+      "tags": ["basics", "syntax", "introduction", "variables"],
+      "xp_reward": 50,
+      "pycoins_reward": 10,
+      "code_examples": [
+        {
+          "id": "hello-world",
+          "title": "Hello World",
+          "code": "print(\"Hello, World!\")",
+          "explanation": "This prints a greeting message to the console. It's the traditional first program in any language."
+        },
+        {
+          "id": "variables-intro",
+          "title": "Variables",
+          "code": "name = \"Student\"\nage = 16\nprint(f\"Welcome, {name}! You are {age} years old.\")",
+          "explanation": "This creates variables and uses them in a formatted string. Variables store data that can be used later."
+        },
+        {
+          "id": "data-types",
+          "title": "Data Types",
+          "code": "# Different data types\ntext = \"Hello\"        # String\nnumber = 42           # Integer\ndecimal = 3.14        # Float\nis_student = True     # Boolean\n\nprint(type(text))\nprint(type(number))",
+          "explanation": "Python has several built-in data types. The type() function shows what type a variable is."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "create-greeting",
+          "title": "Create Your Greeting",
+          "description": "Create a variable with your name and print a personalized greeting message.",
+          "instructions": "Create a variable called 'name' with your name, then print a greeting using that variable.",
+          "starter_code": "# Your code here\nname = \nprint()",
+          "solution": "name = \"Your Name\"\nprint(f\"Hello, {name}! Welcome to Python programming!\")",
+          "hints": ["Use quotes for string values", "Use f-strings for formatting", "Don't forget the f before the quotes"]
+        },
+        {
+          "id": "basic-math",
+          "title": "Basic Calculator",
+          "description": "Create variables for two numbers and perform basic arithmetic operations.",
+          "instructions": "Create two number variables and calculate their sum, difference, and product.",
+          "starter_code": "# Create two numbers\nnum1 = \nnum2 = \n\n# Calculate operations\nsum_result = \ndifference = \nproduct = \n\n# Print results\nprint(f\"Sum: {sum_result}\")",
+          "solution": "num1 = 10\nnum2 = 5\n\nsum_result = num1 + num2\ndifference = num1 - num2\nproduct = num1 * num2\n\nprint(f\"Sum: {sum_result}\")\nprint(f\"Difference: {difference}\")\nprint(f\"Product: {product}\")",
+          "hints": ["Use meaningful variable names", "Remember to assign values to your variables", "Print all three results"]
+        }
+      ],
+      "quiz_id": "python-basics-quiz",
+      "subtopics": ["Introduction", "Variables", "Data Types", "Practice"],
+      "blocks": [
+        {
+          "id": "intro-text",
+          "type": "text",
+          "order": 1,
+          "content": "# Python Basics: Getting Started\n\nWelcome to your first Python lesson! In this lesson, you'll learn the fundamentals of Python programming.\n\n## What is Python?\n\nPython is a high-level, interpreted programming language known for its simplicity and readability. It's perfect for beginners and powerful enough for advanced applications.",
+          "key_points": [
+            "Python is beginner-friendly",
+            "It's used in web development, data science, and AI",
+            "Python code is easy to read and write"
+          ]
+        },
+        {
+          "id": "hello-world-example",
+          "type": "code_example",
+          "order": 2,
+          "title": "Your First Python Program",
+          "code": "print(\"Hello, World!\")",
+          "explanation": "This is the traditional first program. The print() function displays text on the screen."
+        },
+        {
+          "id": "variables-lesson",
+          "type": "text",
+          "order": 3,
+          "content": "## Variables\n\nVariables are containers for storing data values. In Python, you create a variable by assigning a value to it.",
+          "key_points": [
+            "Variables store data for later use",
+            "No need to declare variable types",
+            "Use descriptive names for variables"
+          ]
+        },
+        {
+          "id": "variables-example",
+          "type": "code_example",
+          "order": 4,
+          "title": "Creating Variables",
+          "code": "name = \"João\"\nage = 16\nprint(f\"Hello, my name is {name} and I am {age} years old.\")",
+          "explanation": "Here we create two variables and use them in a formatted string (f-string)."
+        },
+        {
+          "id": "practice-exercise",
+          "type": "interactive",
+          "order": 5,
+          "title": "Your Turn: Create Variables",
+          "instructions": "Create a variable with your name and print a greeting message.",
+          "starter_code": "# Your code here\nname = \nprint()",
+          "solution": "name = \"Your Name\"\nprint(f\"Hello, {name}! Welcome to Python!\")",
+          "hints": ["Use quotes around text", "Use f-strings for formatting"]
+        },
+        {
+          "id": "quiz-block",
+          "type": "quiz",
+          "order": 6,
+          "quiz_id": "python-basics-quiz"
+        }
+      ],
+      "created_at": "2025-07-02T18:20:00Z",
+      "updated_at": "2025-07-02T18:20:00Z",
+      "is_published": true
+    },
+    
+    "variables-02": {
+      "id": "variables-02",
+      "title": "Variables and Data Types",
+      "description": "Deep dive into Python variables, data types, and how to work with different kinds of data in your programs.",
+      "content": "# Variables and Data Types\n\nNow that you've learned the basics, let's explore variables and data types in more detail.\n\n## Understanding Variables\n\nThink of variables as labeled boxes that store information:\n\n```python\nstudent_name = \"Maria\"\nstudent_age = 17\nstudent_grade = 95.5\nis_passing = True\n```\n\n## String Operations\n\nStrings have many useful methods:\n\n```python\nmessage = \"Hello, Python!\"\nprint(message.upper())  # HELLO, PYTHON!\nprint(message.lower())  # hello, python!\nprint(len(message))     # 14\n```\n\n## Number Operations\n\n```python\nx = 10\ny = 3\n\nprint(x + y)   # Addition: 13\nprint(x - y)   # Subtraction: 7\nprint(x * y)   # Multiplication: 30\nprint(x / y)   # Division: 3.333...\nprint(x // y)  # Floor division: 3\nprint(x % y)   # Modulo: 1\nprint(x ** y)  # Exponentiation: 1000\n```",
+      "order": 2,
+      "difficulty": "beginner",
+      "estimated_time": 45,
+      "prerequisites": ["python-basics-01"],
+      "tags": ["variables", "data types", "strings", "numbers"],
+      "xp_reward": 75,
+      "pycoins_reward": 15,
+      "code_examples": [
+        {
+          "id": "data-types-demo",
+          "title": "Python Data Types",
+          "code": "# Different data types\ntext = \"Hello, Python!\"    # String\nnumber = 42               # Integer\ndecimal = 3.14159         # Float\nis_coding = True          # Boolean\n\n# Check types\nprint(f\"'{text}' is a {type(text).__name__}\")\nprint(f\"{number} is a {type(number).__name__}\")\nprint(f\"{decimal} is a {type(decimal).__name__}\")\nprint(f\"{is_coding} is a {type(is_coding).__name__}\")",
+          "explanation": "Python has four main data types: strings (text), integers (whole numbers), floats (decimals), and booleans (True/False)."
+        },
+        {
+          "id": "string-methods",
+          "title": "String Methods",
+          "code": "message = \"Python Programming\"\n\nprint(message.upper())      # PYTHON PROGRAMMING\nprint(message.lower())      # python programming\nprint(message.title())      # Python Programming\nprint(message.count('P'))   # 2\nprint(len(message))         # 18\nprint(message.replace('Python', 'Java'))  # Java Programming",
+          "explanation": "Strings have many built-in methods for manipulation. These methods don't change the original string but return a new one."
+        },
+        {
+          "id": "number-operations",
+          "title": "Number Operations",
+          "code": "x = 15\ny = 4\n\nprint(f\"{x} + {y} = {x + y}\")     # Addition\nprint(f\"{x} - {y} = {x - y}\")     # Subtraction  \nprint(f\"{x} * {y} = {x * y}\")     # Multiplication\nprint(f\"{x} / {y} = {x / y}\")     # Division\nprint(f\"{x} // {y} = {x // y}\")   # Floor division\nprint(f\"{x} % {y} = {x % y}\")     # Modulo (remainder)\nprint(f\"{x} ** {y} = {x ** y}\")   # Exponentiation",
+          "explanation": "Python supports all basic arithmetic operations. Floor division (//) gives whole numbers, modulo (%) gives remainders."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "string-playground",
+          "title": "String Playground",
+          "description": "Practice string operations with your own text.",
+          "instructions": "Create a string variable with your favorite quote and try different string methods on it.",
+          "starter_code": "# Create your favorite quote\nquote = \n\n# Try different string methods\nprint(quote.upper())\nprint(quote.title())\nprint(f\"Length: {len(quote)}\")\nprint(f\"Word count: {quote.count(' ') + 1}\")",
+          "solution": "quote = \"Code is poetry in motion\"\n\nprint(quote.upper())              # CODE IS POETRY IN MOTION\nprint(quote.title())              # Code Is Poetry In Motion  \nprint(f\"Length: {len(quote)}\")    # Length: 23\nprint(f\"Word count: {quote.count(' ') + 1}\")  # Word count: 5\nprint(quote.replace('poetry', 'art'))  # Code is art in motion",
+          "hints": ["Choose a quote you like", "Try different string methods", "Word count = spaces + 1"]
+        },
+        {
+          "id": "calculator-advanced",
+          "title": "Advanced Calculator",
+          "description": "Create a calculator that performs various operations on two numbers.",
+          "instructions": "Create two number variables and perform all arithmetic operations, then format the output nicely.",
+          "starter_code": "# Create two numbers\nnum1 = \nnum2 = \n\n# Perform all operations\naddition = \nsubtraction = \nmultiplication = \ndivision = \nremainder = \npower = \n\n# Print results in a nice format\nprint(f\"Numbers: {num1} and {num2}\")\nprint(f\"Addition: {num1} + {num2} = {addition}\")",
+          "solution": "num1 = 20\nnum2 = 6\n\naddition = num1 + num2\nsubtraction = num1 - num2\nmultiplication = num1 * num2\ndivision = num1 / num2\nremainder = num1 % num2\npower = num1 ** num2\n\nprint(f\"Numbers: {num1} and {num2}\")\nprint(f\"Addition: {num1} + {num2} = {addition}\")\nprint(f\"Subtraction: {num1} - {num2} = {subtraction}\")\nprint(f\"Multiplication: {num1} * {num2} = {multiplication}\")\nprint(f\"Division: {num1} / {num2} = {division:.2f}\")\nprint(f\"Remainder: {num1} % {num2} = {remainder}\")\nprint(f\"Power: {num1} ** {num2} = {power}\")",
+          "hints": ["Use meaningful numbers", "Format division to 2 decimal places", "Don't forget all operations"]
+        }
+      ],
+      "quiz_id": "variables-quiz",
+      "subtopics": ["Data Types", "String Operations", "Number Operations", "Practice"],
+      "blocks": [
+        {
+          "id": "intro-variables",
+          "type": "text",
+          "order": 1,
+          "content": "# Variables and Data Types\n\nNow that you've learned the basics, let's explore variables and data types in more detail.\n\n## Understanding Variables\n\nThink of variables as labeled boxes that store information. Each box can hold different types of data.",
+          "key_points": [
+            "Variables are like labeled storage containers",
+            "Python has four main data types",
+            "You can check a variable's type using type()"
+          ]
+        },
+        {
+          "id": "data-types-example",
+          "type": "code_example", 
+          "order": 2,
+          "title": "Python Data Types",
+          "code": "student_name = \"Maria\"     # String\nstudent_age = 17          # Integer\nstudent_grade = 95.5      # Float\nis_passing = True         # Boolean\n\nprint(f\"Name: {student_name} (type: {type(student_name).__name__})\")\nprint(f\"Age: {student_age} (type: {type(student_age).__name__})\")",
+          "explanation": "Python automatically determines the data type based on the value you assign. No need to declare types explicitly!"
+        },
+        {
+          "id": "string-operations",
+          "type": "text",
+          "order": 3,
+          "content": "## String Operations\n\nStrings in Python are very powerful and have many built-in methods for manipulation.",
+          "key_points": [
+            "Strings are immutable (can't be changed)",
+            "String methods return new strings",
+            "Use len() to get string length"
+          ]
+        },
+        {
+          "id": "string-methods-example",
+          "type": "code_example",
+          "order": 4,
+          "title": "String Methods in Action",
+          "code": "message = \"Hello, Python!\"\nprint(message.upper())      # HELLO, PYTHON!\nprint(message.lower())      # hello, python!\nprint(len(message))         # 14\nprint(message.count('l'))   # 2\nprint(message.replace('Python', 'World'))  # Hello, World!",
+          "explanation": "These methods help you manipulate text. They're very useful for processing user input and formatting output."
+        },
+        {
+          "id": "string-practice",
+          "type": "interactive",
+          "order": 5,
+          "title": "Practice: String Manipulation",
+          "instructions": "Create a variable with your favorite programming language and try different string methods.",
+          "starter_code": "# Your favorite programming language\nlanguage = \n\n# Try different methods\nprint(language.upper())\nprint(f\"Length: {len(language)}\")",
+          "solution": "language = \"Python\"\n\nprint(language.upper())              # PYTHON\nprint(f\"Length: {len(language)}\")    # Length: 6\nprint(language.replace('P', 'J'))    # Jython\nprint(language * 3)                  # PythonPythonPython",
+          "hints": ["Choose any programming language", "Try upper(), lower(), len()", "Experiment with replace() method"]
+        },
+        {
+          "id": "number-operations-text",
+          "type": "text", 
+          "order": 6,
+          "content": "## Number Operations\n\nPython supports all standard arithmetic operations and some special ones too.",
+          "key_points": [
+            "Use // for floor division (no decimals)",
+            "Use % for modulo (remainder)",
+            "Use ** for exponentiation (power)"
+          ]
+        },
+        {
+          "id": "arithmetic-example",
+          "type": "code_example",
+          "order": 7,
+          "title": "Arithmetic Operations",
+          "code": "x = 17\ny = 5\n\nprint(f\"{x} + {y} = {x + y}\")     # 22\nprint(f\"{x} - {y} = {x - y}\")     # 12\nprint(f\"{x} * {y} = {x * y}\")     # 85\nprint(f\"{x} / {y} = {x / y}\")     # 3.4\nprint(f\"{x} // {y} = {x // y}\")   # 3 (floor division)\nprint(f\"{x} % {y} = {x % y}\")     # 2 (remainder)\nprint(f\"{x} ** {y} = {x ** y}\")   # 1419857 (17 to the power of 5)",
+          "explanation": "Each operation has its use. Modulo (%) is great for checking if numbers are even/odd or for cycling through lists."
+        },
+        {
+          "id": "calculator-practice",
+          "type": "interactive",
+          "order": 8,
+          "title": "Build a Calculator",
+          "instructions": "Create a simple calculator that performs all arithmetic operations on two numbers.",
+          "starter_code": "# Create two numbers\nnum1 = \nnum2 = \n\n# Calculate and display results\nprint(f\"Addition: {num1} + {num2} = \")\nprint(f\"Subtraction: {num1} - {num2} = \")\nprint(f\"Multiplication: {num1} * {num2} = \")",
+          "solution": "num1 = 12\nnum2 = 5\n\nprint(f\"Addition: {num1} + {num2} = {num1 + num2}\")\nprint(f\"Subtraction: {num1} - {num2} = {num1 - num2}\")\nprint(f\"Multiplication: {num1} * {num2} = {num1 * num2}\")\nprint(f\"Division: {num1} / {num2} = {num1 / num2:.2f}\")\nprint(f\"Floor Division: {num1} // {num2} = {num1 // num2}\")\nprint(f\"Remainder: {num1} % {num2} = {num1 % num2}\")\nprint(f\"Power: {num1} ** {num2} = {num1 ** num2}\")",
+          "hints": ["Pick any two numbers", "Complete all operations", "Use :.2f to format decimals"]
+        },
+        {
+          "id": "variables-quiz",
+          "type": "quiz",
+          "order": 9,
+          "quiz_id": "variables-quiz"
+        }
+      ],
+      "created_at": "2025-07-02T18:20:00Z",
+      "updated_at": "2025-07-02T18:20:00Z",
+      "is_published": true
+    },
+
+    "functions-03": {
+      "id": "functions-03",
+      "title": "Functions and Code Reusability",
+      "description": "Learn how to create and use functions to make your code more organized, reusable, and maintainable.",
+      "content": "# Functions and Code Reusability\n\nFunctions are reusable blocks of code that perform specific tasks. They help organize your code and avoid repetition.\n\n## Creating Functions\n\n```python\ndef greet_student(name):\n    \"\"\"Function to greet a student\"\"\"\n    return f\"Hello, {name}! Ready to code?\"\n\n# Call the function\nmessage = greet_student(\"Ana\")\nprint(message)\n```\n\n## Function Parameters\n\n```python\ndef calculate_grade(points, total_points):\n    \"\"\"Calculate percentage grade\"\"\"\n    percentage = (points / total_points) * 100\n    return round(percentage, 2)\n\n# Usage\nstudent_grade = calculate_grade(85, 100)\nprint(f\"Grade: {student_grade}%\")\n```",
+      "order": 3,
+      "difficulty": "intermediate",
+      "estimated_time": 60,
+      "prerequisites": ["python-basics-01", "variables-02"],
+      "tags": ["functions", "parameters", "return", "code organization"],
+      "xp_reward": 100,
+      "pycoins_reward": 20,
+      "code_examples": [
+        {
+          "id": "simple-function",
+          "title": "Your First Function",
+          "code": "def greet_user(name):\n    \"\"\"A simple greeting function\"\"\"\n    return f\"Hello, {name}! Welcome to Python functions!\"\n\n# Call the function\nmessage = greet_user(\"Student\")\nprint(message)\n\n# Call with different names\nprint(greet_user(\"Alice\"))\nprint(greet_user(\"Bob\"))",
+          "explanation": "Functions are defined with 'def' followed by the function name and parentheses. You can call them multiple times with different inputs."
+        },
+        {
+          "id": "function-parameters",
+          "title": "Functions with Multiple Parameters",
+          "code": "def calculate_area(length, width):\n    \"\"\"Calculate the area of a rectangle\"\"\"\n    area = length * width\n    return area\n\n# Test the function\nroom_area = calculate_area(10, 12)\nprint(f\"Room area: {room_area} square meters\")\n\n# Try with different values\nprint(f\"Garden area: {calculate_area(15, 8)} square meters\")",
+          "explanation": "Functions can take multiple parameters. This makes them flexible and reusable for different situations."
+        },
+        {
+          "id": "default-parameters",
+          "title": "Default Parameters",
+          "code": "def introduce_student(name, age=16, grade=\"10th\"):\n    \"\"\"Introduce a student with optional age and grade\"\"\"\n    return f\"{name} is {age} years old and in {grade} grade.\"\n\n# Call with just name (uses defaults)\nprint(introduce_student(\"Maria\"))\n\n# Call with name and age\nprint(introduce_student(\"Carlos\", 17))\n\n# Call with all parameters\nprint(introduce_student(\"Ana\", 15, \"9th\"))",
+          "explanation": "Default parameters let you call functions with fewer arguments. If not provided, the default values are used."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "greeting-function",
+          "title": "Personal Greeting Function",
+          "description": "Create a function that creates personalized greetings.",
+          "instructions": "Write a function that takes a name and returns a personalized greeting message.",
+          "starter_code": "def create_greeting(name):\n    # Your code here\n    pass\n\n# Test your function\nprint(create_greeting(\"Your Name\"))",
+          "solution": "def create_greeting(name):\n    \"\"\"Create a personalized greeting\"\"\"\n    return f\"Hello, {name}! I'm excited to learn Python with you!\"\n\n# Test the function\nprint(create_greeting(\"Your Name\"))\nprint(create_greeting(\"Friend\"))",
+          "hints": ["Use the 'return' keyword", "Include the name parameter in your message", "Make it friendly and personal"]
+        },
+        {
+          "id": "grade-calculator",
+          "title": "Grade Calculator Function",
+          "description": "Create a function that calculates and categorizes student grades.",
+          "instructions": "Write a function that takes a percentage and returns the corresponding letter grade.",
+          "starter_code": "def get_letter_grade(percentage):\n    # Your code here\n    # A: 90-100, B: 80-89, C: 70-79, D: 60-69, F: below 60\n    pass\n\n# Test your function\nprint(get_letter_grade(85))\nprint(get_letter_grade(92))\nprint(get_letter_grade(67))",
+          "solution": "def get_letter_grade(percentage):\n    \"\"\"Convert percentage to letter grade\"\"\"\n    if percentage >= 90:\n        return 'A'\n    elif percentage >= 80:\n        return 'B'\n    elif percentage >= 70:\n        return 'C'\n    elif percentage >= 60:\n        return 'D'\n    else:\n        return 'F'\n\n# Test the function\nprint(get_letter_grade(85))  # B\nprint(get_letter_grade(92))  # A\nprint(get_letter_grade(67))  # D",
+          "hints": ["Use if-elif-else statements", "Check from highest to lowest grade", "Remember to return the letter"]
+        },
+        {
+          "id": "math-functions",
+          "title": "Math Helper Functions",
+          "description": "Create useful math functions for calculations.",
+          "instructions": "Create functions for area calculation, temperature conversion, and circle circumference.",
+          "starter_code": "def rectangle_area(length, width):\n    # Calculate area of rectangle\n    pass\n\ndef celsius_to_fahrenheit(celsius):\n    # Convert Celsius to Fahrenheit: F = C * 9/5 + 32\n    pass\n\ndef circle_circumference(radius):\n    # Calculate circumference: C = 2 * π * r (use 3.14159 for π)\n    pass\n\n# Test your functions\nprint(f\"Rectangle area: {rectangle_area(10, 5)}\")\nprint(f\"Temperature: {celsius_to_fahrenheit(25)}°F\")\nprint(f\"Circumference: {circle_circumference(7)}\")",
+          "solution": "def rectangle_area(length, width):\n    \"\"\"Calculate area of rectangle\"\"\"\n    return length * width\n\ndef celsius_to_fahrenheit(celsius):\n    \"\"\"Convert Celsius to Fahrenheit\"\"\"\n    return celsius * 9/5 + 32\n\ndef circle_circumference(radius):\n    \"\"\"Calculate circumference of circle\"\"\"\n    pi = 3.14159\n    return 2 * pi * radius\n\n# Test the functions\nprint(f\"Rectangle area: {rectangle_area(10, 5)}\")        # 50\nprint(f\"Temperature: {celsius_to_fahrenheit(25)}°F\")      # 77.0°F\nprint(f\"Circumference: {circle_circumference(7):.2f}\")   # 43.98",
+          "hints": ["Each function should return a calculated value", "Use the given formulas", "Test with the provided examples"]
+        }
+      ],
+      "quiz_id": "functions-quiz",
+      "subtopics": ["Function Basics", "Parameters", "Return Values", "Practice"],
+      "blocks": [
+        {
+          "id": "functions-intro",
+          "type": "text",
+          "order": 1,
+          "content": "# Functions and Code Reusability\n\nFunctions are one of the most important concepts in programming. They allow you to organize your code into reusable blocks that perform specific tasks.\n\n## Why Use Functions?\n\nFunctions help you:\n- **Avoid repetition** - Write code once, use it many times\n- **Organize code** - Break complex problems into smaller pieces\n- **Debug easier** - Test individual parts of your program\n- **Collaborate better** - Share and reuse code with others",
+          "key_points": [
+            "Functions make code reusable and organized",
+            "They help break complex problems into smaller parts",
+            "Functions can take inputs (parameters) and return outputs"
+          ]
+        },
+        {
+          "id": "first-function",
+          "type": "code_example",
+          "order": 2,
+          "title": "Creating Your First Function",
+          "code": "def say_hello():\n    \"\"\"A simple function that prints a greeting\"\"\"\n    print(\"Hello, Python world!\")\n    print(\"Functions are awesome!\")\n\n# Call the function\nsay_hello()\n\n# You can call it multiple times\nsay_hello()\nsay_hello()",
+          "explanation": "Functions are defined using the 'def' keyword, followed by the function name and parentheses. The code inside is indented."
+        },
+        {
+          "id": "function-with-parameters",
+          "type": "text",
+          "order": 3,
+          "content": "## Functions with Parameters\n\nParameters make functions more flexible by allowing you to pass different values each time you call the function.",
+          "key_points": [
+            "Parameters are variables that receive values when the function is called",
+            "You can have multiple parameters separated by commas",
+            "Parameters make functions flexible and reusable"
+          ]
+        },
+        {
+          "id": "parameters-example",
+          "type": "code_example",
+          "order": 4,
+          "title": "Functions with Parameters",
+          "code": "def greet_student(name, course):\n    \"\"\"Greet a student with their name and course\"\"\"\n    message = f\"Welcome, {name}! Ready to learn {course}?\"\n    return message\n\n# Call with different parameters\nprint(greet_student(\"Alice\", \"Python\"))\nprint(greet_student(\"Bob\", \"Web Development\"))\nprint(greet_student(\"Carol\", \"Data Science\"))",
+          "explanation": "This function takes two parameters: name and course. Each time we call it with different values, we get a personalized message."
+        },
+        {
+          "id": "practice-simple-function",
+          "type": "interactive",
+          "order": 5,
+          "title": "Create Your First Function",
+          "instructions": "Write a function that takes a name as a parameter and returns a personalized greeting.",
+          "starter_code": "def greet_person(name):\n    # Your code here\n    pass\n\n# Test your function\nresult = greet_person(\"Student\")\nprint(result)",
+          "solution": "def greet_person(name):\n    \"\"\"Return a personalized greeting\"\"\"\n    return f\"Hello, {name}! Nice to meet you!\"\n\n# Test the function\nresult = greet_person(\"Student\")\nprint(result)  # Hello, Student! Nice to meet you!\n\n# Try with different names\nprint(greet_person(\"Alice\"))\nprint(greet_person(\"Bob\"))",
+          "hints": ["Use the 'return' keyword to send back a value", "Include the name parameter in your message", "Test with different names"]
+        },
+        {
+          "id": "return-values",
+          "type": "text",
+          "order": 6,
+          "content": "## Return Values\n\nFunctions can send back results using the 'return' statement. This makes them like mini-calculators that process inputs and give you outputs.",
+          "key_points": [
+            "Use 'return' to send a value back from a function",
+            "You can return numbers, strings, or any data type",
+            "The returned value can be stored in a variable or used directly"
+          ]
+        },
+        {
+          "id": "return-example",
+          "type": "code_example",
+          "order": 7,
+          "title": "Functions that Return Values",
+          "code": "def calculate_tip(bill_amount, tip_percentage):\n    \"\"\"Calculate tip amount and total bill\"\"\"\n    tip = bill_amount * (tip_percentage / 100)\n    total = bill_amount + tip\n    return tip, total  # Return multiple values\n\n# Use the function\nbill = 50.00\ntip_amount, total_bill = calculate_tip(bill, 18)\n\nprint(f\"Bill: ${bill:.2f}\")\nprint(f\"Tip (18%): ${tip_amount:.2f}\")\nprint(f\"Total: ${total_bill:.2f}\")",
+          "explanation": "This function calculates both tip and total, returning both values. You can return multiple values separated by commas."
+        },
+        {
+          "id": "practice-calculator",
+          "type": "interactive",
+          "order": 8,
+          "title": "Build a Calculator Function",
+          "instructions": "Create a function that takes two numbers and an operation, then returns the result.",
+          "starter_code": "def calculate(num1, num2, operation):\n    # Your code here\n    # operation can be: 'add', 'subtract', 'multiply', 'divide'\n    pass\n\n# Test your function\nprint(calculate(10, 5, 'add'))\nprint(calculate(10, 5, 'multiply'))",
+          "solution": "def calculate(num1, num2, operation):\n    \"\"\"Perform basic arithmetic operations\"\"\"\n    if operation == 'add':\n        return num1 + num2\n    elif operation == 'subtract':\n        return num1 - num2\n    elif operation == 'multiply':\n        return num1 * num2\n    elif operation == 'divide':\n        if num2 != 0:\n            return num1 / num2\n        else:\n            return \"Cannot divide by zero!\"\n    else:\n        return \"Unknown operation\"\n\n# Test the function\nprint(calculate(10, 5, 'add'))       # 15\nprint(calculate(10, 5, 'multiply'))  # 50\nprint(calculate(10, 5, 'divide'))    # 2.0\nprint(calculate(10, 0, 'divide'))    # Cannot divide by zero!",
+          "hints": ["Use if-elif statements for different operations", "Don't forget to handle division by zero", "Return the calculated result"]
+        },
+        {
+          "id": "functions-quiz",
+          "type": "quiz",
+          "order": 9,
+          "quiz_id": "functions-quiz"
+        }
+      ],
+      "created_at": "2025-07-02T18:20:00Z",
+      "updated_at": "2025-07-02T18:20:00Z",
+      "is_published": true
+    }
+  }
+}

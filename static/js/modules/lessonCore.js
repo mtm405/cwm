@@ -52,11 +52,15 @@ class LessonCore {
         });
 
         // Setup navigation buttons
-        const prevBtn = document.getElementById('prev-subtopic');
-        const nextBtn = document.getElementById('next-subtopic');
+        const prevBtn = document.getElementById('prev-subtopic-btn');
+        const nextBtn = document.getElementById('next-subtopic-btn');
         
-        if (prevBtn) prevBtn.addEventListener('click', () => this.previousSubtopic());
-        if (nextBtn) nextBtn.addEventListener('click', () => this.nextSubtopic());
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => this.previousSubtopic());
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => this.nextSubtopic());
+        }
     }
 
     /**
@@ -348,15 +352,20 @@ class LessonCore {
      * Update navigation buttons
      */
     updateNavigationButtons() {
-        const prevBtn = document.getElementById('prev-subtopic');
-        const nextBtn = document.getElementById('next-subtopic');
+        const prevBtn = document.getElementById('prev-subtopic-btn');
+        const nextBtn = document.getElementById('next-subtopic-btn');
+
+        // If no buttons are found, exit gracefully.
+        if (!prevBtn && !nextBtn) {
+            return;
+        }
         
         if (prevBtn) {
             prevBtn.disabled = this.currentSubtopic === 0;
         }
         
         if (nextBtn) {
-            nextBtn.disabled = this.currentSubtopic === this.getSubtopicCount() - 1;
+            nextBtn.disabled = this.currentSubtopic >= this.getSubtopicCount() - 1;
         }
     }
 

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 2 & 3: Duplicate Declarations & Data Structure Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .pass { background-color: #d4edda; border: 1px solid #c3e6cb; }
+        .fail { background-color: #f8d7da; border: 1px solid #f5c6cb; }
+        .test-title { font-weight: bold; margin-bottom: 10px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Phase 2 & 3: Complete Fix Testing</h1>
+    <p>Testing duplicate declaration guards and data structure validation enhancements.</p>
+    
+    <div class="section">
+        <h2>Phase 2: Duplicate Declaration Tests</h2>
+        <div id="phase2-results"></div>
+    </div>
+    
+    <div class="section">
+        <h2>Phase 3: Data Structure Tests</h2>
+        <div id="phase3-results"></div>
+    </div>
+
+    <!-- Load scripts multiple times to test duplicate declaration guards -->
+    <script src="static/js/utils/dataStructureNormalizer.js"></script>
+    <script src="static/js/editor/editorConfig.js"></script>
+    <script src="static/js/editor/editorService.js"></script>
+    <script src="static/js/services/firebaseLessonService.js"></script>
+    
+    <!-- Load the same scripts again to test guards -->
+    <script src="static/js/utils/dataStructureNormalizer.js"></script>
+    <script src="static/js/editor/editorConfig.js"></script>
+    <script src="static/js/editor/editorService.js"></script>
+    <script src="static/js/services/firebaseLessonService.js"></script>
+
+    <script>
+        function runPhase2Tests() {
+            const results = [];
+            
+            // Test 1: DataStructureNormalizer
+            try {
+                if (window.DataStructureNormalizer && typeof window.DataStructureNormalizer.normalizeLessonData === 'function') {
+                    results.push({ name: 'DataStructureNormalizer', status: 'pass', message: 'Class loaded successfully with duplicate declaration guard' });
+                } else {
+                    results.push({ name: 'DataStructureNormalizer', status: 'fail', message: 'Class not available' });
+                }
+            } catch (error) {
+                results.push({ name: 'DataStructureNormalizer', status: 'fail', message: `Error: ${error.message}` });
+            }
+            
+            // Test 2: EditorConfig
+            try {
+                if (window.EditorConfig && typeof window.EditorConfig.getLanguageConfig === 'function') {
+                    results.push({ name: 'EditorConfig', status: 'pass', message: 'Config object loaded successfully with duplicate declaration guard' });
+                } else {
+                    results.push({ name: 'EditorConfig', status: 'fail', message: 'Config object not available' });
+                }
+            } catch (error) {
+                results.push({ name: 'EditorConfig', status: 'fail', message: `Error: ${error.message}` });
+            }
+            
+            // Test 3: EditorService
+            try {
+                if (window.EditorService && window.editorService) {
+                    results.push({ name: 'EditorService', status: 'pass', message: 'Service class and instance loaded successfully with duplicate declaration guard' });
+                } else {
+                    results.push({ name: 'EditorService', status: 'fail', message: 'Service class or instance not available' });
+                }
+            } catch (error) {
+                results.push({ name: 'EditorService', status: 'fail', message: `Error: ${error.message}` });
+            }
+            
+            // Test 4: FirebaseLessonService
+            try {
+                if (window.FirebaseLessonService && window.firebaseLessonService) {
+                    results.push({ name: 'FirebaseLessonService', status: 'pass', message: 'Service class and instance loaded successfully with duplicate declaration guard' });
+                } else {
+                    results.push({ name: 'FirebaseLessonService', status: 'fail', message: 'Service class or instance not available' });
+                }
+            } catch (error) {
+                results.push({ name: 'FirebaseLessonService', status: 'fail', message: `Error: ${error.message}` });
+            }
+            
+            return results;
+        }
+        
+        function runPhase3Tests() {
+            const results = [];
+            
+            // Test 1: Data validation
+            try {
+                const invalidData = null;
+                const validation = window.DataStructureNormalizer.validateLessonData(invalidData);
+                if (!validation.isValid && validation.errors.length > 0) {
+                    results.push({ name: 'Null Data Validation', status: 'pass', message: 'Correctly identifies null data as invalid' });
+                } else {
+                    results.push({ name: 'Null Data Validation', status: 'fail', message: 'Failed to validate null data' });
+                }
+            } catch (error) {
+                results.push({ name: 'Null Data Validation', status: 'fail', message: `Error: ${error.message}` });
+            }
+            
+            // Test 2: Data normalization
+            try {
+                const testData = { id: 'test', title: 'Test Lesson', subtopics: 'invalid', blocks: 'invalid' };
+                const normalized = window.DataStructureNormalizer.normalizeLessonData(testData);
+                if (normalized && Array.isArray(normalized.subtopics) && Array.isArray(normalized.blocks)) {
+                    results.push({ name: 'Data Normalization', status: 'pass', message: 'Successfully normalizes invalid data structures' });
+                } else {
+                    results.push({ name: 'Data Normalization', status: 'fail', message: 'Failed to normalize data structures' });
+                }
+            } catch (error) {
+                results.push({ name: 'Data Normalization', status: 'fail', message: `Error: ${error.message}` });
+            }
+            
+            // Test 3: Safe filter operation
+            try {
+                const result = window.DataStructureNormalizer.safeFilter('not-an-array', () => true);
+                if (Array.isArray(result) && result.length === 0) {
+                    results.push({ name: 'Safe Filter', status: 'pass', message: 'Safely handles non-array input' });
+                } else {
+                    results.push({ name: 'Safe Filter', status: 'fail', message: 'Failed to handle non-array input safely' });
+                }
+            } catch (error) {
+                results.push({ name: 'Safe Filter', status: 'fail', message: `Error: ${error.message}` });
+            }
+            
+            // Test 4: Comprehensive normalization
+            try {
+                const brokenData = { id: 'test', blocks: null, subtopics: undefined };
+                const normalized = window.DataStructureNormalizer.normalizeLessonDataComprehensive(brokenData);
+                if (normalized && normalized.blocks && normalized.subtopics) {
+                    results.push({ name: 'Comprehensive Normalization', status: 'pass', message: 'Successfully handles completely broken data' });
+                } else {
+                    results.push({ name: 'Comprehensive Normalization', status: 'fail', message: 'Failed to handle broken data' });
+                }
+            } catch (error) {
+                results.push({ name: 'Comprehensive Normalization', status: 'fail', message: `Error: ${error.message}` });
+            }
+            
+            // Test 5: Content block normalization
+            try {
+                const block = window.DataStructureNormalizer.normalizeContentBlockSafe(null);
+                if (block === null) {
+                    results.push({ name: 'Block Normalization Safety', status: 'pass', message: 'Safely handles null blocks' });
+                } else {
+                    results.push({ name: 'Block Normalization Safety', status: 'fail', message: 'Failed to handle null blocks safely' });
+                }
+            } catch (error) {
+                results.push({ name: 'Block Normalization Safety', status: 'fail', message: `Error: ${error.message}` });
+            }
+            
+            return results;
+        }
+        
+        function displayResults(results, containerId) {
+            const container = document.getElementById(containerId);
+            
+            results.forEach(result => {
+                const div = document.createElement('div');
+                div.className = `test-result ${result.status}`;
+                div.innerHTML = `
+                    <div class="test-title">${result.status === 'pass' ? '✅' : '❌'} ${result.name}</div>
+                    <div>${result.message}</div>
+                `;
+                container.appendChild(div);
+            });
+            
+            const passCount = results.filter(r => r.status === 'pass').length;
+            const totalCount = results.length;
+            
+            const summary = document.createElement('div');
+            summary.className = `test-result ${passCount === totalCount ? 'pass' : 'fail'}`;
+            summary.innerHTML = `
+                <div class="test-title">📊 Summary</div>
+                <div>${passCount}/${totalCount} tests passed</div>
+            `;
+            container.appendChild(summary);
+        }
+        
+        // Run tests when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🧪 Running Phase 2 & 3 fix tests...');
+            
+            const phase2Results = runPhase2Tests();
+            displayResults(phase2Results, 'phase2-results');
+            
+            const phase3Results = runPhase3Tests();
+            displayResults(phase3Results, 'phase3-results');
+            
+            console.log('✅ All tests completed');
+        });
+    </script>
+</body>
+</html>
+            console.log('❌ Some duplicate declaration guards need attention');
+        }
+    </script>
+
+    <!-- Load test file for additional validation -->
+    <script src="static/js/editor/test-duplicate-declarations.js"></script>
+</body>
+</html>

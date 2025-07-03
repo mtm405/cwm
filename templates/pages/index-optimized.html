@@ -1,0 +1,71 @@
+<!--
+Template: Optimized Homepage
+Purpose: Landing page for unauthenticated users - fully modular and optimized
+Features:
+- No navbar (controlled by base template logic)
+- Modular components for maintainability
+- External CSS file for styling
+- Google Sign-In integration
+Parent: base/layout.html
+Components used:
+- components/homepage/hero-section.html
+- components/homepage/trust-section.html  
+- components/homepage/learning-path-section.html
+- components/homepage/gamification-section.html
+- components/homepage/testimonials-section.html
+- components/homepage/final-cta-section.html
+Last updated: July 2, 2025
+-->
+{% extends "base/layout.html" %}
+
+{% block page_name %}index{% endblock %}
+
+{% block title %}Learn Python & Get Certified - Code with Morais{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+{% include 'components/homepage/hero-section.html' %}
+
+<!-- Trust Section -->
+{% include 'components/homepage/trust-section.html' %}
+
+<!-- Learning Path -->
+{% include 'components/homepage/learning-path-section.html' %}
+
+<!-- Gamification Features -->
+{% include 'components/homepage/gamification-section.html' %}
+
+<!-- Student Testimonials -->
+{% include 'components/homepage/testimonials-section.html' %}
+
+<!-- Final CTA -->
+{% include 'components/homepage/final-cta-section.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Google Sign-In handler is now defined globally in base/head.html
+// No need to redefine it here
+
+// Intersection Observer for animations
+document.addEventListener('DOMContentLoaded', function() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, observerOptions);
+    
+    // Observe animated elements
+    document.querySelectorAll('.path-item, .game-card, .testimonial-card').forEach(el => {
+        observer.observe(el);
+    });
+});
+</script>
+{% endblock %}

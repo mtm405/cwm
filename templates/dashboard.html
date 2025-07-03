@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base/layout.html" %}
 {% from "macros/dashboard.html" import stat_card, cached_stat_card, tab_button, progress_bar %}
 {% from "macros/dashboard_modern.html" import render_leaderboard_item, render_daily_challenge, render_no_challenge, render_activity_item %}
 
@@ -128,6 +128,5 @@
     </div> <!-- End of tab-content -->
 </div>
 
-<!-- Dashboard-specific components -->
-<script src="{{ url_for('static', filename='js/components/dashboard.js') }}"></script>
+<!-- Dashboard functionality is now handled by the main app.js module -->
 {% endblock %}

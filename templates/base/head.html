@@ -8,10 +8,138 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+<!-- Page-specific CSS -->
+{% if request.endpoint == 'main.index' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/homepage.css') }}">
+{% endif %}
+
 <!-- ACE Editor -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.23.4/ace.js"></script>
 
+<!-- Global JavaScript Configuration & Google Sign-In Callback -->
+<script>
+// Global configuration
+window.CONFIG = {
+    API_BASE_URL: '/api',
+    DEBUG: {{ 'true' if config.DEBUG else 'false' }},
+    GOOGLE_CLIENT_ID: '{{ google_client_id }}'
+};
+
+// CRITICAL: Google Sign-In callback must be defined before GSI script loads
+window.handleCredentialResponse = function(response) {
+    console.log('🔐 Google Sign-In response received');
+    
+    if (!response || !response.credential) {
+        console.error('Invalid Google Sign-In response');
+        return;
+    }
+    
+    const idToken = response.credential;
+    
+    // Show loading state
+    const authButtons = document.querySelectorAll('.g_id_signin');
+    authButtons.forEach(btn => {
+        if (btn) {
+            btn.style.opacity = '0.6';
+            btn.style.pointerEvents = 'none';
+        }
+    });
+    
+    // Send token to backend
+    fetch('/auth/google/callback', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ token: idToken })
+    })
+    .then(response => {
+        console.log('Backend response status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Backend response:', data);
+        if (data.success) {
+            console.log('✅ Authentication successful');
+            
+            // Show success feedback
+            if (typeof showToast === 'function') {
+                showToast('Login successful! Redirecting...', 'success');
+            }
+            
+            // Store user data if available
+            if (data.user) {
+                window.currentUser = data.user;
+                console.log('User data stored:', data.user);
+            }
+            
+            // Redirect to dashboard
+            const redirectUrl = data.redirect_url || '/dashboard';
+            console.log('Redirecting to:', redirectUrl);
+            
+            setTimeout(() => {
+                console.log('Performing redirect...');
+                window.location.href = redirectUrl;
+            }, 500);
+        } else {
+            console.error('❌ Authentication failed:', data.error);
+            if (typeof showToast === 'function') {
+                showToast(data.error || 'Authentication failed', 'error');
+            } else {
+                alert('Authentication failed: ' + (data.error || 'Unknown error'));
+            }
+            
+            // Re-enable buttons
+            authButtons.forEach(btn => {
+                if (btn) {
+                    btn.style.opacity = '1';
+                    btn.style.pointerEvents = 'auto';
+                }
+            });
+        }
+    })
+    .catch(error => {
+        console.error('❌ Network error during authentication:', error);
+        if (typeof showToast === 'function') {
+            showToast('Network error. Please try again.', 'error');
+        } else {
+            alert('Network error. Please check your connection and try again.');
+        }
+        
+        // Re-enable buttons
+        authButtons.forEach(btn => {
+            if (btn) {
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+            }
+        });
+    });
+};
+</script>
+
 <!-- Google Sign-In -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://accounts.google.com/gsi/client" async defer onload="console.log('Google Identity Services loaded')"></script>
+
+<!-- Main Application JavaScript -->
+<script src="{{ url_for('static', filename='js/core/main.js') }}" defer></script>
+
+<!-- Ensure handleCredentialResponse is available globally -->
+<script>
+// Backup callback function in case main.js hasn't loaded yet
+if (typeof window.handleCredentialResponse !== 'function') {
+    window.handleCredentialResponse = function(response) {
+        console.log('🔐 Using backup Google Sign-In handler');
+        // Store response and retry when main script loads
+        window.pendingGoogleResponse = response;
+        setTimeout(function() {
+            if (typeof window.handleCredentialResponse === 'function' && window.pendingGoogleResponse) {
+                window.handleCredentialResponse(window.pendingGoogleResponse);
+                window.pendingGoogleResponse = null;
+            }
+        }, 1000);
+    };
+}
+</script>
 
 {% block extra_css %}{% endblock %}

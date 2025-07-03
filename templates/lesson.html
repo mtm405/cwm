@@ -1,10 +1,232 @@
-{% extends "base.html" %}
+{% extends "base/layout.html" %}
 {% from "macros/lesson.html" import tab_button, code_block, back_link, progress_bar %}
 
 {% block title %}{{ lesson.title if lesson else "Lesson" }} - Code with Morais{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/lesson.css') }}">
+<style>
+/* Additional inline styles for lesson page specific adjustments */
+.lesson-container {
+    line-height: 1.8;
+}
+
+.text-block h1, .text-block h2, .text-block h3 {
+    color: var(--primary-color);
+    margin: 1rem 0;
+}
+
+.code-example {
+    background-color: var(--bg-secondary);
+}
+
+.code-header {
+    background-color: var(--bg-primary);
+    margin: -2rem -2rem 1rem -2rem;
+    padding: 1rem 2rem;
+    border-radius: 12px 12px 0 0;
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-copy {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.btn-copy:hover {
+    color: var(--primary-color);
+}
+
+.code-example pre {
+    background-color: transparent;
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+}
+
+.code-example code {
+    font-family: 'Fira Code', 'Consolas', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.interactive-challenge h3 {
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+}
+
+.code-output {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    min-height: 50px;
+    font-family: monospace;
+}
+
+.output-success {
+    color: var(--success-color);
+}
+
+.output-success .rewards {
+    background-color: var(--success-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    margin: 0.5rem 0;
+    font-weight: bold;
+}
+
+.output-error {
+    color: var(--error-color);
+}
+
+.quiz-container {
+    margin: 2rem 0;
+    padding: 2rem;
+    background-color: var(--bg-secondary);
+    border-radius: 12px;
+    border: 2px solid var(--primary-color);
+}
+
+.quiz-question {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.quiz-options {
+    list-style: none;
+    padding: 0;
+}
+
+.quiz-option {
+    margin: 0.5rem 0;
+    padding: 1rem;
+    background-color: var(--bg-primary);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.quiz-option:hover {
+    background-color: var(--bg-hover);
+    border-color: var(--primary-color);
+}
+
+.quiz-option.selected {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.quiz-option.correct {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.quiz-option.incorrect {
+    background-color: var(--error-color);
+    color: white;
+}
+
+.lesson-progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: var(--bg-secondary);
+    border-radius: 4px;
+    margin: 1rem 0;
+    overflow: hidden;
+}
+
+.lesson-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.block-completed {
+    opacity: 0.7;
+    transform: scale(0.98);
+    transition: all 0.3s ease;
+}
+
+.next-lesson-card {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.next-lesson-card h3 {
+    margin: 0 0 1rem 0;
+    color: white;
+}
+
+.btn-next-lesson {
+    background-color: white;
+    color: var(--primary-color);
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-next-lesson:hover {
+    background-color: var(--bg-secondary);
+    transform: translateY(-2px);
+}
+
+/* Loading states */
+.content-loading {
+    text-align: center;
+    padding: 3rem;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--bg-secondary);
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .lesson-header {
+        padding: 1rem;
+    }
+    
+    .content-block {
+        margin: 1rem 0;
+        padding: 1rem;
+    }
+    
+    .code-editor {
+        height: 200px;
+    }
+}
+</style>
 {% endblock %}
 
 {% block content %}
@@ -114,7 +336,15 @@
     <!-- 🎯 LESSON NAVIGATION FOOTER -->
     <footer class="lesson-navigation">
         <div class="nav-buttons">
-            {% if prev_lesson %}
+            {% if lesson.subtopics %}
+            <!-- Previous Subtopic Button -->
+            <button id="prev-btn" class="nav-btn prev-btn" 
+                    onclick="previousSubtopic()" 
+                    style="display: flex;">
+                <i class="fas fa-arrow-left"></i>
+                <span class="nav-text">Previous</span>
+            </button>
+            {% elif prev_lesson %}
             <a href="{{ url_for('lesson.lesson', lesson_id=prev_lesson.id) }}" 
                class="nav-btn prev-btn">
                 <i class="fas fa-arrow-left"></i>
@@ -132,7 +362,15 @@
                 </button>
             </div>
             
-            {% if next_lesson %}
+            {% if lesson.subtopics %}
+            <!-- Next Subtopic Button -->
+            <button id="next-btn" class="nav-btn next-btn" 
+                    onclick="nextSubtopic()"
+                    style="display: flex;">
+                <span class="nav-text">Next</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            {% elif next_lesson %}
             <a href="{{ url_for('lesson.lesson', lesson_id=next_lesson.id) }}" 
                class="nav-btn next-btn" 
                id="next-lesson-btn">
@@ -178,40 +416,208 @@
 </div>
 <!-- JavaScript for Dynamic Content Rendering -->
 <script>
-// Lesson data from backend (Firebase integration)
-window.lessonData = {{ lesson | tojson | safe }};
-window.lessonProgress = {{ lesson_progress | tojson | safe }};
-window.currentUser = {{ user | tojson | safe }};
+// Lesson data from backend (Firebase integration) - use globalThis for ES6 compatibility
+globalThis.lessonData = {{ lesson | tojson | safe }};
+globalThis.lessonProgress = {{ lesson_progress | tojson | safe }};
+globalThis.currentUser = {{ user | tojson | safe }};
 
-// Initialize lesson page with Firebase testing
-document.addEventListener('DOMContentLoaded', function() {
-    initializeLessonPage();
-});
+// CRITICAL FIX: Initialize missing global variables
+globalThis.editors = {};
+globalThis.currentSubtopic = 0;
 
-function initializeLessonPage() {
-    console.log('🚀 Initializing lesson page with Firebase integration testing...');
+// CRITICAL FIX: Transform lesson data to expected structure
+function transformLessonDataToBlocks(lesson) {
+    if (!lesson) return null;
     
-    // Test Firebase data structure and integration
-    testFirebaseIntegration();
-    
-    // Hide loading skeleton and show content
-    document.getElementById('content-loading').style.display = 'none';
-    document.getElementById('lesson-content').style.display = 'block';
-    
-    // Load lesson content based on Firebase data structure
-    if (window.lessonData && window.lessonData.blocks) {
-        console.log('✅ Using Firebase lesson blocks structure');
-        renderLessonBlocks(window.lessonData.blocks);
-    } else if (lessonData && lessonData.content) {
-        // Fallback for old content structure
-        renderLegacyContent(lessonData.content);
-    } else {
-        showFallbackContent();
+    // If blocks already exist, return as is
+    if (lesson.blocks && Array.isArray(lesson.blocks)) {
+        return lesson;
     }
     
-    // Initialize progress tracking
-    updateProgressDisplay();
+    console.log('📦 Transforming lesson data to blocks structure...');
+    
+    // Create blocks array
+    lesson.blocks = [];
+    let blockOrder = 0;
+    
+    // 1. Create introduction block from main content
+    if (lesson.content) {
+        lesson.blocks.push({
+            id: `${lesson.id}-intro`,
+            type: 'text',
+            title: 'Introduction',
+            content: lesson.content,
+            order: blockOrder++,
+            subtopic_index: 0
+        });
+    }
+    
+    // 2. Add code examples as blocks
+    if (lesson.code_examples && Array.isArray(lesson.code_examples)) {
+        lesson.code_examples.forEach((example, index) => {
+            lesson.blocks.push({
+                id: `${lesson.id}-code-${index}`,
+                type: 'code_example',
+                title: example.title || `Example ${index + 1}`,
+                code: example.code,
+                explanation: example.explanation,
+                language: 'python',
+                order: blockOrder++,
+                subtopic_index: 0
+            });
+        });
+    }
+    
+    // 3. Add exercises as interactive blocks
+    if (lesson.exercises && Array.isArray(lesson.exercises)) {
+        lesson.exercises.forEach((exercise, index) => {
+            lesson.blocks.push({
+                id: `${lesson.id}-exercise-${index}`,
+                type: 'interactive',
+                title: exercise.title,
+                instructions: exercise.description,
+                starter_code: exercise.starter_code,
+                solution: exercise.solution,
+                hints: exercise.hints,
+                language: 'python',
+                order: blockOrder++,
+                subtopic_index: 1,  // Put in Practice subtopic
+                challenge_type: 'Exercise',
+                difficulty: lesson.difficulty
+            });
+        });
+    }
+    
+    // 4. Add quiz block if quiz_id exists
+    if (lesson.quiz_id) {
+        lesson.blocks.push({
+            id: `${lesson.id}-quiz`,
+            type: 'quiz',
+            quiz_id: lesson.quiz_id,
+            title: 'Knowledge Check',
+            description: 'Test your understanding of this lesson',
+            order: blockOrder++,
+            subtopic_index: 2  // Put in Assessment subtopic
+        });
+    }
+    
+    // 5. Fix subtopics structure
+    if (!lesson.subtopics || lesson.subtopics.length === 0) {
+        lesson.subtopics = ['Introduction', 'Practice', 'Assessment'];
+    } else if (lesson.subtopics && Array.isArray(lesson.subtopics)) {
+        lesson.subtopics = lesson.subtopics.map((subtopic, index) => {
+            // If subtopic is just a string, keep as string for template compatibility
+            if (typeof subtopic === 'string') {
+                return subtopic;
+            }
+            return subtopic.title || subtopic;
+        });
+    }
+    
+    console.log(`✅ Lesson data transformed: ${lesson.blocks.length} blocks created`);
+    return lesson;
 }
+
+// Apply transformation immediately
+globalThis.lessonData = transformLessonDataToBlocks(globalThis.lessonData);
+
+// Normalize lesson data immediately after loading - Phase 3 Enhancement
+if (globalThis.DataStructureNormalizer && globalThis.lessonData) {
+    try {
+        console.log('🔧 Normalizing lesson data structure...');
+        const validation = globalThis.DataStructureNormalizer.validateLessonData(globalThis.lessonData);
+        
+        if (validation.warnings.length > 0) {
+            console.warn('⚠️ Lesson data validation warnings:', validation.warnings);
+        }
+        
+        if (validation.errors.length > 0) {
+            console.error('❌ Lesson data validation errors:', validation.errors);
+            // Use comprehensive normalizer for error recovery
+            globalThis.lessonData = globalThis.DataStructureNormalizer.normalizeLessonDataComprehensive(globalThis.lessonData);
+        } else {
+            globalThis.lessonData = globalThis.DataStructureNormalizer.normalizeLessonData(globalThis.lessonData);
+        }
+        console.log('✅ Lesson data normalized successfully');
+    } catch (error) {
+        console.error('❌ Error normalizing lesson data:', error);
+        // Continue with original data if normalization fails
+    }
+} else if (!globalThis.DataStructureNormalizer) {
+    console.warn('⚠️ DataStructureNormalizer not available, data may be unstable');
+}
+
+// InitializationQueue (ES6 module) handles all timing coordination
+// No inline initialization needed - handled by the ES6 module
+
+function initializeLesson() {
+    console.log('🚀 Initializing lesson page...');
+    
+    try {
+        // Validate required elements
+        const requiredElements = ['lesson-content-container'];
+        const missingElements = requiredElements.filter(id => !document.getElementById(id));
+        
+        if (missingElements.length > 0) {
+            throw new Error(`Required elements not found: ${missingElements.join(', ')}`);
+        }
+        
+        // Safely hide loading and show content
+        const loadingElement = document.getElementById('content-loading');
+        const contentElement = document.getElementById('lesson-content');
+        
+        if (loadingElement) {
+            loadingElement.style.display = 'none';
+        }
+        if (contentElement) {
+            contentElement.style.display = 'block';
+        }
+        
+        // Ensure lesson data is properly structured
+        if (!globalThis.lessonData) {
+            throw new Error('No lesson data available');
+        }
+        
+        // Initialize progress if not exists
+        if (!globalThis.lessonProgress) {
+            globalThis.lessonProgress = {
+                completed_blocks: [],
+                progress: 0,
+                current_block: 0
+            };
+        }
+        if (!globalThis.lessonProgress.completed_blocks) {
+            globalThis.lessonProgress.completed_blocks = [];
+        }
+        
+        // Test Firebase data structure and integration
+        testFirebaseIntegration();
+        
+        // Render content based on structure
+        if (globalThis.lessonData.subtopics && globalThis.lessonData.subtopics.length > 0) {
+            console.log('📑 Rendering subtopic-based lesson...');
+            globalThis.currentSubtopic = 0;
+            renderSubtopic(0);
+        } else if (globalThis.lessonData.blocks && globalThis.lessonData.blocks.length > 0) {
+            console.log('📄 Rendering single-page lesson...');
+            renderLessonContent(globalThis.lessonData.blocks);
+        } else {
+            console.warn('⚠️ No structured content found, attempting legacy render...');
+            renderLegacyContent(globalThis.lessonData.content || 'No content available');
+        }
+        
+        // Update progress display
+        updateProgressDisplay();
+        
+        console.log('✅ Lesson initialization complete');
+        
+    } catch (error) {
+        console.error('❌ Failed to initialize lesson:', error);
+        showFallbackContent();
+    }
+}
+
+// This function is replaced by the comprehensive renderSubtopic below
 
 function renderLessonBlocks(blocks) {
     const container = document.getElementById('lesson-content-container');
@@ -227,35 +633,48 @@ function renderLessonBlocks(blocks) {
 }
 
 function createBlockElement(block, index) {
+    // Phase 3 Fix: Enhanced data validation for block creation
+    if (!block) {
+        console.warn('⚠️ Null block at index:', index);
+        return null;
+    }
+    
     const article = document.createElement('article');
-    article.className = `content-block ${block.type}-block`;
+    article.className = `content-block ${block.type || 'unknown'}-block`;
     article.id = `block-${block.id || index}`;
     article.dataset.blockId = block.id || index;
-    article.dataset.blockType = block.type;
+    article.dataset.blockType = block.type || 'text';
     
-    // Add completion status
-    const isCompleted = lessonProgress.completed_blocks && 
-                       lessonProgress.completed_blocks.includes(block.id);
+    // Add completion status with safe access
+    const isCompleted = globalThis.lessonProgress?.completed_blocks && 
+                       Array.isArray(globalThis.lessonProgress.completed_blocks) &&
+                       globalThis.lessonProgress.completed_blocks.includes(block.id);
     if (isCompleted) {
         article.classList.add('completed');
     }
     
-    // Render based on block type
-    switch(block.type) {
-        case 'text':
-            article.innerHTML = createTextBlockHTML(block);
-            break;
-        case 'code_example':
-            article.innerHTML = createCodeExampleHTML(block);
-            break;
-        case 'interactive':
-            article.innerHTML = createInteractiveBlockHTML(block);
-            break;
-        case 'quiz':
-            article.innerHTML = createQuizBlockHTML(block);
-            break;
-        default:
-            article.innerHTML = createDefaultBlockHTML(block);
+    // Render based on block type with fallback
+    try {
+        switch(block.type) {
+            case 'text':
+                article.innerHTML = createTextBlockHTML(block);
+                break;
+            case 'code_example':
+                article.innerHTML = createCodeExampleHTML(block);
+                break;
+            case 'interactive':
+                article.innerHTML = createInteractiveBlockHTML(block);
+                break;
+            case 'quiz':
+                article.innerHTML = createQuizBlockHTML(block);
+                break;
+            default:
+                console.warn('⚠️ Unknown block type:', block.type);
+                article.innerHTML = createDefaultBlockHTML(block);
+        }
+    } catch (error) {
+        console.error('❌ Error creating block element:', error);
+        article.innerHTML = `<div class="error-block">Error rendering block: ${error.message}</div>`;
     }
     
     return article;
@@ -445,775 +864,189 @@ function createDefaultBlockHTML(block) {
     `;
 }
 
-// Fallback for legacy content structure
-function renderLegacyContent(content) {
-    const container = document.getElementById('lesson-content-container');
-    container.innerHTML = '';
+// Utility functions
+function showNotification(message, type = 'info') {
+    console.log(`${type.toUpperCase()}: ${message}`);
     
-    content.forEach((contentBlock, index) => {
-        const blockElement = document.createElement('div');
-        blockElement.className = `content-block ${contentBlock.type}-block`;
+    // Create simple notification if no notification system exists
+    if (typeof showToast === 'function') {
+        showToast(message, type);
+    } else {
+        // Fallback notification
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        `;
+        notification.textContent = message;
+        document.body.appendChild(notification);
         
-        if (contentBlock.type === 'text') {
-            blockElement.innerHTML = `<div class="text-content">${contentBlock.content}</div>`;
-        } else if (contentBlock.type === 'code_example') {
-            blockElement.innerHTML = `
-                <div class="code-header">
-                    <span>Example Code</span>
-                    <button class="btn btn-sm" onclick="copyCode(this)">
-                        <i class="fas fa-copy"></i> Copy
-                    </button>
-                </div>
-                <pre><code class="language-${contentBlock.language}">${contentBlock.code}</code></pre>
-            `;
-        }
-        // Add more legacy content types as needed
+        // Animate in
+        setTimeout(() => notification.style.opacity = '1', 100);
         
-        container.appendChild(blockElement);
-    });
+        // Auto remove
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
 }
 
 function showFallbackContent() {
-    document.getElementById('lesson-content').style.display = 'none';
-    document.getElementById('fallback-content').style.display = 'block';
+    const fallbackElement = document.getElementById('fallback-content');
+    const contentElement = document.getElementById('lesson-content');
+    
+    if (fallbackElement) {
+        fallbackElement.style.display = 'block';
+    }
+    if (contentElement) {
+        contentElement.style.display = 'none';
+    }
+    
+    console.warn('⚠️ Showing fallback content due to initialization failure');
 }
 
 function retryLoadContent() {
-    document.getElementById('fallback-content').style.display = 'none';
-    document.getElementById('content-loading').style.display = 'block';
+    const fallbackElement = document.getElementById('fallback-content');
+    const loadingElement = document.getElementById('content-loading');
+    
+    if (fallbackElement) {
+        fallbackElement.style.display = 'none';
+    }
+    if (loadingElement) {
+        loadingElement.style.display = 'block';
+    }
+    
     setTimeout(() => {
-        initializeLessonPage();
+        initializeLesson();
     }, 1000);
 }
 
-// Interactive functions
-function markBlockComplete(blockId) {
-    console.log('Marking block complete:', blockId);
+function renderLegacyContent(content) {
+    const container = document.getElementById('lesson-content-container');
+    if (!container) return;
     
-    // Update local progress
-    if (!lessonProgress.completed_blocks) {
-        lessonProgress.completed_blocks = [];
-    }
-    
-    if (!lessonProgress.completed_blocks.includes(blockId)) {
-        lessonProgress.completed_blocks.push(blockId);
-        
-        // Update UI
-        const blockElement = document.querySelector(`[data-block-id="${blockId}"]`);
-        if (blockElement) {
-            blockElement.classList.add('completed');
-        }
-        
-        // Update progress
-        updateProgressDisplay();
-        
-        // Show completion animation
-        showBlockCompletionAnimation(blockId);
-        
-        // Sync with Firebase (if user is logged in)
-        if (currentUser) {
-            syncProgressToFirebase();
-        }
-    }
+    container.innerHTML = `
+        <div class="content-block text-block">
+            <div class="block-header">
+                <div class="block-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="block-meta">
+                    <span class="block-type">Lesson Content</span>
+                </div>
+            </div>
+            <div class="block-content">
+                <div class="text-content">
+                    ${typeof content === 'string' ? content.replace(/\n/g, '<br>') : 'No content available'}
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 function updateProgressDisplay() {
-    const totalBlocks = lessonData.blocks ? lessonData.blocks.length : 0;
-    const completedBlocks = lessonProgress.completed_blocks ? lessonProgress.completed_blocks.length : 0;
+    const totalBlocks = globalThis.lessonData.blocks ? globalThis.lessonData.blocks.length : 0;
+    const completedBlocks = globalThis.lessonProgress.completed_blocks ? 
+        globalThis.lessonProgress.completed_blocks.length : 0;
     const progress = totalBlocks > 0 ? Math.round((completedBlocks / totalBlocks) * 100) : 0;
     
-    // Update progress bar
-    document.getElementById('progress-percentage').textContent = progress + '%';
-    document.getElementById('progress-fill').style.width = progress + '%';
-    document.getElementById('completed-blocks-text').textContent = 
-        `${completedBlocks} of ${totalBlocks} blocks completed`;
+    // Update progress bar if it exists
+    const progressBar = document.getElementById('progress-fill');
+    const progressText = document.getElementById('progress-percentage');
+    const completedText = document.getElementById('completed-blocks-text');
+    
+    if (progressBar) {
+        progressBar.style.width = progress + '%';
+    }
+    if (progressText) {
+        progressText.textContent = progress + '%';
+    }
+    if (completedText) {
+        completedText.textContent = `${completedBlocks} of ${totalBlocks} blocks completed`;
+    }
     
     // Update lesson progress
-    lessonProgress.progress = progress;
-    
-    // Check for milestones
-    if (progress === 25 || progress === 50 || progress === 75 || progress === 100) {
-        showMilestoneAnimation(progress);
-    }
-}
-
-function showBlockCompletionAnimation(blockId) {
-    // Simple completion animation
-    const blockElement = document.querySelector(`[data-block-id="${blockId}"]`);
-    if (blockElement) {
-        blockElement.style.transform = 'scale(1.02)';
-        blockElement.style.boxShadow = '0 4px 20px rgba(74, 144, 226, 0.3)';
-        setTimeout(() => {
-            blockElement.style.transform = '';
-            blockElement.style.boxShadow = '';
-        }, 300);
-    }
-}
-
-function showMilestoneAnimation(progress) {
-    const messages = {
-        25: "🎯 Great start!",
-        50: "🔥 Halfway there!",
-        75: "⭐ Almost done!",
-        100: "🎉 Lesson mastered!"
-    };
-    
-    const message = messages[progress];
-    if (message) {
-        console.log('Milestone reached:', message);
-        // Add visual celebration here
-    }
-}
-
-function syncProgressToFirebase() {
-    if (!currentUser || !lessonData.id) return;
-    
-    fetch('/api/lesson/progress', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            lesson_id: lessonData.id,
-            progress: lessonProgress
-        })
-    }).catch(error => {
-        console.error('Failed to sync progress:', error);
-    });
-}
-
-function copyCodeBlock(blockId) {
-    const codeElement = document.getElementById(`code-${blockId}`);
-    if (codeElement) {
-        const text = codeElement.textContent;
-        navigator.clipboard.writeText(text).then(() => {
-            console.log('Code copied to clipboard');
-            // Show feedback
-        });
-    }
+    globalThis.lessonProgress.progress = progress;
 }
 
 function initializeInteractiveElements() {
     // Initialize ACE editors for interactive blocks
     document.querySelectorAll('.code-editor').forEach(editor => {
-        if (editor.id.startsWith('editor-')) {
-            initializeAceEditor(editor.id);
+        if (editor.id && typeof ace !== 'undefined') {
+            try {
+                const aceEditor = ace.edit(editor.id);
+                aceEditor.setTheme('ace/theme/monokai');
+                aceEditor.session.setMode('ace/mode/python');
+                aceEditor.setOptions({
+                    showPrintMargin: false,
+                    fontSize: 14
+                });
+                globalThis.editors[editor.id] = aceEditor;
+            } catch (error) {
+                console.warn('Failed to initialize ACE editor for', editor.id, error);
+            }
         }
     });
     
     // Initialize quiz systems
     document.querySelectorAll('[data-quiz-id]').forEach(quizElement => {
-        const quizId = quizElement.dataset.quizId;
-        if (window.QuizSystem) {
-            new QuizSystem(quizElement, quizId);
-        }
+        // Quiz initialization would go here
+        console.log('Quiz element found:', quizElement.dataset.quizId);
     });
 }
 
-function initializeAceEditor(editorId) {
-    if (typeof ace !== 'undefined') {
-        const editor = ace.edit(editorId);
-        editor.setTheme("ace/theme/monokai");
-        editor.session.setMode("ace/mode/python");
-        editor.setOptions({
-            enableBasicAutocompletion: true,
-            enableLiveAutocompletion: true,
-            fontSize: 14,
-            showPrintMargin: false
-        });
-        return editor;
-    }
-}
-
-/**
- * Test Firebase integration and lesson data structure
- * This function validates the lesson data and Firebase connectivity
- */
-function testFirebaseIntegration() {
-    console.log('🔥 Testing Firebase integration and lesson data structure...');
-    
-    try {
-        // Test 1: Validate lesson data structure
-        console.log('📊 Lesson Data Structure Test:');
-        if (window.lessonData) {
-            console.log('✅ Lesson data available:', window.lessonData);
-            
-            // Check required fields
-            const requiredFields = ['id', 'title', 'difficulty', 'estimated_time', 'xp_reward'];
-            const missingFields = requiredFields.filter(field => !window.lessonData[field]);
-            
-            if (missingFields.length === 0) {
-                console.log('✅ All required lesson fields present');
-            } else {
-                console.warn('⚠️ Missing required fields:', missingFields);
-            }
-            
-            // Test blocks structure (Firebase lesson format)
-            if (window.lessonData.blocks && Array.isArray(window.lessonData.blocks)) {
-                console.log(`✅ Firebase blocks structure found: ${window.lessonData.blocks.length} blocks`);
-                
-                // Validate each block
-                window.lessonData.blocks.forEach((block, index) => {
-                    const blockRequired = ['id', 'type', 'order'];
-                    const blockMissing = blockRequired.filter(field => !block[field]);
-                    
-                    if (blockMissing.length === 0) {
-                        console.log(`  ✅ Block ${index + 1}: ${block.type} - ${block.title || block.id}`);
-                    } else {
-                        console.warn(`  ⚠️ Block ${index + 1} missing:`, blockMissing);
-                    }
-                });
-            } else {
-                console.log('ℹ️ No Firebase blocks found, checking legacy content structure...');
-                if (window.lessonData.content) {
-                    console.log('✅ Legacy content structure detected');
-                } else {
-                    console.warn('⚠️ No content structure found');
-                }
-            }
-        } else {
-            console.error('❌ No lesson data available');
-        }
-        
-        // Test 2: User progress structure
-        console.log('📈 User Progress Test:');
-        if (window.lessonProgress && typeof window.lessonProgress === 'object') {
-            console.log('✅ User progress data available:', window.lessonProgress);
-            
-            const progressFields = ['completed_blocks', 'progress', 'current_block'];
-            progressFields.forEach(field => {
-                if (window.lessonProgress[field] !== undefined) {
-                    console.log(`  ✅ ${field}: ${window.lessonProgress[field]}`);
-                } else {
-                    console.log(`  ℹ️ ${field}: not set (new lesson)`);
-                }
-            });
-        } else {
-            console.log('ℹ️ No user progress data (new user or lesson)');
-        }
-        
-        // Test 3: Firebase service availability
-        console.log('🔧 Firebase Service Test:');
-        if (window.firebase && window.firebase.apps && window.firebase.apps.length > 0) {
-            console.log('✅ Firebase SDK initialized');
-            
-            // Check if Firestore is available
-            if (window.firebase.firestore) {
-                console.log('✅ Firestore service available');
-            } else {
-                console.log('ℹ️ Firestore service not detected');
-            }
-        } else {
-            console.log('ℹ️ Firebase SDK not loaded (using server-side Firebase)');
-        }
-        
-        // Test 4: Integration with existing systems
-        console.log('🔗 System Integration Test:');
-        
-        // Check ACE editor availability (for code blocks)
-        if (window.ace) {
-            console.log('✅ ACE editor available for code blocks');
-        } else {
-            console.log('ℹ️ ACE editor not loaded');
-        }
-        
-        // Check QuizSystem availability
-        if (window.QuizSystem) {
-            console.log('✅ QuizSystem available for quiz blocks');
-        } else {
-            console.log('ℹ️ QuizSystem not loaded');
-        }
-        
-        // Test 5: Page elements and containers
-        console.log('🏗️ Page Structure Test:');
-        const requiredElements = [
-            'lesson-content',
-            'lesson-progress-bar', 
-            'progress-fill',
-            'progress-percentage'
-        ];
-        
-        requiredElements.forEach(elementId => {
-            const element = document.getElementById(elementId);
-            if (element) {
-                console.log(`  ✅ ${elementId} container found`);
-            } else {
-                console.warn(`  ⚠️ ${elementId} container missing`);
-            }
-        });
-        
-        console.log('🎯 Firebase integration test completed successfully');
-        return true;
-        
-    } catch (error) {
-        console.error('❌ Firebase integration test failed:', error);
-        return false;
+// Global function to toggle lesson menu
+function toggleLessonMenu() {
+    const sidebar = document.getElementById('lesson-menu-sidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('active');
+    } else {
+        console.warn('⚠️ Lesson menu sidebar not found');
     }
 }
 </script>
 
-<!-- 🚀 Lesson Page Scripts - Orchestration Integration -->
-{% block extra_js %}
-<!-- Lesson-specific components -->
-<script src="{{ url_for('static', filename='js/quiz/QuizEngine.js') }}"></script>
-<script src="{{ url_for('static', filename='js/quiz/QuizController.js') }}"></script>
-<script src="{{ url_for('static', filename='js/quiz/QuizState.js') }}"></script>
-<script src="{{ url_for('static', filename='js/quiz/renderers/MultipleChoiceRenderer.js') }}"></script>
-<script src="{{ url_for('static', filename='js/quiz/renderers/TrueFalseRenderer.js') }}"></script>
-<script src="{{ url_for('static', filename='js/quiz/renderers/FillBlankRenderer.js') }}"></script>
-
-<!-- Editor components -->
-<script src="{{ url_for('static', filename='js/editor/editorService.js') }}"></script>
-<script src="{{ url_for('static', filename='js/editor/editorConfig.js') }}"></script>
-<script src="{{ url_for('static', filename='js/editor/codeSubmissionHandler.js') }}"></script>
-
-<!-- Lesson system components -->
-<script src="{{ url_for('static', filename='js/modules/lessonCore.js') }}"></script>
-<script src="{{ url_for('static', filename='js/modules/interactiveEditor.js') }}"></script>
-<script src="{{ url_for('static', filename='js/components/modal-manager.js') }}"></script>
-
-<script>
-// Use existing data objects from previous script
-// Avoid redefining global variables
-console.log('📚 Lesson data loaded:', window.lessonData);
-console.log('📊 Progress data loaded:', window.lessonProgress);
-
-// Wait for application to be ready before initializing lesson-specific features
-document.addEventListener('DOMContentLoaded', function() {
-    // Wait for the app to be ready
-    if (window.CwMApp) {
-        initializeLessonFeatures();
-    } else {
-        // Listen for app ready event
-        document.addEventListener('app:ready', initializeLessonFeatures);
-        
-        // Fallback timeout
-        setTimeout(() => {
-            if (window.CwMApp) {
-                initializeLessonFeatures();
-            } else {
-                console.error('❌ Application not ready for lesson initialization');
-            }
-        }, 5000);
-    }
-});
-
-async function initializeLessonFeatures() {
-    try {
-        console.log('🚀 Initializing lesson-specific features...');
-        
-        const app = window.CwMApp;
-        const moduleLoader = window.CwMModuleLoader;
-        
-        // Load lesson-specific modules
-        const lessonModules = [
-            'lessonCore',
-            'quiz', 
-            'interactiveEditor',
-            'xpAnimation',
-            'lessonTestSuite'
-        ];
-        
-        // Try to load lesson modules (some may not exist yet)
-        for (const moduleName of lessonModules) {
-            try {
-                if (!moduleLoader.isModuleLoaded(moduleName)) {
-                    await moduleLoader.loadModule(moduleName);
-                }
-            } catch (error) {
-                console.warn(`⚠️ Could not load lesson module ${moduleName}:`, error.message);
-            }
-        }
-        
-        // Initialize lesson-specific functionality
-        await initializeLessonCore();
-        
-        console.log('✅ Lesson features initialized successfully');
-        
-    } catch (error) {
-        console.error('❌ Failed to initialize lesson features:', error);
-        
-        // Fallback to basic lesson functionality
-        initializeBasicLessonFunctionality();
-    }
-}
-
-async function initializeLessonCore() {
-    const app = window.CwMApp;
-    
-    // Get required modules
-    const editorService = app.getModule('editorService');
-    const progressTracker = app.getModule('progressTracker');
-    
-    // Initialize lesson progress tracking
-    if (progressTracker && window.lessonId) {
-        progressTracker.setCurrentLesson(window.lessonId, window.lessonProgress);
-    }
-    
-    // Initialize code editor if present
-    if (editorService) {
-        const codeContainers = document.querySelectorAll('.code-editor-container');
-        codeContainers.forEach(container => {
-            editorService.initializeEditor(container);
-        });
-    }
-    
-    // Set up lesson-specific event listeners
-    setupLessonEventListeners();
-    
-    // Initialize lesson content interactions
-    initializeLessonContent();
-    
-    // Emit lesson ready event
-    app.eventBus.emit('lesson:ready', {
-        lessonId: window.lessonId,
-        lessonData: window.lessonData,
-        progress: window.lessonProgress
-    });
-}
-
-function setupLessonEventListeners() {
-    const app = window.CwMApp;
-    
-    // Listen for lesson completion
-    app.eventBus.on('lesson:section:complete', (data) => {
-        updateLessonProgress(data);
-    });
-    
-    // Listen for code execution
-    app.eventBus.on('editor:code:executed', (data) => {
-        handleCodeExecution(data);
-    });
-    
-    // Listen for quiz completion
-    app.eventBus.on('quiz:completed', (data) => {
-        handleQuizCompletion(data);
-    });
-}
-
-function initializeLessonContent() {
-    // Initialize tabs
-    initializeTabs();
-    
-    // Initialize code blocks
-    initializeCodeBlocks();
-    
-    // Initialize quizzes
-    initializeQuizzes();
-    
-    // Initialize interactive elements
-    initializeInteractiveElements();
-}
-
-function initializeTabs() {
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const tabContents = document.querySelectorAll('.tab-content');
-    
-    tabButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            const tabId = button.getAttribute('data-tab');
-            
-            // Update active states
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            tabContents.forEach(content => content.classList.remove('active'));
-            
-            button.classList.add('active');
-            const targetContent = document.getElementById(tabId);
-            if (targetContent) {
-                targetContent.classList.add('active');
-            }
-            
-            // Emit tab change event
-            if (window.CwMApp) {
-                window.CwMApp.eventBus.emit('lesson:tab:changed', { tabId });
-            }
-        });
-    });
-}
-
-function initializeCodeBlocks() {
-    const codeBlocks = document.querySelectorAll('.code-block');
-    
-    codeBlocks.forEach(block => {
-        // Add copy functionality
-        const copyBtn = block.querySelector('.copy-btn');
-        if (copyBtn) {
-            copyBtn.addEventListener('click', () => {
-                const code = block.querySelector('code').textContent;
-                navigator.clipboard.writeText(code).then(() => {
-                    showNotification('Code copied to clipboard!', 'success');
-                });
-            });
-        }
-    });
-}
-
-function initializeQuizzes() {
-    const quizContainers = document.querySelectorAll('.quiz-container');
-    
-    quizContainers.forEach(container => {
-        const quizId = container.getAttribute('data-quiz-id');
-        if (quizId && window.CwMApp) {
-            const quizEngine = window.CwMApp.getModule('quizEngine');
-            if (quizEngine) {
-                quizEngine.initializeQuiz(container, quizId);
-            }
-        }
-    });
-}
-
-function initializeInteractiveElements() {
-    // Initialize code execution buttons
-    const runButtons = document.querySelectorAll('.run-code-btn');
-    runButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const editorId = button.getAttribute('data-editor-id');
-            executeCode(editorId);
-        });
-    });
-    
-    // Initialize lesson navigation
-    const nextButton = document.querySelector('.next-lesson-btn');
-    const prevButton = document.querySelector('.prev-lesson-btn');
-    
-    if (nextButton) {
-        nextButton.addEventListener('click', () => navigateToNextLesson());
-    }
-    
-    if (prevButton) {
-        prevButton.addEventListener('click', () => navigateToPrevLesson());
-    }
-}
-
-function executeCode(editorId) {
-    if (window.CwMApp) {
-        const editorService = window.CwMApp.getModule('editorService');
-        if (editorService) {
-            editorService.executeCode(editorId);
-        }
-    }
-}
-
-function updateLessonProgress(data) {
-    const progressBar = document.getElementById('progress-fill');
-    const progressText = document.getElementById('progress-percentage');
-    
-    if (progressBar && progressText) {
-        progressBar.style.width = `${data.progress}%`;
-        progressText.textContent = `${data.progress}%`;
-    }
-    
-    // Update global state
-    if (window.CwMApp) {
-        window.CwMApp.updateGlobalState({
-            lessonProgress: data.progress
-        });
-    }
-}
-
-function handleCodeExecution(data) {
-    console.log('🏃 Code executed:', data);
-    
-    // Show execution results
-    const outputContainer = document.querySelector(`#output-${data.editorId}`);
-    if (outputContainer) {
-        outputContainer.innerHTML = data.output;
-        outputContainer.classList.add('show');
-    }
-}
-
-function handleQuizCompletion(data) {
-    console.log('✅ Quiz completed:', data);
-    
-    if (data.passed) {
-        showNotification('Quiz completed successfully!', 'success');
-        
-        // Update progress
-        updateLessonProgress({
-            progress: Math.min(100, (window.lessonProgress.progress || 0) + 20)
-        });
-    } else {
-        showNotification('Quiz needs more work. Try again!', 'warning');
-    }
-}
-
-function navigateToNextLesson() {
-    // Implementation depends on lesson navigation structure
-    console.log('🔄 Navigating to next lesson...');
-}
-
-function navigateToPrevLesson() {
-    // Implementation depends on lesson navigation structure
-    console.log('🔄 Navigating to previous lesson...');
-}
-
-function showNotification(message, type = 'info') {
-    if (window.CwMApp) {
-        const notificationComponent = window.CwMApp.getModule('notificationComponent');
-        if (notificationComponent) {
-            notificationComponent.show(message, type);
-        }
-    }
-}
-
-// Fallback basic functionality if app fails to load
-function initializeBasicLessonFunctionality() {
-    console.log('🔧 Initializing basic lesson functionality...');
-    
-    // Basic tab functionality
-    initializeTabs();
-    
-    // Basic code block copy functionality
-    initializeCodeBlocks();
-    
-    console.log('✅ Basic lesson functionality initialized');
-}
-</script>
 {% endblock %}
-        window.initializeLessonIntegration(window.lessonId);
-    } else {
-        console.log('⚠️ Legacy lesson mode - some features may be limited');
-        // Fallback to existing lesson manager
-        if (window.LessonPageManager) {
-            new LessonPageManager().init();
-        }
-    }
-});
-</script>
 
-<style>
-/* Additional inline styles for lesson page specific adjustments */
-.lesson-container {
-    line-height: 1.8;
-}
+<!-- 🚀 Lesson Page Scripts - ES6 Modules -->
+{% block extra_js %}
+<!-- 🛡️ Error Recovery System - Load first for maximum coverage -->
+<script src="{{ url_for('static', filename='js/utils/errorRecoverySystem.js') }}"></script>
+<script src="{{ url_for('static', filename='js/utils/errorRecoveryIntegration.js') }}"></script>
 
-.text-block h1, .text-block h2, .text-block h3 {
-    color: var(--primary-color);
-    margin: 1rem 0;
-}
+<!-- Data Structure Utils - Load first to ensure availability -->
+<script src="{{ url_for('static', filename='js/utils/dataStructureNormalizer.js') }}"></script>
 
-.code-example {
-    background-color: var(--bg-secondary);
-}
+<!-- Quiz components - Load as ES6 modules -->
+<script type="module" src="{{ url_for('static', filename='js/quiz/QuizEngine.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/quiz/QuizController.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/quiz/QuizState.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/quiz/renderers/MultipleChoiceRenderer.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/quiz/renderers/TrueFalseRenderer.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/quiz/renderers/FillBlankRenderer.js') }}"></script>
 
-.code-header {
-    background-color: var(--bg-primary);
-    margin: -2rem -2rem 1rem -2rem;
-    padding: 1rem 2rem;
-    border-radius: 12px 12px 0 0;
-    font-weight: 500;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+<!-- Editor components - Convert to modules or use UMD pattern -->
+<script type="module" src="{{ url_for('static', filename='js/editor/codeSubmissionHandler.js') }}"></script>
 
-.btn-copy {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    padding: 0.5rem;
-    transition: color 0.3s ease;
-}
+<!-- Module Initializer - Handles ES6 module initialization -->
+<script type="module" src="{{ url_for('static', filename='js/core/moduleInitializer.js') }}"></script>
 
-.btn-copy:hover {
-    color: var(--primary-color);
-}
+<!-- Initialization Queue - ES6 Module for proper timing coordination -->
+<script type="module" src="{{ url_for('static', filename='js/core/initializationQueue.js') }}"></script>
 
-.code-example pre {
-    background-color: transparent;
-    margin: 0;
-    padding: 0;
-    overflow-x: auto;
-}
-
-.code-example code {
-    font-family: 'Fira Code', 'Consolas', monospace;
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-.interactive-challenge h3 {
-    color: var(--secondary-color);
-    margin-bottom: 1rem;
-}
-
-.code-output {
-    margin-top: 1rem;
-    padding: 1rem;
-    background-color: var(--bg-secondary);
-    border-radius: 8px;
-    min-height: 50px;
-    font-family: monospace;
-}
-
-.output-success {
-    color: var(--success-color);
-}
-
-.output-success .rewards {
-    background-color: var(--success-color);
-    color: white;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-top: 1rem;
-    text-align: center;
-}
-
-.error {
-    color: var(--danger-color);
-}
-
-.quiz-block h3 {
-    color: var(--warning-color);
-    margin-bottom: 1rem;
-}
-
-.quiz-start {
-    text-align: center;
-    padding: 2rem;
-}
-
-.lesson-navigation {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border-color);
-}
-
-#complete-subtopic-btn {
-    background-color: var(--success-color);
-}
-
-#complete-subtopic-btn:hover {
-    background-color: #45a049;
-}
-
-#complete-subtopic-btn:disabled {
-    background-color: var(--text-secondary);
-    cursor: not-allowed;
-}
-
-@media (max-width: 768px) {
-    .lesson-navigation {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .lesson-navigation button {
-        width: 100%;
-    }
-    
-    .code-editor-header {
-        flex-direction: column;
-        gap: 1rem;
-    }
-}
-</style>
+<!-- Phase 8: Test Suite - Load in development mode -->
+<script type="module" src="{{ url_for('static', filename='js/core/LessonSystemTest.js') }}"></script>
+{% endblock %}
 
 <script>
 // Current subtopic tracking
@@ -1222,13 +1055,8 @@ let currentSubtopicIndex = 0;
 let subtopics = window.lessonData && window.lessonData.subtopics ? window.lessonData.subtopics : [];
 let completedSubtopics = window.lessonProgress && window.lessonProgress.completed_subtopics ? window.lessonProgress.completed_subtopics : [];
 
-// Initialize ACE Editor when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    if (document.getElementById('editor')) {
-        initializeEditor('editor');
-    }
-    updateCompleteButton();
-});
+// Initialize ACE Editor - handled by InitializationQueue
+// Editor initialization will be handled by the main initialization queue
 
 function switchLessonTab(subtopicId) {
     // Update active tab
@@ -1333,638 +1161,101 @@ function copyCode(button) {
         }, 2000);
     });
 }
-</script>
 
-<script>
-// Initialize lesson after DOM loaded
-// This script continues from the previous script block
-// Data is already loaded in previous script sections
-// Additional lesson functionality continues here
-if (typeof initializeLesson === 'function') {
-    initializeLesson();
+/**
+ * Debug function to check authentication state
+ * Add this to your console to check auth state
+ */
+window.debugAuth = function() {
+    console.log('=== Auth Debug Info ===');
+    console.log('Token in localStorage:', localStorage.getItem('auth_token'));
+    
+    // Check if authService exists and get its properties
+    if (window.authService) {
+        console.log('AuthService available:', !!window.authService);
+        console.log('Token in authService:', window.authService.token);
+        console.log('Current User:', window.authService.currentUser);
+        console.log('Is Authenticated:', window.authService.isAuthenticated());
+        console.log('Is Initialized:', window.authService.initialized);
+    } else {
+        console.log('AuthService not available');
+    }
+    
+    // Check global user objects
+    console.log('globalThis.currentUser:', globalThis.currentUser);
+    console.log('window.currentUser:', window.currentUser);
+    
+    // Check other auth managers
+    if (window.authManager) {
+        console.log('AuthManager available:', !!window.authManager);
+        console.log('AuthManager user:', window.authManager.getCurrentUser());
+        console.log('AuthManager authenticated:', window.authManager.isUserAuthenticated());
+    }
+    
+    // Check session storage
+    console.log('SessionStorage auth_token:', sessionStorage.getItem('auth_token'));
+    console.log('LocalStorage user data:', localStorage.getItem('user_data'));
+    
+    return {
+        authService: window.authService,
+        authManager: window.authManager,
+        currentUser: globalThis.currentUser || window.currentUser,
+        localStorage: {
+            auth_token: localStorage.getItem('auth_token'),
+            user_data: localStorage.getItem('user_data')
+        },
+        sessionStorage: {
+            auth_token: sessionStorage.getItem('auth_token')
+        }
+    };
+};
+
+// Make it available globally for easy access
+globalThis.debugAuth = window.debugAuth;
+
+// Auto-run once for immediate debugging (can be commented out in production)
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.includes('dev')) {
+    console.log('🔧 Running auth debug in development mode...');
+    setTimeout(() => {
+        try {
+            debugAuth();
+        } catch (error) {
+            console.error('Error running debug auth:', error);
+        }
+    }, 1000);
 }
-let quizStates = {};
 
-// Initialize lesson
+// Initialize lesson when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    initializeLesson();
+    console.log('📄 DOM loaded, initializing lesson...');
+    
+    // Wait a bit for all scripts to load
+    setTimeout(() => {
+        try {
+            initializeLesson();
+        } catch (error) {
+            console.error('❌ Failed to initialize lesson:', error);
+            showFallbackContent();
+        }
+    }, 100);
 });
 
-function initializeLesson() {
-    // Load saved progress
-    const savedProgress = localStorage.getItem(`lesson_${lessonData.id}_progress`);
-    if (savedProgress) {
-        lessonProgress = JSON.parse(savedProgress);
-    }
-    
-    // Render first subtopic or all content if no subtopics
-    if (lessonData.subtopics && lessonData.subtopics.length > 0) {
-        renderSubtopic(0);
-    } else {
-        renderLessonContent(lessonData.blocks || lessonData.content);
-    }
-    
-    updateProgressBar();
-}
-
-function renderSubtopic(index) {
-    currentSubtopic = index;
+// Also set up a fallback initialization
+window.addEventListener('load', function() {
+    // Check if already initialized
     const container = document.getElementById('lesson-content-container');
-    
-    // Update tab active state
-    document.querySelectorAll('.subtopic-tab').forEach((tab, i) => {
-        tab.classList.toggle('active', i === index);
-    });
-    
-    // Clear container
-    container.innerHTML = '';
-    
-    // Get blocks for this subtopic
-    const subtopicBlocks = lessonData.blocks.filter(block => 
-        block.subtopic_index === index || (!block.subtopic_index && index === 0)
-    );
-    
-    renderLessonContent(subtopicBlocks);
-    updateNavigationButtons();
-}
-
-function renderLessonContent(blocks) {
-    const container = document.getElementById('lesson-content-container');
-    container.innerHTML = '';
-    
-    blocks.forEach((block, index) => {
-        const blockElement = createBlockElement(block, index);
-        if (blockElement) {
-            container.appendChild(blockElement);
-        }
-    });
-    
-    // Initialize ACE editors after rendering
-    setTimeout(() => {
-        Object.keys(editors).forEach(id => {
-            const editorInfo = editors[id];
-            initializeAceEditor(id, editorInfo.options);
-            if (editorInfo.code) {
-                ace.edit(id).setValue(editorInfo.code, -1);
-            }
-        });
-    }, 100);
-}
-
-function createBlockElement(block, index) {
-    const div = document.createElement('div');
-    div.className = 'content-block';
-    div.id = `block-${index}`;
-    
-    switch(block.type) {
-        case 'text':
-            div.innerHTML = `<div class="text-block">${block.content}</div>`;
-            break;
-            
-        case 'code_snippet':
-            div.innerHTML = createCodeSnippetBlock(block);
-            break;
-            
-        case 'ide':
-            div.innerHTML = createIDEBlock(block);
-            break;
-            
-        case 'quiz':
-            div.innerHTML = createQuizBlock(block);
-            break;
-            
-        case 'debug_challenge':
-            div.innerHTML = createDebugBlock(block);
-            break;
-            
-        case 'divider':
-            div.innerHTML = `<div class="${block.style || 'topic-divider'}"></div>`;
-            break;
-            
-        default:
-            console.warn('Unknown block type:', block.type);
-            return null;
-    }
-    
-    return div;
-}
-
-function createCodeSnippetBlock(block) {
-    const editorId = `snippet-${block.id}`;
-    editors[editorId] = {
-        code: block.code,
-        options: { readOnly: true, maxLines: 20 }
-    };
-    
-    return `
-        <div class="code-snippet-block">
-            <div class="code-snippet-header">
-                <span>${block.language || 'python'}</span>
-                <button class="copy-button" onclick="copyCode('${editorId}')">
-                    <i class="fas fa-copy"></i> Copy
-                </button>
-            </div>
-            <div class="code-snippet-content">
-                <div id="${editorId}" class="ace-editor"></div>
-            </div>
-        </div>
-    `;
-}
-
-function createIDEBlock(block) {
-    const editorId = `ide-${block.id}`;
-    editors[editorId] = {
-        code: block.default_code || '# Write your code here\n',
-        options: { readOnly: !block.editable }
-    };
-    
-    return `
-        <div class="ide-block">
-            <div class="ide-header">
-                <span class="ide-label">${block.label || 'Python Editor'}</span>
-                <div class="ide-controls">
-                    ${block.hint ? `<button class="btn btn-secondary btn-sm" onclick="toggleHint('${block.id}')">
-                        <i class="fas fa-lightbulb"></i> Hint
-                    </button>` : ''}
-                    <button class="btn btn-secondary btn-sm" onclick="resetCode('${editorId}', \`${(block.default_code || '').replace(/`/g, '\\`')}\`)">
-                        <i class="fas fa-undo"></i> Reset
-                    </button>
-                    <button class="btn btn-primary btn-sm" onclick="runCode('${editorId}', '${block.id}')">
-                        <i class="fas fa-play"></i> Run
-                    </button>
-                </div>
-            </div>
-            <div id="${editorId}" class="ace-editor"></div>
-            <div id="output-${block.id}" class="ide-output"></div>
-            ${block.hint ? `<div id="hint-${block.id}" class="ide-hint">${block.hint}</div>` : ''}
-        </div>
-    `;
-}
-
-function createQuizBlock(block) {
-    const quizId = block.id;
-    if (!quizStates[quizId]) {
-        quizStates[quizId] = {
-            currentQuestion: 0,
-            answers: {},
-            submitted: false
-        };
-    }
-    
-    return `
-        <div class="quiz-block" id="quiz-${quizId}">
-            <div class="quiz-header">
-                <h3>${block.title}</h3>
-                ${block.instructions ? `<p>${block.instructions}</p>` : ''}
-                <div class="quiz-meta">
-                    <span><i class="fas fa-question-circle"></i> ${block.questions.length} questions</span>
-                    <span><i class="fas fa-star"></i> ${block.total_points} points</span>
-                    <span><i class="fas fa-percentage"></i> Pass: ${block.passing_score}%</span>
-                </div>
-            </div>
-            <div id="quiz-content-${quizId}">
-                ${createQuizQuestion(block, 0)}
-            </div>
-            <div class="quiz-navigation" style="margin-top: 1.5rem;">
-                <button class="btn btn-secondary" onclick="previousQuizQuestion('${quizId}')" 
-                        id="quiz-prev-${quizId}" style="display: none;">Previous</button>
-                <button class="btn btn-primary" onclick="nextQuizQuestion('${quizId}')" 
-                        id="quiz-next-${quizId}">Next</button>
-                <button class="btn btn-success" onclick="submitQuiz('${quizId}')" 
-                        id="quiz-submit-${quizId}" style="display: none;">Submit Quiz</button>
-            </div>
-        </div>
-    `;
-}
-
-function createQuizQuestion(quiz, questionIndex) {
-    const question = quiz.questions[questionIndex];
-    let html = `<div class="quiz-question">`;
-    
-    html += `<h4>Question ${questionIndex + 1} of ${quiz.questions.length}</h4>`;
-    html += `<p>${question.question}</p>`;
-    
-    switch(question.type) {
-        case 'multiple_choice':
-            html += `<div class="quiz-options">`;
-            question.options.forEach((option, i) => {
-                html += `
-                    <div class="quiz-option" onclick="selectQuizOption('${quiz.id}', ${questionIndex}, ${i})">
-                        ${option}
-                    </div>
-                `;
-            });
-            html += `</div>`;
-            break;
-            
-        case 'fill_in_the_blank':
-            const questionText = question.question.replace('______', 
-                `<input type="text" class="fill-blank-input" 
-                        id="quiz-${quiz.id}-q${questionIndex}-input"
-                        onchange="updateFillBlank('${quiz.id}', ${questionIndex}, this.value)">`);
-            html = `<div class="quiz-question">
-                <h4>Question ${questionIndex + 1} of ${quiz.questions.length}</h4>
-                <p>${questionText}</p>
-            </div>`;
-            break;
-            
-        case 'drag_and_drop':
-            html += createDragDropQuestion(quiz.id, question, questionIndex);
-            break;
-    }
-    
-    html += `</div>`;
-    return html;
-}
-
-function createDragDropQuestion(quizId, question, questionIndex) {
-    let html = `<div class="drag-drop-container">`;
-    
-    // Drag items
-    html += `<div class="drag-items">`;
-    html += `<h5>Options:</h5>`;
-    question.options.forEach((option, i) => {
-        html += `
-            <div class="drag-item" draggable="true" 
-                 data-option-index="${i}"
-                 ondragstart="handleDragStart(event)"
-                 ondragend="handleDragEnd(event)">
-                ${option}
-            </div>
-        `;
-    });
-    html += `</div>`;
-    
-    // Drop zones
-    html += `<div class="drop-zones">`;
-    html += `<h5>Match with:</h5>`;
-    question.stems.forEach((stem, i) => {
-        html += `
-            <div>
-                <div class="drop-zone-label">${stem}</div>
-                <div class="drop-zone" 
-                     data-stem-index="${i}"
-                     data-quiz-id="${quizId}"
-                     data-question-index="${questionIndex}"
-                     ondragover="handleDragOver(event)"
-                     ondragleave="handleDragLeave(event)"
-                     ondrop="handleDrop(event)">
-                </div>
-            </div>
-        `;
-    });
-    html += `</div>`;
-    
-    html += `</div>`;
-    return html;
-}
-
-function createDebugBlock(block) {
-    const editorId = `debug-${block.id}`;
-    editors[editorId] = {
-        code: block.buggy_code,
-        options: { readOnly: false }
-    };
-    
-    return `
-        <div class="debug-block">
-            <div class="debug-header">
-                <h3><i class="fas fa-bug"></i> ${block.label || 'Debug Challenge'}</h3>
-            </div>
-            <div class="debug-content">
-                <p class="debug-instructions">${block.instructions}</p>
-                <div id="${editorId}" class="ace-editor"></div>
-                <div id="debug-output-${block.id}" class="ide-output"></div>
-                <div style="margin-top: 1rem;">
-                    <button class="btn btn-primary" onclick="checkDebugSolution('${block.id}', '${editorId}')">
-                        <i class="fas fa-check"></i> Check Solution
-                    </button>
-                    <button class="btn btn-secondary" onclick="showDebugSolution('${block.id}')">
-                        <i class="fas fa-lightbulb"></i> Show Solution
-                    </button>
-                </div>
-                <div id="debug-solution-${block.id}" style="display: none; margin-top: 1rem;">
-                    <div class="alert alert-info">
-                        <h4>Solution:</h4>
-                        <p>${block.solution.explanation}</p>
-                        <pre>${block.solution.correct_code}</pre>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-// ACE Editor functions
-function initializeAceEditor(editorId, options = {}) {
-    const editor = ace.edit(editorId);
-    editor.setTheme("ace/theme/monokai");
-    editor.session.setMode("ace/mode/python");
-    editor.setOptions({
-        fontSize: "14px",
-        showPrintMargin: false,
-        enableBasicAutocompletion: true,
-        enableLiveAutocompletion: true,
-        ...options
-    });
-    return editor;
-}
-
-function copyCode(editorId) {
-    const editor = ace.edit(editorId);
-    const code = editor.getValue();
-    
-    navigator.clipboard.writeText(code).then(() => {
-        const button = event.target.closest('.copy-button');
-        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
-        button.classList.add('copied');
-        
+    if (container && container.children.length === 0) {
+        console.log('⚠️ Lesson not initialized, attempting now...');
         setTimeout(() => {
-            button.innerHTML = '<i class="fas fa-copy"></i> Copy';
-            button.classList.remove('copied');
-        }, 2000);
-    });
-}
-
-function toggleHint(blockId) {
-    const hint = document.getElementById(`hint-${blockId}`);
-    hint.classList.toggle('show');
-}
-
-function resetCode(editorId, defaultCode) {
-    const editor = ace.edit(editorId);
-    editor.setValue(defaultCode, -1);
-}
-
-function runCode(editorId, blockId) {
-    const editor = ace.edit(editorId);
-    const code = editor.getValue();
-    const outputDiv = document.getElementById(`output-${blockId}`);
-    
-    outputDiv.innerHTML = '<div class="spinner"></div>';
-    
-    // Send code to backend
-    fetch('/api/submit-code', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            code: code,
-            lesson_id: lessonData.id,
-            challenge_id: blockId
-        })
-    })
-    .then(response => response.json())
-    .then(result => {
-        if (result.success) {
-            outputDiv.innerHTML = result.output || 'Code executed successfully!';
-            if (result.passed_tests) {
-                outputDiv.innerHTML += `\n\nΓ£à All tests passed! +${result.xp_earned} XP`;
-                markBlockComplete(blockId);
+            try {
+                initializeLesson();
+            } catch (error) {
+                console.error('❌ Fallback initialization failed:', error);
+                showFallbackContent();
             }
-        } else {
-            outputDiv.innerHTML = `Error: ${result.error || 'Unknown error'}`;
-            outputDiv.style.color = 'var(--danger-color)';
-        }
-    })
-    .catch(error => {
-        outputDiv.innerHTML = `Error: ${error.message}`;
-        outputDiv.style.color = 'var(--danger-color)';
-    });
-}
-
-// Quiz functions
-function selectQuizOption(quizId, questionIndex, optionIndex) {
-    const state = quizStates[quizId];
-    state.answers[questionIndex] = optionIndex;
-    
-    // Update UI
-    const options = document.querySelectorAll(`#quiz-content-${quizId} .quiz-option`);
-    options.forEach((opt, i) => {
-        opt.classList.toggle('selected', i === optionIndex);
-    });
-}
-
-function updateFillBlank(quizId, questionIndex, value) {
-    const state = quizStates[quizId];
-    state.answers[questionIndex] = value;
-}
-
-function previousQuizQuestion(quizId) {
-    const state = quizStates[quizId];
-    const quiz = lessonData.blocks.find(b => b.id === quizId);
-    
-    if (state.currentQuestion > 0) {
-        state.currentQuestion--;
-        const content = document.getElementById(`quiz-content-${quizId}`);
-        content.innerHTML = createQuizQuestion(quiz, state.currentQuestion);
-        updateQuizNavigation(quizId, quiz);
+        }, 500);
     }
-}
+});
 
-function nextQuizQuestion(quizId) {
-    const state = quizStates[quizId];
-    const quiz = lessonData.blocks.find(b => b.id === quizId);
-    
-    if (state.currentQuestion < quiz.questions.length - 1) {
-        state.currentQuestion++;
-        const content = document.getElementById(`quiz-content-${quizId}`);
-        content.innerHTML = createQuizQuestion(quiz, state.currentQuestion);
-        updateQuizNavigation(quizId, quiz);
-    }
-}
-
-function updateQuizNavigation(quizId, quiz) {
-    const state = quizStates[quizId];
-    const prevBtn = document.getElementById(`quiz-prev-${quizId}`);
-    const nextBtn = document.getElementById(`quiz-next-${quizId}`);
-    const submitBtn = document.getElementById(`quiz-submit-${quizId}`);
-    
-    prevBtn.style.display = state.currentQuestion > 0 ? 'inline-block' : 'none';
-    nextBtn.style.display = state.currentQuestion < quiz.questions.length - 1 ? 'inline-block' : 'none';
-    submitBtn.style.display = state.currentQuestion === quiz.questions.length - 1 ? 'inline-block' : 'none';
-}
-
-function submitQuiz(quizId) {
-    const quiz = lessonData.blocks.find(b => b.id === quizId);
-    const state = quizStates[quizId];
-    
-    // Calculate score
-    let correct = 0;
-    let totalPoints = 0;
-    
-    quiz.questions.forEach((question, i) => {
-        const userAnswer = state.answers[i];
-        totalPoints += question.points || 1;
-        
-        if (question.type === 'multiple_choice' && userAnswer === question.correct_index) {
-            correct += question.points || 1;
-        } else if (question.type === 'fill_in_the_blank') {
-            const answers = Array.isArray(question.answers) ? question.answers : [question.answers];
-            if (answers.some(ans => ans.toLowerCase() === (userAnswer || '').toLowerCase())) {
-                correct += question.points || 1;
-            }
-        }
-    });
-    
-    const score = Math.round((correct / totalPoints) * 100);
-    const passed = score >= quiz.passing_score;
-    
-    // Display results
-    const content = document.getElementById(`quiz-content-${quizId}`);
-    content.innerHTML = `
-        <div class="quiz-results">
-            <h3>${passed ? '≡ƒÄë Quiz Passed!' : '≡ƒÿö Try Again'}</h3>
-            <div class="score-display">
-                <div class="score-circle ${passed ? 'passed' : 'failed'}">
-                    ${score}%
-                </div>
-            </div>
-            <p>You scored ${correct} out of ${totalPoints} points</p>
-            ${passed ? `<p class="success">Great job! You've earned ${quiz.total_points} XP!</p>` : 
-                     `<p>You need ${quiz.passing_score}% to pass. Cost to retake: ${quiz.retake_cost} PyCoins</p>`}
-        </div>
-    `;
-    
-    // Hide navigation buttons
-    document.getElementById(`quiz-prev-${quizId}`).style.display = 'none';
-    document.getElementById(`quiz-submit-${quizId}`).style.display = 'none';
-    
-    if (passed) {
-        markBlockComplete(quizId);
-    }
-}
-
-// Drag and Drop functions
-let draggedElement = null;
-
-function handleDragStart(e) {
-    draggedElement = e.target;
-    e.target.classList.add('dragging');
-}
-
-function handleDragEnd(e) {
-    e.target.classList.remove('dragging');
-}
-
-function handleDragOver(e) {
-    e.preventDefault();
-    e.currentTarget.classList.add('drag-over');
-}
-
-function handleDragLeave(e) {
-    e.currentTarget.classList.remove('drag-over');
-}
-
-function handleDrop(e) {
-    e.preventDefault();
-    e.currentTarget.classList.remove('drag-over');
-    
-    if (draggedElement && e.currentTarget.classList.contains('drop-zone')) {
-        // Clone the dragged element
-        const clone = draggedElement.cloneNode(true);
-        clone.classList.remove('dragging');
-        
-        // Clear the drop zone and add the clone
-        e.currentTarget.innerHTML = '';
-        e.currentTarget.appendChild(clone);
-        
-        // Update quiz state
-        const quizId = e.currentTarget.dataset.quizId;
-        const questionIndex = parseInt(e.currentTarget.dataset.questionIndex);
-        const stemIndex = parseInt(e.currentTarget.dataset.stemIndex);
-        const optionIndex = parseInt(draggedElement.dataset.optionIndex);
-        
-        if (!quizStates[quizId].answers[questionIndex]) {
-            quizStates[quizId].answers[questionIndex] = {};
-        }
-        quizStates[quizId].answers[questionIndex][stemIndex] = optionIndex;
-    }
-}
-
-// Debug challenge functions
-function checkDebugSolution(blockId, editorId) {
-    const editor = ace.edit(editorId);
-    const code = editor.getValue();
-    const outputDiv = document.getElementById(`debug-output-${blockId}`);
-    
-    // Run the code first
-    runCode(editorId, blockId);
-    
-    // You can add additional validation here
-    const block = lessonData.blocks.find(b => b.id === blockId);
-    if (block && block.solution && code.trim() === block.solution.correct_code.trim()) {
-        outputDiv.innerHTML += '\n\nΓ£à Perfect! You fixed the bug!';
-        markBlockComplete(blockId);
-    }
-}
-
-function showDebugSolution(blockId) {
-    const solutionDiv = document.getElementById(`debug-solution-${blockId}`);
-    solutionDiv.style.display = solutionDiv.style.display === 'none' ? 'block' : 'none';
-}
-
-// Progress tracking
-function markBlockComplete(blockId) {
-    if (!lessonProgress[lessonData.id]) {
-        lessonProgress[lessonData.id] = {};
-    }
-    lessonProgress[lessonData.id][blockId] = true;
-    
-    // Save progress
-    localStorage.setItem(`lesson_${lessonData.id}_progress`, JSON.stringify(lessonProgress));
-    
-    // Update progress bar
-    updateProgressBar();
-}
-
-function updateProgressBar() {
-    const totalBlocks = lessonData.blocks ? lessonData.blocks.length : 0;
-    const completedBlocks = lessonProgress[lessonData.id] ? 
-        Object.keys(lessonProgress[lessonData.id]).length : 0;
-    
-    const progress = totalBlocks > 0 ? Math.round((completedBlocks / totalBlocks) * 100) : 0;
-    
-    document.getElementById('lesson-progress-bar').style.width = `${progress}%`;
-    document.getElementById('lesson-progress-text').textContent = `${progress}%`;
-}
-
-// Navigation functions
-function switchSubtopic(index) {
-    renderSubtopic(index);
-}
-
-function previousSubtopic() {
-    if (currentSubtopic > 0) {
-        renderSubtopic(currentSubtopic - 1);
-    }
-}
-
-function nextSubtopic() {
-    if (lessonData.subtopics && currentSubtopic < lessonData.subtopics.length - 1) {
-        renderSubtopic(currentSubtopic + 1);
-    } else {
-        // Lesson complete
-        showNotification('Lesson completed! Great job! ≡ƒÄë');
-        window.location.href = '/lessons';
-    }
-}
-
-function updateNavigationButtons() {
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
-    
-    prevBtn.disabled = currentSubtopic === 0;
-    
-    if (lessonData.subtopics && currentSubtopic === lessonData.subtopics.length - 1) {
-        nextBtn.innerHTML = 'Complete <i class="fas fa-check"></i>';
-    } else {
-        nextBtn.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
-    }
-}
+console.log('✅ Lesson initialization scripts loaded');
 </script>
-
-<!-- Emergency Bootstrapper - Ensures lesson content always loads -->
-<script src="{{ url_for('static', filename='js/emergency-bootstrapper.js') }}"></script>
-{% endblock %}

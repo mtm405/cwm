@@ -15,6 +15,7 @@
 @import url('components/buttons.css');          /* Button styles */
 @import url('components/cards.css');            /* Card components */
 @import url('components/skeleton.css');         /* Skeleton loader components */
+@import url('components/notifications.css');    /* Notification system */
 @import url('components/responsive-enhancements.css'); /* Mobile-first responsive enhancements */
 
 /* Page-Specific Styles */

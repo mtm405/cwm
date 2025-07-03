@@ -3,6 +3,9 @@
  * Centralized configuration for code editors
  */
 
+// Prevent duplicate declarations - Phase 2 Fix
+if (typeof window.EditorConfig === 'undefined') {
+
 const EditorConfig = {
     // Default editor settings
     defaults: {
@@ -279,3 +282,5 @@ if (typeof module !== 'undefined' && module.exports) {
     // Make available globally
     window.EditorConfig = EditorConfig;
 }
+
+} // End of duplicate declaration guard

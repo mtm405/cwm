@@ -127,8 +127,19 @@ class LessonTestSuite {
         
         // Get code from editor if available
         let code = '';
-        if (window.editorService && window.editorService.getCurrentCode) {
-            code = window.editorService.getCurrentCode();
+        if (window.editorService && window.editorService.getCode) {
+            // Try to get code from the active editor
+            const activeEditor = window.editorService.activeEditor;
+            if (activeEditor) {
+                code = window.editorService.getCode(activeEditor);
+            } else {
+                // Fallback: try to get code from first available editor
+                const editors = window.editorService.editors;
+                if (editors && editors.size > 0) {
+                    const firstEditorId = editors.keys().next().value;
+                    code = window.editorService.getCode(firstEditorId);
+                }
+            }
         } else if (options.code) {
             code = options.code;
         } else {

@@ -85,11 +85,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- Auth components -->
-<script src="{{ url_for('static', filename='js/auth/authService.js') }}"></script>
-<script src="{{ url_for('static', filename='js/auth/authController.js') }}"></script>
-<script src="{{ url_for('static', filename='js/auth/authEvents.js') }}"></script>
-
+<!-- Auth functionality is now handled by the main app.js module -->
 <script>
 // Handle form submissions and Google OAuth
 document.addEventListener('DOMContentLoaded', function() {
@@ -119,11 +115,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Handle Google OAuth success/failure
-    window.handleCredentialResponse = function(response) {
-        // This would be handled by your backend
-        console.log('Google OAuth response received');
-    };
+    // Google OAuth is handled by the global callback in base.html
+    // No need to redefine handleCredentialResponse here
     
     // Auto-focus email field
     const emailInput = document.getElementById('email');
@@ -133,8 +126,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<!-- Authentication specific JavaScript -->
-<script src="{{ url_for('static', filename='js/auth/authController.js') }}"></script>
-<script src="{{ url_for('static', filename='js/auth/authService.js') }}"></script>
-<script src="{{ url_for('static', filename='js/components/modal-manager.js') }}"></script>
+<!-- Authentication specific JavaScript - using ES6 modules now -->
 {% endblock %}

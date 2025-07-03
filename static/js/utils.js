@@ -8,6 +8,58 @@ if (typeof window.Utils === 'undefined') {
     console.log('🔧 Initializing Utils...');
     
     window.Utils = {
+        // Notification System
+        showToast: function(message, type = 'info', duration = 3000) {
+            // Toast implementation for backward compatibility
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <i class="fas fa-${this.getToastIcon(type)}"></i>
+                    <span>${message}</span>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            // Style the toast
+            Object.assign(toast.style, {
+                position: 'fixed',
+                top: '20px',
+                right: '20px',
+                background: type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : type === 'warning' ? '#ffc107' : '#17a2b8',
+                color: 'white',
+                padding: '12px 16px',
+                borderRadius: '8px',
+                zIndex: '10000',
+                minWidth: '300px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                animation: 'slideIn 0.3s ease-out',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+            });
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.remove();
+                }
+            }, duration);
+        },
+        
+        getToastIcon: function(type) {
+            const icons = {
+                success: 'check-circle',
+                error: 'exclamation-circle', 
+                warning: 'exclamation-triangle',
+                info: 'info-circle'
+            };
+            return icons[type] || 'info-circle';
+        },
+
         // DOM Manipulation Helpers
         dom: {
             /**

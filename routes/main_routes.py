@@ -9,6 +9,11 @@ import os
 
 main_bp = Blueprint('main', __name__)
 
+@main_bp.route('/test-lesson-system')
+def test_lesson_system():
+    """Phase 8: Lesson System Test Suite"""
+    return render_template('test-lesson-system.html')
+
 @main_bp.route('/')
 def index():
     """Landing page"""
@@ -92,6 +97,18 @@ def dashboard():
 def test_template():
     """Simple test route to check template rendering"""
     return render_template('simple_test.html')
+
+@main_bp.route('/test-js')
+def test_js():
+    """Test page for JavaScript module loading"""
+    google_client_id = os.environ.get('GOOGLE_CLIENT_ID')
+    return render_template('test-js.html', google_client_id=google_client_id)
+
+@main_bp.route('/test-google-signin')
+def test_google_signin():
+    """Test page for Google Sign-In functionality"""
+    google_client_id = os.environ.get('GOOGLE_CLIENT_ID')
+    return render_template('test-google-signin.html', google_client_id=google_client_id)
 
 # Note: /lessons route moved to lesson_routes.py for better organization
 # Note: /lesson/<lesson_id> route also moved to lesson_routes.py for proper data handling

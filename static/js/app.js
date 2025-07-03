@@ -1,557 +1,276 @@
 /**
- * Main Application Controller
- * Code with Morais - Application Orchestration System
- * 
- * This is the central controller that coordinates all application modules,
- * manages initialization sequences, and provides global state management.
+ * Main Application Controller - ES6 Module
+ * Code with Morais - Clean ES6 Implementation
  */
 
-// Prevent redeclaration
-if (typeof window.App === 'undefined') {
+import { NotificationComponent } from './components/NotificationComponent.js';
+import { ModalManager } from './components/modal-manager.js';
+import { ThemeController } from './components/ThemeController.js';
 
 class App {
     constructor() {
-        this.version = '1.0.0';
+        this.version = '2.0.0';
         this.initialized = false;
         this.modules = new Map();
-        this.moduleStates = new Map();
         this.globalState = {
             user: null,
             theme: 'dark',
             currentLesson: null,
             isOnline: navigator.onLine,
-            performanceMetrics: {},
             lastActivity: Date.now()
         };
         
-        // Event bus for inter-module communication
-        this.eventBus = null;
-        
-        // Configuration
-        this.config = null;
-        
-        // Performance tracking
-        this.performanceStart = performance.now();
-        
-        // Bind methods
-        this.handleError = this.handleError.bind(this);
-        this.handleOnlineStatus = this.handleOnlineStatus.bind(this);
-        this.handleVisibilityChange = this.handleVisibilityChange.bind(this);
-        
-        console.log('🚀 Code with Morais App Controller initialized');
+        console.log('🚀 Code with Morais App Controller (ES6) initialized');
+        this.init();
     }
     
-    /**
-     * Initialize the application
-     * This is the main entry point that orchestrates all modules
-     */
     async init() {
         try {
-            console.log('🎯 Starting application initialization...');
+            console.log('🎯 Starting ES6 application initialization...');
             
-            // Set up global error handling
-            this.setupGlobalErrorHandling();
+            // Wait for DOM to be ready
+            if (document.readyState === 'loading') {
+                await new Promise(resolve => {
+                    document.addEventListener('DOMContentLoaded', resolve);
+                });
+            }
             
-            // Set up environment detection and monitoring
-            this.setupEnvironmentMonitoring();
+            // Initialize core components
+            await this.initializeComponents();
             
-            // Load core dependencies first
-            await this.loadCoreDependencies();
+            // Setup global event handlers
+            this.setupGlobalEventHandlers();
             
-            // Initialize modules in dependency order
-            await this.initializeModules();
+            // Page-specific initialization
+            this.initPageSpecific();
             
-            // Set up inter-module communication
-            this.setupModuleCommunication();
-            
-            // Final setup and validation
-            await this.finalizeInitialization();
-            
+            // Mark as initialized
             this.initialized = true;
             
-            const initTime = performance.now() - this.performanceStart;
-            console.log(`✅ Application initialized successfully in ${initTime.toFixed(2)}ms`);
+            console.log('✅ App initialized successfully');
             
-            // Emit app ready event
-            this.eventBus?.emit('app:ready', {
-                version: this.version,
-                initTime,
-                modules: Array.from(this.modules.keys())
-            });
+            // Emit ready event
+            window.dispatchEvent(new CustomEvent('appReady', { 
+                detail: { app: this } 
+            }));
             
         } catch (error) {
-            console.error('❌ Application initialization failed:', error);
-            this.handleError(error, 'INIT_FAILED');
+            console.error('❌ App initialization failed:', error);
+            this.handleError(error, 'Application initialization failed');
+        }
+    }
+    
+    async initializeComponents() {
+        console.log('🔧 Initializing core components...');
+        
+        try {
+            // Initialize notification system
+            this.modules.set('notifications', new NotificationComponent());
+            console.log('✅ NotificationComponent initialized');
+            
+            // Initialize modal manager
+            this.modules.set('modals', new ModalManager());
+            console.log('✅ ModalManager initialized');
+            
+            // Initialize theme controller
+            this.modules.set('theme', new ThemeController());
+            console.log('✅ ThemeController initialized');
+            
+            console.log('✅ Core components initialized');
+            
+        } catch (error) {
+            console.error('❌ Component initialization failed:', error);
             throw error;
         }
     }
     
-    /**
-     * Load core dependencies
-     */
-    async loadCoreDependencies() {
-        console.log('📦 Loading core dependencies...');
+    setupGlobalEventHandlers() {
+        // Online/offline status
+        window.addEventListener('online', () => {
+            this.globalState.isOnline = true;
+            this.showNotification('Connection restored', 'success');
+        });
         
-        // Ensure EventBus is available
-        if (typeof window.EventBus !== 'undefined') {
-            this.eventBus = new window.EventBus();
-            console.log('✅ EventBus initialized');
-        } else {
-            throw new Error('EventBus not available');
-        }
+        window.addEventListener('offline', () => {
+            this.globalState.isOnline = false;
+            this.showNotification('Connection lost', 'warning');
+        });
         
-        // Ensure Config is available
-        if (typeof window.Config !== 'undefined') {
-            this.config = window.Config;
-            console.log('✅ Config loaded');
-        } else {
-            throw new Error('Config not available');
-        }
-        
-        // Load editor configuration if available
-        if (typeof EditorConfig !== 'undefined') {
-            console.log('✅ EditorConfig available');
-        }
-    }
-    
-    /**
-     * Initialize modules in proper dependency order
-     */
-    async initializeModules() {
-        console.log('🔧 Initializing application modules...');
-        
-        const moduleInitOrder = [
-            'themeManager',
-            'authManager', 
-            'navigationManager',
-            'editorService',
-            'quizEngine',
-            'progressTracker',
-            'performanceMonitor'
-        ];
-        
-        for (const moduleName of moduleInitOrder) {
-            await this.initializeModule(moduleName);
-        }
-        
-        console.log('✅ All modules initialized');
-    }
-    
-    /**
-     * Initialize a specific module
-     */
-    async initializeModule(moduleName) {
-        try {
-            console.log(`🔧 Initializing ${moduleName}...`);
-            
-            let moduleInstance = null;
-            
-            switch (moduleName) {
-                case 'themeManager':
-                    if (typeof ThemeManager !== 'undefined') {
-                        moduleInstance = new ThemeManager();
-                        this.globalState.theme = moduleInstance.currentTheme;
-                    }
-                    break;
-                    
-                case 'authManager':
-                    if (typeof AuthManager !== 'undefined') {
-                        moduleInstance = new AuthManager();
-                        // Listen for auth changes
-                        this.eventBus.on('auth:login', (userData) => {
-                            this.globalState.user = userData;
-                        });
-                        this.eventBus.on('auth:logout', () => {
-                            this.globalState.user = null;
-                        });
-                    }
-                    break;
-                    
-                case 'navigationManager':
-                    if (typeof NavigationManager !== 'undefined') {
-                        moduleInstance = new NavigationManager();
-                    }
-                    break;
-                    
-                case 'editorService':
-                    if (typeof EditorService !== 'undefined') {
-                        moduleInstance = new EditorService();
-                    }
-                    break;
-                    
-                case 'quizEngine':
-                    if (typeof QuizEngine !== 'undefined') {
-                        moduleInstance = new QuizEngine();
-                    }
-                    break;
-                    
-                case 'progressTracker':
-                    if (typeof ProgressTracker !== 'undefined') {
-                        moduleInstance = new ProgressTracker();
-                    }
-                    break;
-                    
-                case 'performanceMonitor':
-                    if (typeof PerformanceMonitor !== 'undefined') {
-                        moduleInstance = new PerformanceMonitor();
-                    }
-                    break;
-                    
-                default:
-                    console.warn(`⚠️ Unknown module: ${moduleName}`);
-                    return;
+        // Page visibility
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                this.globalState.lastActivity = Date.now();
             }
-            
-            if (moduleInstance) {
-                this.modules.set(moduleName, moduleInstance);
-                this.moduleStates.set(moduleName, 'initialized');
-                console.log(`✅ ${moduleName} initialized successfully`);
-            } else {
-                console.warn(`⚠️ ${moduleName} class not available, skipping...`);
-                this.moduleStates.set(moduleName, 'unavailable');
-            }
-            
-        } catch (error) {
-            console.error(`❌ Failed to initialize ${moduleName}:`, error);
-            this.moduleStates.set(moduleName, 'failed');
-            this.handleError(error, `MODULE_INIT_FAILED:${moduleName}`);
-        }
-    }
-    
-    /**
-     * Set up communication between modules
-     */
-    setupModuleCommunication() {
-        console.log('🔗 Setting up inter-module communication...');
-        
-        // Theme changes
-        this.eventBus.on('theme:changed', (theme) => {
-            this.globalState.theme = theme;
-            this.broadcastGlobalStateChange('theme', theme);
         });
         
-        // Lesson navigation
-        this.eventBus.on('lesson:start', (lessonData) => {
-            this.globalState.currentLesson = lessonData;
-            this.updateLastActivity();
-        });
-        
-        this.eventBus.on('lesson:complete', (lessonData) => {
-            this.globalState.currentLesson = null;
-            this.updateLastActivity();
-        });
-        
-        // Performance monitoring
-        this.eventBus.on('performance:metric', (metric) => {
-            this.globalState.performanceMetrics[metric.name] = metric.value;
-        });
-        
-        // Activity tracking
-        this.eventBus.on('user:activity', () => {
-            this.updateLastActivity();
-        });
-        
-        console.log('✅ Inter-module communication established');
-    }
-    
-    /**
-     * Finalize initialization
-     */
-    async finalizeInitialization() {
-        console.log('🎯 Finalizing application setup...');
-        
-        // Validate critical modules
-        const criticalModules = ['themeManager', 'authManager'];
-        const failedCritical = criticalModules.filter(module => 
-            this.moduleStates.get(module) === 'failed'
-        );
-        
-        if (failedCritical.length > 0) {
-            throw new Error(`Critical modules failed: ${failedCritical.join(', ')}`);
-        }
-        
-        // Set up page visibility handling
-        document.addEventListener('visibilitychange', this.handleVisibilityChange);
-        
-        // Set up online/offline detection
-        window.addEventListener('online', this.handleOnlineStatus);
-        window.addEventListener('offline', this.handleOnlineStatus);
-        
-        // Set up activity tracking
-        this.setupActivityTracking();
-        
-        // Initialize page-specific functionality
-        await this.initializePageSpecific();
-        
-        console.log('✅ Application finalization complete');
-    }
-    
-    /**
-     * Initialize page-specific functionality
-     */
-    async initializePageSpecific() {
-        const pathname = window.location.pathname;
-        
-        try {
-            if (pathname.includes('/lesson/')) {
-                await this.initializeLessonPage();
-            } else if (pathname.includes('/dashboard')) {
-                await this.initializeDashboardPage();
-            } else if (pathname.includes('/quiz/')) {
-                await this.initializeQuizPage();
-            }
-        } catch (error) {
-            console.warn('⚠️ Page-specific initialization failed:', error);
-        }
-    }
-    
-    /**
-     * Initialize lesson page
-     */
-    async initializeLessonPage() {
-        console.log('📚 Initializing lesson page...');
-        
-        const editorService = this.getModule('editorService');
-        if (editorService && editorService.initialized) {
-            // Initialize editors for lesson page elements
-            const codeEditorContainers = document.querySelectorAll('.code-editor-container, .ace-editor');
-            for (const container of codeEditorContainers) {
-                try {
-                    const editorId = container.id || `editor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-                    if (!container.id) container.id = editorId;
-                    await editorService.createEditor(editorId, {
-                        language: container.dataset.language || 'python',
-                        theme: container.dataset.theme || 'github',
-                        readOnly: container.dataset.readonly === 'true',
-                        code: container.dataset.code || ''
-                    });
-                    console.log(`✅ Editor initialized: ${editorId}`);
-                } catch (error) {
-                    console.warn(`⚠️ Failed to initialize editor for container:`, error);
-                }
-            }
-        } else {
-            console.warn('⚠️ EditorService not available or not initialized');
-        }
-        
-        this.eventBus.emit('page:lesson:ready');
-    }
-    
-    /**
-     * Initialize dashboard page
-     */
-    async initializeDashboardPage() {
-        console.log('📊 Initializing dashboard page...');
-        
-        const progressTracker = this.getModule('progressTracker');
-        if (progressTracker) {
-            await progressTracker.loadUserProgress();
-        }
-        
-        this.eventBus.emit('page:dashboard:ready');
-    }
-    
-    /**
-     * Initialize quiz page
-     */
-    async initializeQuizPage() {
-        console.log('❓ Initializing quiz page...');
-        
-        const quizEngine = this.getModule('quizEngine');
-        if (quizEngine) {
-            await quizEngine.initializeForPage();
-        }
-        
-        this.eventBus.emit('page:quiz:ready');
-    }
-    
-    /**
-     * Set up global error handling
-     */
-    setupGlobalErrorHandling() {
-        window.addEventListener('error', (event) => {
-            this.handleError(event.error, 'GLOBAL_ERROR');
+        // Global error handling
+        window.addEventListener('error', (error) => {
+            this.handleError(error, 'Global error');
         });
         
         window.addEventListener('unhandledrejection', (event) => {
-            this.handleError(event.reason, 'UNHANDLED_PROMISE');
+            this.handleError(event.reason, 'Unhandled promise rejection');
         });
     }
     
-    /**
-     * Set up environment monitoring
-     */
-    setupEnvironmentMonitoring() {
-        // Monitor network status
-        this.globalState.isOnline = navigator.onLine;
+    initPageSpecific() {
+        const page = document.body.dataset.page;
+        console.log(`📄 Initializing page: ${page}`);
         
-        // Monitor performance
-        if ('performance' in window) {
-            this.globalState.performanceMetrics.navigation = performance.getEntriesByType('navigation')[0];
+        switch(page) {
+            case 'dashboard':
+                this.initDashboard();
+                break;
+            case 'lesson':
+                this.initLesson();
+                break;
+            case 'lessons':
+                this.initLessons();
+                break;
+            default:
+                console.log('No specific initialization for page:', page);
         }
     }
     
-    /**
-     * Set up activity tracking
-     */
-    setupActivityTracking() {
-        const activityEvents = ['click', 'keydown', 'scroll', 'mousemove'];
+    initDashboard() {
+        console.log('📊 Initializing dashboard...');
         
-        let activityTimeout;
-        const trackActivity = () => {
-            this.updateLastActivity();
-            
-            clearTimeout(activityTimeout);
-            activityTimeout = setTimeout(() => {
-                this.eventBus.emit('user:idle');
-            }, 300000); // 5 minutes of inactivity
-        };
+        // Tab switching
+        document.querySelectorAll('[data-tab]').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.switchTab(tab.dataset.tab);
+            });
+        });
         
-        activityEvents.forEach(event => {
-            document.addEventListener(event, trackActivity, { passive: true });
+        // Stat cards
+        document.querySelectorAll('[data-stat]').forEach(card => {
+            card.addEventListener('click', () => {
+                console.log('Stat clicked:', card.dataset.stat);
+            });
         });
     }
     
-    /**
-     * Handle errors
-     */
-    handleError(error, context = 'UNKNOWN') {
-        console.error(`❌ [${context}] Error:`, error);
+    async initLesson() {
+        console.log('📚 Initializing lesson page...');
         
-        // Emit error event for modules to handle
-        this.eventBus?.emit('app:error', {
-            error,
-            context,
-            timestamp: Date.now(),
-            url: window.location.href,
-            userAgent: navigator.userAgent
-        });
-        
-        // Log to analytics if available
-        if (this.config?.analytics?.enabled) {
-            // Track error in analytics
+        try {
+            // Dynamic import for lesson-specific functionality
+            const { LessonManager } = await import('./modules/LessonManager.js');
+            this.modules.set('lesson', new LessonManager());
+            console.log('✅ LessonManager loaded');
+        } catch (error) {
+            console.warn('LessonManager not available:', error);
         }
     }
     
-    /**
-     * Handle online/offline status
-     */
-    handleOnlineStatus() {
-        const isOnline = navigator.onLine;
-        if (this.globalState.isOnline !== isOnline) {
-            this.globalState.isOnline = isOnline;
-            this.eventBus.emit('app:network', { isOnline });
-            console.log(isOnline ? '🌐 Back online' : '📴 Gone offline');
-        }
-    }
-    
-    /**
-     * Handle visibility change
-     */
-    handleVisibilityChange() {
-        if (document.hidden) {
-            this.eventBus.emit('app:hidden');
-        } else {
-            this.eventBus.emit('app:visible');
-            this.updateLastActivity();
-        }
-    }
-    
-    /**
-     * Update last activity timestamp
-     */
-    updateLastActivity() {
-        this.globalState.lastActivity = Date.now();
-    }
-    
-    /**
-     * Broadcast global state changes
-     */
-    broadcastGlobalStateChange(key, value) {
-        this.eventBus.emit('app:state:change', { key, value, state: this.globalState });
-    }
-    
-    /**
-     * Get a module instance
-     */
-    getModule(moduleName) {
-        return this.modules.get(moduleName);
-    }
-    
-    /**
-     * Get module state
-     */
-    getModuleState(moduleName) {
-        return this.moduleStates.get(moduleName);
-    }
-    
-    /**
-     * Get global state
-     */
-    getGlobalState() {
-        return { ...this.globalState };
-    }
-    
-    /**
-     * Update global state
-     */
-    updateGlobalState(updates) {
-        Object.assign(this.globalState, updates);
-        this.eventBus.emit('app:state:update', this.globalState);
-    }
-    
-    /**
-     * Get application status
-     */
-    getStatus() {
-        return {
-            version: this.version,
-            initialized: this.initialized,
-            modules: Object.fromEntries(this.moduleStates),
-            globalState: this.globalState,
-            uptime: Date.now() - this.performanceStart
-        };
-    }
-    
-    /**
-     * Destroy the application (cleanup)
-     */
-    destroy() {
-        console.log('🧹 Cleaning up application...');
+    initLessons() {
+        console.log('📋 Initializing lessons page...');
         
-        // Clean up event listeners
-        document.removeEventListener('visibilitychange', this.handleVisibilityChange);
-        window.removeEventListener('online', this.handleOnlineStatus);
-        window.removeEventListener('offline', this.handleOnlineStatus);
-        
-        // Destroy modules
-        for (const [name, module] of this.modules) {
-            if (module && typeof module.destroy === 'function') {
-                try {
-                    module.destroy();
-                    console.log(`✅ ${name} destroyed`);
-                } catch (error) {
-                    console.error(`❌ Failed to destroy ${name}:`, error);
+        // Lessons page functionality
+        document.querySelectorAll('.lesson-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const lessonId = card.dataset.lessonId;
+                if (lessonId) {
+                    window.location.href = `/lesson/${lessonId}`;
                 }
-            }
+            });
+        });
+    }
+    
+    switchTab(tabId) {
+        // Hide all tab panes
+        document.querySelectorAll('.tab-pane').forEach(pane => {
+            pane.classList.remove('active');
+        });
+        
+        // Show selected tab
+        const targetTab = document.getElementById(`${tabId}-tab`);
+        if (targetTab) {
+            targetTab.classList.add('active');
         }
         
-        // Clear state
-        this.modules.clear();
-        this.moduleStates.clear();
+        // Update tab buttons
+        document.querySelectorAll('[data-tab]').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`[data-tab="${tabId}"]`)?.classList.add('active');
+    }
+    
+    // Utility methods
+    showNotification(message, type = 'info') {
+        const notifications = this.modules.get('notifications');
+        if (notifications) {
+            notifications.show(message, type);
+        } else {
+            console.log(`Notification (${type}):`, message);
+        }
+    }
+    
+    showError(message) {
+        this.showNotification(message, 'error');
+    }
+    
+    getModule(name) {
+        return this.modules.get(name);
+    }
+    
+    handleError(error, context = 'Unknown') {
+        console.error(`Error in ${context}:`, error);
         
-        console.log('✅ Application cleanup complete');
+        if (error instanceof Error) {
+            this.showError(`${context}: ${error.message}`);
+        } else if (typeof error === 'string') {
+            this.showError(`${context}: ${error}`);
+        } else {
+            this.showError(`An error occurred in ${context}`);
+        }
+    }
+    
+    // State management
+    setState(key, value) {
+        this.globalState[key] = value;
+        window.dispatchEvent(new CustomEvent('stateChange', { 
+            detail: { key, value } 
+        }));
+    }
+    
+    getState(key) {
+        return this.globalState[key];
     }
 }
 
-// Create global app instance
+// Initialize app
+window.app = new App();
+
+// Global access for debugging and backward compatibility
 window.App = App;
 
-// Export for module use
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = App;
-}
+// Global utility functions for backward compatibility
+window.showToast = function(message, type, duration) {
+    if (window.app && window.app.showNotification) {
+        window.app.showNotification(message, type);
+    } else {
+        console.log(`Toast (${type}):`, message);
+    }
+};
 
-} else {
-    console.log('ℹ️ App class already exists, skipping redeclaration');
-}
+window.openModal = function(modalId) {
+    if (window.app && window.app.modules.get('modals')) {
+        window.app.modules.get('modals').openModal(modalId);
+    }
+};
+
+window.closeModal = function(modalId) {
+    if (window.app && window.app.modules.get('modals')) {
+        window.app.modules.get('modals').closeModal(modalId);
+    }
+};
+
+window.setTheme = function(theme) {
+    if (window.app && window.app.modules.get('theme')) {
+        window.app.modules.get('theme').applyTheme(theme);
+    }
+};
+
+export default App;

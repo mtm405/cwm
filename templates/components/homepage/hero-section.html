@@ -1,0 +1,67 @@
+<!--
+Component: Homepage Hero Section
+Purpose: Main hero area with Google Sign-In for landing page
+Usage: {% include 'components/homepage/hero-section.html' %}
+Variables: google_client_id
+-->
+<section class="hero">
+    <div class="hero-background">
+        <div class="floating-code">print("Hello, Future Dev! 🚀")</div>
+        <div class="floating-code">level_up = True</div>
+        <div class="floating-code">skills += ["Python", "Problem Solving"]</div>
+    </div>
+    
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-badge">🎯 IT Specialist Certification Prep</div>
+            <h1 class="hero-title">
+                <span class="text-gradient">Master Python</span>
+                <br>The Fun & Rewarding Way
+            </h1>
+            <p class="hero-description">
+                Join thousands of students learning Python through gamified lessons, 
+                earn rewards, and prep for your IT Specialist certification - all for FREE!
+            </p>
+            
+            <div class="hero-cta">
+                <div class="signin-wrapper primary-signin">
+                    <div id="g_id_onload"
+                         data-client_id="{{ google_client_id }}"
+                         data-context="signin"
+                         data-callback="handleCredentialResponse"
+                         data-auto_prompt="false">
+                    </div>
+                    <div class="g_id_signin"
+                         data-type="standard"
+                         data-size="large"
+                         data-theme="filled_blue"
+                         data-text="continue_with"
+                         data-shape="pill"
+                         data-logo_alignment="left"
+                         data-width="300">
+                    </div>
+                </div>
+                <p class="signin-note">🔒 Secure sign-in with Google • No password needed</p>
+            </div>
+            
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">12K+</span>
+                    <span class="stat-label">Students</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">95%</span>
+                    <span class="stat-label">Pass Rate</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">4.9★</span>
+                    <span class="stat-label">Rating</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="hero-visual">
+            {% include 'components/homepage/code-editor-visual.html' %}
+        </div>
+    </div>
+</section>

@@ -1,0 +1,79 @@
+<!--
+Component: Learning Path Section
+Purpose: Shows the curriculum timeline with progress indicators
+Usage: {% include 'components/homepage/learning-path-section.html' %}
+Variables: google_client_id
+-->
+<section class="learning-path">
+    <div class="container">
+        <h2 class="section-title">Your Path to Python Mastery</h2>
+        <p class="section-subtitle">Follow our structured curriculum designed for exam success</p>
+        
+        <div class="path-timeline">
+            <div class="path-item" data-week="Week 1-2">
+                <div class="path-icon">🐍</div>
+                <h3>Python Basics</h3>
+                <p>Variables, data types, and your first programs</p>
+                <div class="path-progress">
+                    <div class="progress-fill" style="width: 100%"></div>
+                </div>
+            </div>
+            
+            <div class="path-item" data-week="Week 3-4">
+                <div class="path-icon">🔄</div>
+                <h3>Control Flow</h3>
+                <p>Loops, conditions, and program logic</p>
+                <div class="path-progress">
+                    <div class="progress-fill" style="width: 100%"></div>
+                </div>
+            </div>
+            
+            <div class="path-item" data-week="Week 5-6">
+                <div class="path-icon">📦</div>
+                <h3>Data Structures</h3>
+                <p>Lists, dictionaries, and data manipulation</p>
+                <div class="path-progress">
+                    <div class="progress-fill" style="width: 100%"></div>
+                </div>
+            </div>
+            
+            <div class="path-item" data-week="Week 7-8">
+                <div class="path-icon">⚡</div>
+                <h3>Functions & Modules</h3>
+                <p>Build reusable and efficient code</p>
+                <div class="path-progress">
+                    <div class="progress-fill" style="width: 100%"></div>
+                </div>
+            </div>
+            
+            <div class="path-item" data-week="Week 9-10">
+                <div class="path-icon">🎯</div>
+                <h3>Exam Prep</h3>
+                <p>Practice tests and certification readiness</p>
+                <div class="path-progress">
+                    <div class="progress-fill" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="path-cta">
+            <div class="signin-wrapper">
+                <div id="g_id_onload"
+                     data-client_id="{{ google_client_id }}"
+                     data-context="signin"
+                     data-callback="handleCredentialResponse"
+                     data-auto_prompt="false">
+                </div>
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-size="large"
+                     data-theme="filled_blue"
+                     data-text="signin_with"
+                     data-shape="pill"
+                     data-logo_alignment="left">
+                </div>
+            </div>
+            <p class="cta-text">Start Week 1 Now - It's Free!</p>
+        </div>
+    </div>
+</section>

@@ -3,13 +3,13 @@ Challenge model for Code with Morais
 """
 from datetime import datetime
 from services.firebase_service import db
-from config import DEV_MODE
+import config
 
 def get_daily_challenge():
     """Get today's daily challenge"""
     today = datetime.now().strftime('%Y-%m-%d')
     
-    if DEV_MODE:
+    if config.DEV_MODE:
         return {
             'id': f'daily_{today}',
             'title': 'Print Pattern Challenge',

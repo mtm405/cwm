@@ -511,14 +511,16 @@ if (typeof window !== 'undefined' && window.MultipleChoiceRenderer) {
         window.MultipleChoiceRenderer = MultipleChoiceRenderer;
         
         // Auto-register with quiz engine if available
-        if (window.QuizEngine) {
+        if (window.QuizEngine && window.eventBus) {
             // Register when quiz engine is initialized
             document.addEventListener('DOMContentLoaded', () => {
-                eventBus.on('quiz:init', (data) => {
-                    if (data.engine) {
-                        data.engine.registerRenderer('multiple_choice', new MultipleChoiceRenderer());
-                    }
-                });
+                if (window.eventBus) {
+                    window.eventBus.on('quiz:init', (data) => {
+                        if (data.engine) {
+                            data.engine.registerRenderer('multiple_choice', new MultipleChoiceRenderer());
+                        }
+                    });
+                }
             });
         }
     }

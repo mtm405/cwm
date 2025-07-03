@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sign-In Test - Code with Morais</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .test-section {
+            background: #2d2d2d;
+            padding: 2rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+        }
+        .test-result {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .success { background: #22c55e; }
+        .error { background: #ef4444; }
+        .warning { background: #f59e0b; }
+        .info { background: #3b82f6; }
+        pre {
+            background: #000;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 Google Sign-In Test Page</h1>
+    
+    <div class="test-section">
+        <h2>1. Callback Function Test</h2>
+        <div id="callback-test"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Google Library Test</h2>
+        <div id="library-test"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Google Sign-In Button Test</h2>
+        <div id="g_id_onload"
+             data-client_id="{{ google_client_id or 'YOUR_CLIENT_ID' }}"
+             data-callback="handleCredentialResponse"
+             data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin"
+             data-type="standard"
+             data-size="large"
+             data-theme="outline"
+             data-text="sign_in_with"
+             data-shape="rectangular"
+             data-logo_alignment="left"
+             data-callback="handleCredentialResponse">
+        </div>
+        <div id="button-test"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Console Output</h2>
+        <pre id="console-output"></pre>
+    </div>
+
+    <!-- Global Configuration -->
+    <script>
+        // Log capture for display
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        const originalConsoleWarn = console.warn;
+        const logOutput = [];
+        
+        function logToOutput(level, ...args) {
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            logOutput.push(`[${level.toUpperCase()}] ${new Date().toLocaleTimeString()} - ${message}`);
+            updateConsoleOutput();
+        }
+        
+        console.log = (...args) => {
+            originalConsoleLog(...args);
+            logToOutput('log', ...args);
+        };
+        
+        console.error = (...args) => {
+            originalConsoleError(...args);
+            logToOutput('error', ...args);
+        };
+        
+        console.warn = (...args) => {
+            originalConsoleWarn(...args);
+            logToOutput('warn', ...args);
+        };
+        
+        function updateConsoleOutput() {
+            const output = document.getElementById('console-output');
+            if (output) {
+                output.textContent = logOutput.slice(-20).join('\n');
+            }
+        }
+        
+        // Global configuration
+        window.CONFIG = {
+            API_BASE_URL: '/api',
+            DEBUG: true,
+            GOOGLE_CLIENT_ID: '{{ google_client_id or "YOUR_CLIENT_ID" }}',
+        };
+        
+        // CRITICAL: Google Sign-In callback must be defined before GSI script loads
+        function handleCredentialResponse(response) {
+            console.log('🔐 Google Sign-In response received');
+            console.log('Response object:', response);
+            
+            if (!response || !response.credential) {
+                console.error('Invalid Google Sign-In response');
+                return;
+            }
+            
+            console.log('✅ Valid credential received');
+            console.log('Credential length:', response.credential.length);
+            
+            // In a real app, you would send this to your backend
+            alert('Google Sign-In Success! Check console for details.');
+        }
+        
+        // Make callback available globally
+        window.handleCredentialResponse = handleCredentialResponse;
+        
+        console.log('🔧 Google Sign-In callback registered');
+    </script>
+    
+    <!-- Google Sign-In -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <!-- Test Scripts -->
+    <script>
+        function runTests() {
+            console.log('🧪 Running Google Sign-In tests...');
+            
+            // Test 1: Callback Function
+            const callbackResult = document.getElementById('callback-test');
+            if (typeof window.handleCredentialResponse === 'function') {
+                callbackResult.innerHTML = '<div class="test-result success">✅ handleCredentialResponse function is available</div>';
+                console.log('✅ Callback function test passed');
+            } else {
+                callbackResult.innerHTML = '<div class="test-result error">❌ handleCredentialResponse function is NOT available</div>';
+                console.error('❌ Callback function test failed');
+            }
+            
+            // Test 2: Google Library
+            const libraryResult = document.getElementById('library-test');
+            if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+                libraryResult.innerHTML = '<div class="test-result success">✅ Google Identity Services library is loaded</div>';
+                console.log('✅ Google library test passed');
+                
+                // Try to initialize
+                try {
+                    google.accounts.id.initialize({
+                        client_id: window.CONFIG.GOOGLE_CLIENT_ID,
+                        callback: handleCredentialResponse,
+                        auto_select: false
+                    });
+                    libraryResult.innerHTML += '<div class="test-result success">✅ Google Sign-In initialized successfully</div>';
+                    console.log('✅ Google Sign-In initialization successful');
+                } catch (error) {
+                    libraryResult.innerHTML += '<div class="test-result error">❌ Google Sign-In initialization failed: ' + error.message + '</div>';
+                    console.error('❌ Google Sign-In initialization failed:', error);
+                }
+            } else {
+                libraryResult.innerHTML = '<div class="test-result error">❌ Google Identity Services library is NOT loaded</div>';
+                console.error('❌ Google library test failed');
+            }
+            
+            // Test 3: Button Test
+            const buttonResult = document.getElementById('button-test');
+            const gsiButton = document.querySelector('.g_id_signin');
+            if (gsiButton) {
+                buttonResult.innerHTML = '<div class="test-result info">ℹ️ Google Sign-In button found. If you see the button above, GSI is working.</div>';
+                console.log('✅ Google Sign-In button element found');
+            } else {
+                buttonResult.innerHTML = '<div class="test-result warning">⚠️ Google Sign-In button element not found yet (may still be loading)</div>';
+                console.warn('⚠️ Google Sign-In button element not found');
+            }
+        }
+        
+        // Run tests after page loads
+        window.addEventListener('load', function() {
+            setTimeout(runTests, 2000); // Wait 2 seconds for everything to load
+        });
+        
+        // Run tests again after a longer delay
+        setTimeout(function() {
+            console.log('🔄 Running tests again after 5 seconds...');
+            runTests();
+        }, 5000);
+    </script>
+</body>
+</html>

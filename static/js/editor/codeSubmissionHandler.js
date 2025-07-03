@@ -3,6 +3,9 @@
  * Handles code validation, execution, and test processing
  */
 
+// Prevent duplicate declarations
+if (typeof window.CodeSubmissionHandler === 'undefined') {
+
 class CodeSubmissionHandler {
     constructor() {
         this.eventBus = window.eventBus || null;
@@ -910,3 +913,5 @@ if (typeof module !== 'undefined' && module.exports) {
     window.CodeSubmissionHandler = CodeSubmissionHandler;
     window.codeSubmissionHandler = codeSubmissionHandler;
 }
+
+} // End of duplicate declaration guard

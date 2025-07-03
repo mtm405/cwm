@@ -18,6 +18,31 @@ A highly engaging, gamified online learning platform for teenagers to master Pyt
 - **Database**: Firebase Firestore
 - **Authentication**: Firebase Auth
 - **Hosting**: Google Cloud Platform (App Engine)
+
+## Project Structure
+
+```
+/
+├── admin/            # Admin tools and utilities
+├── app.py            # Main application entry point
+├── archive/          # Archived/legacy code
+├── config/           # Application configuration
+├── config.py         # Configuration settings (to be migrated to config/)
+├── deployment/       # Deployment configurations (Docker, Cloud, Cloudflare)
+├── docs/             # Documentation
+├── environments/     # Environment configuration files
+├── firebase_data/    # Firebase data models and tools
+├── logs/             # Application logs
+├── models/           # Data models
+├── routes/           # API and view routes
+├── scripts/          # Utility scripts
+├── secure/           # Sensitive configuration (not in version control)
+├── services/         # Service layer
+├── static/           # Static assets (CSS, JS, images)
+├── templates/        # HTML templates
+├── tests/            # Test suite
+└── utils/            # Utility functions
+```
 - **Containerization**: Docker
 - **Code Editor**: ACE Editor
 - **Frontend**: HTML, CSS, JavaScript

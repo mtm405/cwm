@@ -8,15 +8,30 @@ templates/
 ├── index.html                  # ✅ Landing page  
 ├── dashboard.html              # ✅ Dashboard
 ├── lesson.html                 # ✅ MAIN LESSON TEMPLATE - Primary lesson page
-├── lessons.html                # ✅ Lessons overview
+├── base/                       # ✅ Base layout components
+│   ├── head.html              # ✅ HTML head content
+│   └── layout.html            # ✅ Alternative layout (cleaned up)
 ├── components/                 # ✅ Reusable components
-│   ├── navigation/
-│   ├── common/
-│   └── lesson/
+│   ├── navigation/            # ✅ Navigation components
+│   ├── common/                # ✅ Common UI components
+│   ├── lesson/                # ✅ Lesson-specific components
+│   ├── dashboard/             # ✅ Dashboard components
+│   ├── forms/                 # ✅ Form components
+│   ├── gamification/          # ✅ XP and badge components
+│   ├── modals/                # ✅ Modal components
+│   └── _docs/                 # ✅ Component documentation
 ├── macros/                     # ✅ Jinja macros
-├── pages/                      # ✅ Additional pages
-└── archive/                    # 📁 Legacy files
-    └── lesson_backups/         # 📁 Archived lesson templates
+│   ├── dashboard.html         # ✅ Dashboard utility macros
+│   ├── dashboard_modern.html  # ✅ Modern dashboard components
+│   ├── forms.html             # ✅ Form utility macros
+│   ├── lesson.html            # ✅ Lesson utility macros
+│   └── modals.html            # ✅ Modal utility macros
+└── pages/                      # ✅ Standalone pages
+    ├── index.html             # ✅ Landing page content
+    ├── lessons.html           # ✅ Lessons listing
+    ├── login.html             # ✅ Login page
+    ├── profile.html           # ✅ User profile
+    └── signup.html            # ✅ User registration
 ```
 
 ## 🔧 **Main Templates**
@@ -46,8 +61,21 @@ All legacy lesson templates have been moved to `archive/lesson_backups/`:
 3. **DO NOT delete `lesson.html`** - it's the main lesson template
 4. **Archived files are safe to delete** if storage space is needed
 
+## 🧹 **Template Cleanup (July 2, 2025)**
+
+### Removed/Archived
+- `base/scripts.html` - Deprecated script loader (caused duplicate loading conflicts)
+  - **Moved to**: `archive/templates-deprecated-2025-07-02/scripts.html`
+  - **Reason**: File caused "already been declared" JavaScript errors
+  - **Fix**: Removed include from `base/layout.html`
+
+### Updated
+- `base/layout.html` - Removed deprecated script include
+  - Scripts now loaded directly in `base.html` to prevent conflicts
+
 ## 🔄 **Recent Changes**
 
+- ✅ **July 2025**: Cleaned up deprecated template files and script conflicts
 - ✅ Consolidated all lesson templates to single `lesson.html`
 - ✅ Moved 6 legacy templates to archive
 - ✅ Updated debug route to use main template

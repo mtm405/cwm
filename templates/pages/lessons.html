@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base/layout.html" %}
 
 {% block page_name %}lessons{% endblock %}
 
@@ -421,7 +421,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<!-- Lessons specific JavaScript -->
-<script src="{{ url_for('static', filename='js/components/modal-manager.js') }}"></script>
-<script src="{{ url_for('static', filename='js/navigation/navigationController.js') }}"></script>
+<!-- Lessons specific JavaScript - using ES6 modules now -->
 {% endblock %}

@@ -3,6 +3,9 @@
  * Manages ACE editor instances with enhanced functionality
  */
 
+// Prevent duplicate declarations - Phase 2 Fix
+if (typeof window.EditorService === 'undefined') {
+
 class EditorService {
     constructor() {
         this.editors = new Map(); // Store multiple editor instances
@@ -728,3 +731,5 @@ if (typeof module !== 'undefined' && module.exports) {
     window.EditorService = EditorService;
     window.editorService = editorService;
 }
+
+} // End of duplicate declaration guard

@@ -13,6 +13,133 @@
  */
 
 // ==========================================
+// GOOGLE AUTH CALLBACK - MUST BE FIRST
+// ==========================================
+
+// Global Google credential handler - must be available immediately
+function handleCredentialResponse(response) {
+    console.log('🔐 Google Sign-In response received');
+    
+    if (!response || !response.credential) {
+        console.error('Invalid Google Sign-In response');
+        return;
+    }
+    
+    const idToken = response.credential;
+    
+    // Show loading state
+    const authButtons = document.querySelectorAll('.g_id_signin');
+    authButtons.forEach(btn => {
+        if (btn) {
+            btn.style.opacity = '0.6';
+            btn.style.pointerEvents = 'none';
+        }
+    });
+    
+    // Send token to backend
+    fetch('/auth/google/callback', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ token: idToken })
+    })
+    .then(response => {
+        console.log('Backend response status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Backend response:', data);
+        if (data.success) {
+            console.log('✅ Authentication successful');
+            
+            // Show success feedback
+            if (typeof showToast === 'function') {
+                showToast('Login successful! Redirecting...', 'success');
+            }
+            
+            // Store user data if available
+            if (data.user) {
+                window.currentUser = data.user;
+                console.log('User data stored:', data.user);
+            }
+            
+            // Verify session was set by making a quick auth status check
+            fetch('/auth/status')
+                .then(response => response.json())
+                .then(authStatus => {
+                    console.log('Auth status check:', authStatus);
+                    
+                    // Redirect to dashboard with a small delay to ensure session is set
+                    const redirectUrl = data.redirect_url || '/dashboard';
+                    console.log('Redirecting to:', redirectUrl);
+                    
+                    setTimeout(() => {
+                        console.log('Performing redirect...');
+                        try {
+                            window.location.href = redirectUrl;
+                        } catch (error) {
+                            console.error('Redirect failed, trying location.replace:', error);
+                            try {
+                                window.location.replace(redirectUrl);
+                            } catch (error2) {
+                                console.error('Location.replace also failed:', error2);
+                                // Last resort - reload the page and let the server handle the redirect
+                                window.location.reload();
+                            }
+                        }
+                    }, 500);
+                })
+                .catch(authError => {
+                    console.warn('Auth status check failed, proceeding with redirect anyway:', authError);
+                    const redirectUrl = data.redirect_url || '/dashboard';
+                    setTimeout(() => {
+                        window.location.href = redirectUrl;
+                    }, 500);
+                });
+        } else {
+            console.error('❌ Authentication failed:', data.error);
+            if (typeof showToast === 'function') {
+                showToast(data.error || 'Authentication failed', 'error');
+            } else {
+                alert('Authentication failed: ' + (data.error || 'Unknown error'));
+            }
+            
+            // Re-enable buttons
+            authButtons.forEach(btn => {
+                if (btn) {
+                    btn.style.opacity = '1';
+                    btn.style.pointerEvents = 'auto';
+                }
+            });
+        }
+    })
+    .catch(error => {
+        console.error('❌ Network error during authentication:', error);
+        if (typeof showToast === 'function') {
+            showToast('Network error. Please try again.', 'error');
+        } else {
+            alert('Network error. Please check your connection and try again.');
+        }
+        
+        // Re-enable buttons
+        authButtons.forEach(btn => {
+            if (btn) {
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+            }
+        });
+    });
+}
+
+// Make function globally available immediately
+window.handleCredentialResponse = handleCredentialResponse;
+if (typeof globalThis !== 'undefined') {
+    globalThis.handleCredentialResponse = handleCredentialResponse;
+}
+
+// ==========================================
 // CORE APPLICATION INITIALIZATION
 // ==========================================
 
@@ -561,13 +688,6 @@ function refreshDashboard() {
 function signOut() {
     if (window.appManagers && window.appManagers.auth) {
         window.appManagers.auth.signOut();
-    }
-}
-
-// Global Google credential handler
-function handleCredentialResponse(response) {
-    if (window.appManagers && window.appManagers.auth) {
-        window.appManagers.auth.handleCredentialResponse(response);
     }
 }
 

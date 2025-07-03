@@ -2,12 +2,13 @@
 Authentication routes for Code with Morais
 Handles Google OAuth authentication and user sessions
 """
-from flask import Blueprint, request, jsonify, session, redirect, url_for, current_app
+import os
+from flask import Blueprint, request, jsonify, session, current_app
 from firebase_admin import auth as firebase_auth
 import logging
-import requests
-import jwt
 from typing import Optional, Dict, Any
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
 
 logger = logging.getLogger(__name__)
 auth_bp = Blueprint('auth', __name__)
@@ -16,42 +17,24 @@ auth_bp = Blueprint('auth', __name__)
 def get_firebase_service():
     return current_app.config.get('firebase_service')
 
-def verify_google_token(id_token: str) -> Optional[Dict[str, Any]]:
-    """Verify Google OAuth ID token directly with Google"""
+def verify_google_token(id_token_str: str) -> Optional[Dict[str, Any]]:
+    """Verify Google OAuth ID token using the google-auth library."""
     try:
-        # Verify with Google's tokeninfo endpoint
-        url = f"https://oauth2.googleapis.com/tokeninfo?id_token={id_token}"
-        response = requests.get(url, timeout=10)
+        request = google_requests.Request()
+        expected_client_id = os.environ.get('GOOGLE_CLIENT_ID')
         
-        if response.status_code == 200:
-            token_info = response.json()
-            
-            # Verify the audience (client ID) matches our app
-            import os
-            expected_client_id = os.environ.get('GOOGLE_CLIENT_ID')
-            if token_info.get('aud') != expected_client_id:
-                logger.error(f"Token audience mismatch. Expected: {expected_client_id}, Got: {token_info.get('aud')}")
-                return None
-            
-            # Verify the issuer
-            if token_info.get('iss') not in ['accounts.google.com', 'https://accounts.google.com']:
-                logger.error(f"Invalid token issuer: {token_info.get('iss')}")
-                return None
-            
-            # Check if token is still valid (not expired)
-            import time
-            if int(token_info.get('exp', 0)) < time.time():
-                logger.error("Token has expired")
-                return None
-            
-            logger.info(f"Google token verified successfully for user: {token_info.get('email')}")
-            return token_info
-        else:
-            logger.error(f"Google token verification failed: {response.status_code} - {response.text}")
-            return None
-            
+        id_info = id_token.verify_oauth2_token(
+            id_token_str, request, expected_client_id)
+        
+        logger.info(f"Google token verified successfully for user: {id_info.get('email')}")
+        return id_info
+        
+    except ValueError as e:
+        # Token is invalid
+        logger.error(f"Google token verification failed: {str(e)}")
+        return None
     except Exception as e:
-        logger.error(f"Error verifying Google token: {str(e)}")
+        logger.error(f"An unexpected error occurred during token verification: {str(e)}")
         return None
 
 @auth_bp.route('/google/callback', methods=['POST'])
@@ -149,8 +132,12 @@ def google_callback():
                 session['is_admin'] = user_data.get('is_admin', False)
                 session['authenticated'] = True
                 
+                # Force session save
+                session.permanent = True
+                
                 return jsonify({
                     'success': True,
+                    'redirect_url': '/dashboard',
                     'user': {
                         'uid': user_id,
                         'email': user_email,
@@ -173,8 +160,13 @@ def google_callback():
                 session['user_picture'] = user_picture
                 session['is_admin'] = False
                 session['authenticated'] = True
+                session.permanent = True
                 
-                return jsonify({'success': True, 'warning': 'User data sync failed'})
+                return jsonify({
+                    'success': True, 
+                    'redirect_url': '/dashboard',
+                    'warning': 'User data sync failed'
+                })
         else:
             # Firebase not available, set basic session
             session['user_id'] = user_id
@@ -183,8 +175,13 @@ def google_callback():
             session['user_picture'] = user_picture
             session['is_admin'] = False
             session['authenticated'] = True
+            session.permanent = True
             
-            return jsonify({'success': True, 'warning': 'Firebase unavailable'})
+            return jsonify({
+                'success': True, 
+                'redirect_url': '/dashboard',
+                'warning': 'Firebase unavailable'
+            })
     except Exception as e:
         logger.error(f"Google callback error: {str(e)}")
         return jsonify({'success': False, 'error': 'Authentication failed'}), 500
@@ -215,6 +212,17 @@ def auth_status():
     """Get current authentication status"""
     try:
         is_authenticated = session.get('authenticated', False)
+        user_id = session.get('user_id')
+        
+        return jsonify({
+            'success': True,
+            'authenticated': is_authenticated,
+            'user_id': user_id,
+            'session_keys': list(session.keys())
+        })
+    except Exception as e:
+        logger.error(f"Auth status error: {str(e)}")
+        return jsonify({'success': False, 'error': 'Failed to get auth status'}), 500
         return jsonify({
             'authenticated': is_authenticated,
             'user': {

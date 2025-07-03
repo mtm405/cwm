@@ -166,11 +166,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- Auth components -->
-<script src="{{ url_for('static', filename='js/auth/authService.js') }}"></script>
-<script src="{{ url_for('static', filename='js/auth/authController.js') }}"></script>
-<script src="{{ url_for('static', filename='js/auth/authEvents.js') }}"></script>
-
+<!-- Auth functionality is now handled by the main app.js module -->
 <script>
 // Handle form submissions and validation
 document.addEventListener('DOMContentLoaded', function() {
@@ -262,7 +258,5 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <!-- Authentication specific JavaScript -->
-<script src="{{ url_for('static', filename='js/auth/authController.js') }}"></script>
-<script src="{{ url_for('static', filename='js/auth/authService.js') }}"></script>
-<script src="{{ url_for('static', filename='js/components/modal-manager.js') }}"></script>
+<!-- Authentication specific JavaScript - using ES6 modules now -->
 {% endblock %}

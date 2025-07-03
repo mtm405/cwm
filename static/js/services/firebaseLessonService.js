@@ -3,6 +3,9 @@
  * Handles all Firebase operations for lessons
  */
 
+// Prevent duplicate declarations - Phase 2 Fix
+if (typeof window.FirebaseLessonService === 'undefined') {
+
 class FirebaseLessonService {
     constructor() {
         this.db = null;
@@ -277,3 +280,6 @@ class FirebaseLessonService {
 
 // Create global instance
 window.firebaseLessonService = new FirebaseLessonService();
+window.FirebaseLessonService = FirebaseLessonService;
+
+} // End of duplicate declaration guard - Phase 2 Fix

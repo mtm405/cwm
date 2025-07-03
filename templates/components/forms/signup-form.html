@@ -33,7 +33,7 @@ Example usage:
     <div class="auth-section google-auth">
         <div id="g_id_onload"
              data-client_id="{{ google_client_id }}"
-             data-login_uri="{{ form_action or '/auth/signup' }}"
+             data-callback="handleCredentialResponse"
              data-auto_prompt="false">
         </div>
         <div class="g_id_signin"
@@ -42,7 +42,8 @@ Example usage:
              data-theme="outline"
              data-text="signup_with"
              data-shape="rectangular"
-             data-logo_alignment="left">
+             data-logo_alignment="left"
+             data-callback="handleCredentialResponse">
         </div>
     </div>
 

@@ -5,11 +5,18 @@ A gamified Python learning platform for teenagers
 import os
 import logging
 import re
+import mimetypes
 from flask import Flask, request, jsonify, render_template, flash, redirect, url_for
 from flask_caching import Cache
 from config import get_config, setup_logging
 from services.firebase_service import FirebaseService
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
+
+# CRITICAL: Fix MIME types for JavaScript modules
+mimetypes.add_type('application/javascript', '.js')
+mimetypes.add_type('text/javascript', '.js')
+mimetypes.add_type('application/javascript', '.mjs')
+mimetypes.add_type('text/css', '.css')
 
 # Get configuration based on environment
 config = get_config()
@@ -21,6 +28,24 @@ logger = logging.getLogger(__name__)
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
+
+# Enhanced MIME type handler for ES6 modules
+@app.after_request
+def fix_mime_types(response):
+    """Fix MIME types for static files and ES6 modules"""
+    if hasattr(response, 'direct_passthrough') and response.direct_passthrough:
+        return response
+        
+    # Fix JavaScript MIME types - critical for ES6 modules
+    if response.headers.get('Content-Type') == 'application/json' and \
+       any(request.path.endswith(ext) for ext in ['.js', '.mjs']):
+        response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
+    elif request.path.endswith('.js') or request.path.endswith('.mjs'):
+        response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
+    elif request.path.endswith('.css'):
+        response.headers['Content-Type'] = 'text/css; charset=utf-8'
+    
+    return response
 
 # Initialize caching
 app.config.update(config.TEMPLATE_CACHE_CONFIG)
@@ -298,9 +323,18 @@ def favicon():
 @app.after_request
 def add_security_headers(response):
     """Add security headers to all responses"""
+    # Standard security headers
     response.headers['X-Content-Type-Options'] = 'nosniff'
-    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'  # Changed from DENY to allow Google OAuth popups
     response.headers['X-XSS-Protection'] = '1; mode=block'
+    
+    # Fix CORS issues for Google OAuth
+    response.headers['Cross-Origin-Opener-Policy'] = 'unsafe-none'
+    response.headers['Cross-Origin-Embedder-Policy'] = 'unsafe-none'
+    
+    # Cache control for better performance
+    if 'Cache-Control' not in response.headers:
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     
     if not config.DEV_MODE:
         response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'

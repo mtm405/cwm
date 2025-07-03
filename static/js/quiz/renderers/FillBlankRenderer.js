@@ -810,13 +810,15 @@ if (typeof window !== 'undefined' && window.FillBlankRenderer) {
         window.FillBlankRenderer = FillBlankRenderer;
         
         // Auto-register with quiz engine if available
-        if (window.QuizEngine) {
+        if (window.QuizEngine && window.eventBus) {
             document.addEventListener('DOMContentLoaded', () => {
-                eventBus.on('quiz:init', (data) => {
-                    if (data.engine) {
-                        data.engine.registerRenderer('fill_blank', new FillBlankRenderer());
-                    }
-                });
+                if (window.eventBus) {
+                    window.eventBus.on('quiz:init', (data) => {
+                        if (data.engine) {
+                            data.engine.registerRenderer('fill_blank', new FillBlankRenderer());
+                        }
+                    });
+                }
             });
         }
     }

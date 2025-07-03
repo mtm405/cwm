@@ -1,0 +1,144 @@
+{% extends "base/layout.html" %}
+
+{% block title %}JavaScript Test - Code with Morais{% endblock %}
+{% block page_name %}test{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>JavaScript Module Test</h1>
+    
+    <div class="test-buttons">
+        <button onclick="testToast()">Test Toast Notification</button>
+        <button onclick="testModernNotification()">Test Modern Notification</button>
+        <button onclick="testModalManager()">Test Modal Manager</button>
+        <button onclick="testThemeController()">Test Theme Controller</button>
+    </div>
+    
+    <div class="test-results">
+        <h2>Test Results</h2>
+        <div id="test-console"></div>
+    </div>
+</div>
+
+<style>
+.container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+}
+
+.test-buttons {
+    display: flex;
+    gap: 1rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+}
+
+.test-buttons button {
+    padding: 0.75rem 1.5rem;
+    background: var(--primary-color, #4a90e2);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.test-buttons button:hover {
+    background: var(--primary-hover, #357abd);
+}
+
+.test-results {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: var(--bg-card, #2d3748);
+    border-radius: 8px;
+}
+
+#test-console {
+    font-family: monospace;
+    font-size: 0.9rem;
+    color: var(--text-secondary, #a0aec0);
+    white-space: pre-wrap;
+    max-height: 300px;
+    overflow-y: auto;
+}
+</style>
+
+<script>
+function log(message) {
+    const console = document.getElementById('test-console');
+    const time = new Date().toLocaleTimeString();
+    console.textContent += `[${time}] ${message}\n`;
+    console.scrollTop = console.scrollHeight;
+}
+
+function testToast() {
+    log('Testing Utils.showToast...');
+    if (typeof window.Utils !== 'undefined' && window.Utils.showToast) {
+        window.Utils.showToast('Test toast message!', 'success');
+        log('✅ Utils.showToast works!');
+    } else {
+        log('❌ Utils.showToast not available');
+    }
+}
+
+function testModernNotification() {
+    log('Testing modern notification system...');
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('Modern notification test!', 'info');
+        log('✅ Modern notification system works!');
+    } else {
+        log('❌ Modern notification system not available');
+    }
+}
+
+function testModalManager() {
+    log('Testing ModalManager...');
+    if (typeof ModalManager !== 'undefined') {
+        log('✅ ModalManager is available');
+        log(`ModalManager type: ${typeof ModalManager}`);
+    } else {
+        log('❌ ModalManager not available');
+    }
+}
+
+function testThemeController() {
+    log('Testing ThemeController...');
+    if (typeof ThemeController !== 'undefined') {
+        log('✅ ThemeController is available');
+        if (window.themeController) {
+            log('✅ ThemeController instance is available');
+        } else {
+            log('⚠️ ThemeController class available but no instance');
+        }
+    } else {
+        log('❌ ThemeController not available');
+    }
+}
+
+// Test on page load
+document.addEventListener('DOMContentLoaded', function() {
+    log('Page loaded, testing JavaScript modules...');
+    
+    // Test what's available
+    const availableModules = [];
+    if (typeof window.Config !== 'undefined') availableModules.push('Config');
+    if (typeof window.Utils !== 'undefined') availableModules.push('Utils');
+    if (typeof window.App !== 'undefined') availableModules.push('App');
+    if (typeof ModalManager !== 'undefined') availableModules.push('ModalManager');
+    if (typeof ThemeController !== 'undefined') availableModules.push('ThemeController');
+    if (typeof window.modernApp !== 'undefined') availableModules.push('modernApp');
+    if (typeof window.showNotification === 'function') availableModules.push('showNotification');
+    
+    log(`Available modules: ${availableModules.join(', ')}`);
+    
+    // Test Google Sign-In callback
+    if (typeof window.handleCredentialResponse === 'function') {
+        log('✅ Google Sign-In callback function is available');
+    } else {
+        log('❌ Google Sign-In callback function not available');
+    }
+});
+</script>
+{% endblock %}
