@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment-Based Progress Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn.success {
+            background: #28a745;
+        }
+        .btn.danger {
+            background: #dc3545;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .progress-info {
+            background: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+        .json-display {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔬 Assessment-Based Progress Test</h1>
+        <p>This page tests the new assessment-based progress tracking system.</p>
+        
+        <div class="test-section">
+            <h3>📊 Progress System Status</h3>
+            <button class="btn" onclick="testProgressSystem()">Test Progress System</button>
+            <div id="progress-status" class="result" style="display: none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🧪 Quiz Assessment Test</h3>
+            <button class="btn" onclick="testQuizAssessment(85, true)">Pass Quiz (85%)</button>
+            <button class="btn" onclick="testQuizAssessment(55, false)">Fail Quiz (55%)</button>
+            <div id="quiz-result" class="result" style="display: none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>💻 Code Assessment Test</h3>
+            <button class="btn success" onclick="testCodeAssessment(true, 5, 5)">Pass Code (5/5 tests)</button>
+            <button class="btn danger" onclick="testCodeAssessment(false, 2, 5)">Fail Code (2/5 tests)</button>
+            <div id="code-result" class="result" style="display: none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📖 Text Block Assessment Test</h3>
+            <button class="btn" onclick="testTextAssessment(true, 45)">Complete Text (45s reading)</button>
+            <button class="btn" onclick="testTextAssessment(false, 15)">Incomplete Text (15s reading)</button>
+            <div id="text-result" class="result" style="display: none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🔍 Current Progress Info</h3>
+            <button class="btn" onclick="getProgressInfo()">Get Progress Info</button>
+            <div id="progress-info" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { LessonProgress } from '/static/js/lesson/services/LessonProgress.js';
+        import { AssessmentBasedProgressTracker } from '/static/js/lesson/services/AssessmentBasedProgressTracker.js';
+        
+        // Initialize test environment
+        const lessonProgress = new LessonProgress();
+        const assessmentTracker = new AssessmentBasedProgressTracker();
+        
+        // Mock lesson data for testing
+        const mockLessonData = {
+            id: 'test-lesson-01',
+            title: 'Test Lesson',
+            blocks: [
+                {
+                    id: 'quiz-block-1',
+                    type: 'quiz',
+                    title: 'Test Quiz',
+                    quiz_id: 'test-quiz-1'
+                },
+                {
+                    id: 'code-block-1',
+                    type: 'interactive_code',
+                    title: 'Test Code Challenge',
+                    tests: ['test1', 'test2', 'test3', 'test4', 'test5']
+                },
+                {
+                    id: 'text-block-1',
+                    type: 'text',
+                    title: 'Test Reading',
+                    content: 'This is a test text block.'
+                }
+            ]
+        };
+        
+        // Initialize systems
+        lessonProgress.initialize('test-lesson-01', {}, 'test-user-001', mockLessonData);
+        
+        // Make functions available globally
+        window.testProgressSystem = testProgressSystem;
+        window.testQuizAssessment = testQuizAssessment;
+        window.testCodeAssessment = testCodeAssessment;
+        window.testTextAssessment = testTextAssessment;
+        window.getProgressInfo = getProgressInfo;
+        window.lessonProgress = lessonProgress;
+        window.assessmentTracker = assessmentTracker;
+        
+        function testProgressSystem() {
+            const statusDiv = document.getElementById('progress-status');
+            statusDiv.style.display = 'block';
+            
+            const info = lessonProgress.getProgressInfo();
+            const assessmentInfo = lessonProgress.getLessonAssessmentProgress();
+            
+            statusDiv.innerHTML = `
+                <h4>✅ Progress System Status</h4>
+                <p><strong>Lesson ID:</strong> ${info.lessonId}</p>
+                <p><strong>User ID:</strong> ${info.userId}</p>
+                <p><strong>Total Blocks:</strong> ${info.totalBlocks}</p>
+                <p><strong>Assessment Tracker:</strong> ${assessmentInfo ? 'Initialized' : 'Not Initialized'}</p>
+                <div class="json-display">${JSON.stringify(info, null, 2)}</div>
+            `;
+            statusDiv.className = 'result success';
+        }
+        
+        async function testQuizAssessment(score, passed) {
+            const resultDiv = document.getElementById('quiz-result');
+            resultDiv.style.display = 'block';
+            
+            const blockId = 'quiz-block-1';
+            const assessmentResults = {
+                score: score,
+                passed: passed,
+                attempts: 1,
+                tests_passed: passed ? 10 : 5,
+                total_tests: 10,
+                success: passed,
+                error: null,
+                output: `Quiz completed with score: ${score}%`,
+                timestamp: Date.now()
+            };
+            
+            try {
+                // Start assessment
+                lessonProgress.startBlockAssessment(blockId);
+                
+                // Try to complete the block
+                const completed = await lessonProgress.markBlockComplete(blockId, assessmentResults);
+                
+                resultDiv.innerHTML = `
+                    <h4>${completed ? '✅' : '❌'} Quiz Assessment Result</h4>
+                    <p><strong>Score:</strong> ${score}%</p>
+                    <p><strong>Passed:</strong> ${passed ? 'Yes' : 'No'}</p>
+                    <p><strong>Block Completed:</strong> ${completed ? 'Yes' : 'No'}</p>
+                    <div class="json-display">${JSON.stringify(assessmentResults, null, 2)}</div>
+                `;
+                resultDiv.className = completed ? 'result success' : 'result error';
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <h4>❌ Quiz Assessment Error</h4>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function testCodeAssessment(success, testsPassed, totalTests) {
+            const resultDiv = document.getElementById('code-result');
+            resultDiv.style.display = 'block';
+            
+            const blockId = 'code-block-1';
+            const assessmentResults = {
+                success: success,
+                score: Math.round((testsPassed / totalTests) * 100),
+                passed: success,
+                tests_passed: testsPassed,
+                total_tests: totalTests,
+                output: success ? 'All tests passed!' : 'Some tests failed',
+                error: success ? null : 'Test failure',
+                timestamp: Date.now(),
+                attempts: 1
+            };
+            
+            try {
+                // Start assessment
+                lessonProgress.startBlockAssessment(blockId);
+                
+                // Try to complete the block
+                const completed = await lessonProgress.markBlockComplete(blockId, assessmentResults);
+                
+                resultDiv.innerHTML = `
+                    <h4>${completed ? '✅' : '❌'} Code Assessment Result</h4>
+                    <p><strong>Tests Passed:</strong> ${testsPassed}/${totalTests}</p>
+                    <p><strong>Score:</strong> ${assessmentResults.score}%</p>
+                    <p><strong>Block Completed:</strong> ${completed ? 'Yes' : 'No'}</p>
+                    <div class="json-display">${JSON.stringify(assessmentResults, null, 2)}</div>
+                `;
+                resultDiv.className = completed ? 'result success' : 'result error';
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <h4>❌ Code Assessment Error</h4>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function testTextAssessment(scrolledToBottom, timeSpent) {
+            const resultDiv = document.getElementById('text-result');
+            resultDiv.style.display = 'block';
+            
+            const blockId = 'text-block-1';
+            const assessmentResults = {
+                scrolledToBottom: scrolledToBottom,
+                timeSpent: timeSpent,
+                success: scrolledToBottom && timeSpent >= 30,
+                score: scrolledToBottom && timeSpent >= 30 ? 100 : 0,
+                passed: scrolledToBottom && timeSpent >= 30,
+                timestamp: Date.now(),
+                attempts: 1
+            };
+            
+            try {
+                // Start assessment
+                lessonProgress.startBlockAssessment(blockId);
+                
+                // Try to complete the block
+                const completed = await lessonProgress.markBlockComplete(blockId, assessmentResults);
+                
+                resultDiv.innerHTML = `
+                    <h4>${completed ? '✅' : '❌'} Text Assessment Result</h4>
+                    <p><strong>Time Spent:</strong> ${timeSpent}s (minimum: 30s)</p>
+                    <p><strong>Scrolled to Bottom:</strong> ${scrolledToBottom ? 'Yes' : 'No'}</p>
+                    <p><strong>Block Completed:</strong> ${completed ? 'Yes' : 'No'}</p>
+                    <div class="json-display">${JSON.stringify(assessmentResults, null, 2)}</div>
+                `;
+                resultDiv.className = completed ? 'result success' : 'result error';
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <h4>❌ Text Assessment Error</h4>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        function getProgressInfo() {
+            const infoDiv = document.getElementById('progress-info');
+            infoDiv.style.display = 'block';
+            
+            const info = lessonProgress.getProgressInfo();
+            
+            infoDiv.innerHTML = `
+                <h4>📊 Current Progress Information</h4>
+                <div class="json-display">${JSON.stringify(info, null, 2)}</div>
+            `;
+            infoDiv.className = 'result progress-info';
+        }
+        
+        console.log('🧪 Assessment-Based Progress Test System Initialized');
+    </script>
+</body>
+</html>

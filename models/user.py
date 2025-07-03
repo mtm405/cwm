@@ -197,7 +197,7 @@ def get_user_progress(user_id):
             return user_data.get('lesson_progress', {})
     return {}
 
-def update_lesson_progress(user_id: str, lesson_id: str, progress: int, completed: bool, completed_subtopics: list, time_spent: int = 0) -> bool:
+def update_lesson_progress(user_id: str, lesson_id: str, progress: int, completed: bool, completed_subtopics: list, time_spent: int = 0, assessment_scores: dict = None, assessment_attempts: dict = None) -> bool:
     """Update lesson progress for a user"""
     from config import get_config
     config = get_config()
@@ -210,6 +210,12 @@ def update_lesson_progress(user_id: str, lesson_id: str, progress: int, complete
             'time_spent': time_spent,
             'last_accessed': datetime.now().isoformat()
         }
+        
+        # Include assessment data if provided
+        if assessment_scores:
+            progress_data['assessment_scores'] = assessment_scores
+        if assessment_attempts:
+            progress_data['assessment_attempts'] = assessment_attempts
         
         if config.DEV_MODE and user_id == DEV_USER['uid']:
             # Update dev user progress

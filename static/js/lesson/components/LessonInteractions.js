@@ -307,8 +307,21 @@ export class LessonInteractions {
             
             // Mark as complete if successful and no errors
             if (result.success && !result.error) {
+                // Prepare assessment results for simple code execution
+                const assessmentResults = {
+                    success: true,
+                    score: 100,
+                    passed: true,
+                    tests_passed: 1,
+                    total_tests: 1,
+                    output: result.output,
+                    error: null,
+                    timestamp: Date.now(),
+                    attempts: 1
+                };
+                
                 setTimeout(() => {
-                    this.markBlockComplete(blockId);
+                    this.markBlockComplete(blockId, assessmentResults);
                 }, 1000);
             }
             
@@ -481,10 +494,10 @@ export class LessonInteractions {
         }
     }
     
-    async markBlockComplete(blockId) {
-        // Delegate to lesson system
+    async markBlockComplete(blockId, assessmentResults = null) {
+        // Delegate to lesson system with assessment results
         if (window.lessonSystem) {
-            return await window.lessonSystem.markBlockComplete(blockId);
+            return await window.lessonSystem.markBlockComplete(blockId, assessmentResults);
         }
         
         console.warn('Lesson system not available for marking completion');
@@ -1389,15 +1402,29 @@ export class LessonInteractions {
     handleCodeCompletion(blockId, result) {
         console.log(`🎉 Code completion for block ${blockId}:`, result);
         
-        // Mark block as complete if all tests passed
+        // Prepare assessment results for the progress tracker
+        const assessmentResults = {
+            success: result.allTestsPassed || result.success,
+            score: result.score || (result.allTestsPassed ? 100 : 0),
+            passed: result.allTestsPassed || result.success,
+            tests_passed: result.testsPassedCount || 0,
+            total_tests: result.totalTestCount || 0,
+            output: result.output || null,
+            error: result.error || null,
+            timestamp: Date.now(),
+            attempts: 1 // This would be tracked by the assessment system
+        };
+        
+        // Mark block as complete with assessment results
         if (result.allTestsPassed) {
-            this.markBlockComplete(blockId);
+            this.markBlockComplete(blockId, assessmentResults);
         }
         
         // Emit custom event for progress tracking
         this.emitCustomEvent('codeCompleted', {
             blockId: blockId,
             result: result,
+            assessmentResults: assessmentResults,
             timestamp: Date.now()
         });
     }

@@ -1,7 +1,9 @@
 /**
  * Lesson Progress Service
- * Handles user progress tracking and persistence
+ * Handles user progress tracking and persistence with assessment-based completion
  */
+
+import { AssessmentBasedProgressTracker } from './AssessmentBasedProgressTracker.js';
 
 export class LessonProgress {
     constructor() {
@@ -12,9 +14,12 @@ export class LessonProgress {
             completed_blocks: [],
             progress: 0,
             last_updated: null,
-            time_spent: 0
+            time_spent: 0,
+            assessment_scores: {},
+            assessment_attempts: {}
         };
         this.startTime = Date.now();
+        this.assessmentTracker = new AssessmentBasedProgressTracker();
         this.initializeFirebase();
     }
     
@@ -27,7 +32,7 @@ export class LessonProgress {
         }
     }
     
-    initialize(lessonId, initialProgress, userId) {
+    initialize(lessonId, initialProgress, userId, lessonData = null) {
         this.lessonId = lessonId;
         this.userId = userId;
         this.progressData = {
@@ -35,10 +40,17 @@ export class LessonProgress {
             progress: 0,
             last_updated: null,
             time_spent: 0,
+            assessment_scores: {},
+            assessment_attempts: {},
             ...initialProgress
         };
         
         console.log(`📊 Progress tracker initialized for lesson ${lessonId}`);
+        
+        // Initialize assessment-based tracking
+        if (lessonData) {
+            this.assessmentTracker.initializeLessonAssessments(lessonData);
+        }
         
         // Set up auto-save interval
         this.setupAutoSave();
@@ -94,7 +106,7 @@ export class LessonProgress {
         };
     }
     
-    async markBlockComplete(blockId) {
+    async markBlockComplete(blockId, assessmentResults = null) {
         if (!blockId) {
             console.error('Block ID is required');
             return false;
@@ -105,9 +117,36 @@ export class LessonProgress {
             return true;
         }
         
+        // Check if assessment is required and validate
+        if (this.assessmentTracker.initialized) {
+            const canComplete = this.assessmentTracker.canMarkBlockComplete(blockId);
+            
+            if (!canComplete) {
+                console.log(`❌ Block ${blockId} cannot be marked complete - assessment not passed`);
+                
+                // If assessment results provided, evaluate them
+                if (assessmentResults) {
+                    const assessmentPassed = await this.assessmentTracker.evaluateBlockCompletion(blockId, assessmentResults);
+                    
+                    if (!assessmentPassed) {
+                        return false;
+                    }
+                } else {
+                    // No assessment results provided but assessment is required
+                    return false;
+                }
+            }
+        }
+        
         // Add to completed blocks
         this.progressData.completed_blocks.push(blockId);
         this.progressData.last_updated = new Date().toISOString();
+        
+        // Store assessment results if provided
+        if (assessmentResults) {
+            this.progressData.assessment_scores[blockId] = assessmentResults.score || 0;
+            this.progressData.assessment_attempts[blockId] = assessmentResults.attempts || 1;
+        }
         
         // Calculate new progress percentage
         const totalBlocks = this.getTotalBlocks();
@@ -124,7 +163,11 @@ export class LessonProgress {
             console.log(`✅ Block ${blockId} marked as complete (${this.progressData.progress}%)`);
             
             // Dispatch event for other components
-            this.dispatchProgressEvent('blockCompleted', { blockId, progress: this.progressData.progress });
+            this.dispatchProgressEvent('blockCompleted', { 
+                blockId, 
+                progress: this.progressData.progress,
+                assessmentResults: assessmentResults 
+            });
             
             // Check for milestones
             this.checkMilestones();
@@ -134,8 +177,8 @@ export class LessonProgress {
     }
     
     async saveProgress() {
-        if (!this.userId || !this.lessonId) {
-            console.log('👤 No user ID or lesson ID, progress not saved');
+        if (!this.lessonId) {
+            console.log('� No lesson ID, progress not saved');
             return false;
         }
         
@@ -144,35 +187,54 @@ export class LessonProgress {
         this.progressData.last_updated = new Date().toISOString();
         
         try {
-            if (this.db) {
-                // Save to Firebase
-                await this.db
-                    .collection('user_progress')
-                    .doc(this.userId)
-                    .collection('lessons')
-                    .doc(this.lessonId)
-                    .set(this.progressData, { merge: true });
-                
-                console.log('💾 Progress saved to Firebase');
-            } else {
-                // Fallback to API
-                const response = await fetch(`/api/lessons/${this.lessonId}/progress`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(this.progressData)
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`API save failed: ${response.status}`);
-                }
-                
+            // Always try API first (works for both authenticated and dev users)
+            const response = await fetch(`/api/lessons/${this.lessonId}/progress`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache'
+                },
+                body: JSON.stringify({
+                    progress: this.progressData.progress,
+                    completed: this.progressData.progress >= 100,
+                    completed_blocks: this.progressData.completed_blocks,
+                    time_spent: this.progressData.time_spent,
+                    last_updated: this.progressData.last_updated,
+                    assessment_scores: this.progressData.assessment_scores,
+                    assessment_attempts: this.progressData.assessment_attempts
+                })
+            });
+            
+            if (response.ok) {
                 console.log('💾 Progress saved via API');
+                
+                // Also save to localStorage as backup
+                localStorage.setItem(
+                    `lesson_${this.lessonId}_progress`, 
+                    JSON.stringify(this.progressData)
+                );
+                
+                return true;
+            } else {
+                const errorText = await response.text();
+                throw new Error(`API save failed: ${response.status} - ${errorText}`);
             }
             
-            return true;
         } catch (error) {
             console.error(`❌ Error saving progress for lesson ${this.lessonId}:`, error);
-            return false;
+            
+            // Fallback: save to localStorage only
+            try {
+                localStorage.setItem(
+                    `lesson_${this.lessonId}_progress`, 
+                    JSON.stringify(this.progressData)
+                );
+                console.log('💾 Progress saved to localStorage as fallback');
+                return true;
+            } catch (localError) {
+                console.error('❌ Failed to save to localStorage:', localError);
+                return false;
+            }
         }
     }
     
@@ -307,6 +369,71 @@ export class LessonProgress {
         });
     }
     
+    /**
+     * Start assessment for a specific block
+     */
+    startBlockAssessment(blockId) {
+        if (this.assessmentTracker.initialized) {
+            return this.assessmentTracker.startBlockAssessment(blockId);
+        }
+        return true;
+    }
+    
+    /**
+     * Check if a block requires assessment
+     */
+    blockRequiresAssessment(blockId) {
+        if (!this.assessmentTracker.initialized) {
+            return false;
+        }
+        
+        const progress = this.assessmentTracker.getBlockAssessmentProgress(blockId);
+        return progress ? progress.requiresAssessment : false;
+    }
+    
+    /**
+     * Get assessment progress for a block
+     */
+    getBlockAssessmentProgress(blockId) {
+        if (!this.assessmentTracker.initialized) {
+            return null;
+        }
+        
+        return this.assessmentTracker.getBlockAssessmentProgress(blockId);
+    }
+    
+    /**
+     * Reset assessment for a block (for retries)
+     */
+    resetBlockAssessment(blockId) {
+        if (this.assessmentTracker.initialized) {
+            return this.assessmentTracker.resetBlockAssessment(blockId);
+        }
+        return false;
+    }
+    
+    /**
+     * Get overall lesson assessment progress
+     */
+    getLessonAssessmentProgress() {
+        if (!this.assessmentTracker.initialized) {
+            return null;
+        }
+        
+        return this.assessmentTracker.getLessonAssessmentProgress();
+    }
+    
+    /**
+     * Evaluate assessment results for a block
+     */
+    async evaluateBlockAssessment(blockId, results) {
+        if (!this.assessmentTracker.initialized) {
+            return true; // If no assessment tracker, allow completion
+        }
+        
+        return await this.assessmentTracker.evaluateBlockCompletion(blockId, results);
+    }
+    
     // Debugging helper
     getProgressInfo() {
         return {
@@ -314,7 +441,9 @@ export class LessonProgress {
             userId: this.userId,
             progressData: this.progressData,
             totalBlocks: this.getTotalBlocks(),
-            timeSpent: Math.floor((Date.now() - this.startTime) / 1000)
+            timeSpent: Math.floor((Date.now() - this.startTime) / 1000),
+            assessmentProgress: this.getLessonAssessmentProgress(),
+            assessmentStats: this.assessmentTracker.initialized ? this.assessmentTracker.getAssessmentStats() : null
         };
     }
 }

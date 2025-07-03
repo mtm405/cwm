@@ -1,0 +1,170 @@
+# 📋 Daily Progress Tracking Checklist
+
+**Project**: Lesson System Overhaul  
+**Start Date**: July 3, 2025  
+**Current Phase**: Phase 1 - Critical Fixes
+
+---
+
+## 🎯 **CURRENT SPRINT: PHASE 1 - Critical Fixes**
+
+### **Day 1 Goals (Today)**
+- [ ] **1.1.1** Fix `LessonProgress.saveProgress()` method
+  - [ ] Investigate current API call structure
+  - [ ] Add proper POST/PUT call to `/api/lessons/{id}/progress`
+  - [ ] Test with network inspector
+  - [ ] Handle success/error responses
+
+- [ ] **1.1.2** Fix `markBlockComplete()` method  
+  - [ ] Add call to `/api/lessons/{id}/complete-block`
+  - [ ] Update local state immediately
+  - [ ] Test block completion persistence
+
+**Target**: Progress persists across page reloads ✅
+
+### **Day 2 Goals**
+- [ ] **1.1.3** Fix progress loading on page initialization
+- [ ] **1.2.1** Fix overall progress bar calculation
+- [ ] **1.2.2** Fix progress bar UI updates
+- [ ] Test complete Phase 1 functionality
+
+**Target**: Progress system fully working ✅
+
+---
+
+## ⏱️ **TIME TRACKING**
+
+### **Phase 1 Estimates:**
+- Progress Persistence: 4-6 hours
+- Progress Bar Fix: 2-3 hours
+- Testing & Polish: 1-2 hours
+- **Total Phase 1**: 7-11 hours
+
+### **Daily Time Log:**
+**Day 1**: ___ hours spent
+- Task: ________________
+- Issues encountered: ________________
+- Completed: [ ] Yes [ ] No
+
+**Day 2**: ___ hours spent  
+- Task: ________________
+- Issues encountered: ________________
+- Completed: [ ] Yes [ ] No
+
+---
+
+## 🔍 **IMMEDIATE DEBUGGING CHECKLIST**
+
+### **Before Starting Development:**
+- [ ] Create branch: `git checkout -b fix/lesson-progress-overhaul`
+- [ ] Run Flask app and test current progress system
+- [ ] Open browser dev tools → Network tab
+- [ ] Navigate to a lesson and try completing a block
+- [ ] Document what API calls are currently being made (if any)
+
+### **Progress Persistence Investigation:**
+- [ ] Check if `/api/lessons/{id}/progress` GET endpoint works
+- [ ] Check if `/api/lessons/{id}/complete-block` POST endpoint works  
+- [ ] Test with Postman/Thunder Client if needed
+- [ ] Identify where the frontend should be calling these APIs
+
+### **Frontend Investigation:**
+- [ ] Find `LessonProgress.saveProgress()` method location
+- [ ] Find `markBlockComplete()` method location
+- [ ] Check what happens when "Mark as Complete" button is clicked
+- [ ] Verify if localStorage is being used as fallback
+
+---
+
+## 🚨 **CRITICAL ISSUES TO SOLVE**
+
+### **Issue 1: Progress Not Persisting**
+**Current Behavior**: Progress resets on page reload  
+**Expected Behavior**: Progress persists across sessions  
+**Investigation**: 
+- [ ] Check network calls when completing blocks
+- [ ] Verify backend API endpoints are functional
+- [ ] Find where progress should be saved/loaded
+
+### **Issue 2: Progress Bar Shows 0%**  
+**Current Behavior**: Always shows 0% even with completed blocks  
+**Expected Behavior**: Shows actual completion percentage  
+**Investigation**:
+- [ ] Check progress calculation formula
+- [ ] Verify completed_blocks array is populated
+- [ ] Check if UI is reading the correct data
+
+### **Issue 3: Topics Not Displayed**
+**Current Behavior**: Linear block display  
+**Expected Behavior**: Topic/section navigation  
+**Investigation**:
+- [ ] Check lesson data structure in Firebase
+- [ ] See if topic information exists in lesson data
+- [ ] Check template rendering logic
+
+---
+
+## ✅ **COMPLETION CRITERIA**
+
+### **Phase 1 Complete When:**
+- [ ] Complete a lesson block → reload page → block still completed
+- [ ] Progress bar shows correct percentage based on completed blocks
+- [ ] Network tab shows successful API calls to save progress
+- [ ] Error handling works when network is unavailable
+- [ ] All existing functionality still works
+
+### **Ready for Phase 2 When:**
+- [ ] All Phase 1 tests pass
+- [ ] No regression in existing features
+- [ ] Performance is acceptable (< 2 second page loads)
+- [ ] Works on both desktop and mobile
+
+---
+
+## 🛠️ **DEVELOPMENT SETUP**
+
+### **Files to Keep Open:**
+- `static/js/modules/lessonCore.js`
+- `static/js/lesson/components/LessonProgress.js` (if exists)
+- `routes/lesson_api.py`
+- `templates/lesson.html`
+- Browser Dev Tools (Network & Console tabs)
+
+### **Testing URLs:**
+- Development: `http://localhost:5000/lesson/python-basics-01`
+- Test different lessons to ensure general functionality
+
+### **Git Workflow:**
+```bash
+# Daily workflow
+git add .
+git commit -m "fix: progress persistence - [specific change]"
+git push origin fix/lesson-progress-overhaul
+
+# When phase complete
+git checkout main
+git merge fix/lesson-progress-overhaul
+git push origin main
+```
+
+---
+
+## 📊 **DAILY REVIEW QUESTIONS**
+
+### **End of Day Review:**
+1. **What did I accomplish today?**
+2. **What issues did I encounter?**
+3. **What needs to be done tomorrow?**
+4. **Any blockers or concerns?**
+5. **Is the timeline still realistic?**
+
+### **Weekly Review:**
+1. **Did we complete the planned phase?**
+2. **What went better/worse than expected?**
+3. **Any scope changes needed?**
+4. **User testing feedback received?**
+5. **Ready for next phase?**
+
+---
+
+**🚀 Ready to start Phase 1! Let's fix those critical progress issues first.**

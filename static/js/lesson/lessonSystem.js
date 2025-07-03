@@ -70,8 +70,8 @@ export class LessonSystem {
             // Initialize interactions
             this.interactions.initialize(this.lessonData, this.userProgress);
             
-            // Set up progress tracking
-            this.progress.initialize(this.lessonId, this.userProgress, this.currentUser?.id);
+            // Set up progress tracking with assessment validation
+            this.progress.initialize(this.lessonId, this.userProgress, this.currentUser?.id, this.lessonData);
             
             // Set up quiz event listeners
             this.setupQuizEventListeners();
@@ -200,22 +200,42 @@ export class LessonSystem {
     
     async handleQuizCompletion(blockId, results) {
         try {
-            // Mark block as completed if quiz was passed
-            if (results.passed) {
-                await this.markBlockComplete(blockId);
+            // Prepare assessment results for the progress tracker
+            const assessmentResults = {
+                score: results.score,
+                passed: results.passed,
+                attempts: (this.userProgress.quizResults?.[blockId]?.attempts || 0) + 1,
+                tests_passed: results.correct_answers || 0,
+                total_tests: results.total_questions || 0,
+                success: results.passed,
+                error: null,
+                output: results.feedback || null,
+                timestamp: Date.now()
+            };
+            
+            // Try to mark block as completed with assessment results
+            const completed = await this.progress.markBlockComplete(blockId, assessmentResults);
+            
+            if (completed) {
+                console.log(`✅ Block ${blockId} completed with quiz results`);
+                
+                // Update quiz-specific progress
+                await this.updateQuizResults(blockId, results);
+                
+                // Update progress display
+                this.updateProgressDisplay();
+                
+                // Show completion notification
+                this.showCompletionNotification(blockId, results);
+            } else {
+                console.log(`❌ Block ${blockId} not completed - assessment requirements not met`);
+                
+                // Show assessment feedback
+                const assessmentProgress = this.progress.getBlockAssessmentProgress(blockId);
+                if (assessmentProgress) {
+                    this.showAssessmentFeedback(blockId, assessmentProgress, results);
+                }
             }
-            
-            // Update quiz-specific progress
-            await this.updateQuizResults(blockId, results);
-            
-            // Save progress
-            await this.saveProgress();
-            
-            // Update progress display
-            this.updateProgressDisplay();
-            
-            // Show completion notification
-            this.showCompletionNotification(blockId, results);
             
         } catch (error) {
             console.error('❌ Failed to handle quiz completion:', error);
@@ -278,6 +298,27 @@ export class LessonSystem {
             : `📚 Quiz completed. Score: ${Math.round(results.score)}%. Keep learning!`;
         
         this.showNotification(results.passed ? 'success' : 'info', 'Quiz Completed', message);
+    }
+    
+    showAssessmentFeedback(blockId, assessmentProgress, results) {
+        const { canRetry, attempts, maxAttempts } = assessmentProgress;
+        
+        let message = '';
+        let type = 'warning';
+        
+        if (canRetry) {
+            const attemptsRemaining = maxAttempts - attempts;
+            message = `Assessment not passed. You have ${attemptsRemaining} attempt${attemptsRemaining !== 1 ? 's' : ''} remaining.`;
+            
+            if (results.score < 70) {
+                message += ` You need at least 70% to pass. Review the material and try again.`;
+            }
+        } else {
+            message = `Assessment not passed. You've used all ${maxAttempts} attempts. Please review the material and ask for help if needed.`;
+            type = 'error';
+        }
+        
+        this.showNotification(type, 'Assessment Feedback', message);
     }
     
     showNotification(type, title, message) {
@@ -417,8 +458,8 @@ export class LessonSystem {
     }
     
     // Event handlers for lesson interactions
-    async markBlockComplete(blockId) {
-        return await this.progress.markBlockComplete(blockId);
+    async markBlockComplete(blockId, assessmentResults = null) {
+        return await this.progress.markBlockComplete(blockId, assessmentResults);
     }
     
     async executeCode(blockId, code) {

@@ -153,18 +153,31 @@ def update_lesson_progress(lesson_id):
         if not data:
             return jsonify({'error': 'No data provided'}), 400
         
+        # Extract assessment data
+        assessment_scores = data.get('assessment_scores', {})
+        assessment_attempts = data.get('assessment_attempts', {})
+        completed_blocks = data.get('completed_blocks', [])
+        
         # Update progress in user model
         success = update_lesson_progress(
             user['uid'],
             lesson_id,
             data.get('progress', 0),
             data.get('completed', False),
-            data.get('completed_subtopics', []),
-            data.get('time_spent', 0)
+            completed_blocks,
+            data.get('time_spent', 0),
+            assessment_scores,
+            assessment_attempts
         )
         
         if success:
-            return jsonify({'message': 'Progress updated successfully'})
+            return jsonify({
+                'message': 'Progress updated successfully',
+                'progress': data.get('progress', 0),
+                'completed_blocks': completed_blocks,
+                'assessment_scores': assessment_scores,
+                'assessment_attempts': assessment_attempts
+            })
         else:
             return jsonify({'error': 'Failed to update progress'}), 500
             
