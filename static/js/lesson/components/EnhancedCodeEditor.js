@@ -335,6 +335,22 @@ export class EnhancedCodeEditor {
     }
 
     /**
+     * Validate syntax manually (called during initialization)
+     */
+    validateSyntax() {
+        if (!this.editor) return;
+        
+        try {
+            // Trigger ACE's syntax validation
+            const annotations = this.editor.session.getAnnotations();
+            this.handleSyntaxAnnotations(annotations);
+            console.log('✅ Syntax validation completed for', this.editorId);
+        } catch (error) {
+            console.warn('⚠️ Syntax validation failed:', error);
+        }
+    }
+
+    /**
      * Setup keyboard shortcuts
      */
     setupKeyboardShortcuts() {
