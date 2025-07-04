@@ -1,0 +1,154 @@
+<!-- Enhanced Head Template with CSS Splitting and Lazy Loading -->
+<!-- Phase 3A.4: CSS Splitting and Lazy Loading -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google-signin-client_id" content="{{ google_client_id }}">
+<meta name="page" content="{{ request.endpoint.split('.')[-1] if request.endpoint else 'default' }}">
+<title>{% block title %}Code with Morais{% endblock %}</title>
+
+<!-- Critical CSS (Inline) -->
+<style>
+{% if critical_css %}
+{{ critical_css | safe }}
+{% else %}
+/* Fallback critical CSS */
+:root {
+    --primary-color: #3b82f6;
+    --secondary-color: #1e40af;
+    --bg-primary: #ffffff;
+    --text-primary: #1f2937;
+    --font-primary: 'Inter', sans-serif;
+    --header-height: 80px;
+}
+
+body {
+    font-family: var(--font-primary);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    margin: 0;
+    padding-top: var(--header-height);
+}
+
+.loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+{% endif %}
+</style>
+
+<!-- Core CSS (Async Preload) -->
+<link rel="preload" href="{{ url_for('static', filename='css/bundles/core.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="{{ url_for('static', filename='css/bundles/core.css') }}"></noscript>
+
+<!-- Fallback for no-JS -->
+<noscript>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</noscript>
+
+<!-- External CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- CSS Lazy Loader -->
+<script>
+// CSS Loading Configuration
+window.CSS_CONFIG = {
+    page: '{{ request.endpoint.split(".")[-1] if request.endpoint else "default" }}',
+    basePath: '{{ url_for("static", filename="css/bundles/") }}',
+    debug: {{ config.DEBUG | lower if config.DEBUG else 'false' }}
+};
+</script>
+
+<!-- Load CSS Lazy Loader -->
+<script src="{{ url_for('static', filename='js/utils/css-lazy-loader.js') }}" defer></script>
+
+<!-- Initialize CSS Loading -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.cssLoader) {
+        // Enable debug if needed
+        if (window.CSS_CONFIG.debug) {
+            window.cssLoader.setDebug(true);
+        }
+        
+        // Load page-specific CSS
+        window.cssLoader.loadPageCSS(window.CSS_CONFIG.page);
+        
+        // Preload likely next pages
+        const currentPage = window.CSS_CONFIG.page;
+        if (currentPage === 'dashboard' || currentPage === 'index') {
+            window.cssLoader.preloadBundles(['lessons', 'ui']);
+        } else if (currentPage === 'lesson') {
+            window.cssLoader.preloadBundles(['dashboard', 'ui']);
+        }
+    }
+});
+</script>
+
+<!-- Page-specific CSS preload hints -->
+{% if request.endpoint == 'main.index' or request.endpoint == 'main.dashboard' %}
+    <link rel="preload" href="{{ url_for('static', filename='css/bundles/dashboard.css') }}" as="style">
+    <link rel="preload" href="{{ url_for('static', filename='css/bundles/ui.css') }}" as="style">
+{% elif request.endpoint == 'main.lesson' or request.endpoint == 'main.lesson_new' %}
+    <link rel="preload" href="{{ url_for('static', filename='css/bundles/lessons.css') }}" as="style">
+    <link rel="preload" href="{{ url_for('static', filename='css/bundles/ui.css') }}" as="style">
+{% elif request.endpoint == 'auth.login' or request.endpoint == 'auth.register' %}
+    <link rel="preload" href="{{ url_for('static', filename='css/bundles/auth.css') }}" as="style">
+{% endif %}
+
+<!-- JS: Core and Modular Loading -->
+<!-- Core JS (always loaded) -->
+<script src="{{ url_for('static', filename='js/core/config.js') }}" type="module"></script>
+<script src="{{ url_for('static', filename='js/core/constants.js') }}" type="module"></script>
+<script src="{{ url_for('static', filename='js/core/utils.js') }}" type="module"></script>
+<script src="{{ url_for('static', filename='js/core/eventBus.js') }}" type="module"></script>
+<script src="{{ url_for('static', filename='js/core/app.js') }}" type="module"></script>
+
+<!-- Modular JS (load as needed) -->
+<script src="{{ url_for('static', filename='js/modules/app-utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/modules/theme-manager.js') }}"></script>
+<script src="{{ url_for('static', filename='js/modules/auth-manager.js') }}"></script>
+<script src="{{ url_for('static', filename='js/modules/navigation-manager.js') }}"></script>
+
+<!-- Auth and Google: Load Google Identity Services first -->
+<script src="https://accounts.google.com/gsi/client" async defer onload="initGoogleAuth()"></script>
+<script src="{{ url_for('static', filename='js/auth/google-auth.js') }}"></script>
+<script src="{{ url_for('static', filename='js/auth/google-buttons.js') }}"></script>
+
+<script>
+function initGoogleAuth() {
+    console.log('🔐 Google Identity Services loaded, initializing auth...');
+    if (window.GoogleAuth && window.CONFIG) {
+        window.GoogleAuth.init();
+    }
+}
+</script>
+
+<!-- Performance Monitoring -->
+<script>
+// CSS Performance Monitoring
+window.addEventListener('load', function() {
+    if (window.performance && window.cssLoader) {
+        const stats = window.cssLoader.getStats();
+        console.log('📊 CSS Loading Stats:', stats);
+        
+        // Report to analytics if available
+        if (window.gtag) {
+            gtag('event', 'css_load_complete', {
+                'loaded_bundles': stats.loadedBundles.length,
+                'page': window.CSS_CONFIG.page
+            });
+        }
+    }
+});
+</script>
+
+{% block extra_css %}{% endblock %}

@@ -1,0 +1,101 @@
+{
+  "version": "1.0.0",
+  "generated": "2025-07-04T00:45:20.443Z",
+  "bundles": {
+    "critical": {
+      "file": "critical.css",
+      "size": 164899,
+      "priority": "high",
+      "loadStrategy": "blocking"
+    },
+    "core": {
+      "file": "core.css",
+      "size": 29863,
+      "priority": "high",
+      "loadStrategy": "async"
+    },
+    "dashboard": {
+      "file": "dashboard.css",
+      "size": 37832,
+      "priority": "medium",
+      "loadStrategy": "lazy"
+    },
+    "lessons": {
+      "file": "lessons.css",
+      "size": 75647,
+      "priority": "medium",
+      "loadStrategy": "lazy"
+    },
+    "auth": {
+      "file": "auth.css",
+      "size": 17268,
+      "priority": "medium",
+      "loadStrategy": "lazy"
+    },
+    "ui": {
+      "file": "ui.css",
+      "size": 55883,
+      "priority": "low",
+      "loadStrategy": "lazy"
+    },
+    "utils": {
+      "file": "utils.css",
+      "size": 16642,
+      "priority": "low",
+      "loadStrategy": "lazy"
+    }
+  },
+  "pages": {
+    "dashboard": [
+      "critical",
+      "core",
+      "dashboard",
+      "ui"
+    ],
+    "index": [
+      "critical",
+      "core",
+      "dashboard",
+      "ui"
+    ],
+    "lesson": [
+      "critical",
+      "core",
+      "lessons",
+      "ui"
+    ],
+    "lesson_new": [
+      "critical",
+      "core",
+      "lessons",
+      "ui"
+    ],
+    "auth": [
+      "critical",
+      "core",
+      "auth",
+      "ui"
+    ],
+    "login": [
+      "critical",
+      "core",
+      "auth"
+    ],
+    "register": [
+      "critical",
+      "core",
+      "auth"
+    ],
+    "profile": [
+      "critical",
+      "core",
+      "ui",
+      "utils"
+    ],
+    "default": [
+      "critical",
+      "core",
+      "ui"
+    ]
+  }
+}

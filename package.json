@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A project configured to detect and catch errors",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
@@ -15,7 +16,21 @@
     "audit": "npm audit",
     "audit:fix": "npm audit fix",
     "check-all": "npm run lint && npm run type-check && npm run test && npm run audit",
-    "pre-commit": "npm run lint:fix && npm run type-check && npm run test"
+    "pre-commit": "npm run lint:fix && npm run type-check && npm run test",
+    "build-css": "postcss static/css/main.css -o static/css/main.min.css --verbose",
+    "build-css-all": "postcss 'static/css/**/*.css' --dir static/css/dist --verbose",
+    "watch-css": "postcss static/css/main.css -o static/css/main.min.css --watch --verbose",
+    "css-size": "node scripts/css-size-check.js",
+    "extract-critical": "node scripts/extract-critical-css.js",
+    "purge-css": "node scripts/purge-css.js",
+    "generate-css-bundles": "node scripts/generate-css-bundles.js",
+    "extract-critical-bundles": "node scripts/extract-critical-bundles.js",
+    "analyze-css-bundles": "node scripts/analyze-css-bundles.js",
+    "css-optimize": "npm run build-css-all && npm run extract-critical && npm run css-size",
+    "css-optimize-full": "npm run build-css-all && npm run extract-critical && npm run purge-css && npm run css-size",
+    "css-split": "npm run generate-css-bundles && npm run extract-critical-bundles && npm run css-optimize-full",
+    "css-split-dev": "npm run generate-css-bundles && npm run extract-critical-bundles",
+    "css-split-analyze": "npm run css-split-dev && npm run analyze-css-bundles"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.0.0",

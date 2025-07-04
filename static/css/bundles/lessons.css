@@ -1,0 +1,3126 @@
+/* CSS Bundle: lessons */
+/* Generated on: 2025-07-04T00:45:20.314Z */
+/* Priority: medium */
+/* Load Strategy: lazy */
+
+/* === static/css/components/lesson.css === */
+/**
+ * Lesson Template CSS - Code with Morais
+ * Dynamic lesson page styling following Implementation Plan
+ * Extends dashboard.css patterns for consistency
+ */
+
+/* =========================================
+   🏗️ LESSON CONTAINER & LAYOUT
+   ========================================= */
+
+.lesson-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    min-height: 100vh;
+    background: var(--bg-color, #ffffff);
+    color: var(--text-color, #333333);
+}
+
+/* =========================================
+   📊 LESSON HEADER SECTION
+   ========================================= */
+
+.lesson-header {
+    background: linear-gradient(135deg, var(--primary-color, #3498db) 0%, var(--secondary-color, #2980b9) 100%);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(52, 152, 219, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+.lesson-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M30 30c0-11.046-8.954-20-20-20s-20 8.954-20 20 8.954 20 20 20 20-8.954 20-20zm-20-18c9.941 0 18 8.059 18 18s-8.059 18-18 18S-8 38.941-8 30s8.059-18 18-18z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+    pointer-events: none;
+}
+
+.lesson-header-content {
+    position: relative;
+    z-index: 2;
+}
+
+.lesson-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.lesson-title {
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    line-height: 1.2;
+}
+
+.lesson-title i {
+    font-size: 1.75rem;
+    opacity: 0.9;
+}
+
+.lesson-badges {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.lesson-badges > span {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.lesson-badges > span:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.difficulty-badge.beginner {
+    background: rgba(46, 204, 113, 0.2);
+    border-color: rgba(46, 204, 113, 0.5);
+}
+
+.difficulty-badge.intermediate {
+    background: rgba(241, 196, 15, 0.2);
+    border-color: rgba(241, 196, 15, 0.5);
+}
+
+.difficulty-badge.advanced {
+    background: rgba(231, 76, 60, 0.2);
+    border-color: rgba(231, 76, 60, 0.5);
+}
+
+/* =========================================
+   📊 PROGRESS BAR SECTION  
+   ========================================= */
+
+.progress-section {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.progress-text {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.progress-percentage {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.progress-bar-container {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.progress-bar {
+    background: rgba(255, 255, 255, 0.2);
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    background: linear-gradient(90deg, #2ecc71 0%, #27ae60 100%);
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.progress-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.875rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+/* =========================================
+   🗂️ SUBTOPIC NAVIGATION
+   ========================================= */
+
+.subtopic-navigation {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.subtopic-tabs {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 0.5rem 0;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.subtopic-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.subtopic-tab {
+    background: var(--bg-light, #f8f9fa);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 0.75rem 1.25rem;
+    font-weight: 500;
+    color: var(--text-muted, #6c757d);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    scroll-snap-align: start;
+    min-width: fit-content;
+    position: relative;
+}
+
+.subtopic-tab:hover {
+    background: var(--primary-light, #e3f2fd);
+    color: var(--primary-color, #3498db);
+    transform: translateY(-2px);
+}
+
+.subtopic-tab.active {
+    background: var(--primary-color, #3498db);
+    color: white;
+    border-color: var(--primary-dark, #2980b9);
+}
+
+.subtopic-tab.completed .tab-check {
+    color: #2ecc71;
+    opacity: 1;
+}
+
+.tab-check {
+    opacity: 0.3;
+    transition: all 0.3s ease;
+}
+
+.subtopic-tab.active .tab-check {
+    color: white;
+    opacity: 1;
+}
+
+/* =========================================
+   📚 DYNAMIC CONTENT BLOCKS CONTAINER
+   ========================================= */
+
+.lesson-content-wrapper {
+    position: relative;
+    min-height: 400px;
+}
+
+.lesson-content {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: 1fr;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Content Loading States */
+.content-loading {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    opacity: 0.7;
+}
+
+.skeleton-loader {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 8px;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.skeleton-header {
+    height: 60px;
+    margin-bottom: 1rem;
+}
+
+.skeleton-content {
+    height: 200px;
+    margin-bottom: 2rem;
+}
+
+/* Loading Placeholder for Content */
+.loading-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    min-height: 300px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--primary-color, #3498db);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-placeholder p {
+    color: var(--text-muted, #666);
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* Fallback Content */
+.fallback-content {
+    text-align: center;
+    padding: 3rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* =========================================
+   🧱 CONTENT BLOCK BASE STYLES
+   ========================================= */
+
+.content-block {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.content-block::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--block-color, #3498db);
+    transition: all 0.3s ease;
+}
+
+.content-block:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    border-color: var(--block-color, #3498db);
+}
+
+.block-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.block-icon {
+    font-size: 1.5rem;
+    color: var(--block-color, #3498db);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    background: var(--block-color-light, rgba(52, 152, 219, 0.1));
+    border-radius: 8px;
+}
+
+.block-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.block-type {
+    background: var(--block-color-light, rgba(52, 152, 219, 0.1));
+    color: var(--block-color, #3498db);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* =========================================
+   🎨 VISUAL PROGRESS STATE INDICATORS
+   ========================================= */
+
+.block-progress-indicator {
+    font-size: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.content-block[data-status="not-started"] .block-progress-indicator {
+    color: #bdc3c7; /* ⭕ Not Started */
+}
+
+.content-block[data-status="in-progress"] .block-progress-indicator {
+    color: #f39c12; /* ⏳ In Progress */
+    animation: pulse 2s infinite;
+}
+
+.content-block[data-status="completed"] .block-progress-indicator {
+    color: #2ecc71; /* ✅ Completed */
+}
+
+.content-block[data-status="locked"] .block-progress-indicator {
+    color: #7f8c8d; /* 🔒 Locked */
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* =========================================
+   📝 TEXT BLOCK STYLES
+   ========================================= */
+
+.text-block {
+    --block-color: #2c3e50;
+    --block-color-light: rgba(44, 62, 80, 0.1);
+}
+
+.text-block .text-content {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--text-color, #333);
+}
+
+.text-block .text-content h1,
+.text-block .text-content h2,
+.text-block .text-content h3,
+.text-block .text-content h4 {
+    color: var(--block-color);
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.text-block .text-content p {
+    margin-bottom: 1.5rem;
+}
+
+.text-block .key-points {
+    background: rgba(44, 62, 80, 0.05);
+    border-left: 4px solid var(--block-color);
+    padding: 1.5rem;
+    border-radius: 0 8px 8px 0;
+    margin-top: 2rem;
+}
+
+.text-block .key-points h4 {
+    color: var(--block-color);
+    margin-top: 0;
+}
+
+.text-block .key-points ul {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+}
+
+.text-block .key-points li {
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+/* =========================================
+   💻 CODE EXAMPLE BLOCK STYLES
+   ========================================= */
+
+.code-example-block {
+    --block-color: #8e44ad;
+    --block-color-light: rgba(142, 68, 173, 0.1);
+}
+
+.code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--block-color);
+    color: white;
+    padding: 1rem 1.5rem;
+    margin: -1rem -1rem 1rem -1rem;
+    border-radius: 8px 8px 0 0;
+}
+
+.code-title {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.code-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-copy,
+.btn-run {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-copy:hover,
+.btn-run:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.code-container {
+    position: relative;
+}
+
+.lesson-container .code-content {
+    background: #2d3748;
+    color: #e2e8f0;
+    padding: 1.5rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.code-explanation {
+    background: var(--block-color-light);
+    border-left: 4px solid var(--block-color);
+    padding: 1.5rem;
+    border-radius: 0 8px 8px 0;
+    margin-top: 1rem;
+}
+
+.code-explanation h5 {
+    color: var(--block-color);
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.lesson-container .code-output {
+    background: #1a202c;
+    color: #e2e8f0;
+    border-radius: 8px;
+    margin-top: 1rem;
+    overflow: hidden;
+}
+
+/* =========================================
+   🎮 INTERACTIVE BLOCK STYLES
+   ========================================= */
+
+.interactive-block {
+    --block-color: #e67e22;
+    --block-color-light: rgba(230, 126, 34, 0.1);
+}
+
+.challenge-meta {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.challenge-type,
+.difficulty {
+    background: var(--block-color-light);
+    color: var(--block-color);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.challenge-instructions {
+    background: var(--block-color-light);
+    border-left: 4px solid var(--block-color);
+    padding: 1.5rem;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 2rem;
+}
+
+.challenge-instructions h4 {
+    color: var(--block-color);
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.requirements {
+    margin-top: 1.5rem;
+}
+
+.requirements h5 {
+    color: var(--block-color);
+    margin-bottom: 1rem;
+}
+
+.requirements ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.requirements li {
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.lesson-container .code-editor-wrapper {
+    background: #1a202c;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.lesson-container .editor-toolbar {
+    background: #2d3748;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #4a5568;
+}
+
+.editor-label {
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.editor-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-hint,
+.btn-reset {
+    background: rgba(230, 126, 34, 0.2);
+    border: 1px solid rgba(230, 126, 34, 0.3);
+    color: #e67e22;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-hint:hover,
+.btn-reset:hover {
+    background: rgba(230, 126, 34, 0.3);
+    transform: translateY(-2px);
+}
+
+.lesson-container .code-editor {
+    min-height: 300px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9rem;
+    background: #1a202c;
+    color: #e2e8f0;
+}
+
+.lesson-container .editor-footer {
+    background: #2d3748;
+    padding: 1rem 1.5rem;
+    display: flex;
+    gap: 1rem;
+    border-top: 1px solid #4a5568;
+}
+
+.btn-primary {
+    background: var(--block-color);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary:hover {
+    filter: brightness(0.9);
+    transform: translateY(-2px);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid var(--block-color);
+    color: var(--block-color);
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-outline:hover {
+    background: var(--block-color);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* =========================================
+   🧭 LESSON NAVIGATION FOOTER
+   ========================================= */
+
+.lesson-navigation {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-top: 3rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.nav-buttons {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 2rem;
+    align-items: center;
+}
+
+.nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: var(--bg-light, #f8f9fa);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text-color, #333);
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.nav-btn:hover {
+    background: var(--primary-light, #e3f2fd);
+    border-color: var(--primary-color, #3498db);
+    color: var(--primary-color, #3498db);
+    transform: translateY(-2px);
+}
+
+.prev-btn {
+    justify-self: start;
+}
+
+.next-btn {
+    justify-self: end;
+    flex-direction: row-reverse;
+}
+
+.nav-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.nav-text small {
+    color: var(--text-muted, #6c757d);
+    font-size: 0.875rem;
+}
+
+.nav-text strong {
+    color: var(--text-color, #333);
+    font-size: 1rem;
+}
+
+.nav-center {
+    justify-self: center;
+}
+
+.lesson-menu-btn {
+    background: var(--primary-color, #3498db);
+    border: none;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+}
+
+.lesson-menu-btn:hover {
+    background: var(--primary-dark, #2980b9);
+    transform: translateY(-2px);
+}
+
+/* =========================================
+   📱 RESPONSIVE BREAKPOINTS
+   ========================================= */
+
+@media (max-width: 768px) {
+    .lesson-container {
+        padding: 1rem;
+    }
+    
+    .lesson-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .lesson-title {
+        font-size: 1.5rem;
+        justify-content: center;
+    }
+    
+    .lesson-meta {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .lesson-badges {
+        justify-content: center;
+    }
+    
+    .content-block {
+        padding: 1.5rem;
+    }
+    
+    .block-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .nav-buttons {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .prev-btn,
+    .next-btn {
+        justify-self: stretch;
+        text-align: center;
+        justify-content: center;
+    }
+    
+    .nav-center {
+        order: -1;
+        justify-self: stretch;
+    }
+    
+    .subtopic-tabs {
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .subtopic-tab {
+        scroll-snap-align: start;
+        min-width: max-content;
+    }
+}
+
+/* === End static/css/components/lesson.css === */
+
+/* === static/css/components/lesson-block-types.css === */
+/**
+ * Enhanced Block Type Styles - Phase 2 UI Improvements
+ * Specific styling for different lesson content types
+ * Code with Morais - July 3, 2025
+ */
+
+/* ================================
+   CODE EXAMPLE BLOCKS
+   ================================ */
+.code_example-block .block-content,
+.code-example-block .block-content {
+    padding: 0; /* Remove default padding for code blocks */
+}
+
+.code-container {
+    position: relative;
+    background: var(--code-block-bg, #1A202C);
+    border-radius: 8px;
+    margin: var(--block-padding);
+    overflow: hidden;
+}
+
+.code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.code-title {
+    color: var(--code-block-text, #E2E8F0);
+    font-size: 0.875rem;
+    font-weight: var(--font-weight-medium);
+}
+
+.language-badge {
+    background: var(--code-block-primary, #319795);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.btn-copy {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--code-block-text, #E2E8F0);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    transition: all var(--animation-fast);
+}
+
+.btn-copy:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.code-content {
+    margin: 0;
+    padding: 1.25rem;
+    background: transparent;
+    overflow-x: auto;
+}
+
+.code-content code {
+    color: var(--code-block-text, #E2E8F0);
+    font-family: var(--font-mono, 'Fira Code', monospace);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    background: transparent;
+    padding: 0;
+}
+
+.code-explanation {
+    padding: 1rem var(--block-padding);
+    background: rgba(49, 151, 149, 0.05);
+    border-top: 1px solid var(--code-block-primary, #319795);
+    margin-top: 0;
+}
+
+.code-explanation h4 {
+    color: var(--code-block-primary, #319795);
+    margin: 0 0 0.5rem 0;
+    font-size: 0.875rem;
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.code-explanation p {
+    margin: 0;
+    color: var(--lesson-text-primary, #2D3748);
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+/* ================================
+   INTERACTIVE CODE BLOCKS
+   ================================ */
+.interactive-block .challenge-instructions {
+    background: rgba(16, 185, 129, 0.05);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.challenge-instructions h4 {
+    color: var(--interactive-accent);
+    margin: 0 0 0.75rem 0;
+    font-size: 1rem;
+    font-weight: var(--font-weight-semibold);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.challenge-instructions p {
+    margin: 0;
+    color: var(--lesson-text-primary, #2D3748);
+    line-height: 1.6;
+}
+
+.requirements {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.requirements h5 {
+    color: var(--interactive-accent);
+    margin: 0 0 0.5rem 0;
+    font-size: 0.875rem;
+    font-weight: var(--font-weight-semibold);
+}
+
+.requirements ul {
+    margin: 0;
+    padding-left: 1.25rem;
+    color: var(--lesson-text-primary, #374151);
+}
+
+.requirements li {
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.code-editor-wrapper {
+    background: #1e293b;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    border: 1px solid #374151;
+}
+
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.editor-title {
+    color: #e2e8f0;
+    font-size: 0.875rem;
+    font-weight: var(--font-weight-medium);
+}
+
+.editor-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.code-editor {
+    width: 100%;
+    min-height: 150px;
+    padding: 1rem;
+    background: transparent;
+    border: none;
+    color: #e2e8f0;
+    font-family: var(--font-mono, 'Fira Code', monospace);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    resize: vertical;
+    outline: none;
+}
+
+.code-editor:focus {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.code-output {
+    margin-top: 1rem;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--block-border);
+}
+
+.output-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: rgba(107, 114, 128, 0.1);
+    border-bottom: 1px solid var(--block-border);
+    font-size: 0.875rem;
+    font-weight: var(--font-weight-medium);
+    color: var(--lesson-text-primary, #374151);
+}
+
+.output-content {
+    padding: 1rem;
+    background: var(--block-bg);
+    font-family: var(--font-mono, 'Fira Code', monospace);
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+.output-success {
+    border-left: 4px solid var(--assessment-success);
+    background: rgba(16, 185, 129, 0.05);
+}
+
+.output-error {
+    border-left: 4px solid var(--assessment-error);
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.output-loading {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--text-secondary, #6b7280);
+    padding: 1rem;
+}
+
+.output-loading i {
+    color: var(--lesson-primary, #6366f1);
+}
+
+/* ================================
+   QUIZ BLOCKS
+   ================================ */
+.quiz-intro {
+    background: rgba(245, 158, 11, 0.05);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.quiz-intro p {
+    margin: 0;
+    color: var(--lesson-text-primary, #374151);
+    font-weight: var(--font-weight-medium);
+}
+
+.quiz-container {
+    position: relative;
+}
+
+.quiz-question {
+    margin-bottom: 1.5rem;
+}
+
+.quiz-question h4 {
+    color: var(--lesson-text-primary, #1f2937);
+    margin: 0 0 1rem 0;
+    font-size: 1.125rem;
+    font-weight: var(--font-weight-semibold);
+    line-height: 1.4;
+}
+
+.quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.quiz-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(248, 250, 252, 0.8);
+    border: 1px solid var(--block-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all var(--animation-fast);
+    position: relative;
+    overflow: hidden;
+}
+
+.quiz-option:hover {
+    background: rgba(99, 102, 241, 0.05);
+    border-color: var(--lesson-primary, #6366f1);
+    transform: translateX(4px);
+}
+
+.quiz-option.selected {
+    background: rgba(99, 102, 241, 0.1);
+    border-color: var(--lesson-primary, #6366f1);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.quiz-option.correct {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: var(--assessment-success);
+    color: var(--assessment-success);
+}
+
+.quiz-option.incorrect {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: var(--assessment-error);
+    color: var(--assessment-error);
+}
+
+.quiz-option input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--block-border);
+    border-radius: 50%;
+    appearance: none;
+    cursor: pointer;
+    position: relative;
+    transition: all var(--animation-fast);
+}
+
+.quiz-option input[type="radio"]:checked {
+    border-color: var(--lesson-primary, #6366f1);
+    background: var(--lesson-primary, #6366f1);
+}
+
+.quiz-option input[type="radio"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+}
+
+.quiz-option label {
+    flex: 1;
+    cursor: pointer;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.quiz-result {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    font-weight: var(--font-weight-medium);
+}
+
+.quiz-result.success {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid var(--assessment-success);
+    color: var(--assessment-success);
+}
+
+.quiz-result.error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--assessment-error);
+    color: var(--assessment-error);
+}
+
+.quiz-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 2rem;
+    color: var(--text-secondary, #6b7280);
+}
+
+.quiz-loading i {
+    color: var(--quiz-accent);
+}
+
+/* ================================
+   KEY POINTS & HIGHLIGHTS
+   ================================ */
+.key-points {
+    background: rgba(139, 92, 246, 0.05);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1.5rem;
+}
+
+.key-points h4 {
+    color: var(--text-accent);
+    margin: 0 0 0.75rem 0;
+    font-size: 0.875rem;
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.key-points ul {
+    margin: 0;
+    padding-left: 1.25rem;
+}
+
+.key-points li {
+    margin-bottom: 0.5rem;
+    color: var(--lesson-text-primary, #374151);
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+.key-points li::marker {
+    color: var(--text-accent);
+}
+
+/* ================================
+   PROGRESS INDICATORS
+   ================================ */
+.progress-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary, #6b7280);
+}
+
+.progress-indicator.reading-time::before {
+    content: '📖';
+    font-size: 1rem;
+}
+
+.progress-indicator.difficulty::before {
+    content: '⭐';
+    font-size: 1rem;
+}
+
+.progress-indicator.estimated-time::before {
+    content: '⏱️';
+    font-size: 1rem;
+}
+
+/* ================================
+   ASSESSMENT FEEDBACK MODALS
+   ================================ */
+.assessment-feedback {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--block-bg);
+    border: 1px solid var(--block-border);
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    padding: 2rem;
+    max-width: 500px;
+    width: 90vw;
+    z-index: 1000;
+    animation: modal-appear 0.3s ease-out;
+}
+
+.assessment-feedback.success {
+    border-color: var(--assessment-success);
+}
+
+.assessment-feedback.error {
+    border-color: var(--assessment-error);
+}
+
+.assessment-feedback.warning {
+    border-color: var(--assessment-warning);
+}
+
+.feedback-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    animation: overlay-appear 0.3s ease-out;
+}
+
+.feedback-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.feedback-icon {
+    font-size: 2rem;
+}
+
+.feedback-title {
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-semibold);
+    margin: 0;
+}
+
+.feedback-content p {
+    margin: 0 0 1rem 0;
+    line-height: 1.6;
+}
+
+.feedback-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+@keyframes modal-appear {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes overlay-appear {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ================================
+   RESPONSIVE ENHANCEMENTS
+   ================================ */
+@media (max-width: 768px) {
+    .code-header,
+    .editor-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .editor-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .quiz-option {
+        padding: 0.75rem;
+    }
+    
+    .quiz-option:hover {
+        transform: none;
+    }
+    
+    .assessment-feedback {
+        padding: 1.5rem;
+        border-radius: 8px;
+    }
+    
+    .feedback-actions {
+        flex-direction: column;
+    }
+}
+
+/* ================================
+   DARK THEME ADJUSTMENTS
+   ================================ */
+.theme-dark .quiz-option {
+    background: rgba(31, 41, 55, 0.8);
+}
+
+.theme-dark .quiz-option:hover {
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.theme-dark .key-points,
+.theme-dark .quiz-intro,
+.theme-dark .challenge-instructions {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.theme-dark .code-explanation {
+    background: rgba(6, 182, 212, 0.1);
+}
+
+/* === End static/css/components/lesson-block-types.css === */
+
+/* === static/css/components/lesson-blocks-enhanced.css === */
+/**
+ * Enhanced Lesson Content Blocks - Phase 2 UI Improvements
+ * Modern, unified visual experience with assessment-based states
+ * Code with Morais - July 3, 2025
+ */
+
+/* ================================
+   CSS VARIABLES & DESIGN TOKENS
+   Now using lesson-specific color system
+   ================================ */
+:root {
+    /* Block Colors - Using lesson-specific colors */
+    --block-bg: var(--lesson-surface-primary, #ffffff);
+    --block-border: var(--text-block-border, #e2e8f0);
+    --block-shadow: var(--lesson-shadow-sm, 0 1px 3px 0 rgba(0, 0, 0, 0.1));
+    --block-hover-shadow: var(--lesson-shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+    
+    /* Assessment States - Using lesson feedback colors */
+    --assessment-pending: var(--lesson-warning, #ED8936);
+    --assessment-success: var(--lesson-success, #28A745);
+    --assessment-error: var(--lesson-active, #F56565);
+    --assessment-warning: var(--lesson-warning, #ED8936);
+    
+    /* Block Type Colors - Using lesson-specific block colors */
+    --text-accent: var(--text-block-primary, #667EEA);
+    --code-accent: var(--code-block-primary, #319795);
+    --interactive-accent: var(--interactive-primary, #F56500);
+    --quiz-accent: var(--quiz-primary, #9F7AEA);
+    
+    /* Spacing - Using lesson spacing system */
+    --block-spacing: var(--lesson-spacing-xl, 2rem);
+    --block-padding: var(--lesson-spacing-lg, 1.5rem);
+    --block-radius: var(--lesson-radius-lg, 16px);
+    
+    /* Animations - Using lesson transitions */
+    --animation-fast: var(--lesson-transition-fast, 0.15s ease-out);
+    --animation-normal: var(--lesson-transition-normal, 0.25s ease-out);
+    --animation-slow: var(--lesson-transition-slow, 0.4s ease-out);
+    
+    /* Typography */
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+}
+
+/* Dark theme overrides - Using lesson dark mode colors */
+.theme-dark {
+    --block-bg: var(--lesson-bg-secondary, #2D3748);
+    --block-border: var(--text-block-border, #4A5568);
+    --block-shadow: var(--lesson-shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.3));
+    --block-hover-shadow: var(--lesson-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.3));
+}
+
+/* ================================
+   UNIFIED BLOCK FOUNDATION
+   ================================ */
+.content-block,
+.lesson-block {
+    position: relative;
+    margin-bottom: var(--block-spacing);
+    background: var(--block-bg);
+    border: 1px solid var(--block-border);
+    border-radius: var(--block-radius);
+    box-shadow: var(--block-shadow);
+    transition: all var(--animation-normal);
+    overflow: hidden;
+    
+    /* Remove default padding - handled by children */
+    padding: 0;
+}
+
+.content-block:hover,
+.lesson-block:hover {
+    box-shadow: var(--block-hover-shadow);
+    transform: translateY(-2px);
+    border-color: var(--lesson-primary, #4A90E2);
+}
+
+/* ================================
+   BLOCK HEADER SYSTEM
+   ================================ */
+.block-header,
+.lesson-block-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem var(--block-padding);
+    background: linear-gradient(135deg, 
+        rgba(74, 144, 226, 0.05) 0%, 
+        rgba(74, 144, 226, 0.02) 100%);
+    border-bottom: 1px solid var(--block-border);
+    position: relative;
+}
+
+.block-icon,
+.text-block-icon,
+.code-block-icon,
+.interactive-block-icon,
+.quiz-block-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    font-size: 18px;
+    color: var(--lesson-primary, #4A90E2);
+    background: rgba(74, 144, 226, 0.1);
+    transition: all var(--animation-fast);
+}
+
+.block-meta {
+    flex: 1;
+    min-width: 0; /* Allow text truncation */
+}
+
+.block-type {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--lesson-primary, #4A90E2);
+    margin-bottom: 0.25rem;
+}
+
+.block-title {
+    font-size: 1.125rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--lesson-text-primary, #2D3748);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.block-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* ================================
+   ASSESSMENT STATUS INDICATORS
+   ================================ */
+.block-progress-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 12px;
+    transition: all var(--animation-fast);
+}
+
+.block-progress-indicator.pending {
+    background: rgba(251, 191, 36, 0.2);
+    color: var(--assessment-pending);
+}
+
+.block-progress-indicator.completed {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--assessment-success);
+}
+
+.block-progress-indicator.failed {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--assessment-error);
+}
+
+.block-progress-indicator.locked {
+    background: rgba(156, 163, 175, 0.2);
+    color: var(--lesson-text-muted, #9ca3af);
+}
+
+/* Assessment attempts indicator */
+.assessment-attempts {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    background: rgba(107, 114, 128, 0.1);
+    color: var(--lesson-text-muted, #6b7280);
+    font-weight: var(--font-weight-medium);
+}
+
+.assessment-attempts.warning {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--assessment-warning);
+}
+
+.assessment-attempts.danger {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--assessment-error);
+}
+
+/* ================================
+   BLOCK TYPE SPECIALIZATIONS
+   ================================ */
+
+/* Text Blocks */
+.text-block .block-icon,
+.text-block .text-block-icon {
+    background: rgba(102, 126, 234, 0.1);
+    color: var(--text-block-primary, #667EEA);
+}
+
+.text-block .block-type,
+.text-block .block-type-label {
+    color: var(--text-block-primary, #667EEA);
+}
+
+/* Code Example Blocks */
+.code_example-block .block-icon,
+.code-example-block .block-icon,
+.code_example-block .code-block-icon,
+.code-example-block .code-block-icon {
+    background: rgba(49, 151, 149, 0.1);
+    color: var(--code-block-primary, #319795);
+}
+
+.code_example-block .block-type,
+.code-example-block .block-type,
+.code_example-block .block-type-label,
+.code-example-block .block-type-label {
+    color: var(--code-block-primary, #319795);
+}
+
+/* Interactive/Challenge Blocks */
+.interactive-block .block-icon,
+.challenge-block .block-icon,
+.interactive-block .interactive-block-icon,
+.challenge-block .interactive-block-icon {
+    background: rgba(245, 101, 0, 0.1);
+    color: var(--interactive-primary, #F56500);
+}
+
+.interactive-block .block-type,
+.challenge-block .block-type,
+.interactive-block .block-type-label,
+.challenge-block .block-type-label {
+    color: var(--interactive-primary, #F56500);
+}
+
+/* Quiz Blocks */
+.quiz-block .block-icon,
+.quiz-block .quiz-block-icon {
+    background: rgba(159, 122, 234, 0.1);
+    color: var(--quiz-primary, #9F7AEA);
+}
+
+.quiz-block .block-type,
+.quiz-block .block-type-label {
+    color: var(--quiz-primary, #9F7AEA);
+}
+
+/* ================================
+   BLOCK CONTENT AREAS
+   ================================ */
+.block-content,
+.lesson-block-content {
+    padding: var(--block-padding);
+    position: relative;
+}
+
+/* Text content styling */
+.text-content {
+    line-height: 1.7;
+    color: var(--lesson-text-primary, #2D3748);
+    font-size: 1rem;
+}
+
+.text-content h1,
+.text-content h2,
+.text-content h3,
+.text-content h4 {
+    color: var(--lesson-text-primary, #1f2937);
+    margin: 1.5rem 0 1rem 0;
+    font-weight: var(--font-weight-semibold);
+    line-height: 1.3;
+}
+
+.text-content h1 { font-size: 1.875rem; }
+.text-content h2 { font-size: 1.5rem; }
+.text-content h3 { font-size: 1.25rem; }
+.text-content h4 { font-size: 1.125rem; }
+
+.text-content p {
+    margin-bottom: 1rem;
+}
+
+.text-content strong {
+    font-weight: var(--font-weight-semibold);
+    color: var(--lesson-primary, #6366f1);
+}
+
+.text-content em {
+    font-style: italic;
+    color: var(--text-accent);
+}
+
+.text-content code {
+    background: rgba(107, 114, 128, 0.1);
+    color: var(--code-accent);
+    padding: 0.125rem 0.375rem;
+    border-radius: 4px;
+    font-family: var(--font-mono, 'Fira Code', monospace);
+    font-size: 0.875em;
+}
+
+/* ================================
+   BLOCK FOOTER & ACTIONS
+   ================================ */
+.block-footer {
+    padding: 1rem var(--block-padding);
+    background: rgba(248, 250, 252, 0.8);
+    border-top: 1px solid var(--block-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.theme-dark .block-footer {
+    background: rgba(31, 41, 55, 0.8);
+}
+
+.block-footer .assessment-info {
+    font-size: 0.875rem;
+    color: var(--text-secondary, #6b7280);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.block-footer .btn-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* ================================
+   LESSON BLOCK ACTIONS
+   ================================ */
+.lesson-block-actions {
+    padding: 1rem var(--block-padding);
+    background: var(--lesson-bg-secondary, #f8fafc);
+    border-top: 1px solid var(--block-border);
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: var(--lesson-radius, 8px);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--lesson-transition-normal, 0.2s ease-out);
+    text-decoration: none;
+}
+
+.action-btn.primary {
+    background: var(--lesson-primary, #4A90E2);
+    color: white;
+}
+
+.action-btn.primary:hover {
+    background: var(--lesson-primary-dark, #357ABD);
+    transform: translateY(-1px);
+}
+
+.action-btn.secondary {
+    background: var(--lesson-surface-secondary, #f7fafc);
+    color: var(--lesson-text-secondary, #4A5568);
+    border: 1px solid var(--lesson-border-light, #e2e8f0);
+}
+
+.action-btn.secondary:hover {
+    background: var(--lesson-bg-accent, #edf2f7);
+    border-color: var(--lesson-border-medium, #cbd5e1);
+}
+
+/* Language badges */
+.language-badge {
+    background: var(--code-block-primary, #319795);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.language-badge.python {
+    background: var(--code-block-primary, #319795);
+}
+
+/* Quiz type badges */
+.quiz-type-badge {
+    background: var(--quiz-primary, #9F7AEA);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* Difficulty badges */
+.difficulty-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.difficulty-badge.beginner {
+    background: var(--lesson-success-bg, #d4f6dd);
+    color: var(--lesson-success, #28A745);
+}
+
+/* Block type indicators */
+.block-type-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.block-type-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Meta information styling */
+.code-meta,
+.challenge-meta,
+.quiz-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* ================================
+   ENHANCED BUTTONS
+   ================================ */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: var(--font-weight-medium);
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--animation-fast);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left var(--animation-normal);
+}
+
+.btn:hover:before {
+    left: 100%;
+}
+
+/* Button variants */
+.btn.success {
+    background: var(--assessment-success);
+    color: white;
+}
+
+.btn.success:hover {
+    background: #059669;
+    transform: translateY(-1px);
+}
+
+.btn.primary {
+    background: var(--lesson-primary, #6366f1);
+    color: white;
+}
+
+.btn.primary:hover {
+    background: #4f46e5;
+    transform: translateY(-1px);
+}
+
+.btn.secondary {
+    background: rgba(107, 114, 128, 0.1);
+    color: var(--lesson-text-primary, #374151);
+    border: 1px solid var(--block-border);
+}
+
+.btn.secondary:hover {
+    background: rgba(107, 114, 128, 0.15);
+    border-color: var(--lesson-primary, #6366f1);
+}
+
+.btn.warning {
+    background: var(--assessment-warning);
+    color: white;
+}
+
+.btn.warning:hover {
+    background: #d97706;
+    transform: translateY(-1px);
+}
+
+.btn.danger {
+    background: var(--assessment-error);
+    color: white;
+}
+
+.btn.danger:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn:disabled:hover:before {
+    left: -100% !important;
+}
+
+/* Small button variant */
+.btn.sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+}
+
+/* Icon-only button */
+.btn.icon-only {
+    padding: 0.75rem;
+    width: auto;
+    height: auto;
+}
+
+/* ================================
+   COMPLETION STATES & ANIMATIONS
+   ================================ */
+.content-block.completed {
+    border-color: var(--assessment-success);
+    position: relative;
+}
+
+.content-block.completed::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--assessment-success), #34d399);
+    border-radius: var(--block-radius) var(--block-radius) 0 0;
+}
+
+.content-block.failed {
+    border-color: var(--assessment-error);
+}
+
+.content-block.failed::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--assessment-error), #f87171);
+    border-radius: var(--block-radius) var(--block-radius) 0 0;
+}
+
+.content-block.locked {
+    opacity: 0.6;
+    background: repeating-linear-gradient(
+        45deg,
+        var(--block-bg),
+        var(--block-bg) 10px,
+        rgba(156, 163, 175, 0.1) 10px,
+        rgba(156, 163, 175, 0.1) 20px
+    );
+}
+
+/* ================================
+   COMPLETION ANIMATIONS
+   ================================ */
+@keyframes completion-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+@keyframes completion-glow {
+    0% { box-shadow: var(--block-shadow); }
+    50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.3), var(--block-shadow); }
+    100% { box-shadow: var(--block-shadow); }
+}
+
+@keyframes checkmark-draw {
+    0% { stroke-dashoffset: 16; }
+    100% { stroke-dashoffset: 0; }
+}
+
+.content-block.completing {
+    animation: completion-pulse 0.6s ease-out, completion-glow 1s ease-out;
+}
+
+.completion-checkmark {
+    stroke-dasharray: 16;
+    stroke-dashoffset: 16;
+    animation: checkmark-draw 0.5s ease-out forwards;
+}
+
+/* ================================
+   RESPONSIVE DESIGN
+   ================================ */
+@media (max-width: 768px) {
+    :root {
+        --block-spacing: 1.5rem;
+        --block-padding: 1rem;
+        --block-radius: 12px;
+    }
+    
+    .block-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .block-title {
+        font-size: 1rem;
+    }
+    
+    .block-footer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+    
+    .btn {
+        padding: 0.875rem 1.25rem;
+        font-size: 0.875rem;
+        justify-content: center;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .content-block:hover {
+        transform: none; /* Disable hover lift on mobile */
+    }
+}
+
+/* ================================
+   ACCESSIBILITY ENHANCEMENTS
+   ================================ */
+.content-block:focus-within {
+    outline: 2px solid var(--lesson-primary, #6366f1);
+    outline-offset: 2px;
+}
+
+.btn:focus {
+    outline: 2px solid var(--lesson-primary, #6366f1);
+    outline-offset: 2px;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .content-block,
+    .btn,
+    .block-icon,
+    .block-progress-indicator {
+        transition: none;
+    }
+    
+    .content-block.completing {
+        animation: none;
+    }
+    
+    .completion-checkmark {
+        animation: none;
+        stroke-dashoffset: 0;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .content-block {
+        border-width: 2px;
+    }
+    
+    .btn {
+        border: 2px solid currentColor;
+    }
+    
+    .block-progress-indicator {
+        border: 2px solid currentColor;
+    }
+}
+
+/* ================================
+   PRINT STYLES
+   ================================ */
+@media print {
+    .content-block {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+    
+    .btn {
+        display: none;
+    }
+    
+    .block-actions {
+        display: none;
+    }
+}
+
+/* === End static/css/components/lesson-blocks-enhanced.css === */
+
+/* === static/css/components/lesson-learning-colors.css === */
+/**
+ * Lesson Learning Color System - Education Optimized
+ * Code with Morais - Lesson-Specific Design Tokens
+ * Optimized for learning, focus, and educational progression
+ */
+
+/* ================================
+   LESSON LEARNING COLOR SYSTEM
+   ================================ */
+
+/* Override root variables specifically for lesson pages */
+.lesson-container,
+.lesson-page,
+[data-page="lesson"] {
+    /* ================================
+       EDUCATIONAL COLOR PSYCHOLOGY
+       ================================ */
+    
+    /* Primary Learning Colors - Based on educational research */
+    --lesson-primary: #4A90E2;        /* Calm, trustworthy blue for focus */
+    --lesson-primary-light: #6BA3E8;  /* Lighter variant */
+    --lesson-primary-dark: #357ABD;   /* Darker variant */
+    
+    /* Success & Progress Colors - Motivational greens */
+    --lesson-success: #28A745;        /* Achievement green */
+    --lesson-success-light: #34CE57;  /* Celebration green */
+    --lesson-success-bg: #D4F6DD;     /* Success background */
+    
+    /* Learning State Colors */
+    --lesson-focus: #5A67D8;          /* Deep focus purple-blue */
+    --lesson-active: #F56565;         /* Attention-grabbing red */
+    --lesson-warning: #ED8936;        /* Warning orange */
+    --lesson-info: #38B2AC;           /* Information teal */
+    
+    /* ================================
+       BLOCK TYPE SPECIFIC COLORS
+       ================================ */
+    
+    /* Text Block - Reading & Comprehension */
+    --text-block-primary: #667EEA;    /* Calm reading blue */
+    --text-block-bg: #F7FAFC;         /* Clean reading background */
+    --text-block-border: #E2E8F0;     /* Subtle border */
+    --text-block-accent: #4C51BF;     /* Accent for highlights */
+    
+    /* Code Block - Technical & Precise */
+    --code-block-primary: #319795;    /* Developer teal */
+    --code-block-bg: #1A202C;         /* Dark code background */
+    --code-block-border: #2D3748;     /* Code border */
+    --code-block-accent: #81E6D9;     /* Syntax highlighting accent */
+    --code-block-text: #E2E8F0;       /* Code text color */
+    
+    /* Interactive Block - Engagement & Challenge */
+    --interactive-primary: #F56500;   /* Energetic orange */
+    --interactive-bg: #FFFAF0;        /* Warm background */
+    --interactive-border: #FBD38D;    /* Challenge border */
+    --interactive-accent: #DD6B20;    /* Action accent */
+    
+    /* Quiz Block - Assessment & Evaluation */
+    --quiz-primary: #9F7AEA;          /* Knowledge purple */
+    --quiz-bg: #FAF5FF;               /* Quiz background */
+    --quiz-border: #D6BCFA;           /* Quiz border */
+    --quiz-accent: #805AD5;           /* Quiz accent */
+    --quiz-correct: #48BB78;          /* Correct answer */
+    --quiz-incorrect: #F56565;        /* Incorrect answer */
+    
+    /* ================================
+       PROGRESS & FEEDBACK COLORS
+       ================================ */
+    
+    /* Progress Visualization */
+    --progress-empty: #E2E8F0;        /* Empty progress */
+    --progress-partial: #4299E1;      /* Partial progress */
+    --progress-complete: #48BB78;     /* Complete progress */
+    --progress-mastery: #38A169;      /* Mastery level */
+    
+    /* Assessment Feedback */
+    --assessment-excellent: #38A169;  /* 90-100% */
+    --assessment-good: #4299E1;       /* 80-89% */
+    --assessment-fair: #ED8936;       /* 70-79% */
+    --assessment-needs-work: #F56565; /* Below 70% */
+    
+    /* Learning States */
+    --learning-new: #4299E1;          /* New content */
+    --learning-practice: #ED8936;     /* Practice needed */
+    --learning-review: #9F7AEA;       /* Review required */
+    --learning-mastered: #38A169;     /* Mastered content */
+    
+    /* ================================
+       ADDITIONAL LESSON VARIABLES
+       ================================ */
+    
+    /* Code Block Specific */
+    --lesson-code-bg: #1A202C;        /* Dark code background */
+    --lesson-code-text: #E2E8F0;      /* Code text color */
+    
+    /* Progress Gradients */
+    --lesson-progress-start: #28A745;  /* Progress start color */
+    --lesson-progress-end: #20A04A;    /* Progress end color */
+    
+    /* UI Elements */
+    --lesson-skeleton-light: #F7FAFC;  /* Skeleton light */
+    --lesson-skeleton-dark: #EDF2F7;   /* Skeleton dark */
+    --lesson-spinner-base: #E2E8F0;    /* Spinner base */
+    
+    /* ================================
+       BACKGROUNDS & SURFACES
+       ================================ */
+    
+    /* Lesson Page Backgrounds */
+    --lesson-bg-primary: #FFFFFF;     /* Main background */
+    --lesson-bg-secondary: #F7FAFC;   /* Secondary background */
+    --lesson-bg-accent: #EDF2F7;      /* Accent background */
+    
+    /* Card & Block Surfaces */
+    --lesson-surface-primary: #FFFFFF;   /* Primary surface */
+    --lesson-surface-secondary: #F7FAFC; /* Secondary surface */
+    --lesson-surface-raised: #FFFFFF;    /* Elevated surface */
+    
+    /* ================================
+       TEXT & TYPOGRAPHY
+       ================================ */
+    
+    /* Reading Optimized Text Colors */
+    --lesson-text-primary: #2D3748;      /* Primary text - optimal reading */
+    --lesson-text-secondary: #4A5568;    /* Secondary text */
+    --lesson-text-tertiary: #718096;     /* Tertiary text */
+    --lesson-text-inverse: #FFFFFF;      /* Inverse text */
+    
+    /* Content Specific Text */
+    --lesson-heading: #1A202C;           /* Headings */
+    --lesson-body: #2D3748;              /* Body text */
+    --lesson-caption: #718096;           /* Captions */
+    --lesson-link: #4299E1;              /* Links */
+    --lesson-link-hover: #3182CE;        /* Link hover */
+    
+    /* ================================
+       SEMANTIC COLORS
+       ================================ */
+    
+    /* User Feedback */
+    --lesson-success-text: #276749;      /* Success message text */
+    --lesson-error-text: #C53030;        /* Error message text */
+    --lesson-warning-text: #C05621;      /* Warning message text */
+    --lesson-info-text: #2C5282;         /* Info message text */
+    
+    /* Interactive States */
+    --lesson-hover: #EDF2F7;             /* Hover state */
+    --lesson-active: #E2E8F0;            /* Active state */
+    --lesson-focus: #4299E1;             /* Focus state */
+    --lesson-disabled: #A0AEC0;          /* Disabled state */
+    
+    /* ================================
+       SHADOWS & ELEVATION
+       ================================ */
+    
+    /* Educational UI Shadows - Softer for focus */
+    --lesson-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    --lesson-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --lesson-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --lesson-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    
+    /* Focus-specific shadows */
+    --lesson-shadow-focus: 0 0 0 3px rgba(66, 153, 225, 0.5);
+    --lesson-shadow-success: 0 0 0 3px rgba(72, 187, 120, 0.5);
+    --lesson-shadow-error: 0 0 0 3px rgba(245, 101, 101, 0.5);
+    
+    /* ================================
+       ANIMATION & TRANSITIONS
+       ================================ */
+    
+    /* Learning-optimized timing */
+    --lesson-transition-fast: 0.15s ease-out;    /* Quick feedback */
+    --lesson-transition-normal: 0.25s ease-out;  /* Normal interactions */
+    --lesson-transition-slow: 0.4s ease-out;     /* Major state changes */
+    --lesson-transition-deliberate: 0.6s ease-out; /* Celebration animations */
+    
+    /* ================================
+       ACCESSIBILITY OVERRIDES
+       ================================ */
+    
+    /* High contrast mode support */
+    --lesson-contrast-border: #000000;
+    --lesson-contrast-text: #000000;
+    --lesson-contrast-bg: #FFFFFF;
+}
+
+/* ================================
+   DARK MODE LESSON COLORS
+   ================================ */
+
+.theme-dark .lesson-container,
+.theme-dark .lesson-page,
+.theme-dark [data-page="lesson"] {
+    /* Dark mode - optimized for learning in low light */
+    --lesson-bg-primary: #1A202C;
+    --lesson-bg-secondary: #2D3748;
+    --lesson-bg-accent: #4A5568;
+    
+    --lesson-text-primary: #F7FAFC;
+    --lesson-text-secondary: #E2E8F0;
+    --lesson-text-tertiary: #A0AEC0;
+    
+    /* Block backgrounds for dark mode */
+    --text-block-bg: #2D3748;
+    --interactive-bg: #2D3748;
+    --quiz-bg: #2D3748;
+    
+    /* Adjusted for dark mode readability */
+    --lesson-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+    --lesson-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    --lesson-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+/* ================================
+   ACCESSIBILITY PREFERENCES
+   ================================ */
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .lesson-container,
+    .lesson-page,
+    [data-page="lesson"] {
+        --lesson-transition-fast: 0s;
+        --lesson-transition-normal: 0s;
+        --lesson-transition-slow: 0s;
+        --lesson-transition-deliberate: 0s;
+    }
+}
+
+/* High contrast support */
+@media (prefers-contrast: high) {
+    .lesson-container,
+    .lesson-page,
+    [data-page="lesson"] {
+        --lesson-text-primary: var(--lesson-contrast-text);
+        --lesson-bg-primary: var(--lesson-contrast-bg);
+        --text-block-border: var(--lesson-contrast-border);
+        --interactive-border: var(--lesson-contrast-border);
+        --quiz-border: var(--lesson-contrast-border);
+        --code-block-border: var(--lesson-contrast-border);
+    }
+}
+
+/* === End static/css/components/lesson-learning-colors.css === */
+
+/* === static/css/components/lesson-progress-enhanced.css === */
+/**
+ * Enhanced Progress System - Phase 2 UI Improvements
+ * Modern progress bars, animations, and visual feedback
+ * Code with Morais - July 3, 2025
+ */
+
+/* ================================
+   LESSON PROGRESS BAR
+   ================================ */
+.lesson-progress-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--lesson-border-light, #e2e8f0);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--lesson-shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+    position: relative;
+    overflow: hidden;
+}
+
+.theme-dark .lesson-progress-container {
+    background: var(--lesson-bg-secondary, rgba(45, 55, 72, 0.95));
+}
+
+.lesson-progress-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, 
+        var(--lesson-primary, #4A90E2) 0%, 
+        var(--lesson-success, #28A745) 50%, 
+        var(--quiz-primary, #9F7AEA) 100%
+    );
+    border-radius: 12px 12px 0 0;
+}
+
+.progress-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.progress-title {
+    font-size: 1.125rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--lesson-text-primary, #1f2937);
+    margin: 0;
+}
+
+.progress-stats {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary, #6b7280);
+}
+
+.progress-percentage {
+    font-size: 1.5rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--lesson-primary, #6366f1);
+    margin: 0;
+}
+
+.progress-bar-wrapper {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: rgba(229, 231, 235, 0.8);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+
+.theme-dark .progress-bar {
+    background: rgba(75, 85, 99, 0.8);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, 
+        var(--lesson-primary, #6366f1) 0%, 
+        var(--assessment-success) 100%
+    );
+    border-radius: 6px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -50%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.3), 
+        transparent
+    );
+    animation: progress-shine 2s infinite;
+}
+
+@keyframes progress-shine {
+    0% { left: -50%; }
+    100% { left: 100%; }
+}
+
+.progress-milestones {
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.milestone {
+    width: 8px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px solid var(--lesson-primary, #6366f1);
+    border-radius: 50%;
+    transition: all var(--animation-normal);
+}
+
+.milestone.reached {
+    background: var(--assessment-success);
+    border-color: var(--assessment-success);
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+.progress-details {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.875rem;
+}
+
+.blocks-completed {
+    color: var(--text-secondary, #6b7280);
+}
+
+.assessment-summary {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.assessment-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.assessment-stat.quiz {
+    color: var(--quiz-accent);
+}
+
+.assessment-stat.code {
+    color: var(--interactive-accent);
+}
+
+.assessment-stat.reading {
+    color: var(--text-accent);
+}
+
+/* ================================
+   BLOCK PROGRESS INDICATORS
+   ================================ */
+.block-progress-indicator {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    transition: all var(--animation-normal);
+    cursor: pointer;
+}
+
+.block-progress-indicator:hover {
+    transform: scale(1.1);
+}
+
+.block-progress-indicator.not-started {
+    background: rgba(156, 163, 175, 0.2);
+    color: #9ca3af;
+    border: 2px solid #d1d5db;
+}
+
+.block-progress-indicator.in-progress {
+    background: rgba(251, 191, 36, 0.2);
+    color: var(--assessment-pending);
+    border: 2px solid var(--assessment-pending);
+    animation: pulse-pending 2s infinite;
+}
+
+.block-progress-indicator.completed {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--assessment-success);
+    border: 2px solid var(--assessment-success);
+    animation: completion-bounce 0.6s ease-out;
+}
+
+.block-progress-indicator.failed {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--assessment-error);
+    border: 2px solid var(--assessment-error);
+}
+
+.block-progress-indicator.locked {
+    background: rgba(156, 163, 175, 0.1);
+    color: #9ca3af;
+    border: 2px solid #e5e7eb;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Progress indicator animations */
+@keyframes pulse-pending {
+    0%, 100% { 
+        box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7);
+    }
+    50% { 
+        box-shadow: 0 0 0 8px rgba(251, 191, 36, 0);
+    }
+}
+
+@keyframes completion-bounce {
+    0%, 20%, 60%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-8px);
+    }
+    80% {
+        transform: translateY(-4px);
+    }
+}
+
+/* ================================
+   ASSESSMENT PROGRESS RINGS
+   ================================ */
+.assessment-progress-ring {
+    position: relative;
+    width: 48px;
+    height: 48px;
+}
+
+.assessment-progress-ring svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.assessment-progress-ring .ring-bg {
+    fill: none;
+    stroke: rgba(229, 231, 235, 0.8);
+    stroke-width: 4;
+}
+
+.assessment-progress-ring .ring-progress {
+    fill: none;
+    stroke: var(--lesson-primary, #6366f1);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 126; /* 2 * π * 20 */
+    stroke-dashoffset: 126;
+    transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.assessment-progress-ring.success .ring-progress {
+    stroke: var(--assessment-success);
+}
+
+.assessment-progress-ring.warning .ring-progress {
+    stroke: var(--assessment-warning);
+}
+
+.assessment-progress-ring.error .ring-progress {
+    stroke: var(--assessment-error);
+}
+
+.assessment-progress-ring .ring-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--lesson-text-primary, #1f2937);
+}
+
+/* ================================
+   COMPLETION CELEBRATIONS
+   ================================ */
+.completion-celebration {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--block-bg);
+    border: 2px solid var(--assessment-success);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    animation: celebration-appear 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    max-width: 400px;
+    width: 90vw;
+}
+
+.completion-celebration.lesson-complete {
+    border-color: var(--quiz-accent);
+}
+
+.celebration-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: celebration-bounce 1s infinite;
+}
+
+.celebration-title {
+    font-size: 1.5rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--assessment-success);
+    margin: 0 0 0.5rem 0;
+}
+
+.celebration-message {
+    color: var(--text-secondary, #6b7280);
+    margin: 0 0 1.5rem 0;
+    line-height: 1.6;
+}
+
+.celebration-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.celebration-stat {
+    text-align: center;
+}
+
+.celebration-stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--lesson-primary, #6366f1);
+}
+
+.celebration-stat-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary, #6b7280);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.celebration-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+@keyframes celebration-appear {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8) rotate(-10deg);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    }
+}
+
+@keyframes celebration-bounce {
+    0%, 20%, 60%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    80% {
+        transform: translateY(-5px);
+    }
+}
+
+/* ================================
+   STREAK INDICATORS
+   ================================ */
+.streak-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, 
+        rgba(245, 158, 11, 0.1) 0%, 
+        rgba(251, 191, 36, 0.1) 100%
+    );
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: var(--font-weight-medium);
+    color: var(--assessment-warning);
+}
+
+.streak-indicator.fire {
+    animation: streak-fire 2s infinite;
+}
+
+@keyframes streak-fire {
+    0%, 100% { 
+        box-shadow: 0 0 5px rgba(245, 158, 11, 0.3);
+    }
+    50% { 
+        box-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+    }
+}
+
+.streak-icon {
+    font-size: 1rem;
+}
+
+.streak-count {
+    font-weight: var(--font-weight-bold);
+}
+
+/* ================================
+   TIME TRACKING
+   ================================ */
+.time-tracker {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: rgba(99, 102, 241, 0.05);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.time-tracker-icon {
+    color: var(--lesson-primary, #6366f1);
+    font-size: 1rem;
+}
+
+.time-spent {
+    font-weight: var(--font-weight-medium);
+    color: var(--lesson-text-primary, #1f2937);
+}
+
+.time-estimate {
+    color: var(--text-secondary, #6b7280);
+}
+
+.time-efficiency {
+    margin-left: auto;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-semibold);
+}
+
+.time-efficiency.excellent {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--assessment-success);
+}
+
+.time-efficiency.good {
+    background: rgba(251, 191, 36, 0.2);
+    color: var(--assessment-pending);
+}
+
+.time-efficiency.needs-improvement {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--assessment-error);
+}
+
+/* ================================
+   RESPONSIVE PROGRESS DESIGN
+   ================================ */
+@media (max-width: 768px) {
+    .lesson-progress-container {
+        padding: 1rem;
+    }
+    
+    .progress-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .progress-stats {
+        align-self: stretch;
+        justify-content: space-between;
+    }
+    
+    .progress-details {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .assessment-summary {
+        align-self: stretch;
+        justify-content: space-between;
+    }
+    
+    .completion-celebration {
+        padding: 1.5rem;
+    }
+    
+    .celebration-actions {
+        flex-direction: column;
+    }
+    
+    .celebration-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ================================
+   ACCESSIBILITY ENHANCEMENTS
+   ================================ */
+.block-progress-indicator:focus {
+    outline: 2px solid var(--lesson-primary, #6366f1);
+    outline-offset: 2px;
+}
+
+.block-progress-indicator[aria-label]::after {
+    content: attr(aria-label);
+    position: absolute;
+    bottom: -2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--lesson-text-primary, #1f2937);
+    color: var(--block-bg);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--animation-fast);
+}
+
+.block-progress-indicator:hover::after,
+.block-progress-indicator:focus::after {
+    opacity: 1;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .progress-fill,
+    .ring-progress,
+    .block-progress-indicator,
+    .celebration-icon,
+    .streak-indicator {
+        animation: none;
+        transition: none;
+    }
+    
+    .progress-fill::after {
+        display: none;
+    }
+}
+
+/* ================================
+   PRINT STYLES
+   ================================ */
+@media print {
+    .lesson-progress-container {
+        background: white;
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+    
+    .completion-celebration {
+        display: none;
+    }
+    
+    .block-progress-indicator {
+        background: white !important;
+        border-color: #000 !important;
+        color: #000 !important;
+    }
+}
+
+/* === End static/css/components/lesson-progress-enhanced.css === */
+
