@@ -3,12 +3,9 @@
 {% block title %}{{ lesson.title if lesson else "Lesson" }} - Code with Morais{% endblock %}
 
 {% block extra_css %}
-<!-- Consolidated Lesson CSS -->
-<link rel="stylesheet" href="{{ url_for('static', filename='css/lessons.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/quiz-integration.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/lesson.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/responsive.css') }}">
+<!-- Consolidated Lesson CSS - Using Bundles for Better Performance -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bundles/lessons.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bundles/utils.css') }}">
 <style>
 /* Loading states */
 .content-loading {

@@ -4,6 +4,11 @@
 
 {% block page_name %}profile{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/profile.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bundles/utils.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="container">
     <header class="profile-header">
@@ -337,5 +342,8 @@
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/profile/ProfileManager.js') }}"></script>
+<script src="{{ url_for('static', filename='js/profile/AchievementSystem.js') }}"></script>
+<script src="{{ url_for('static', filename='js/profile/ProgressVisualization.js') }}"></script>
 {% endblock %}
