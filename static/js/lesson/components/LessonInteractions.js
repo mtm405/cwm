@@ -4,7 +4,8 @@
  * Updated for Phase 3: Enhanced Code Editor Integration
  */
 
-import { EnhancedCodeEditor } from './EnhancedCodeEditor.js';
+// Dynamic import to avoid blocking initialization
+let EnhancedCodeEditor = null;
 
 export class LessonInteractions {
     constructor() {
@@ -12,6 +13,51 @@ export class LessonInteractions {
         this.lessonData = null;
         this.userProgress = null;
         this.initialized = false;
+        
+        // Initialize bound handlers to prevent undefined errors
+        this.boundHandleClick = null;
+        this.boundHandleKeydown = null;
+        
+        // Pre-bind event handlers - ensure methods exist first
+        try {
+            this.bindEventHandlers();
+            console.log('✅ LessonInteractions constructor completed successfully');
+        } catch (error) {
+            console.error('❌ Error in LessonInteractions constructor:', error);
+            // Provide fallback handlers
+            this.boundHandleClick = () => {};
+            this.boundHandleKeydown = () => {};
+        }
+    }
+    
+    /**
+     * Safely bind event handlers
+     */
+    bindEventHandlers() {
+        // Use arrow functions to automatically bind context
+        try {
+            // Ensure methods exist before binding
+            if (typeof this.handleClick === 'function') {
+                this.boundHandleClick = (event) => this.handleClick(event);
+            } else {
+                console.warn('⚠️ handleClick method not found during binding');
+                this.boundHandleClick = () => {};
+            }
+            
+            if (typeof this.handleKeydown === 'function') {
+                this.boundHandleKeydown = (event) => this.handleKeydown(event);
+            } else {
+                console.warn('⚠️ handleKeydown method not found during binding');
+                this.boundHandleKeydown = () => {};
+            }
+            
+            console.log('✅ Event handlers bound successfully');
+        } catch (error) {
+            console.error('❌ Failed to bind event handlers:', error);
+            // Provide fallback handlers
+            this.boundHandleClick = () => {};
+            this.boundHandleKeydown = () => {};
+        }
     }
     
     initialize(lessonData, userProgress) {
@@ -20,26 +66,53 @@ export class LessonInteractions {
         
         console.log('🎮 Initializing lesson interactions...');
         
-        // Set up event listeners
-        this.setupEventListeners();
-        
-        // Initialize code editors
-        this.initializeCodeEditors();
-        
-        // Initialize quiz interactions
-        this.initializeQuizzes();
-        
-        this.initialized = true;
-        console.log('✅ Lesson interactions initialized');
+        try {
+            // Set up event listeners
+            this.setupEventListeners();
+            
+            // Initialize code editors
+            this.initializeCodeEditors();
+            
+            // Initialize quiz interactions
+            this.initializeQuizzes();
+            
+            this.initialized = true;
+            console.log('✅ Lesson interactions initialized');
+        } catch (error) {
+            console.error('❌ Failed to initialize lesson interactions:', error);
+            throw error;
+        }
     }
     
     setupEventListeners() {
-        // Global event delegation for lesson interactions
-        document.addEventListener('click', this.handleClick.bind(this));
-        document.addEventListener('keydown', this.handleKeydown.bind(this));
-        
-        // Custom events
-        document.addEventListener('blockCompleted', this.handleBlockCompleted.bind(this));
+        try {
+            // Ensure bound handlers exist before using them
+            if (!this.boundHandleClick || !this.boundHandleKeydown) {
+                console.warn('⚠️ Event handlers not bound, rebinding...');
+                this.bindEventHandlers();
+            }
+            
+            // Remove existing listeners to avoid duplicates
+            if (this.boundHandleClick) {
+                document.removeEventListener('click', this.boundHandleClick);
+            }
+            if (this.boundHandleKeydown) {
+                document.removeEventListener('keydown', this.boundHandleKeydown);
+            }
+            
+            // Add event listeners with pre-bound handlers
+            if (this.boundHandleClick) {
+                document.addEventListener('click', this.boundHandleClick);
+            }
+            if (this.boundHandleKeydown) {
+                document.addEventListener('keydown', this.boundHandleKeydown);
+            }
+            
+            console.log('👂 Event listeners set up successfully');
+        } catch (error) {
+            console.error('❌ Failed to setup event listeners:', error);
+            throw error;
+        }
     }
     
     handleClick(event) {
@@ -121,6 +194,18 @@ export class LessonInteractions {
         
         try {
             console.log(`🎯 Initializing Enhanced Code Editor for block: ${blockId}`);
+            
+            // Dynamic import of EnhancedCodeEditor
+            if (!EnhancedCodeEditor) {
+                try {
+                    const module = await import('./EnhancedCodeEditor.js');
+                    EnhancedCodeEditor = module.EnhancedCodeEditor;
+                } catch (importError) {
+                    console.warn('⚠️ Failed to load EnhancedCodeEditor, using fallback:', importError);
+                    await this.initializeFallbackEditor(editorElement, initialCode);
+                    return;
+                }
+            }
             
             // Get block data for enhanced configuration
             const blockData = this.lessonData?.blocks?.find(b => b.id === blockId);

@@ -351,9 +351,37 @@ export const utils = {
         get(key, defaultValue = null) {
             try {
                 const item = localStorage.getItem(key);
-                return item ? JSON.parse(item) : defaultValue;
+                if (item === null) return defaultValue;
+                
+                // Handle simple string values that aren't JSON
+                if (typeof item === 'string') {
+                    // Handle boolean strings
+                    if (item === 'true') return true;
+                    if (item === 'false') return false;
+                    
+                    // Handle plain string values (like theme names)
+                    if (!item.startsWith('{') && !item.startsWith('[') && !item.startsWith('"')) {
+                        return item;
+                    }
+                    
+                    // Try to parse as JSON
+                    try {
+                        return JSON.parse(item);
+                    } catch (parseError) {
+                        console.warn(`Failed to parse localStorage item "${key}" as JSON, returning as string:`, item);
+                        return item;
+                    }
+                }
+                
+                return item;
             } catch (error) {
-                console.error('Failed to get localStorage item:', error);
+                console.error(`Failed to get localStorage item "${key}":`, error);
+                // Remove corrupted item
+                try {
+                    localStorage.removeItem(key);
+                } catch (removeError) {
+                    console.error(`Failed to remove corrupted localStorage item "${key}":`, removeError);
+                }
                 return defaultValue;
             }
         },
@@ -609,6 +637,21 @@ if (typeof document !== 'undefined') {
         document.head.appendChild(style);
     }
 }
+
+// Add global error recovery to prevent cascading failures
+window.addEventListener('error', (event) => {
+    console.error('Global JavaScript error:', event.error);
+    if (typeof utils !== 'undefined' && utils.showNotification) {
+        utils.showNotification('An error occurred. Some features may not work properly.', 'error');
+    }
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+    console.error('Unhandled promise rejection:', event.reason);
+    if (typeof utils !== 'undefined' && utils.showNotification) {
+        utils.showNotification('A system error occurred. Please refresh the page if issues persist.', 'error');
+    }
+});
 
 // Export default for ES6 modules
 export default utils;

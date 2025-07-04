@@ -4,9 +4,100 @@
  */
 
 import { utils } from './utils.js';
-import { eventBus } from './eventBus.js';
-import { CONFIG } from './config.js';
-import { EVENTS } from './constants.js';
+
+// Create eventBus if it doesn't exist
+const eventBus = {
+    events: {},
+    on(event, callback) {
+        if (!this.events[event]) {
+            this.events[event] = [];
+        }
+        this.events[event].push(callback);
+    },
+    emit(event, data) {
+        if (this.events[event]) {
+            this.events[event].forEach(callback => callback(data));
+        }
+    },
+    off(event, callback) {
+        if (this.events[event]) {
+            this.events[event] = this.events[event].filter(cb => cb !== callback);
+        }
+    }
+};
+
+// Create CONFIG if it doesn't exist
+const CONFIG = {
+    THEME_KEY: 'cwm_theme',
+    DEFAULT_THEME: 'dark',
+    AUTH_TOKEN_KEY: 'cwm_token',
+    AUTH_REFRESH_KEY: 'cwm_refresh_token',
+    AUTH_USER_KEY: 'cwm_user',
+    ERROR_REPORTING: false
+};
+
+// Create EVENTS if it doesn't exist
+const EVENTS = {
+    THEME_CHANGED: 'theme:changed',
+    USER_LOGIN: 'user:login',
+    USER_LOGOUT: 'user:logout',
+    NOTIFICATION_SHOW: 'notification:show'
+};
+
+// Ensure utils has all required methods
+if (!utils.handleError) {
+    utils.handleError = function(error, context = 'Unknown') {
+        console.error(`❌ Error in ${context}:`, error);
+        // Show user-friendly error message
+        if (this.showNotification) {
+            this.showNotification(`Error: ${error.message || error}`, 'error');
+        }
+    };
+}
+
+if (!utils.showNotification) {
+    utils.showNotification = function(message, type = 'info', duration = 3000) {
+        // Use existing notification system or create fallback
+        if (utils.notification && utils.notification.show) {
+            return utils.notification.show(message, type, duration);
+        }
+        
+        // Fallback notification
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : type === 'warning' ? '#ffc107' : '#17a2b8'};
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            z-index: 10000;
+            min-width: 300px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideInRight 0.3s ease-out;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        `;
+        notification.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-${type === 'error' ? 'exclamation-circle' : type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease-in';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, duration);
+    };
+}
 
 /**
  * Main Application Class
@@ -29,42 +120,33 @@ export class App {
      */
     async init() {
         if (this.initialized) {
-            console.warn('⚠️ App already initialized');
+            console.log('⚠️ App already initialized');
             return;
         }
 
         try {
-            console.log('📱 Starting app initialization...');
+            console.log('🚀 Initializing app...');
             
-            // Initialize core systems
+            // Initialize core systems first
             await this.initializeCore();
             
-            // Load user preferences
-            await this.loadUserPreferences();
+            // Set up global events
+            this.setupGlobalEvents();
             
             // Initialize page-specific functionality
             await this.initializePageSpecific();
             
-            // Set up global event listeners
-            this.setupGlobalEvents();
-            
-            // Apply theme
-            this.applyTheme();
-            
             this.initialized = true;
-            
-            // Emit app ready event
-            this.eventBus.emit(EVENTS.SYSTEM_READY, {
-                timestamp: Date.now(),
-                theme: this.theme,
-                user: this.currentUser
-            });
-            
-            console.log('✅ App initialization complete');
+            console.log('✅ App initialized successfully');
             
         } catch (error) {
             console.error('❌ App initialization failed:', error);
-            this.utils.handleError(error, 'App Initialization');
+            // Use safe error handling
+            if (this.utils && typeof this.utils.handleError === 'function') {
+                this.utils.handleError(error, 'App initialization');
+            } else {
+                console.error('Utils not available for error handling');
+            }
         }
     }
 
@@ -159,9 +241,33 @@ export class App {
      * Initialize theme system
      */
     initializeTheme() {
-        const savedTheme = this.utils.storage.get(CONFIG.THEME_KEY, CONFIG.DEFAULT_THEME);
-        this.theme = savedTheme;
-        console.log('🎨 Theme initialized:', this.theme);
+        try {
+            // Try to get theme from storage, with fallback
+            const savedTheme = this.utils.storage.get(CONFIG.THEME_KEY, CONFIG.DEFAULT_THEME);
+            
+            // Handle corrupted theme data
+            if (savedTheme && typeof savedTheme === 'string' && ['light', 'dark'].includes(savedTheme)) {
+                this.theme = savedTheme;
+            } else {
+                console.warn('⚠️ Invalid theme data, using default');
+                this.theme = CONFIG.DEFAULT_THEME;
+                // Clear corrupted data
+                this.utils.storage.remove(CONFIG.THEME_KEY);
+                this.utils.storage.set(CONFIG.THEME_KEY, this.theme);
+            }
+            
+            // Apply theme immediately
+            this.applyTheme();
+            
+            console.log(`🎨 Theme system initialized with theme: ${this.theme}`);
+            
+        } catch (error) {
+            console.error('❌ Theme initialization failed:', error);
+            this.theme = CONFIG.DEFAULT_THEME;
+            // Clear all corrupted theme data
+            this.utils.storage.remove(CONFIG.THEME_KEY);
+            this.applyTheme();
+        }
     }
 
     /**
@@ -234,7 +340,12 @@ export class App {
         
         // Don't show notifications for minor errors
         if (error && error.message && !error.message.includes('Script error')) {
-            this.utils.showNotification(`Error: ${error.message}`, 'error');
+            // Safe notification with fallback
+            if (this.utils && typeof this.utils.showNotification === 'function') {
+                this.utils.showNotification(`Error: ${error.message}`, 'error');
+            } else {
+                console.error('Utils not available for showing notification');
+            }
         }
 
         // Send error to backend for logging (if configured)
@@ -331,8 +442,16 @@ export class App {
         try {
             console.log('📚 Initializing lesson page...');
             
-            // Import lesson system modules
-            const { default: LessonSystem } = await import('../lesson/lesson-system.js');
+            // Import lesson system modules with dynamic import for better error handling
+            let LessonSystem;
+            try {
+                const module = await import('../lesson/lesson-system.js');
+                LessonSystem = module.default || module.LessonSystem;
+            } catch (importError) {
+                console.error('❌ Failed to import LessonSystem:', importError);
+                this.showLessonError('Failed to load lesson system modules. Please refresh the page.');
+                return;
+            }
             
             // Initialize lesson system
             const lessonSystem = new LessonSystem();
@@ -344,8 +463,52 @@ export class App {
             
         } catch (error) {
             console.error('❌ Failed to initialize lesson page:', error);
-            this.utils.handleError(error, 'Lesson Page Initialization');
+            
+            // Safe error handling
+            if (this.utils && typeof this.utils.handleError === 'function') {
+                this.utils.handleError(error, 'Lesson Page Initialization');
+            } else {
+                console.error('Utils not available for error handling');
+            }
+            
+            // Show user-friendly error message
+            this.showLessonError(error.message || 'Failed to initialize lesson system');
         }
+    }
+    
+    /**
+     * Show lesson error message
+     */
+    showLessonError(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'lesson-error-message';
+        errorDiv.style.cssText = 'background: #f8d7da; color: #721c24; padding: 1rem; border: 1px solid #f5c6cb; border-radius: 4px; margin: 1rem; text-align: center;';
+        errorDiv.innerHTML = `
+            <div style="margin-bottom: 0.5rem;">
+                <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem;"></i>
+                <strong>Lesson Loading Error</strong>
+            </div>
+            <div style="margin-bottom: 1rem;">${message}</div>
+            <button onclick="location.reload()" style="background: #dc3545; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">
+                <i class="fas fa-refresh" style="margin-right: 0.5rem;"></i>Refresh Page
+            </button>
+        `;
+        
+        // Find lesson content container or create one
+        const container = document.getElementById('lesson-content-container') || 
+                         document.getElementById('lesson-content') || 
+                         document.querySelector('.lesson-container') ||
+                         document.body;
+                         
+        // Clear container and add error
+        if (container.id === 'lesson-content-container' || container.id === 'lesson-content') {
+            container.innerHTML = '';
+        }
+        container.appendChild(errorDiv);
+        
+        // Hide loading indicators
+        const loading = document.getElementById('content-loading');
+        if (loading) loading.style.display = 'none';
     }
 
     /**

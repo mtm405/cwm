@@ -14,12 +14,29 @@ import { LessonInteractions } from './components/LessonInteractions.js';
 export class LessonSystem {
     constructor() {
         this.lessonId = this.getLessonId();
-        this.services = {
-            data: new LessonDataService(),
-            progress: new LessonProgress(),
-            renderer: new LessonRenderer(),
-            interactions: new LessonInteractions()
-        };
+        
+        // Initialize services with error handling
+        try {
+            this.services = {
+                data: new LessonDataService(),
+                progress: new LessonProgress(),
+                renderer: new LessonRenderer(),
+                interactions: null // Initialize later to avoid import errors
+            };
+        } catch (error) {
+            console.error('❌ Failed to initialize lesson services:', error);
+            
+            // Create fallback services
+            this.services = {
+                data: new LessonDataService(),
+                progress: new LessonProgress(),
+                renderer: new LessonRenderer(),
+                interactions: null
+            };
+            
+            // Mark that interactions failed to load
+            this.interactionsError = error;
+        }
         
         this.state = {
             lessonData: null,
@@ -78,8 +95,30 @@ export class LessonSystem {
             // Render the lesson
             await this.services.renderer.renderLesson(this.state.lessonData, this.state.userProgress);
             
-            // Initialize interactions
-            this.services.interactions.initialize(this.state.lessonData, this.state.userProgress);
+            // Initialize interactions with error handling
+            if (!this.services.interactions) {
+                try {
+                    // Create interactions dynamically
+                    this.services.interactions = new LessonInteractions();
+                    console.log('✅ Created LessonInteractions instance');
+                } catch (error) {
+                    console.error('❌ Failed to create LessonInteractions:', error);
+                    this.services.interactions = null;
+                }
+            }
+            
+            if (this.services.interactions) {
+                try {
+                    await this.services.interactions.initialize(this.state.lessonData, this.state.userProgress);
+                    console.log('✅ LessonInteractions initialized successfully');
+                } catch (interactionError) {
+                    console.error('❌ Interaction initialization failed:', interactionError);
+                    // Show error but continue - interactions are not critical for basic lesson viewing
+                    this.services.renderer.showError('Some interactive features may not work properly');
+                }
+            } else {
+                console.warn('⚠️ Interactions not available - continuing with basic lesson functionality');
+            }
             
             // Set up progress tracking
             this.services.progress.initialize(
@@ -104,7 +143,9 @@ export class LessonSystem {
         } catch (error) {
             console.error('❌ Lesson initialization failed:', error);
             this.services.renderer.showError(error.message);
-            throw error;
+            
+            // Don't re-throw - let the page continue with basic functionality
+            this.state.initialized = false;
         }
     }
     
@@ -138,13 +179,20 @@ export class LessonSystem {
      */
     async loadLessonData() {
         try {
+            console.log(`🔍 Loading lesson data for: ${this.lessonId}`);
+            
             // First try to use provided data from template
-            if (window.lessonData && Object.keys(window.lessonData).length > 0) {
+            if (window.lessonData && Object.keys(window.lessonData).length > 0 && window.lessonData.id === this.lessonId) {
                 this.state.lessonData = window.lessonData;
                 this.state.userProgress = window.lessonProgress || {};
-                console.log('📖 Using lesson data from template');
-            } else {
-                // Fetch from API
+                console.log('📖 Using lesson data from template:', this.state.lessonData.title);
+                return;
+            }
+            
+            // If no window data or wrong lesson, fetch from API
+            console.log('🌐 Fetching lesson data from API...');
+            
+            try {
                 const [lessonData, userProgress] = await Promise.all([
                     this.services.data.fetchLesson(this.lessonId),
                     this.services.progress.fetchUserProgress(this.lessonId, this.state.currentUser?.id)
@@ -152,7 +200,29 @@ export class LessonSystem {
                 
                 this.state.lessonData = lessonData;
                 this.state.userProgress = userProgress;
-                console.log('📖 Fetched lesson data from API');
+                console.log('📖 Fetched lesson data from API:', this.state.lessonData?.title);
+                
+            } catch (apiError) {
+                console.error('❌ API fetch failed:', apiError);
+                
+                // Try to create a basic fallback lesson
+                this.state.lessonData = {
+                    id: this.lessonId,
+                    title: `Lesson: ${this.lessonId}`,
+                    description: 'We encountered an issue loading this lesson.',
+                    blocks: [
+                        {
+                            id: 'error-block',
+                            type: 'text',
+                            title: 'Loading Error',
+                            content: `# Unable to Load Lesson\n\nWe're having trouble loading "${this.lessonId}". This could be due to:\n\n- Network connectivity issues\n- The lesson ID may not exist\n- Server is temporarily unavailable\n\nPlease try refreshing the page or contact support if the problem persists.`,
+                            order: 0
+                        }
+                    ]
+                };
+                this.state.userProgress = { completed_blocks: [], progress: 0 };
+                
+                console.warn('📝 Using fallback lesson data');
             }
             
         } catch (error) {
