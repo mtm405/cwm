@@ -16,13 +16,14 @@
 
 ### **🔄 Files Consolidated**
 - **Before**: 3 utility files with duplicates (`utils.js`, `core/utils.js`, `modules/app-utils.js`)
-- **After**: 1 consolidated utilities file with ES6 compatibility bridge
+- **After**: 1 consolidated `utils.js` file with ES6 compatibility bridge
 - **Result**: Single source of truth for all utility functions
+- **Architecture**: `utils.js` (main) ← `core/utils.js` (ES6 bridge) ← templates/modules
 
 ### **📁 Final Structure**
 ```
 static/js/
-├── utils.js                        # 🎯 Consolidated utilities (primary)
+├── utils.js                        # 🎯 MAIN: Consolidated utilities (617 lines, 50+ functions)
 ├── core/utils.js                   # 🔗 ES6 bridge (imports from utils.js)
 ├── lesson/lesson-system.js         # 🚀 Lesson system (consolidated)
 ├── quiz/QuizEngine.js              # 📝 Quiz system (consolidated)
@@ -34,7 +35,7 @@ static/js/
 ├── utils/                          # 🛠️ Specialized utilities
 ├── modules/                        # 📂 Feature modules
 ├── services/                       # 🔧 Business logic
-└── archive/                        # 📁 Archived files
+└── archive/                        # 📁 Archived files (old versions)
 ```
 
 ## **Key Consolidation Benefits**
