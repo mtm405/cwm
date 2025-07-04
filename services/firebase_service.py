@@ -146,34 +146,7 @@ class FirebaseService:
         except Exception as e:
             logger.error(f"Error creating user {user_id}: {str(e)}")
             return False
-    
-    def get_leaderboard(self, limit: int = 10) -> list:
-        """Get leaderboard data with error handling."""
-        if not self.is_available():
-            logger.warning("Firebase not available, cannot get leaderboard")
-            return []
-        
-        try:
-            users_ref = self.db.collection('users')
-            query = users_ref.order_by('xp', direction=firestore.Query.DESCENDING).limit(limit)
-            docs = query.stream()
-            
-            leaderboard = []
-            for doc in docs:
-                user_data = doc.to_dict()
-                leaderboard.append({
-                    'username': user_data.get('username', 'Anonymous'),
-                    'xp': user_data.get('xp', 0)
-                })
-            
-            logger.debug(f"Retrieved leaderboard with {len(leaderboard)} entries")
-            return leaderboard
-            
-        except Exception as e:
-            logger.error(f"Error retrieving leaderboard: {str(e)}")
-            return []
-    
-    def save_quiz_result(self, user_id: str, quiz_id: str, result: Dict[str, Any]) -> bool:
+      def save_quiz_result(self, user_id: str, quiz_id: str, result: Dict[str, Any]) -> bool:
         """Save quiz result with validation."""
         if not self.is_available():
             logger.warning("Firebase not available, cannot save quiz result")
@@ -203,7 +176,7 @@ class FirebaseService:
             logger.error(f"Error saving quiz result: {str(e)}")
             return False
         
-    def save_quiz_result(self, result_id: str, result_data: Dict[str, Any]) -> bool:
+    def save_quiz_result_by_id(self, result_id: str, result_data: Dict[str, Any]) -> bool:
         """Save quiz result with result ID and data"""
         if not self.is_available():
             logger.warning("Firebase not available, cannot save quiz result")

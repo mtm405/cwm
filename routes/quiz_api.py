@@ -79,7 +79,7 @@ def submit_quiz_result(quiz_id):
             try:
                 # Save to quiz results collection
                 result_id = f"{user_id}_{quiz_id}_{int(data.get('timestamp', 0))}"
-                firebase_service.save_quiz_result(result_id, result_data)
+                firebase_service.save_quiz_result_by_id(result_id, result_data)
                 success = True
                 logger.info(f"Quiz result saved: {result_id}")
             except Exception as e:
