@@ -203,6 +203,22 @@ class FirebaseService:
             logger.error(f"Error saving quiz result: {str(e)}")
             return False
         
+    def save_quiz_result(self, result_id: str, result_data: Dict[str, Any]) -> bool:
+        """Save quiz result with result ID and data"""
+        if not self.is_available():
+            logger.warning("Firebase not available, cannot save quiz result")
+            return False
+        
+        try:
+            # Save to quiz_results collection with specified ID
+            self.db.collection('quiz_results').document(result_id).set(result_data)
+            logger.info(f"Saved quiz result with ID: {result_id}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error saving quiz result: {str(e)}")
+            return False
+    
     def get_lesson(self, lesson_id: str) -> Optional[Dict[str, Any]]:
         """Get lesson from Firebase"""
         if not self.is_available():

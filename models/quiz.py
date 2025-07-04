@@ -66,6 +66,14 @@ def submit_quiz_result(user_id: str, quiz_id: str, answers: Dict[str, Any], scor
         logger.error(f"Error submitting quiz result: {str(e)}")
         return False
 
+def save_quiz_result(result_id: str, result_data: Dict[str, Any]) -> bool:
+    """Save quiz result to Firebase"""
+    if firebase_service and firebase_service.is_available():
+        return firebase_service.save_quiz_result(result_id, result_data)
+    else:
+        logger.warning("Firebase not available, cannot save quiz result")
+        return False
+
 def get_mock_quiz(quiz_id):
     """Get mock quiz data for development"""
     quizzes = {

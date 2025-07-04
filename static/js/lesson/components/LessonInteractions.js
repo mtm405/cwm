@@ -1197,25 +1197,23 @@ export class LessonInteractions {
     }
     
     async initializeFallbackQuizzes(quizElements) {
-        console.log('🔄 Initializing fallback quiz system...');
+        console.log('🔄 Initializing quiz system...');
         
         try {
-            // Try to load the basic quiz module
-            const { QuizModule } = await import('/static/js/modules/quiz.js');
-            this.quizModule = new QuizModule({
-                autoSave: true,
-                showFeedback: true,
-                animateTransitions: true
-            });
-            
-            await this.quizModule.init();
-            
-            // Load each quiz with basic system
-            for (const quizElement of quizElements) {
-                const quizId = quizElement.dataset.quizId;
-                const blockId = quizElement.dataset.blockId;
+            // Use the main quiz system (QuizEngine + QuizController)
+            if (window.QuizEngine && window.QuizController && window.QuizState) {
+                console.log('✅ Using main quiz system');
                 
-                await this.loadBasicQuiz(quizId, blockId, quizElement);
+                // Initialize each quiz with the main system
+                for (const quizElement of quizElements) {
+                    const quizId = quizElement.dataset.quizId;
+                    const blockId = quizElement.dataset.blockId;
+                    
+                    await this.loadMainQuiz(quizId, blockId, quizElement);
+                }
+            } else {
+                console.warn('⚠️ Main quiz system not loaded, loading basic fallback');
+                await this.loadBasicQuizFallback(quizElements);
             }
             
             console.log(`🧠 Initialized ${quizElements.length} basic quizzes`);
@@ -1243,9 +1241,9 @@ export class LessonInteractions {
         }
     }
     
-    async loadBasicQuiz(quizId, blockId, quizElement) {
+    async loadMainQuiz(quizId, blockId, quizElement) {
         try {
-            console.log(`🔄 Loading basic quiz: ${quizId}`);
+            console.log(`🧠 Loading main quiz: ${quizId}`);
             
             // Load quiz data from API
             const response = await fetch(`/api/quiz/${quizId}`);
@@ -1256,139 +1254,87 @@ export class LessonInteractions {
             
             const quizData = await response.json();
             
-            // Render quiz with the loaded data using basic system
-            this.renderBasicQuiz(quizData, quizElement, blockId);
+            // Create quiz controller for this quiz
+            const quizController = new window.QuizController(quizElement.id, {
+                showProgress: true,
+                showTimer: true,
+                showHints: true,
+                allowNavigation: true,
+                animateTransitions: true
+            });
+            
+            // Initialize quiz engine
+            const quizEngine = new window.QuizEngine();
+            await quizEngine.initialize(quizData, {
+                analytics: true,
+                autoSave: true,
+                debugMode: false
+            });
+            
+            // Connect controller to engine
+            quizController.engine = quizEngine;
+            
+            // Start the quiz
+            await quizController.start();
+            
+            // Set up completion handler
+            quizEngine.state.addEventListener('quiz_completed', (event) => {
+                this.handleQuizCompletion(blockId, event.detail);
+            });
+            
+            console.log(`✅ Main quiz ${quizId} loaded successfully`);
             
         } catch (error) {
-            console.error(`❌ Failed to load basic quiz ${quizId}:`, error);
+            console.error(`❌ Failed to load main quiz ${quizId}:`, error);
             this.renderQuizError(quizElement, error.message);
         }
     }
     
-    renderBasicQuiz(quizData, quizElement, blockId) {
-        // Clear loading state
-        quizElement.innerHTML = '';
+    /**
+     * Load basic quiz fallback when main system isn't available
+     */
+    async loadBasicQuizFallback(quizElements) {
+        console.log('🔄 Loading basic quiz fallback...');
         
-        // Create quiz overview
-        const quizOverview = document.createElement('div');
-        quizOverview.className = 'quiz-overview';
-        quizOverview.innerHTML = `
-            <div class="quiz-header">
-                <h4><i class="fas fa-brain"></i> ${quizData.title}</h4>
-                <div class="quiz-meta">
-                    <span class="quiz-questions-count">
-                        <i class="fas fa-question-circle"></i>
-                        ${quizData.questions.length} questions
-                    </span>
-                    ${quizData.time_limit ? `
-                        <span class="quiz-time-limit">
-                            <i class="fas fa-clock"></i>
-                            ${quizData.time_limit} seconds
-                        </span>
-                    ` : ''}
-                    <span class="quiz-difficulty">
-                        <i class="fas fa-star"></i>
-                        ${quizData.difficulty}
-                    </span>
-                </div>
-            </div>
-            <div class="quiz-description">
-                <p>${quizData.description}</p>
-            </div>
-            <div class="quiz-rewards">
-                <span class="reward-item">
-                    <i class="fas fa-star"></i>
-                    ${quizData.xp_reward || 0} XP
-                </span>
-                <span class="reward-item">
-                    <i class="fas fa-coins"></i>
-                    ${quizData.pycoins_reward || 0} PyCoins
-                </span>
-            </div>
-            <div class="quiz-actions">
-                <button class="btn btn-primary start-quiz-btn" data-quiz-id="${quizData.id}" data-block-id="${blockId}">
-                    <i class="fas fa-play"></i> Start Quiz
-                </button>
-            </div>
-        `;
-        
-        quizElement.appendChild(quizOverview);
-        
-        // Set up quiz start handler
-        const startBtn = quizOverview.querySelector('.start-quiz-btn');
-        startBtn.addEventListener('click', () => this.startBasicQuiz(quizData, quizElement, blockId));
-    }
-    
-    async startBasicQuiz(quizData, quizElement, blockId) {
         try {
-            // Clear overview and show quiz questions
-            quizElement.innerHTML = '';
-            
-            // Create quiz interface
-            const quizInterface = document.createElement('div');
-            quizInterface.className = 'quiz-interface';
-            quizInterface.innerHTML = `
-                <div class="quiz-header">
-                    <h4>${quizData.title}</h4>
-                    <div class="quiz-progress">
-                        <span class="current-question">1</span> / <span class="total-questions">${quizData.questions.length}</span>
-                    </div>
-                </div>
-                <div class="quiz-content">
-                    <div class="quiz-questions" id="quiz-questions-${blockId}"></div>
-                </div>
-                <div class="quiz-controls">
-                    <button class="btn btn-secondary prev-question-btn" disabled>
-                        <i class="fas fa-arrow-left"></i> Previous
-                    </button>
-                    <button class="btn btn-primary next-question-btn">
-                        Next <i class="fas fa-arrow-right"></i>
-                    </button>
-                    <button class="btn btn-success submit-quiz-btn" style="display: none;">
-                        <i class="fas fa-check"></i> Submit Quiz
-                    </button>
-                </div>
-            `;
-            
-            quizElement.appendChild(quizInterface);
-            
-            // Initialize quiz state
-            this.currentQuiz = {
-                data: quizData,
-                blockId: blockId,
-                currentQuestion: 0,
-                answers: {},
-                element: quizElement
-            };
-            
-            // Render first question
-            this.renderQuestion(0);
-            
-            // Set up controls
-            this.setupQuizControls();
+            // Use simple placeholder quiz system as fallback
+            console.warn('⚠️ Main quiz system not available, using simple placeholders');
+            this.renderQuizPlaceholders(quizElements);
             
         } catch (error) {
-            console.error('❌ Failed to start basic quiz:', error);
-            this.renderQuizError(quizElement, 'Failed to start quiz');
+            console.error('❌ Failed to load quiz fallback:', error);
+            // Render static quiz placeholder
+            this.renderQuizPlaceholders(quizElements);
         }
     }
     
-    handleBlockCompleted(event) {
-        const { blockId, progress } = event.detail;
-        console.log(`🎉 Block completed: ${blockId} (${progress}%)`);
+    /**
+     * Handle quiz completion from main system
+     */
+    handleQuizCompletion(blockId, result) {
+        console.log(`🎉 Quiz completed for block ${blockId}:`, result);
         
-        // Update UI for completed block
-        const blockElement = document.getElementById(`block-${blockId}`);
-        if (blockElement) {
-            blockElement.classList.add('completed');
-            
-            // Add completion animation
-            blockElement.style.animation = 'completion-pulse 0.6s ease-out';
-            setTimeout(() => {
-                blockElement.style.animation = '';
-            }, 600);
+        // Dispatch completion event
+        document.dispatchEvent(new CustomEvent('quiz-completed', {
+            detail: {
+                blockId: blockId,
+                score: result.score,
+                passed: result.passed,
+                totalQuestions: result.totalQuestions,
+                correctAnswers: result.correctAnswers,
+                timeSpent: result.timeSpent
+            }
+        }));
+        
+        // Mark block as completed if passed
+        if (result.passed) {
+            document.dispatchEvent(new CustomEvent('block-completed', {
+                detail: { blockId: blockId }
+            }));
         }
     }
+
+    // ...existing code...
     
     escapeHtml(text) {
         if (!text) return '';
@@ -1527,5 +1473,61 @@ export class LessonInteractions {
         });
         
         this.codeEditors.clear();
+    }
+    
+    /**
+     * Render simple quiz placeholders when quiz system isn't available
+     */
+    renderQuizPlaceholders(quizElements) {
+        console.log('📝 Rendering quiz placeholders...');
+        
+        quizElements.forEach((quizElement, index) => {
+            const quizId = quizElement.dataset.quizId || `quiz-${index}`;
+            const blockId = quizElement.dataset.blockId || `block-${index}`;
+            
+            quizElement.innerHTML = `
+                <div class="quiz-placeholder">
+                    <div class="quiz-header">
+                        <h4><i class="fas fa-brain"></i> Quiz: ${quizId}</h4>
+                        <span class="quiz-status">Not Available</span>
+                    </div>
+                    <div class="quiz-content">
+                        <div class="placeholder-message">
+                            <i class="fas fa-info-circle"></i>
+                            <p>Quiz system is currently loading. Please refresh the page or try again later.</p>
+                        </div>
+                        <div class="quiz-actions">
+                            <button class="btn btn-primary reload-quiz-btn" data-quiz-id="${quizId}" data-block-id="${blockId}">
+                                <i class="fas fa-refresh"></i> Reload Quiz
+                            </button>
+                            <button class="btn btn-secondary skip-quiz-btn" data-block-id="${blockId}">
+                                <i class="fas fa-forward"></i> Skip for Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add event listeners for placeholder actions
+            const reloadBtn = quizElement.querySelector('.reload-quiz-btn');
+            const skipBtn = quizElement.querySelector('.skip-quiz-btn');
+            
+            reloadBtn?.addEventListener('click', () => {
+                window.location.reload();
+            });
+            
+            skipBtn?.addEventListener('click', () => {
+                // Mark as temporarily skipped
+                quizElement.classList.add('quiz-skipped');
+                quizElement.innerHTML = `
+                    <div class="quiz-skipped">
+                        <i class="fas fa-clock"></i>
+                        <p>Quiz skipped - come back later to complete</p>
+                    </div>
+                `;
+            });
+        });
+        
+        console.log(`📝 Rendered ${quizElements.length} quiz placeholders`);
     }
 }

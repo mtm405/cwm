@@ -201,10 +201,12 @@ class ModuleLoader {
             'themeController': 'components/ThemeController.js',
             
             // Lesson-specific modules
-            'lessonCore': 'modules/lessonCore.js',
             'interactiveEditor': 'modules/interactiveEditor.js',
-            'quiz': 'modules/quiz.js',
-            'lessonTestSuite': 'modules/lessonTestSuite.js',
+            
+            // Quiz system (use main quiz/ directory instead of modules/)
+            'QuizEngine': 'quiz/QuizEngine.js',
+            'QuizController': 'quiz/QuizController.js',
+            'QuizState': 'quiz/QuizState.js',
             
             // Utility modules
             'performanceMonitor': 'utils/performance-monitor.js'
@@ -395,10 +397,21 @@ class ModuleLoader {
             // Load quiz system if needed
             if (this.shouldLoadQuizSystem()) {
                 const quizModules = [
-                    'quizEngine', 'quizState', 'quizController',
-                    'multipleChoiceRenderer', 'trueFalseRenderer', 'fillBlankRenderer'
+                    'QuizEngine', 'QuizState', 'QuizController'
                 ];
                 await this.loadModules(quizModules, options);
+                
+                // Load quiz renderers
+                const rendererModules = [
+                    'quiz/renderers/MultipleChoiceRenderer.js',
+                    'quiz/renderers/TrueFalseRenderer.js', 
+                    'quiz/renderers/FillBlankRenderer.js'
+                ];
+                
+                // Load renderers directly
+                for (const renderer of rendererModules) {
+                    await this.loadScript(this.baseUrl + renderer);
+                }
             }
             
             // Load main app controller last

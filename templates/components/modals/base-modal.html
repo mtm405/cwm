@@ -1,5 +1,5 @@
 <!--
-Base Modal Component (Standardized)
+Base Modal Component
 Usage: {% include 'components/modals/base-modal.html' with context %}
 Variables needed:
 - modal_id: Unique identifier for the modal
@@ -8,13 +8,12 @@ Variables needed:
 - modal_close_action: JavaScript function to call on close (optional, defaults to closeModal)
 - modal_size: Size variant ('sm', 'md', 'lg', 'xl') - defaults to 'md'
 - modal_backdrop_close: Whether clicking backdrop closes modal (default: true)
-Last updated: July 4, 2025 - Standardization Phase
 -->
 <div id="{{ modal_id }}" class="modal-overlay {{ modal_size or 'md' }}" style="display: none;">
     <div class="modal-backdrop" {% if modal_backdrop_close|default(true) %}onclick="{{ modal_close_action or 'closeModal' }}('{{ modal_id }}')"{% endif %}></div>
     <div class="modal-content">
         <div class="modal-header">
-            <h3 class="modal-title">{{ modal_title | safe }}</h3>
+            <h2 class="modal-title">{{ modal_title }}</h2>
             <button class="modal-close" onclick="{{ modal_close_action or 'closeModal' }}('{{ modal_id }}')">
                 <i class="fas fa-times"></i>
             </button>
