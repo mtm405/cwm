@@ -1,0 +1,341 @@
+{% extends "base/layout.html" %}
+
+{% block title %}User Profile - Code with Morais{% endblock %}
+
+{% block page_name %}profile{% endblock %}
+
+{% block content %}
+<div class="container">
+    <header class="profile-header">
+        <div class="profile-header-content">
+            <div class="profile-avatar-section">
+                <div class="profile-avatar-container">
+                    <img id="profileAvatar" src="{{ user.avatar_url or '/static/img/default-avatar.png' }}" 
+                         alt="Profile Avatar" class="profile-avatar">
+                    <button id="changeAvatarBtn" class="change-avatar-btn">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="profile-info-section">
+                <div class="profile-basic-info">
+                    <h1 id="profileDisplayName">{{ user.display_name or user.email }}</h1>
+                    <p id="profileBio" class="profile-bio">{{ user.bio or 'No bio available' }}</p>
+                    <div class="profile-stats-quick">
+                        <div class="stat-item">
+                            <span class="stat-value" id="quickLessonsCompleted">0</span>
+                            <span class="stat-label">Lessons</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="quickAchievements">0</span>
+                            <span class="stat-label">Achievements</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="quickStreak">0</span>
+                            <span class="stat-label">Day Streak</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="profile-actions">
+                    <button id="editProfileBtn" class="btn btn-primary">
+                        <i class="fas fa-edit"></i>
+                        Edit Profile
+                    </button>
+                    <button id="shareProfileBtn" class="btn btn-secondary">
+                        <i class="fas fa-share"></i>
+                        Share
+                    </button>
+                    <button id="settingsBtn" class="btn btn-secondary">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="profile-nav">
+        <div class="nav-container">
+            <button class="nav-btn active" data-section="overview">
+                <i class="fas fa-user"></i>
+                Overview
+            </button>
+            <button class="nav-btn" data-section="progress">
+                <i class="fas fa-chart-line"></i>
+                Progress
+            </button>
+            <button class="nav-btn" data-section="achievements">
+                <i class="fas fa-trophy"></i>
+                Achievements
+            </button>
+            <button class="nav-btn" data-section="activity">
+                <i class="fas fa-history"></i>
+                Activity
+            </button>
+            <button class="nav-btn" data-section="social">
+                <i class="fas fa-users"></i>
+                Social
+            </button>
+        </div>
+    </nav>
+
+    <div class="profile-content">
+        <!-- Overview Section -->
+        <section id="overview-section" class="profile-section active">
+            <!-- Stats Cards Row -->
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="lessonsCompleted">0</div>
+                        <div class="stat-label">Lessons Completed</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="challengesCompleted">0</div>
+                        <div class="stat-label">Challenges Completed</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="xpEarned">0</div>
+                        <div class="stat-label">XP Earned</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="currentStreak">0</div>
+                        <div class="stat-label">Day Streak</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Skill Progress -->
+            <div class="skill-progress-container">
+                <h2>Skill Progress</h2>
+                <div class="skill-bars">
+                    <div class="skill-item">
+                        <div class="skill-info">
+                            <span class="skill-name">Python Basics</span>
+                            <span class="skill-percentage" id="pythonBasicsPercent">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" id="pythonBasicsProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-item">
+                        <div class="skill-info">
+                            <span class="skill-name">Data Structures</span>
+                            <span class="skill-percentage" id="dataStructuresPercent">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" id="dataStructuresProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-item">
+                        <div class="skill-info">
+                            <span class="skill-name">Functions</span>
+                            <span class="skill-percentage" id="functionsPercent">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" id="functionsProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-item">
+                        <div class="skill-info">
+                            <span class="skill-name">OOP Concepts</span>
+                            <span class="skill-percentage" id="oopPercent">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" id="oopProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="recent-activity">
+                <div class="section-header">
+                    <h2>Recent Activity</h2>
+                    <a href="#" class="view-all">View All</a>
+                </div>
+                <div class="activity-list" id="recentActivityList">
+                    <div class="activity-empty">
+                        <i class="fas fa-history"></i>
+                        <p>No recent activity to display</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Progress Section -->
+        <section id="progress-section" class="profile-section">
+            <h2>Your Learning Progress</h2>
+            <div class="progress-overview">
+                <div class="progress-chart-container">
+                    <canvas id="progressChart"></canvas>
+                </div>
+                <div class="progress-summary">
+                    <div class="summary-card">
+                        <h3>Weekly Summary</h3>
+                        <div class="summary-stats">
+                            <div class="summary-stat">
+                                <span class="stat-label">Active Days</span>
+                                <span class="stat-value" id="weeklyActiveDays">0/7</span>
+                            </div>
+                            <div class="summary-stat">
+                                <span class="stat-label">Lessons</span>
+                                <span class="stat-value" id="weeklyLessons">0</span>
+                            </div>
+                            <div class="summary-stat">
+                                <span class="stat-label">XP Gained</span>
+                                <span class="stat-value" id="weeklyXP">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="learning-paths">
+                <h3>Learning Paths</h3>
+                <div class="path-cards" id="learningPathsList">
+                    <!-- Path cards will be dynamically generated -->
+                    <div class="path-empty">
+                        <i class="fas fa-route"></i>
+                        <p>No learning paths started yet</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Achievements Section -->
+        <section id="achievements-section" class="profile-section">
+            <h2>Your Achievements</h2>
+            <div class="achievements-grid" id="achievementsGrid">
+                <!-- Achievements will be dynamically generated -->
+                <div class="achievement-empty">
+                    <i class="fas fa-trophy"></i>
+                    <p>Complete lessons and challenges to earn achievements</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Activity Section -->
+        <section id="activity-section" class="profile-section">
+            <h2>Activity History</h2>
+            <div class="activity-filters">
+                <select id="activityFilter" class="activity-filter-select">
+                    <option value="all">All Activity</option>
+                    <option value="lessons">Lessons</option>
+                    <option value="challenges">Challenges</option>
+                    <option value="achievements">Achievements</option>
+                </select>
+            </div>
+            <div class="activity-timeline" id="activityTimeline">
+                <!-- Activity items will be dynamically generated -->
+                <div class="activity-empty">
+                    <i class="fas fa-history"></i>
+                    <p>No activity history to display</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Social Section -->
+        <section id="social-section" class="profile-section">
+            <h2>Social Connections</h2>
+            <div class="friends-container">
+                <div class="section-header">
+                    <h3>Friends</h3>
+                    <button class="btn btn-small" id="addFriendBtn">
+                        <i class="fas fa-user-plus"></i> Add Friend
+                    </button>
+                </div>
+                <div class="friends-list" id="friendsList">
+                    <!-- Friends will be dynamically generated -->
+                    <div class="friends-empty">
+                        <i class="fas fa-users"></i>
+                        <p>You haven't added any friends yet</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="leaderboard-preview">
+                <div class="section-header">
+                    <h3>Leaderboard Position</h3>
+                    <button class="btn btn-small" onclick="openLeaderboardModal()">
+                        <i class="fas fa-trophy"></i> Full Leaderboard
+                    </button>
+                </div>
+                <div class="leaderboard-snapshot" id="leaderboardSnapshot">
+                    <!-- Leaderboard items will be dynamically generated -->
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- Profile Edit Modal -->
+<div id="editProfileModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Profile</h2>
+            <button class="close-modal" onclick="closeEditProfileModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="profileEditForm">
+                <div class="form-group">
+                    <label for="editDisplayName">Display Name</label>
+                    <input type="text" id="editDisplayName" class="form-control" placeholder="Enter display name">
+                </div>
+                <div class="form-group">
+                    <label for="editBio">Bio</label>
+                    <textarea id="editBio" class="form-control" placeholder="Tell us about yourself"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editPreferences">Email Preferences</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="editPreferencesDailyChallenge"> Daily challenge notifications
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="editPreferencesWeeklySummary"> Weekly progress summary
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="editPreferencesAchievements"> Achievement notifications
+                        </label>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditProfileModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+{% endblock %}

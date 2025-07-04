@@ -9,9 +9,7 @@ const CSS_BUNDLES = {
     // Critical CSS - Always loaded immediately
     critical: {
         files: [
-            'static/css/critical/main.css',
-            'static/css/critical/dashboard.css',
-            'static/css/critical/auth.css'
+            'static/css/main.css',
         ],
         priority: 'high',
         loadStrategy: 'blocking'
@@ -33,9 +31,7 @@ const CSS_BUNDLES = {
     // Page-specific CSS bundles
     dashboard: {
         files: [
-            'static/css/components/dashboard-fixed.css',
-            'static/css/components/dashboard-enhancements.css',
-            'static/css/components/welcome-enhancements.css'
+            'static/css/components/dashboard-consolidated.css'
         ],
         priority: 'medium',
         loadStrategy: 'lazy',
@@ -47,8 +43,8 @@ const CSS_BUNDLES = {
             'static/css/components/lesson.css',
             'static/css/components/lesson-block-types.css',
             'static/css/components/lesson-blocks-enhanced.css',
-            'static/css/components/lesson-learning-colors.css',
-            'static/css/components/lesson-progress-enhanced.css'
+            'static/css/components/lesson-progress-enhanced.css',
+            'static/css/components/lesson-content-blocks.css'
         ],
         priority: 'medium',
         loadStrategy: 'lazy',
@@ -68,7 +64,6 @@ const CSS_BUNDLES = {
     // UI Components - Can be loaded lazily
     ui: {
         files: [
-            'static/css/components/ui-components.css',
             'static/css/components/skeleton.css',
             'static/css/components/responsive-enhancements.css'
         ],

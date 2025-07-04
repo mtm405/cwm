@@ -1,5 +1,5 @@
 /* CSS Bundle: lessons */
-/* Generated on: 2025-07-04T00:45:20.314Z */
+/* Generated on: 2025-07-04T17:05:39.973Z */
 /* Priority: medium */
 /* Load Strategy: lazy */
 
@@ -564,7 +564,7 @@
     position: relative;
 }
 
-.lesson-container .code-content {
+.code-content {
     background: #2d3748;
     color: #e2e8f0;
     padding: 1.5rem;
@@ -590,7 +590,7 @@
     margin-bottom: 1rem;
 }
 
-.lesson-container .code-output {
+.code-output {
     background: #1a202c;
     color: #e2e8f0;
     border-radius: 8px;
@@ -656,14 +656,14 @@
     color: var(--text-color);
 }
 
-.lesson-container .code-editor-wrapper {
+.code-editor-wrapper {
     background: #1a202c;
     border-radius: 8px;
     overflow: hidden;
     margin-bottom: 1.5rem;
 }
 
-.lesson-container .editor-toolbar {
+.editor-toolbar {
     background: #2d3748;
     padding: 1rem 1.5rem;
     display: flex;
@@ -704,7 +704,7 @@
     transform: translateY(-2px);
 }
 
-.lesson-container .code-editor {
+.code-editor {
     min-height: 300px;
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     font-size: 0.9rem;
@@ -712,7 +712,7 @@
     color: #e2e8f0;
 }
 
-.lesson-container .editor-footer {
+.editor-footer {
     background: #2d3748;
     padding: 1rem 1.5rem;
     display: flex;
@@ -735,7 +735,7 @@
 }
 
 .btn-primary:hover {
-    filter: brightness(0.9);
+    background: color-mix(in srgb, var(--block-color) 90%, black);
     transform: translateY(-2px);
 }
 
@@ -850,58 +850,54 @@
 }
 
 /* =========================================
-   📱 RESPONSIVE BREAKPOINTS
+   📱 ENHANCED RESPONSIVE BREAKPOINTS - Implementation Plan
    ========================================= */
 
-@media (max-width: 768px) {
+/* Desktop First Approach - Chromebook & Desktop (1200px+) */
+.lesson-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Large Chromebook & Small Desktop (1000px - 1199px) */
+@media (max-width: 1199px) and (min-width: 1000px) {
     .lesson-container {
-        padding: 1rem;
-    }
-    
-    .lesson-header {
         padding: 1.5rem;
-        text-align: center;
+        max-width: 100%;
     }
     
     .lesson-title {
-        font-size: 1.5rem;
-        justify-content: center;
+        font-size: 1.75rem;
+    }
+    
+    .content-block {
+        padding: 1.75rem;
+    }
+    
+    .code-editor {
+        min-height: 280px;
+    }
+}
+
+/* Standard Chromebook & Tablet (768px - 999px) */
+@media (max-width: 999px) and (min-width: 768px) {
+    .lesson-container {
+        padding: 1.25rem;
+    }
+    
+    .lesson-header {
+        padding: 1.75rem;
     }
     
     .lesson-meta {
         flex-direction: column;
-        align-items: center;
-    }
-    
-    .lesson-badges {
-        justify-content: center;
-    }
-    
-    .content-block {
-        padding: 1.5rem;
-    }
-    
-    .block-header {
-        flex-direction: column;
-        gap: 1rem;
         align-items: flex-start;
-    }
-    
-    .nav-buttons {
-        grid-template-columns: 1fr;
         gap: 1rem;
     }
     
-    .prev-btn,
-    .next-btn {
-        justify-self: stretch;
-        text-align: center;
-        justify-content: center;
-    }
-    
-    .nav-center {
-        order: -1;
-        justify-self: stretch;
+    .lesson-title {
+        font-size: 1.6rem;
     }
     
     .subtopic-tabs {
@@ -913,7 +909,1036 @@
     .subtopic-tab {
         scroll-snap-align: start;
         min-width: max-content;
+        padding: 0.75rem 1rem;
     }
+    
+    .nav-buttons {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .prev-btn,
+    .next-btn {
+        justify-self: stretch;
+    }
+    
+    .nav-center {
+        order: -1;
+        justify-self: stretch;
+    }
+}
+
+/* Small Chromebook & Large Mobile (481px - 767px) */
+@media (max-width: 767px) and (min-width: 481px) {
+    .lesson-container {
+        padding: 1rem;
+    }
+    
+    .lesson-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .lesson-title {
+        font-size: 1.4rem;
+        justify-content: center;
+    }
+    
+    .lesson-badges {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .progress-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    
+    .content-block {
+        padding: 1.25rem;
+    }
+    
+    .block-header {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: flex-start;
+    }
+    
+    .code-editor {
+        min-height: 220px;
+    }
+    
+    .editor-toolbar,
+    .editor-footer {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+}
+
+/* Mobile Phones (≤ 480px) */
+@media (max-width: 480px) {
+    .lesson-container {
+        padding: 0.75rem;
+    }
+    
+    .lesson-header {
+        padding: 1.25rem;
+    }
+    
+    .lesson-title {
+        font-size: 1.25rem;
+        text-align: center;
+    }
+    
+    .lesson-badges > span {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .content-block {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .subtopic-tabs {
+        gap: 0.25rem;
+        padding: 0.25rem 0;
+    }
+    
+    .subtopic-tab {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .code-editor {
+        min-height: 200px; /* As specified in Implementation Plan */
+        font-size: 0.85rem;
+    }
+    
+    .btn-primary,
+    .btn-outline {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 1rem;
+    }
+    
+    .editor-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .nav-btn {
+        padding: 1rem;
+        text-align: center;
+        justify-content: center;
+        font-size: 0.9rem;
+    }
+}
+
+/* =========================================
+   🎯 CHROMEBOOK SPECIFIC OPTIMIZATIONS
+   ========================================= */
+
+/* Touch targets for Chromebook touchscreens */
+@media (max-width: 1366px) {
+    .subtopic-tab,
+    .nav-btn,
+    .lesson-menu-btn,
+    .btn-primary,
+    .btn-outline {
+        min-height: 48px;
+        padding: 0.75rem 1.5rem;
+    }
+}
+
+/* =========================================
+   📱 TOUCH TARGETS & KEYBOARD NAVIGATION
+   Chromebook & Mobile Optimizations
+   ========================================= */
+
+/* Ensure minimum 44px touch targets (WCAG AA compliance) */
+.btn-primary,
+.btn-outline,
+.nav-btn,
+.subtopic-tab,
+.lesson-menu-btn,
+.btn-copy,
+.btn-run,
+.btn-hint,
+.btn-reset {
+    min-height: 44px;
+    min-width: 44px;
+    position: relative;
+}
+
+/* Enhanced focus indicators for keyboard navigation */
+.btn-primary:focus,
+.btn-outline:focus,
+.nav-btn:focus,
+.subtopic-tab:focus,
+.lesson-menu-btn:focus,
+.content-block:focus,
+.code-editor:focus {
+    outline: 3px solid var(--primary-color, #4a90e2);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.2);
+}
+
+/* Touch-friendly interactive elements */
+.content-block {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.content-block:hover,
+.content-block:focus {
+    transform: scale(1.01);
+}
+
+/* Keyboard navigation skip links */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: var(--primary-color, #4a90e2);
+    color: white;
+    padding: 8px;
+    text-decoration: none;
+    border-radius: 4px;
+    z-index: 1000;
+}
+
+.skip-link:focus {
+    top: 6px;
+}
+
+/* Enhanced button states for touch feedback */
+.btn-primary:active,
+.btn-outline:active,
+.nav-btn:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+}
+
+/* Improved spacing for touch interactions */
+@media (max-width: 768px) {
+    .editor-toolbar {
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+    
+    .lesson-navigation {
+        gap: 1rem;
+        padding: 1.5rem 0;
+    }
+    
+    .nav-buttons {
+        gap: 1rem;
+    }
+    
+    /* Larger touch targets on mobile */
+    .btn-primary,
+    .btn-outline {
+        min-height: 48px;
+        padding: 0.75rem 1.5rem;
+    }
+    
+    .subtopic-tab {
+        min-height: 44px;
+        padding: 0.75rem 1rem;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .content-block {
+        border: 2px solid;
+    }
+    
+    .btn-primary,
+    .btn-outline {
+        border-width: 2px;
+    }
+}
+
+/* =========================================
+   🎉 CELEBRATION & REWARD ANIMATIONS
+   ========================================= */
+
+/* Celebration Container */
+.celebration-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10000;
+}
+
+/* Block Completion Animations */
+.content-block.celebrating {
+    animation: blockComplete 0.6s ease-out;
+    transform-origin: center;
+}
+
+@keyframes blockComplete {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); box-shadow: 0 8px 30px rgba(52, 152, 219, 0.4); }
+    100% { transform: scale(1); }
+}
+
+/* Floating Checkmark */
+.floating-checkmark {
+    position: fixed;
+    font-size: 2rem;
+    animation: floatUp 1s ease-out forwards;
+    pointer-events: none;
+    z-index: 10001;
+}
+
+@keyframes floatUp {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-50px) scale(1.5);
+    }
+}
+
+/* Rewards Popup */
+.rewards-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 0;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    pointer-events: auto;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 10002;
+    max-width: 300px;
+    width: 90%;
+}
+
+.rewards-popup.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.rewards-popup.hide {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+}
+
+.rewards-popup-content {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.rewards-header {
+    margin-bottom: 1rem;
+}
+
+.rewards-icon {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.rewards-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.rewards-list {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.reward-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.reward-icon {
+    font-size: 1.2rem;
+}
+
+/* Milestone Popup */
+.milestone-popup {
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: auto;
+    z-index: 10003;
+}
+
+.milestone-popup.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.milestone-popup.hide {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+}
+
+.milestone-content {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    border: 3px solid;
+    position: relative;
+    overflow: hidden;
+}
+
+.milestone-content::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(30deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(30deg); }
+}
+
+.milestone-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.milestone-progress-ring {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.milestone-progress-ring svg {
+    width: 100%;
+    height: 100%;
+    animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Milestone Effects */
+.milestone-popup.bounce .milestone-content {
+    animation: bounce 0.6s ease-out;
+}
+
+.milestone-popup.pulse .milestone-content {
+    animation: pulse 1s ease-in-out infinite;
+}
+
+.milestone-popup.shake .milestone-content {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes bounce {
+    0%, 20%, 53%, 80%, 100% { transform: translate3d(0, 0, 0); }
+    40%, 43% { transform: translate3d(0, -30px, 0); }
+    70% { transform: translate3d(0, -15px, 0); }
+    90% { transform: translate3d(0, -4px, 0); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+/* Confetti Animation */
+.confetti-piece {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    top: -10px;
+    z-index: 9999;
+    animation: confettiFall linear infinite;
+}
+
+@keyframes confettiFall {
+    0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* Trophy Animation */
+.trophy-animation {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 0;
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: auto;
+    z-index: 10004;
+}
+
+.trophy-animation.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.trophy-animation.hide {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3);
+}
+
+.trophy-container {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+    max-width: 400px;
+}
+
+.trophy-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: shimmer 3s infinite;
+}
+
+.trophy-icon {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 1rem;
+    animation: trophyBounce 2s ease-in-out infinite;
+}
+
+@keyframes trophyBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.trophy-text h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.trophy-text p {
+    margin: 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.trophy-sparkles {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.sparkle {
+    font-size: 1.5rem;
+    animation: sparkle 1.5s ease-in-out infinite;
+}
+
+.sparkle:nth-child(2) {
+    animation-delay: 0.5s;
+}
+
+.sparkle:nth-child(3) {
+    animation-delay: 1s;
+}
+
+@keyframes sparkle {
+    0%, 100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 0.7;
+    }
+    50% {
+        transform: scale(1.3) rotate(180deg);
+        opacity: 1;
+    }
+}
+
+/* Achievement Popup */
+.achievement-popup {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    transform: translateX(100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 0;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    pointer-events: auto;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 10005;
+    max-width: 320px;
+    min-width: 280px;
+}
+
+.achievement-popup.show {
+    transform: translateX(0);
+}
+
+.achievement-popup.hide {
+    transform: translateX(100%);
+}
+
+.achievement-content {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    gap: 1rem;
+}
+
+.achievement-badge {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    animation: achievementPulse 2s ease-in-out infinite;
+}
+
+@keyframes achievementPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.achievement-icon {
+    font-size: 1.8rem;
+}
+
+.achievement-info h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.achievement-info h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.achievement-info p {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.achievement-reward {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+/* Progress Bar Animations */
+.progress-fill.progress-update {
+    animation: progressPulse 1s ease-out;
+}
+
+@keyframes progressPulse {
+    0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
+}
+
+.progress-percentage.bounce {
+    animation: textBounce 0.6s ease-out;
+}
+
+@keyframes textBounce {
+    0%, 20%, 53%, 80%, 100% { transform: translate3d(0, 0, 0); }
+    40%, 43% { transform: translate3d(0, -5px, 0); }
+    70% { transform: translate3d(0, -3px, 0); }
+    90% { transform: translate3d(0, -1px, 0); }
+}
+
+/* Mobile Optimizations */
+@media (max-width: 767px) {
+    .rewards-popup,
+    .milestone-popup,
+    .trophy-animation {
+        width: 95%;
+        max-width: none;
+    }
+    
+    .trophy-container {
+        padding: 2rem 1.5rem;
+    }
+    
+    .trophy-icon {
+        font-size: 3rem;
+    }
+    
+    .trophy-text h2 {
+        font-size: 1.5rem;
+    }
+    
+    .achievement-popup {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        min-width: auto;
+    }
+    
+    .milestone-text {
+        font-size: 1.2rem;
+    }
+    
+    .confetti-piece {
+        width: 8px;
+        height: 8px;
+    }
+}
+
+/* Accessibility and Performance */
+@media (prefers-reduced-motion: reduce) {
+    .celebration-container *,
+    .content-block.celebrating,
+    .floating-checkmark,
+    .rewards-popup,
+    .milestone-popup,
+    .trophy-animation,
+    .achievement-popup {
+        animation: none !important;
+        transition: opacity 0.3s ease !important;
+    }
+    
+    .confetti-piece {
+        display: none !important;
+    }
+}
+
+/* =========================================
+   📴 OFFLINE INDICATORS & NETWORK STATUS
+   Network resilience and caching feedback
+   ========================================= */
+
+.offline-indicator {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: var(--warning-color, #f39c12);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    display: none;
+    animation: slideInRight 0.3s ease;
+}
+
+.network-status {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    display: none;
+    animation: slideInUp 0.3s ease;
+    max-width: 90%;
+    text-align: center;
+}
+
+.network-status.success {
+    background: var(--success-color, #27ae60);
+    color: white;
+}
+
+.network-status.warning {
+    background: var(--warning-color, #f39c12);
+    color: white;
+}
+
+.network-status.info {
+    background: var(--info-color, #3498db);
+    color: white;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translate(-50%, 100%);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
+}
+
+/* Mobile adjustments for network indicators */
+@media (max-width: 768px) {
+    .offline-indicator {
+        top: 60px; /* Below mobile navigation */
+        right: 15px;
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .network-status {
+        bottom: 90px; /* Above mobile navigation if present */
+        font-size: 0.9rem;
+        padding: 0.8rem 1.2rem;
+        max-width: 85%;
+    }
+}
+
+/* =========================================
+   🖥️ CHROMEBOOK DEVICE TESTING OPTIMIZATIONS
+   Specific optimizations for common Chromebook models
+   ========================================= */
+
+/* Acer Chromebook Spin 713 (2256x1504) */
+@media (min-width: 2200px) and (max-width: 2300px) {
+    .lesson-container {
+        max-width: 1400px;
+        padding: 2.5rem;
+    }
+    
+    .content-block {
+        padding: 2rem;
+    }
+    
+    .code-editor {
+        font-size: 16px;
+        min-height: 320px;
+    }
+}
+
+/* HP Chromebook 14 (1366x768) - Most common */
+@media (max-width: 1366px) and (min-height: 700px) {
+    .lesson-container {
+        padding: 1.5rem;
+        max-width: 1100px;
+    }
+    
+    .lesson-header {
+        padding: 1.75rem;
+    }
+    
+    .content-block {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .code-editor {
+        min-height: 260px;
+        font-size: 14px;
+    }
+    
+    /* Optimize for typical Chromebook usage patterns */
+    .interactive-block {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        align-items: start;
+    }
+    
+    .challenge-instructions {
+        grid-column: 1;
+    }
+    
+    .code-editor-wrapper {
+        grid-column: 2;
+    }
+}
+
+/* Lenovo Chromebook Duet (1200x800) - Tablet mode */
+@media (max-width: 1200px) and (max-height: 800px) {
+    .lesson-container {
+        padding: 1rem;
+    }
+    
+    .content-block {
+        padding: 1.25rem;
+    }
+    
+    .code-editor {
+        min-height: 200px;
+        font-size: 13px;
+    }
+    
+    /* Single column layout for tablet Chromebooks */
+    .interactive-block {
+        display: block;
+    }
+    
+    .challenge-instructions {
+        margin-bottom: 1rem;
+    }
+}
+
+/* ASUS Chromebook Flip (1280x800) */
+@media (max-width: 1280px) and (max-height: 800px) {
+    .lesson-header {
+        padding: 1.5rem;
+    }
+    
+    .lesson-title {
+        font-size: 1.6rem;
+    }
+    
+    .content-block {
+        padding: 1.25rem;
+    }
+    
+    .code-editor {
+        min-height: 240px;
+    }
+}
+
+/* Chrome OS specific optimizations */
+@media screen and (-webkit-min-device-pixel-ratio: 1) {
+    /* Optimize font rendering for Chrome OS */
+    .code-editor,
+    .code-content,
+    .output-content {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* Ensure proper touch handling on Chrome OS touch devices */
+    .content-block,
+    .btn-primary,
+    .btn-outline,
+    .subtopic-tab {
+        touch-action: manipulation;
+    }
+}
+
+/* High DPI Chromebook displays */
+@media screen and (-webkit-min-device-pixel-ratio: 2) {
+    .lesson-header::before {
+        background-size: 30px 30px; /* Adjust pattern for high DPI */
+    }
+    
+    .block-icon {
+        image-rendering: -webkit-optimize-contrast;
+    }
+}
+
+/* Chromebook dark mode support (when Chrome OS is in dark mode) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #1a1a1a;
+        --bg-primary: #2d2d2d;
+        --bg-secondary: #3a3a3a;
+        --text-color: #e0e0e0;
+        --text-primary: #ffffff;
+        --text-secondary: #b0b0b0;
+        --border-color: #4a4a4a;
+    }
+    
+
+    .code-editor {
+        background: #1e1e1e !important;
+        color: #d4d4d4 !important;
+    }
+    
+    .content-block {
+        background: var(--bg-primary);
+        border-color: var(--border-color);
+    }
+}
+
+/* Test mode indicator for debugging on Chromebooks */
+.chromebook-test-mode {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #ff6b6b;
+    color: white;
+    text-align: center;
+    padding: 0.5rem;
+    font-weight: bold;
+    z-index: 10000;
+    display: none;
+}
+
+.chromebook-test-mode.active {
+    display: block;
 }
 
 /* === End static/css/components/lesson.css === */
@@ -935,7 +1960,7 @@
 
 .code-container {
     position: relative;
-    background: var(--code-block-bg, #1A202C);
+    background: #1e293b;
     border-radius: 8px;
     margin: var(--block-padding);
     overflow: hidden;
@@ -951,13 +1976,13 @@
 }
 
 .code-title {
-    color: var(--code-block-text, #E2E8F0);
+    color: #e2e8f0;
     font-size: 0.875rem;
     font-weight: var(--font-weight-medium);
 }
 
 .language-badge {
-    background: var(--code-block-primary, #319795);
+    background: var(--code-accent);
     color: white;
     padding: 0.25rem 0.75rem;
     border-radius: 12px;
@@ -969,7 +1994,7 @@
 
 .btn-copy {
     background: rgba(255, 255, 255, 0.1);
-    color: var(--code-block-text, #E2E8F0);
+    color: #e2e8f0;
     border: 1px solid rgba(255, 255, 255, 0.2);
     padding: 0.5rem 0.75rem;
     border-radius: 6px;
@@ -991,7 +2016,7 @@
 }
 
 .code-content code {
-    color: var(--code-block-text, #E2E8F0);
+    color: #e2e8f0;
     font-family: var(--font-mono, 'Fira Code', monospace);
     font-size: 0.875rem;
     line-height: 1.6;
@@ -1001,13 +2026,13 @@
 
 .code-explanation {
     padding: 1rem var(--block-padding);
-    background: rgba(49, 151, 149, 0.05);
-    border-top: 1px solid var(--code-block-primary, #319795);
+    background: rgba(6, 182, 212, 0.05);
+    border-top: 1px solid rgba(6, 182, 212, 0.2);
     margin-top: 0;
 }
 
 .code-explanation h4 {
-    color: var(--code-block-primary, #319795);
+    color: var(--code-accent);
     margin: 0 0 0.5rem 0;
     font-size: 0.875rem;
     font-weight: var(--font-weight-semibold);
@@ -1017,7 +2042,7 @@
 
 .code-explanation p {
     margin: 0;
-    color: var(--lesson-text-primary, #2D3748);
+    color: var(--text-primary, #374151);
     font-size: 0.875rem;
     line-height: 1.6;
 }
@@ -1046,7 +2071,7 @@
 
 .challenge-instructions p {
     margin: 0;
-    color: var(--lesson-text-primary, #2D3748);
+    color: var(--text-primary, #374151);
     line-height: 1.6;
 }
 
@@ -1066,7 +2091,7 @@
 .requirements ul {
     margin: 0;
     padding-left: 1.25rem;
-    color: var(--lesson-text-primary, #374151);
+    color: var(--text-primary, #374151);
 }
 
 .requirements li {
@@ -1136,7 +2161,7 @@
     border-bottom: 1px solid var(--block-border);
     font-size: 0.875rem;
     font-weight: var(--font-weight-medium);
-    color: var(--lesson-text-primary, #374151);
+    color: var(--text-primary, #374151);
 }
 
 .output-content {
@@ -1166,7 +2191,7 @@
 }
 
 .output-loading i {
-    color: var(--lesson-primary, #6366f1);
+    color: var(--primary-color, #6366f1);
 }
 
 /* ================================
@@ -1182,7 +2207,7 @@
 
 .quiz-intro p {
     margin: 0;
-    color: var(--lesson-text-primary, #374151);
+    color: var(--text-primary, #374151);
     font-weight: var(--font-weight-medium);
 }
 
@@ -1195,7 +2220,7 @@
 }
 
 .quiz-question h4 {
-    color: var(--lesson-text-primary, #1f2937);
+    color: var(--text-primary, #1f2937);
     margin: 0 0 1rem 0;
     font-size: 1.125rem;
     font-weight: var(--font-weight-semibold);
@@ -1224,13 +2249,13 @@
 
 .quiz-option:hover {
     background: rgba(99, 102, 241, 0.05);
-    border-color: var(--lesson-primary, #6366f1);
+    border-color: var(--primary-color, #6366f1);
     transform: translateX(4px);
 }
 
 .quiz-option.selected {
     background: rgba(99, 102, 241, 0.1);
-    border-color: var(--lesson-primary, #6366f1);
+    border-color: var(--primary-color, #6366f1);
     box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
 }
 
@@ -1258,8 +2283,8 @@
 }
 
 .quiz-option input[type="radio"]:checked {
-    border-color: var(--lesson-primary, #6366f1);
-    background: var(--lesson-primary, #6366f1);
+    border-color: var(--primary-color, #6366f1);
+    background: var(--primary-color, #6366f1);
 }
 
 .quiz-option input[type="radio"]:checked::after {
@@ -1344,7 +2369,7 @@
 
 .key-points li {
     margin-bottom: 0.5rem;
-    color: var(--lesson-text-primary, #374151);
+    color: var(--text-primary, #374151);
     font-size: 0.875rem;
     line-height: 1.6;
 }
@@ -1532,36 +2557,35 @@
 
 /* ================================
    CSS VARIABLES & DESIGN TOKENS
-   Now using lesson-specific color system
    ================================ */
 :root {
-    /* Block Colors - Using lesson-specific colors */
-    --block-bg: var(--lesson-surface-primary, #ffffff);
-    --block-border: var(--text-block-border, #e2e8f0);
-    --block-shadow: var(--lesson-shadow-sm, 0 1px 3px 0 rgba(0, 0, 0, 0.1));
-    --block-hover-shadow: var(--lesson-shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+    /* Block Colors */
+    --block-bg: #ffffff;
+    --block-border: #e2e8f0;
+    --block-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    --block-hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
     
-    /* Assessment States - Using lesson feedback colors */
-    --assessment-pending: var(--lesson-warning, #ED8936);
-    --assessment-success: var(--lesson-success, #28A745);
-    --assessment-error: var(--lesson-active, #F56565);
-    --assessment-warning: var(--lesson-warning, #ED8936);
+    /* Assessment States */
+    --assessment-pending: #fbbf24;
+    --assessment-success: #10b981;
+    --assessment-error: #ef4444;
+    --assessment-warning: #f59e0b;
     
-    /* Block Type Colors - Using lesson-specific block colors */
-    --text-accent: var(--text-block-primary, #667EEA);
-    --code-accent: var(--code-block-primary, #319795);
-    --interactive-accent: var(--interactive-primary, #F56500);
-    --quiz-accent: var(--quiz-primary, #9F7AEA);
+    /* Block Type Colors */
+    --text-accent: #8b5cf6;
+    --code-accent: #06b6d4;
+    --interactive-accent: #10b981;
+    --quiz-accent: #f59e0b;
     
-    /* Spacing - Using lesson spacing system */
-    --block-spacing: var(--lesson-spacing-xl, 2rem);
-    --block-padding: var(--lesson-spacing-lg, 1.5rem);
-    --block-radius: var(--lesson-radius-lg, 16px);
+    /* Spacing */
+    --block-spacing: 2rem;
+    --block-padding: 1.5rem;
+    --block-radius: 16px;
     
-    /* Animations - Using lesson transitions */
-    --animation-fast: var(--lesson-transition-fast, 0.15s ease-out);
-    --animation-normal: var(--lesson-transition-normal, 0.25s ease-out);
-    --animation-slow: var(--lesson-transition-slow, 0.4s ease-out);
+    /* Animations */
+    --animation-fast: 0.2s ease;
+    --animation-normal: 0.3s ease;
+    --animation-slow: 0.5s ease;
     
     /* Typography */
     --font-weight-medium: 500;
@@ -1569,19 +2593,18 @@
     --font-weight-bold: 700;
 }
 
-/* Dark theme overrides - Using lesson dark mode colors */
+/* Dark theme overrides */
 .theme-dark {
-    --block-bg: var(--lesson-bg-secondary, #2D3748);
-    --block-border: var(--text-block-border, #4A5568);
-    --block-shadow: var(--lesson-shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.3));
-    --block-hover-shadow: var(--lesson-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.3));
+    --block-bg: #1f2937;
+    --block-border: #374151;
+    --block-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    --block-hover-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
 }
 
 /* ================================
    UNIFIED BLOCK FOUNDATION
    ================================ */
-.content-block,
-.lesson-block {
+.content-block {
     position: relative;
     margin-bottom: var(--block-spacing);
     background: var(--block-bg);
@@ -1595,34 +2618,28 @@
     padding: 0;
 }
 
-.content-block:hover,
-.lesson-block:hover {
+.content-block:hover {
     box-shadow: var(--block-hover-shadow);
     transform: translateY(-2px);
-    border-color: var(--lesson-primary, #4A90E2);
+    border-color: var(--primary-color, #6366f1);
 }
 
 /* ================================
    BLOCK HEADER SYSTEM
    ================================ */
-.block-header,
-.lesson-block-header {
+.block-header {
     display: flex;
     align-items: center;
     gap: 1rem;
     padding: 1rem var(--block-padding);
     background: linear-gradient(135deg, 
-        rgba(74, 144, 226, 0.05) 0%, 
-        rgba(74, 144, 226, 0.02) 100%);
+        rgba(var(--primary-rgb, 99, 102, 241), 0.05) 0%, 
+        rgba(var(--primary-rgb, 99, 102, 241), 0.02) 100%);
     border-bottom: 1px solid var(--block-border);
     position: relative;
 }
 
-.block-icon,
-.text-block-icon,
-.code-block-icon,
-.interactive-block-icon,
-.quiz-block-icon {
+.block-icon {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1630,8 +2647,8 @@
     height: 40px;
     border-radius: 10px;
     font-size: 18px;
-    color: var(--lesson-primary, #4A90E2);
-    background: rgba(74, 144, 226, 0.1);
+    color: var(--primary-color, #6366f1);
+    background: rgba(var(--primary-rgb, 99, 102, 241), 0.1);
     transition: all var(--animation-fast);
 }
 
@@ -1646,14 +2663,14 @@
     font-weight: var(--font-weight-semibold);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--lesson-primary, #4A90E2);
+    color: var(--primary-color, #6366f1);
     margin-bottom: 0.25rem;
 }
 
 .block-title {
     font-size: 1.125rem;
     font-weight: var(--font-weight-semibold);
-    color: var(--lesson-text-primary, #2D3748);
+    color: var(--text-primary, #1f2937);
     margin: 0;
     line-height: 1.4;
 }
@@ -1695,7 +2712,7 @@
 
 .block-progress-indicator.locked {
     background: rgba(156, 163, 175, 0.2);
-    color: var(--lesson-text-muted, #9ca3af);
+    color: #9ca3af;
 }
 
 /* Assessment attempts indicator */
@@ -1704,7 +2721,7 @@
     padding: 0.25rem 0.5rem;
     border-radius: 12px;
     background: rgba(107, 114, 128, 0.1);
-    color: var(--lesson-text-muted, #6b7280);
+    color: #6b7280;
     font-weight: var(--font-weight-medium);
 }
 
@@ -1723,66 +2740,53 @@
    ================================ */
 
 /* Text Blocks */
-.text-block .block-icon,
-.text-block .text-block-icon {
-    background: rgba(102, 126, 234, 0.1);
-    color: var(--text-block-primary, #667EEA);
+.text-block .block-icon {
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--text-accent);
 }
 
-.text-block .block-type,
-.text-block .block-type-label {
-    color: var(--text-block-primary, #667EEA);
+.text-block .block-type {
+    color: var(--text-accent);
 }
 
 /* Code Example Blocks */
 .code_example-block .block-icon,
-.code-example-block .block-icon,
-.code_example-block .code-block-icon,
-.code-example-block .code-block-icon {
-    background: rgba(49, 151, 149, 0.1);
-    color: var(--code-block-primary, #319795);
+.code-example-block .block-icon {
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--code-accent);
 }
 
 .code_example-block .block-type,
-.code-example-block .block-type,
-.code_example-block .block-type-label,
-.code-example-block .block-type-label {
-    color: var(--code-block-primary, #319795);
+.code-example-block .block-type {
+    color: var(--code-accent);
 }
 
 /* Interactive/Challenge Blocks */
 .interactive-block .block-icon,
-.challenge-block .block-icon,
-.interactive-block .interactive-block-icon,
-.challenge-block .interactive-block-icon {
-    background: rgba(245, 101, 0, 0.1);
-    color: var(--interactive-primary, #F56500);
+.challenge-block .block-icon {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--interactive-accent);
 }
 
 .interactive-block .block-type,
-.challenge-block .block-type,
-.interactive-block .block-type-label,
-.challenge-block .block-type-label {
-    color: var(--interactive-primary, #F56500);
+.challenge-block .block-type {
+    color: var(--interactive-accent);
 }
 
 /* Quiz Blocks */
-.quiz-block .block-icon,
-.quiz-block .quiz-block-icon {
-    background: rgba(159, 122, 234, 0.1);
-    color: var(--quiz-primary, #9F7AEA);
+.quiz-block .block-icon {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--quiz-accent);
 }
 
-.quiz-block .block-type,
-.quiz-block .block-type-label {
-    color: var(--quiz-primary, #9F7AEA);
+.quiz-block .block-type {
+    color: var(--quiz-accent);
 }
 
 /* ================================
    BLOCK CONTENT AREAS
    ================================ */
-.block-content,
-.lesson-block-content {
+.block-content {
     padding: var(--block-padding);
     position: relative;
 }
@@ -1790,7 +2794,7 @@
 /* Text content styling */
 .text-content {
     line-height: 1.7;
-    color: var(--lesson-text-primary, #2D3748);
+    color: var(--text-primary, #374151);
     font-size: 1rem;
 }
 
@@ -1798,7 +2802,7 @@
 .text-content h2,
 .text-content h3,
 .text-content h4 {
-    color: var(--lesson-text-primary, #1f2937);
+    color: var(--text-primary, #1f2937);
     margin: 1.5rem 0 1rem 0;
     font-weight: var(--font-weight-semibold);
     line-height: 1.3;
@@ -1815,7 +2819,7 @@
 
 .text-content strong {
     font-weight: var(--font-weight-semibold);
-    color: var(--lesson-primary, #6366f1);
+    color: var(--primary-color, #6366f1);
 }
 
 .text-content em {
@@ -1859,118 +2863,6 @@
 
 .block-footer .btn-group {
     display: flex;
-    gap: 0.5rem;
-}
-
-/* ================================
-   LESSON BLOCK ACTIONS
-   ================================ */
-.lesson-block-actions {
-    padding: 1rem var(--block-padding);
-    background: var(--lesson-bg-secondary, #f8fafc);
-    border-top: 1px solid var(--block-border);
-    display: flex;
-    gap: 0.75rem;
-    justify-content: flex-end;
-}
-
-.action-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: var(--lesson-radius, 8px);
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all var(--lesson-transition-normal, 0.2s ease-out);
-    text-decoration: none;
-}
-
-.action-btn.primary {
-    background: var(--lesson-primary, #4A90E2);
-    color: white;
-}
-
-.action-btn.primary:hover {
-    background: var(--lesson-primary-dark, #357ABD);
-    transform: translateY(-1px);
-}
-
-.action-btn.secondary {
-    background: var(--lesson-surface-secondary, #f7fafc);
-    color: var(--lesson-text-secondary, #4A5568);
-    border: 1px solid var(--lesson-border-light, #e2e8f0);
-}
-
-.action-btn.secondary:hover {
-    background: var(--lesson-bg-accent, #edf2f7);
-    border-color: var(--lesson-border-medium, #cbd5e1);
-}
-
-/* Language badges */
-.language-badge {
-    background: var(--code-block-primary, #319795);
-    color: white;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.language-badge.python {
-    background: var(--code-block-primary, #319795);
-}
-
-/* Quiz type badges */
-.quiz-type-badge {
-    background: var(--quiz-primary, #9F7AEA);
-    color: white;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-/* Difficulty badges */
-.difficulty-badge {
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-.difficulty-badge.beginner {
-    background: var(--lesson-success-bg, #d4f6dd);
-    color: var(--lesson-success, #28A745);
-}
-
-/* Block type indicators */
-.block-type-indicator {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    flex: 1;
-}
-
-.block-type-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-/* Meta information styling */
-.code-meta,
-.challenge-meta,
-.quiz-meta {
-    display: flex;
-    align-items: center;
     gap: 0.5rem;
 }
 
@@ -2020,7 +2912,7 @@
 }
 
 .btn.primary {
-    background: var(--lesson-primary, #6366f1);
+    background: var(--primary-color, #6366f1);
     color: white;
 }
 
@@ -2031,13 +2923,13 @@
 
 .btn.secondary {
     background: rgba(107, 114, 128, 0.1);
-    color: var(--lesson-text-primary, #374151);
+    color: var(--text-primary, #374151);
     border: 1px solid var(--block-border);
 }
 
 .btn.secondary:hover {
     background: rgba(107, 114, 128, 0.15);
-    border-color: var(--lesson-primary, #6366f1);
+    border-color: var(--primary-color, #6366f1);
 }
 
 .btn.warning {
@@ -2203,12 +3095,12 @@
    ACCESSIBILITY ENHANCEMENTS
    ================================ */
 .content-block:focus-within {
-    outline: 2px solid var(--lesson-primary, #6366f1);
+    outline: 2px solid var(--primary-color, #6366f1);
     outline-offset: 2px;
 }
 
 .btn:focus {
-    outline: 2px solid var(--lesson-primary, #6366f1);
+    outline: 2px solid var(--primary-color, #6366f1);
     outline-offset: 2px;
 }
 
@@ -2267,252 +3159,6 @@
 
 /* === End static/css/components/lesson-blocks-enhanced.css === */
 
-/* === static/css/components/lesson-learning-colors.css === */
-/**
- * Lesson Learning Color System - Education Optimized
- * Code with Morais - Lesson-Specific Design Tokens
- * Optimized for learning, focus, and educational progression
- */
-
-/* ================================
-   LESSON LEARNING COLOR SYSTEM
-   ================================ */
-
-/* Override root variables specifically for lesson pages */
-.lesson-container,
-.lesson-page,
-[data-page="lesson"] {
-    /* ================================
-       EDUCATIONAL COLOR PSYCHOLOGY
-       ================================ */
-    
-    /* Primary Learning Colors - Based on educational research */
-    --lesson-primary: #4A90E2;        /* Calm, trustworthy blue for focus */
-    --lesson-primary-light: #6BA3E8;  /* Lighter variant */
-    --lesson-primary-dark: #357ABD;   /* Darker variant */
-    
-    /* Success & Progress Colors - Motivational greens */
-    --lesson-success: #28A745;        /* Achievement green */
-    --lesson-success-light: #34CE57;  /* Celebration green */
-    --lesson-success-bg: #D4F6DD;     /* Success background */
-    
-    /* Learning State Colors */
-    --lesson-focus: #5A67D8;          /* Deep focus purple-blue */
-    --lesson-active: #F56565;         /* Attention-grabbing red */
-    --lesson-warning: #ED8936;        /* Warning orange */
-    --lesson-info: #38B2AC;           /* Information teal */
-    
-    /* ================================
-       BLOCK TYPE SPECIFIC COLORS
-       ================================ */
-    
-    /* Text Block - Reading & Comprehension */
-    --text-block-primary: #667EEA;    /* Calm reading blue */
-    --text-block-bg: #F7FAFC;         /* Clean reading background */
-    --text-block-border: #E2E8F0;     /* Subtle border */
-    --text-block-accent: #4C51BF;     /* Accent for highlights */
-    
-    /* Code Block - Technical & Precise */
-    --code-block-primary: #319795;    /* Developer teal */
-    --code-block-bg: #1A202C;         /* Dark code background */
-    --code-block-border: #2D3748;     /* Code border */
-    --code-block-accent: #81E6D9;     /* Syntax highlighting accent */
-    --code-block-text: #E2E8F0;       /* Code text color */
-    
-    /* Interactive Block - Engagement & Challenge */
-    --interactive-primary: #F56500;   /* Energetic orange */
-    --interactive-bg: #FFFAF0;        /* Warm background */
-    --interactive-border: #FBD38D;    /* Challenge border */
-    --interactive-accent: #DD6B20;    /* Action accent */
-    
-    /* Quiz Block - Assessment & Evaluation */
-    --quiz-primary: #9F7AEA;          /* Knowledge purple */
-    --quiz-bg: #FAF5FF;               /* Quiz background */
-    --quiz-border: #D6BCFA;           /* Quiz border */
-    --quiz-accent: #805AD5;           /* Quiz accent */
-    --quiz-correct: #48BB78;          /* Correct answer */
-    --quiz-incorrect: #F56565;        /* Incorrect answer */
-    
-    /* ================================
-       PROGRESS & FEEDBACK COLORS
-       ================================ */
-    
-    /* Progress Visualization */
-    --progress-empty: #E2E8F0;        /* Empty progress */
-    --progress-partial: #4299E1;      /* Partial progress */
-    --progress-complete: #48BB78;     /* Complete progress */
-    --progress-mastery: #38A169;      /* Mastery level */
-    
-    /* Assessment Feedback */
-    --assessment-excellent: #38A169;  /* 90-100% */
-    --assessment-good: #4299E1;       /* 80-89% */
-    --assessment-fair: #ED8936;       /* 70-79% */
-    --assessment-needs-work: #F56565; /* Below 70% */
-    
-    /* Learning States */
-    --learning-new: #4299E1;          /* New content */
-    --learning-practice: #ED8936;     /* Practice needed */
-    --learning-review: #9F7AEA;       /* Review required */
-    --learning-mastered: #38A169;     /* Mastered content */
-    
-    /* ================================
-       ADDITIONAL LESSON VARIABLES
-       ================================ */
-    
-    /* Code Block Specific */
-    --lesson-code-bg: #1A202C;        /* Dark code background */
-    --lesson-code-text: #E2E8F0;      /* Code text color */
-    
-    /* Progress Gradients */
-    --lesson-progress-start: #28A745;  /* Progress start color */
-    --lesson-progress-end: #20A04A;    /* Progress end color */
-    
-    /* UI Elements */
-    --lesson-skeleton-light: #F7FAFC;  /* Skeleton light */
-    --lesson-skeleton-dark: #EDF2F7;   /* Skeleton dark */
-    --lesson-spinner-base: #E2E8F0;    /* Spinner base */
-    
-    /* ================================
-       BACKGROUNDS & SURFACES
-       ================================ */
-    
-    /* Lesson Page Backgrounds */
-    --lesson-bg-primary: #FFFFFF;     /* Main background */
-    --lesson-bg-secondary: #F7FAFC;   /* Secondary background */
-    --lesson-bg-accent: #EDF2F7;      /* Accent background */
-    
-    /* Card & Block Surfaces */
-    --lesson-surface-primary: #FFFFFF;   /* Primary surface */
-    --lesson-surface-secondary: #F7FAFC; /* Secondary surface */
-    --lesson-surface-raised: #FFFFFF;    /* Elevated surface */
-    
-    /* ================================
-       TEXT & TYPOGRAPHY
-       ================================ */
-    
-    /* Reading Optimized Text Colors */
-    --lesson-text-primary: #2D3748;      /* Primary text - optimal reading */
-    --lesson-text-secondary: #4A5568;    /* Secondary text */
-    --lesson-text-tertiary: #718096;     /* Tertiary text */
-    --lesson-text-inverse: #FFFFFF;      /* Inverse text */
-    
-    /* Content Specific Text */
-    --lesson-heading: #1A202C;           /* Headings */
-    --lesson-body: #2D3748;              /* Body text */
-    --lesson-caption: #718096;           /* Captions */
-    --lesson-link: #4299E1;              /* Links */
-    --lesson-link-hover: #3182CE;        /* Link hover */
-    
-    /* ================================
-       SEMANTIC COLORS
-       ================================ */
-    
-    /* User Feedback */
-    --lesson-success-text: #276749;      /* Success message text */
-    --lesson-error-text: #C53030;        /* Error message text */
-    --lesson-warning-text: #C05621;      /* Warning message text */
-    --lesson-info-text: #2C5282;         /* Info message text */
-    
-    /* Interactive States */
-    --lesson-hover: #EDF2F7;             /* Hover state */
-    --lesson-active: #E2E8F0;            /* Active state */
-    --lesson-focus: #4299E1;             /* Focus state */
-    --lesson-disabled: #A0AEC0;          /* Disabled state */
-    
-    /* ================================
-       SHADOWS & ELEVATION
-       ================================ */
-    
-    /* Educational UI Shadows - Softer for focus */
-    --lesson-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-    --lesson-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --lesson-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    --lesson-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    
-    /* Focus-specific shadows */
-    --lesson-shadow-focus: 0 0 0 3px rgba(66, 153, 225, 0.5);
-    --lesson-shadow-success: 0 0 0 3px rgba(72, 187, 120, 0.5);
-    --lesson-shadow-error: 0 0 0 3px rgba(245, 101, 101, 0.5);
-    
-    /* ================================
-       ANIMATION & TRANSITIONS
-       ================================ */
-    
-    /* Learning-optimized timing */
-    --lesson-transition-fast: 0.15s ease-out;    /* Quick feedback */
-    --lesson-transition-normal: 0.25s ease-out;  /* Normal interactions */
-    --lesson-transition-slow: 0.4s ease-out;     /* Major state changes */
-    --lesson-transition-deliberate: 0.6s ease-out; /* Celebration animations */
-    
-    /* ================================
-       ACCESSIBILITY OVERRIDES
-       ================================ */
-    
-    /* High contrast mode support */
-    --lesson-contrast-border: #000000;
-    --lesson-contrast-text: #000000;
-    --lesson-contrast-bg: #FFFFFF;
-}
-
-/* ================================
-   DARK MODE LESSON COLORS
-   ================================ */
-
-.theme-dark .lesson-container,
-.theme-dark .lesson-page,
-.theme-dark [data-page="lesson"] {
-    /* Dark mode - optimized for learning in low light */
-    --lesson-bg-primary: #1A202C;
-    --lesson-bg-secondary: #2D3748;
-    --lesson-bg-accent: #4A5568;
-    
-    --lesson-text-primary: #F7FAFC;
-    --lesson-text-secondary: #E2E8F0;
-    --lesson-text-tertiary: #A0AEC0;
-    
-    /* Block backgrounds for dark mode */
-    --text-block-bg: #2D3748;
-    --interactive-bg: #2D3748;
-    --quiz-bg: #2D3748;
-    
-    /* Adjusted for dark mode readability */
-    --lesson-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
-    --lesson-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-    --lesson-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-}
-
-/* ================================
-   ACCESSIBILITY PREFERENCES
-   ================================ */
-
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-    .lesson-container,
-    .lesson-page,
-    [data-page="lesson"] {
-        --lesson-transition-fast: 0s;
-        --lesson-transition-normal: 0s;
-        --lesson-transition-slow: 0s;
-        --lesson-transition-deliberate: 0s;
-    }
-}
-
-/* High contrast support */
-@media (prefers-contrast: high) {
-    .lesson-container,
-    .lesson-page,
-    [data-page="lesson"] {
-        --lesson-text-primary: var(--lesson-contrast-text);
-        --lesson-bg-primary: var(--lesson-contrast-bg);
-        --text-block-border: var(--lesson-contrast-border);
-        --interactive-border: var(--lesson-contrast-border);
-        --quiz-border: var(--lesson-contrast-border);
-        --code-block-border: var(--lesson-contrast-border);
-    }
-}
-
-/* === End static/css/components/lesson-learning-colors.css === */
-
 /* === static/css/components/lesson-progress-enhanced.css === */
 /**
  * Enhanced Progress System - Phase 2 UI Improvements
@@ -2526,17 +3172,17 @@
 .lesson-progress-container {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
-    border: 1px solid var(--lesson-border-light, #e2e8f0);
+    border: 1px solid var(--block-border);
     border-radius: 12px;
     padding: 1.5rem;
     margin-bottom: 2rem;
-    box-shadow: var(--lesson-shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     position: relative;
     overflow: hidden;
 }
 
 .theme-dark .lesson-progress-container {
-    background: var(--lesson-bg-secondary, rgba(45, 55, 72, 0.95));
+    background: rgba(31, 41, 55, 0.95);
 }
 
 .lesson-progress-container::before {
@@ -2547,9 +3193,9 @@
     right: 0;
     height: 3px;
     background: linear-gradient(90deg, 
-        var(--lesson-primary, #4A90E2) 0%, 
-        var(--lesson-success, #28A745) 50%, 
-        var(--quiz-primary, #9F7AEA) 100%
+        var(--primary-color, #6366f1) 0%, 
+        var(--assessment-success) 50%, 
+        var(--quiz-accent) 100%
     );
     border-radius: 12px 12px 0 0;
 }
@@ -2564,7 +3210,7 @@
 .progress-title {
     font-size: 1.125rem;
     font-weight: var(--font-weight-semibold);
-    color: var(--lesson-text-primary, #1f2937);
+    color: var(--text-primary, #1f2937);
     margin: 0;
 }
 
@@ -2579,7 +3225,7 @@
 .progress-percentage {
     font-size: 1.5rem;
     font-weight: var(--font-weight-bold);
-    color: var(--lesson-primary, #6366f1);
+    color: var(--primary-color, #6366f1);
     margin: 0;
 }
 
@@ -2604,7 +3250,7 @@
 .progress-fill {
     height: 100%;
     background: linear-gradient(90deg, 
-        var(--lesson-primary, #6366f1) 0%, 
+        var(--primary-color, #6366f1) 0%, 
         var(--assessment-success) 100%
     );
     border-radius: 6px;
@@ -2648,7 +3294,7 @@
     width: 8px;
     height: 8px;
     background: rgba(255, 255, 255, 0.8);
-    border: 2px solid var(--lesson-primary, #6366f1);
+    border: 2px solid var(--primary-color, #6366f1);
     border-radius: 50%;
     transition: all var(--animation-normal);
 }
@@ -2793,7 +3439,7 @@
 
 .assessment-progress-ring .ring-progress {
     fill: none;
-    stroke: var(--lesson-primary, #6366f1);
+    stroke: var(--primary-color, #6366f1);
     stroke-width: 4;
     stroke-linecap: round;
     stroke-dasharray: 126; /* 2 * π * 20 */
@@ -2820,7 +3466,7 @@
     transform: translate(-50%, -50%);
     font-size: 0.75rem;
     font-weight: var(--font-weight-semibold);
-    color: var(--lesson-text-primary, #1f2937);
+    color: var(--text-primary, #1f2937);
 }
 
 /* ================================
@@ -2881,7 +3527,7 @@
     display: block;
     font-size: 1.5rem;
     font-weight: var(--font-weight-bold);
-    color: var(--lesson-primary, #6366f1);
+    color: var(--primary-color, #6366f1);
 }
 
 .celebration-stat-label {
@@ -2976,13 +3622,13 @@
 }
 
 .time-tracker-icon {
-    color: var(--lesson-primary, #6366f1);
+    color: var(--primary-color, #6366f1);
     font-size: 1rem;
 }
 
 .time-spent {
     font-weight: var(--font-weight-medium);
-    color: var(--lesson-text-primary, #1f2937);
+    color: var(--text-primary, #1f2937);
 }
 
 .time-estimate {
@@ -3059,7 +3705,7 @@
    ACCESSIBILITY ENHANCEMENTS
    ================================ */
 .block-progress-indicator:focus {
-    outline: 2px solid var(--lesson-primary, #6366f1);
+    outline: 2px solid var(--primary-color, #6366f1);
     outline-offset: 2px;
 }
 
@@ -3069,7 +3715,7 @@
     bottom: -2rem;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--lesson-text-primary, #1f2937);
+    background: var(--text-primary, #1f2937);
     color: var(--block-bg);
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
@@ -3123,4 +3769,423 @@
 }
 
 /* === End static/css/components/lesson-progress-enhanced.css === */
+
+/* === static/css/components/lesson-content-blocks.css === */
+/**
+ * Lesson Content Blocks - Essential styling for dynamic content
+ * Code with Morais - Lesson Template System
+ */
+
+/* ================================
+   CONTENT BLOCK BASE STYLES
+   ================================ */
+
+.content-block {
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background: var(--card-bg, #ffffff);
+    border-radius: 16px;
+    border: 1px solid var(--border-color, #e2e8f0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.content-block:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.content-block.completed {
+    border-color: var(--success-color, #10b981);
+    background: linear-gradient(145deg, var(--card-bg, #ffffff), rgba(16, 185, 129, 0.05));
+}
+
+.content-block.completed::before {
+    content: "✅";
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.2rem;
+}
+
+/* ================================
+   TEXT BLOCKS
+   ================================ */
+
+.text-block .text-content {
+    line-height: 1.8;
+    color: var(--text-primary, #1f2937);
+}
+
+.text-block h1,
+.text-block h2,
+.text-block h3 {
+    color: var(--primary-color, #6366f1);
+    margin: 1.5rem 0 1rem 0;
+    font-weight: 700;
+}
+
+.text-block h1 {
+    font-size: 2rem;
+    border-bottom: 2px solid var(--primary-color, #6366f1);
+    padding-bottom: 0.5rem;
+}
+
+.text-block h2 {
+    font-size: 1.5rem;
+}
+
+.text-block h3 {
+    font-size: 1.25rem;
+}
+
+.text-block p {
+    margin-bottom: 1rem;
+}
+
+.text-block strong {
+    color: var(--primary-color, #6366f1);
+    font-weight: 600;
+}
+
+/* ================================
+   CODE EXAMPLE BLOCKS
+   ================================ */
+
+.code-example-block {
+    background: var(--code-bg, #1e293b);
+    border: 1px solid var(--code-border, #374151);
+}
+
+.code-example {
+    position: relative;
+}
+
+.code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid var(--code-border, #374151);
+    border-radius: 16px 16px 0 0;
+}
+
+.language-badge {
+    background: var(--primary-color, #6366f1);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.btn-copy {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.875rem;
+}
+
+.btn-copy:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.code-example pre {
+    margin: 0;
+    padding: 1.5rem;
+    background: transparent;
+    color: #e2e8f0;
+    font-family: 'Fira Code', 'Monaco', 'Courier New', monospace;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    overflow-x: auto;
+}
+
+.code-example code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+}
+
+/* ================================
+   INTERACTIVE CHALLENGE BLOCKS
+   ================================ */
+
+.interactive-challenge-block {
+    background: linear-gradient(145deg, #f8fafc, #e2e8f0);
+    border: 2px solid var(--primary-color, #6366f1);
+}
+
+.interactive-challenge h3 {
+    color: var(--primary-color, #6366f1);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.challenge-instructions {
+    background: rgba(99, 102, 241, 0.1);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid var(--primary-color, #6366f1);
+}
+
+.code-editor-container {
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #d1d5db;
+}
+
+.code-editor {
+    min-height: 200px;
+    font-family: 'Fira Code', 'Monaco', 'Courier New', monospace;
+}
+
+.challenge-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.challenge-actions .btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background: var(--primary-color, #6366f1);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5b21b6;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+}
+
+.code-output {
+    background: #1f2937;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 1rem;
+}
+
+.output-header {
+    background: #374151;
+    padding: 0.75rem 1rem;
+    color: #9ca3af;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.output-content {
+    padding: 1rem;
+    color: #e5e7eb;
+    font-family: 'Fira Code', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    margin: 0;
+}
+
+/* ================================
+   QUIZ BLOCKS
+   ================================ */
+
+.quiz-block {
+    background: linear-gradient(145deg, #fef3c7, #fde68a);
+    border: 2px solid #f59e0b;
+}
+
+.quiz-block h3 {
+    color: #92400e;
+    margin-bottom: 1rem;
+}
+
+.quiz-placeholder {
+    text-align: center;
+    padding: 2rem;
+}
+
+.quiz-placeholder .btn {
+    background: #f59e0b;
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.quiz-placeholder .btn:hover {
+    background: #d97706;
+    transform: translateY(-1px);
+}
+
+/* ================================
+   ERROR STATES
+   ================================ */
+
+.error-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: #fef2f2;
+    border: 2px solid #ef4444;
+    border-radius: 16px;
+}
+
+.error-state h3 {
+    color: #dc2626;
+    margin-bottom: 1rem;
+}
+
+.error-state p {
+    color: #7f1d1d;
+    margin-bottom: 2rem;
+}
+
+.error-state .btn {
+    background: #ef4444;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.unknown-block {
+    background: #f3f4f6;
+    border: 2px dashed #9ca3af;
+    text-align: center;
+    padding: 2rem;
+    color: #6b7280;
+}
+
+/* ================================
+   LOADING STATES
+   ================================ */
+
+.skeleton-loader {
+    animation: skeleton-pulse 1.5s ease-in-out infinite alternate;
+}
+
+.skeleton-title {
+    height: 2rem;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    width: 60%;
+}
+
+.skeleton-block {
+    height: 200px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+
+@keyframes skeleton-pulse {
+    0% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+/* ================================
+   RESPONSIVE DESIGN
+   ================================ */
+
+@media (max-width: 768px) {
+    .content-block {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .challenge-actions {
+        flex-direction: column;
+    }
+    
+    .challenge-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .code-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .btn-copy {
+        align-self: flex-end;
+    }
+}
+
+/* ================================
+   DARK THEME SUPPORT
+   ================================ */
+
+[data-theme="dark"] .content-block {
+    background: #1f2937;
+    border-color: #374151;
+    color: #e5e7eb;
+}
+
+[data-theme="dark"] .text-block .text-content {
+    color: #e5e7eb;
+}
+
+[data-theme="dark"] .interactive-challenge-block {
+    background: linear-gradient(145deg, #1f2937, #111827);
+}
+
+[data-theme="dark"] .challenge-instructions {
+    background: rgba(99, 102, 241, 0.2);
+    color: #e5e7eb;
+}
+
+[data-theme="dark"] .quiz-block {
+    background: linear-gradient(145deg, #451a03, #78350f);
+    border-color: #f59e0b;
+}
+
+[data-theme="dark"] .error-state {
+    background: #451a1a;
+    border-color: #dc2626;
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .skeleton-title,
+[data-theme="dark"] .skeleton-block {
+    background: linear-gradient(90deg, #2d3748 25%, #4a5568 50%, #2d3748 75%);
+}
+
+/* === End static/css/components/lesson-content-blocks.css === */
 

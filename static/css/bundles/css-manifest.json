@@ -1,10 +1,10 @@
 {
   "version": "1.0.0",
-  "generated": "2025-07-04T00:45:20.443Z",
+  "generated": "2025-07-04T17:05:39.997Z",
   "bundles": {
     "critical": {
       "file": "critical.css",
-      "size": 164899,
+      "size": 4554,
       "priority": "high",
       "loadStrategy": "blocking"
     },
@@ -16,13 +16,13 @@
     },
     "dashboard": {
       "file": "dashboard.css",
-      "size": 37832,
+      "size": 11436,
       "priority": "medium",
       "loadStrategy": "lazy"
     },
     "lessons": {
       "file": "lessons.css",
-      "size": 75647,
+      "size": 92011,
       "priority": "medium",
       "loadStrategy": "lazy"
     },
@@ -34,7 +34,7 @@
     },
     "ui": {
       "file": "ui.css",
-      "size": 55883,
+      "size": 39107,
       "priority": "low",
       "loadStrategy": "lazy"
     },

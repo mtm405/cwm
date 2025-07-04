@@ -1,0 +1,39 @@
+<!--
+Template: Consolidated Navigation
+Purpose: Single source of truth for application navigation
+Features:
+- Modern navigation styling
+- User menu integration
+- Search bar integration
+- Responsive design
+Last updated: July 9, 2025
+-->
+<nav class="navbar">
+    <div class="nav-container-modern">
+        <!-- Left Side: Main Navigation -->
+        <div class="nav-left">
+            <ul class="nav-links-modern">
+                <li><a href="/dashboard" class="nav-link-modern {{ 'active' if request.endpoint == 'main.dashboard' }}"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="/lessons" class="nav-link-modern {{ 'active' if request.endpoint == 'lesson.index' or request.endpoint == 'lesson.view' }}"><i class="fas fa-book"></i> Lessons</a></li>
+                <li><button class="nav-link-modern leaderboard-btn" onclick="openLeaderboardModal()"><i class="fas fa-trophy"></i> Leaderboard</button></li>
+                {% if user and user.is_admin %}
+                <li><a href="/admin" class="nav-link-modern {{ 'active' if request.endpoint and 'admin' in request.endpoint }}"><i class="fas fa-shield-alt"></i> Admin</a></li>
+                {% endif %}
+            </ul>
+        </div>
+        
+        <!-- Center: Live Clock -->
+        <div class="nav-center">
+            <div class="live-clock" id="live-clock" onclick="showClockOptions()">
+                <span class="time-display">12:00:00</span>
+                <span class="period-display">AM</span>
+            </div>
+        </div>
+        
+        <!-- Right Side: Search & User Info -->
+        <div class="nav-right">
+            {% include 'components/navigation/search-bar.html' %}
+            {% include 'components/navigation/user-menu.html' %}
+        </div>
+    </div>
+</nav>

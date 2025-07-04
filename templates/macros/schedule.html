@@ -1,0 +1,71 @@
+{# Schedule Component Macros #}
+
+{# Class Schedule Table Macro
+Usage: {{ schedule.class_schedule_table() }}
+#}
+{% macro class_schedule_table() %}
+<div class="class-schedule-table">
+    <table>
+        <thead>
+            <tr>
+                <th>Period</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="period-number">1</span></td>
+                <td>8:00 AM - 8:55 AM</td>
+            </tr>
+            <tr>
+                <td><span class="period-number">2</span></td>
+                <td>9:00 AM - 9:55 AM</td>
+            </tr>
+            <tr>
+                <td><span class="period-number">3</span></td>
+                <td>10:00 AM - 10:55 AM</td>
+            </tr>
+            <tr>
+                <td><span class="period-number">4</span></td>
+                <td>11:00 AM - 11:55 AM</td>
+            </tr>
+            <tr class="lunch-period">
+                <td><span class="period-label">Lunch</span></td>
+                <td>12:00 PM - 12:30 PM</td>
+            </tr>
+            <tr>
+                <td><span class="period-number">5</span></td>
+                <td>12:35 PM - 1:30 PM</td>
+            </tr>
+            <tr>
+                <td><span class="period-number">6</span></td>
+                <td>1:35 PM - 2:30 PM</td>
+            </tr>
+            <tr>
+                <td><span class="period-number">7</span></td>
+                <td>2:35 PM - 3:30 PM</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endmacro %}
+
+{# Schedule Modal Macro
+Usage: {{ schedule.schedule_modal() }}
+#}
+{% macro schedule_modal() %}
+<div id="schedule-modal" class="modal-overlay">
+    <div class="modal-backdrop" onclick="closeScheduleModal()"></div>
+    <div class="modal-content modal-md">
+        <div class="modal-header">
+            <h3 class="modal-title">
+                <i class="fas fa-calendar-alt"></i> Class Schedule
+            </h3>
+            <button class="modal-close" onclick="closeScheduleModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            {{ class_schedule_table() }}
+        </div>
+    </div>
+</div>
+{% endmacro %}

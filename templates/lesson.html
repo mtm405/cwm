@@ -3,11 +3,9 @@
 {% block title %}{{ lesson.title if lesson else "Lesson" }} - Code with Morais{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/lesson-content-blocks.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/lesson-blocks-enhanced.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/lesson-block-types.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/lesson-progress-enhanced.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/lesson.css') }}">
+<!-- Consolidated Lesson CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/lessons.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz-integration.css') }}">
 <style>
 /* Loading states */
@@ -244,7 +242,7 @@ window.initFirebase();
 
 <!-- Main Lesson System (ES6 Module) -->
 <script type="module">
-import { LessonSystem } from '{{ url_for("static", filename="js/lesson/lessonSystem.js") }}';
+import LessonSystem from '{{ url_for("static", filename="js/lesson/lesson-system.js") }}';
 
 // Initialize lesson system when DOM is ready
 document.addEventListener('DOMContentLoaded', async () => {
@@ -259,8 +257,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         console.log('✅ Lesson system initialized successfully');
         
-        // Make available globally for debugging
+        // Make API available globally for debugging and external access
         window.lessonSystem = lessonSystem;
+        window.lessonAPI = lessonSystem.getApi();
         
         // Initialize test system if in debug mode
         if (window.location.search.includes('test=true')) {

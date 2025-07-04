@@ -23,7 +23,7 @@ Usage: {{ dashboard.stat_card(
     </div>
     <div class="stat-progress">
         <div class="progress-bar-mini">
-            <div class="progress-fill-mini" style="width: {{ progress }}%"></div>
+            <div class="progress-fill-mini" data-progress="{{ progress }}"></div>
         </div>
     </div>
 </div>
@@ -64,7 +64,7 @@ Usage: {{ dashboard.progress_bar(75, 'Lesson Progress') }}
     <div class="progress-label">{{ label }}</div>
     {% endif %}
     <div class="progress-bar">
-        <div class="progress-bar-fill" style="width: {{ percentage }}%"></div>
+        <div class="progress-bar-fill" data-progress="{{ percentage }}"></div>
     </div>
     <div class="progress-text">{{ percentage }}%</div>
 </div>

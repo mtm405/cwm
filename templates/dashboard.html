@@ -12,7 +12,7 @@
     <header class="modern-dashboard-header">
         <div class="header-content">
             <div class="welcome-section">
-                <h1 id="welcome-message">Welcome back! <i class="fas fa-code"></i></h1>
+                <h1 id="welcome-message" data-first-name="{{ user.first_name or (user.display_name.split(' ')[0] if user.display_name else user.username) or 'Guest' }}">Welcome back! <i class="fas fa-code"></i></h1>
                 <p class="dashboard-subtitle">Ready to continue your Python journey?</p>
             </div>
             <div class="header-actions">
@@ -20,24 +20,6 @@
                 <button class="btn btn-outline" onclick="openScheduleModal()"><i class="fas fa-calendar-alt"></i> Schedule</button>
             </div>
         </div>
-        
-        <script>
-            (function() {
-                const welcomeMsg = document.getElementById('welcome-message');
-                if (welcomeMsg) {
-                    function getTimeBasedGreeting() {
-                        const hour = new Date().getHours();
-                        if (hour >= 5 && hour < 12) return 'Good morning';
-                        if (hour >= 12 && hour < 17) return 'Good afternoon';
-                        if (hour >= 17 && hour < 22) return 'Good evening';
-                        return 'Good night';
-                    }
-                    const greeting = getTimeBasedGreeting();
-                    const firstName = '{{ user.first_name or (user.display_name.split(" ")[0] if user.display_name else user.username) or "Guest" }}';
-                    welcomeMsg.innerHTML = `${greeting}, ${firstName}! <i class="fas fa-code"></i>`;
-                }
-            })();
-        </script>
         
         <nav class="dashboard-nav">
             <div class="nav-tabs-container">
@@ -119,12 +101,12 @@
                             <i class="fas fa-spinner fa-spin"></i>
                             <p>Loading leaderboard...</p>
                         </div>
-                        <div class="leaderboard-content" style="display: none;">
+                        <div class="leaderboard-content leaderboard-hidden">
                             <div class="leaderboard-list">
                                 <!-- Leaderboard items will be loaded here -->
                             </div>
                         </div>
-                        <div class="leaderboard-error" style="display: none;">
+                        <div class="leaderboard-error leaderboard-hidden">
                             <i class="fas fa-exclamation-triangle"></i>
                             <p>Failed to load leaderboard. Please try again.</p>
                             <button class="btn btn-primary" onclick="loadLeaderboardData()">Retry</button>
@@ -154,119 +136,92 @@
         
     </div> <!-- End of tab-content -->
 
-    <!-- Schedule Modal -->
-    <div id="schedule-modal" class="modal-overlay">
-        <div class="modal-backdrop" onclick="closeScheduleModal()"></div>
-        <div class="modal-content modal-md">
-            <div class="modal-header">
-                <h3 class="modal-title">
-                    <i class="fas fa-calendar-alt"></i> Class Schedule
-                </h3>
-                <button class="modal-close" onclick="closeScheduleModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="class-schedule-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Period</th>
-                                <th>Time</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><span class="period-number">1</span></td>
-                                <td>8:00 AM - 8:55 AM</td>
-                            </tr>
-                            <tr>
-                                <td><span class="period-number">2</span></td>
-                                <td>9:00 AM - 9:55 AM</td>
-                            </tr>
-                            <tr>
-                                <td><span class="period-number">3</span></td>
-                                <td>10:00 AM - 10:55 AM</td>
-                            </tr>
-                            <tr>
-                                <td><span class="period-number">4</span></td>
-                                <td>11:00 AM - 11:55 AM</td>
-                            </tr>
-                            <tr class="lunch-period">
-                                <td><span class="period-label">Lunch</span></td>
-                                <td>12:00 PM - 12:30 PM</td>
-                            </tr>
-                            <tr>
-                                <td><span class="period-number">5</span></td>
-                                <td>12:35 PM - 1:30 PM</td>
-                            </tr>
-                            <tr>
-                                <td><span class="period-number">6</span></td>
-                                <td>1:35 PM - 2:30 PM</td>
-                            </tr>
-                            <tr>
-                                <td><span class="period-number">7</span></td>
-                                <td>2:35 PM - 3:30 PM</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+    <!-- Schedule Modal - Now using standardized template -->
+    {% set schedule_modal_content %}
+    <div class="class-schedule-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Period</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="period-number">1</span></td>
+                    <td>8:00 AM - 8:55 AM</td>
+                </tr>
+                <tr>
+                    <td><span class="period-number">2</span></td>
+                    <td>9:00 AM - 9:55 AM</td>
+                </tr>
+                <tr>
+                    <td><span class="period-number">3</span></td>
+                    <td>10:00 AM - 10:55 AM</td>
+                </tr>
+                <tr>
+                    <td><span class="period-number">4</span></td>
+                    <td>11:00 AM - 11:55 AM</td>
+                </tr>
+                <tr class="lunch-period">
+                    <td><span class="period-label">Lunch</span></td>
+                    <td>12:00 PM - 12:30 PM</td>
+                </tr>
+                <tr>
+                    <td><span class="period-number">5</span></td>
+                    <td>12:35 PM - 1:30 PM</td>
+                </tr>
+                <tr>
+                    <td><span class="period-number">6</span></td>
+                    <td>1:35 PM - 2:30 PM</td>
+                </tr>
+                <tr>
+                    <td><span class="period-number">7</span></td>
+                    <td>2:35 PM - 3:30 PM</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
+    {% endset %}
+    
+    {% set modal_id = 'schedule-modal' %}
+    {% set modal_title = '<i class="fas fa-calendar-alt"></i> Class Schedule' %}
+    {% set modal_content = schedule_modal_content %}
+    {% set modal_close_action = 'closeScheduleModal' %}
+    {% set modal_size = 'md' %}
+    
+    {% include 'components/modals/base-modal.html' with context %}
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <!-- Dashboard-specific JavaScript -->
 <script src="{{ url_for('static', filename='js/components/dashboard.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/dashboard-greeting.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/dashboard-modal.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/progress-bar-manager.js') }}"></script>
 <script src="{{ url_for('static', filename='js/modules/tab-system.js') }}"></script>
 <script>
-// Initialize dashboard after loading
+// Initialize dashboard components after loading
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize dashboard manager
     if (typeof ModernDashboardManager !== 'undefined') {
         window.dashboardManager = new ModernDashboardManager();
         window.dashboardManager.init();
     }
+    
+    // Initialize greeting system
+    if (typeof DashboardGreeting !== 'undefined') {
+        window.dashboardGreeting = new DashboardGreeting();
+        window.dashboardGreeting.init();
+    }
+    
+    // Initialize modal system
+    if (typeof DashboardModal !== 'undefined') {
+        window.dashboardModal = new DashboardModal();
+    }
+    
+    // Progress bar manager is auto-initialized
 });
-
-// Schedule Modal Functions
-function openScheduleModal() {
-    const modal = document.getElementById('schedule-modal');
-    if (modal) {
-        document.body.style.overflow = 'hidden'; // Prevent background scrolling
-        modal.classList.add('active');
-        
-        // Add animation to table rows
-        const rows = modal.querySelectorAll('tbody tr');
-        rows.forEach((row, index) => {
-            row.style.opacity = '0';
-            row.style.transform = 'translateY(20px)';
-            setTimeout(() => {
-                row.style.transition = 'all 0.3s ease';
-                row.style.opacity = '1';
-                row.style.transform = 'translateY(0)';
-            }, 100 + (index * 50)); // Staggered animation
-        });
-    }
-}
-
-function closeScheduleModal() {
-    const modal = document.getElementById('schedule-modal');
-    if (modal) {
-        document.body.style.overflow = ''; // Restore scrolling
-        modal.classList.remove('active');
-        
-        // Reset animations for next open
-        setTimeout(() => {
-            if (!modal.classList.contains('active')) {
-                const rows = modal.querySelectorAll('tbody tr');
-                rows.forEach(row => {
-                    row.style.transition = 'none';
-                    row.style.opacity = '0';
-                    row.style.transform = 'translateY(20px)';
-                });
-            }
-        }, 300);
-    }
-}
 </script>
 {% endblock %}

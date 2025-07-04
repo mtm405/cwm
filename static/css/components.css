@@ -1,0 +1,395 @@
+/* 
+ * Components CSS - Consolidated Component Styles
+ * Merged from: buttons-enhanced.css, cards.css, modal.css, tab-system.css, refresh-button-enhanced.css
+ * Last updated: July 4, 2025
+ */
+
+/* ================================
+   BUTTON COMPONENTS
+   ================================ */
+
+/* Base Button Styles */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    text-decoration: none;
+}
+
+/* Button sizes */
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.125rem;
+}
+
+/* Primary Button */
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Secondary Button */
+.btn-secondary {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+.btn-secondary:hover, .btn-secondary:focus {
+    background: var(--bg-hover);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+/* Success Button */
+.btn-success {
+    background: var(--success-color);
+    color: white;
+    border-color: var(--success-color);
+}
+
+.btn-success:hover, .btn-success:focus {
+    background: var(--success-hover);
+    border-color: var(--success-hover);
+}
+
+/* Danger Button */
+.btn-danger {
+    background: var(--danger-color);
+    color: white;
+    border-color: var(--danger-color);
+}
+
+.btn-danger:hover, .btn-danger:focus {
+    background: var(--danger-hover);
+    border-color: var(--danger-hover);
+}
+
+/* Disabled state */
+.btn:disabled, .btn.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Button with icon */
+.btn i, .btn svg {
+    width: 1em;
+    height: 1em;
+}
+
+/* Button loading state */
+.btn.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.btn.loading::after {
+    content: "";
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: button-loading-spinner 0.8s linear infinite;
+}
+
+@keyframes button-loading-spinner {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Refresh Button Styles */
+.refresh-dashboard,
+.btn-refresh {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: rgba(var(--primary-rgb), 0.1);
+    border: 2px solid rgba(var(--primary-rgb), 0.2);
+    border-radius: 12px;
+    color: var(--primary-color);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.refresh-dashboard i,
+.btn-refresh i {
+    transition: transform 0.3s ease;
+}
+
+.refresh-dashboard:hover,
+.btn-refresh:hover {
+    background: rgba(var(--primary-rgb), 0.2);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.2);
+}
+
+.refresh-dashboard:hover i,
+.btn-refresh:hover i {
+    transform: rotate(180deg);
+}
+
+.refresh-dashboard.refreshing i,
+.btn-refresh.refreshing i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ================================
+   CARD COMPONENTS
+   ================================ */
+
+.card {
+    background-color: var(--bg-card);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Card Header */
+.card-header {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.card-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin: 0.5rem 0 0 0;
+}
+
+/* Card Body */
+.card-body {
+    padding: 0;
+}
+
+.card-text {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Card Footer */
+.card-footer {
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+    margin-top: 1rem;
+}
+
+/* Card Variants */
+.card-primary {
+    border-left: 4px solid var(--primary-color);
+}
+
+.card-success {
+    border-left: 4px solid var(--success-color);
+}
+
+.card-warning {
+    border-left: 4px solid var(--warning-color);
+}
+
+.card-danger {
+    border-left: 4px solid var(--danger-color);
+}
+
+/* ================================
+   MODAL COMPONENTS
+   ================================ */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: scale(0.8);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-content {
+    transform: scale(1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.modal-body {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* ================================
+   TAB SYSTEM COMPONENTS
+   ================================ */
+
+[data-tab-container] {
+    position: relative;
+}
+
+.tab-nav {
+    display: flex;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 1.5rem;
+}
+
+[data-tab-button],
+.nav-tab {
+    background: none;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 2px solid transparent;
+    position: relative;
+}
+
+[data-tab-button]:hover,
+.nav-tab:hover {
+    color: var(--primary-color);
+    background: rgba(var(--primary-rgb), 0.1);
+}
+
+[data-tab-button].active,
+.nav-tab.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+[data-tab-content],
+.tab-pane {
+    display: none;
+    animation: tab-fade-in 0.3s ease;
+}
+
+[data-tab-content].active,
+.tab-pane.active {
+    display: block;
+}
+
+@keyframes tab-fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .tab-nav {
+        flex-wrap: wrap;
+    }
+    
+    [data-tab-button],
+    .nav-tab {
+        flex: 1;
+        text-align: center;
+        padding: 0.5rem;
+        font-size: 0.875rem;
+    }
+}

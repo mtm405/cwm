@@ -1,0 +1,171 @@
+{# Unified Card Component System for consistent card styling across the application
+   This file contains macros for various card types that follow a consistent pattern.
+   
+   Last updated: July 9, 2025
+#}
+
+{# 
+Basic Card - A simple card with title, content, and optional footer
+Usage: 
+{{ cards.basic_card(
+    title='Card Title', 
+    content='<p>Card content goes here</p>', 
+    footer='<button class="btn btn-primary">Action</button>',
+    card_class='custom-class'
+) }}
+#}
+{% macro basic_card(title='', content='', footer='', card_class='') %}
+<div class="card {{ card_class }}">
+    {% if title %}
+    <div class="card-header">
+        <h3 class="card-title">{{ title }}</h3>
+    </div>
+    {% endif %}
+    <div class="card-body">
+        {{ content|safe }}
+    </div>
+    {% if footer %}
+    <div class="card-footer">
+        {{ footer|safe }}
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# 
+Stat Card - For displaying metrics and statistics
+Usage: 
+{{ cards.stat_card(
+    icon='fas fa-star',
+    value='1,234',
+    label='Total Points',
+    trend='+15%',
+    trend_direction='up',
+    card_class='primary'
+) }}
+#}
+{% macro stat_card(icon='', value='', label='', trend='', trend_direction='', card_class='', data_attr='') %}
+<div class="stat-card {{ card_class }}" {% if data_attr %}data-stat="{{ data_attr }}"{% endif %}>
+    <div class="stat-icon">
+        <i class="{{ icon }}"></i>
+    </div>
+    <div class="stat-info">
+        <div class="stat-value">{{ value }}</div>
+        <div class="stat-label">{{ label }}</div>
+    </div>
+    {% if trend %}
+    <div class="stat-trend {{ trend_direction }}">
+        <i class="fas fa-{% if trend_direction == 'up' %}arrow-up{% elif trend_direction == 'down' %}arrow-down{% else %}minus{% endif %}"></i>
+        <span>{{ trend }}</span>
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# 
+Progress Card - For displaying progress with visual indicator
+Usage: 
+{{ cards.progress_card(
+    title='Course Progress',
+    value='65%',
+    progress=65,
+    description='You are making great progress!',
+    card_class='primary'
+) }}
+#}
+{% macro progress_card(title='', value='', progress=0, description='', card_class='') %}
+<div class="progress-card {{ card_class }}">
+    <div class="progress-card-header">
+        <h3 class="progress-card-title">{{ title }}</h3>
+        <span class="progress-card-value">{{ value }}</span>
+    </div>
+    <div class="progress-bar">
+        <div class="progress-fill" style="width: {{ progress }}%"></div>
+    </div>
+    {% if description %}
+    <div class="progress-card-description">
+        {{ description }}
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# 
+Action Card - Card with a prominent action button
+Usage: 
+{{ cards.action_card(
+    title='Get Started',
+    content='Begin your learning journey today',
+    button_text='Start Now',
+    button_action='startCourse()',
+    icon='fas fa-rocket',
+    card_class='primary'
+) }}
+#}
+{% macro action_card(title='', content='', button_text='', button_action='', icon='', card_class='') %}
+<div class="action-card {{ card_class }}">
+    {% if icon %}
+    <div class="action-card-icon">
+        <i class="{{ icon }}"></i>
+    </div>
+    {% endif %}
+    <div class="action-card-content">
+        {% if title %}
+        <h3 class="action-card-title">{{ title }}</h3>
+        {% endif %}
+        <div class="action-card-description">
+            {{ content|safe }}
+        </div>
+    </div>
+    <div class="action-card-button">
+        <button class="btn btn-primary" onclick="{{ button_action }}">
+            {{ button_text }}
+        </button>
+    </div>
+</div>
+{% endmacro %}
+
+{# 
+Item Card - For displaying a list item with image/icon, title, and description
+Usage: 
+{{ cards.item_card(
+    image='/static/img/lesson1.jpg',
+    title='Introduction to Python',
+    description='Learn the basics of Python programming',
+    meta='30 min | Beginner',
+    action_text='Start',
+    action='startLesson(1)',
+    card_class='lesson-card'
+) }}
+#}
+{% macro item_card(image='', icon='', title='', description='', meta='', action_text='', action='', card_class='') %}
+<div class="item-card {{ card_class }}">
+    <div class="item-card-media">
+        {% if image %}
+        <img src="{{ image }}" alt="{{ title }}" class="item-card-image">
+        {% elif icon %}
+        <div class="item-card-icon">
+            <i class="{{ icon }}"></i>
+        </div>
+        {% endif %}
+    </div>
+    <div class="item-card-content">
+        <h3 class="item-card-title">{{ title }}</h3>
+        <div class="item-card-description">
+            {{ description }}
+        </div>
+        {% if meta %}
+        <div class="item-card-meta">
+            {{ meta }}
+        </div>
+        {% endif %}
+    </div>
+    {% if action_text %}
+    <div class="item-card-action">
+        <button class="btn btn-sm btn-primary" onclick="{{ action }}">
+            {{ action_text }}
+        </button>
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}

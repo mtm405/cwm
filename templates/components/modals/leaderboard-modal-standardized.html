@@ -1,0 +1,35 @@
+<!--
+Leaderboard Modal Component (STANDARDIZED)
+Uses base modal component for consistent structure
+-->
+{% set modal_id = 'leaderboard-modal' %}
+{% set modal_title %}
+<i class="fas fa-trophy"></i> Leaderboard
+{% endset %}
+
+{% set modal_content %}
+<div class="leaderboard-loading">
+    <i class="fas fa-spinner fa-spin"></i>
+    <p>Loading leaderboard...</p>
+</div>
+<div class="leaderboard-content" style="display: none;">
+    <div class="leaderboard-filters">
+        <button class="filter-btn active" data-filter="all">All Time</button>
+        <button class="filter-btn" data-filter="weekly">This Week</button>
+        <button class="filter-btn" data-filter="monthly">This Month</button>
+    </div>
+    <div class="leaderboard-list">
+        <!-- Leaderboard items will be loaded here -->
+    </div>
+</div>
+<div class="leaderboard-error" style="display: none;">
+    <i class="fas fa-exclamation-triangle"></i>
+    <p>Failed to load leaderboard. Please try again.</p>
+    <button class="btn btn-primary" onclick="loadLeaderboardData()">Retry</button>
+</div>
+{% endset %}
+
+{% set modal_close_action = 'closeLeaderboardModal' %}
+{% set modal_size = 'lg' %}
+
+{% include 'components/modals/base-modal.html' with context %}

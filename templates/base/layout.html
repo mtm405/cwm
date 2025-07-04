@@ -16,9 +16,9 @@ Last updated: July 2, 2025
     {% include 'base/head.html' %}
 </head>
 <body class="theme-dark" data-page="{% block page_name %}{% endblock %}">
-    <!-- Navbar: Hidden on homepage (main.index), visible everywhere else -->
+    <!-- Consolidated Navbar: Hidden on homepage (main.index), visible everywhere else -->
     {% if request.endpoint != 'main.index' %}
-        {% include 'components/navigation/navbar.html' %}
+        {% include 'components/navigation/navbar-consolidated.html' %}
     {% endif %}
     
     <!-- Main Content Area -->
