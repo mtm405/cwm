@@ -167,7 +167,7 @@ class ModuleLoader {
             'eventBus': 'eventBus.js',
             'config': 'config.js',
             'constants': 'constants.js',
-            'utils': 'utils.js',
+            'utils': 'core/utils.js',
             'app': 'app.js',
             
             // Base components
