@@ -146,7 +146,8 @@ class FirebaseService:
         except Exception as e:
             logger.error(f"Error creating user {user_id}: {str(e)}")
             return False
-      def save_quiz_result(self, user_id: str, quiz_id: str, result: Dict[str, Any]) -> bool:
+    
+    def save_quiz_result(self, user_id: str, quiz_id: str, result: Dict[str, Any]) -> bool:
         """Save quiz result with validation."""
         if not self.is_available():
             logger.warning("Firebase not available, cannot save quiz result")
@@ -720,6 +721,23 @@ class FirebaseService:
         if total_xp < 100:
             return 1
         return int(math.sqrt(total_xp / 100)) + 1
+    
+    def _validate_user_id(self, user_id: str) -> bool:
+        """Validate user ID format and presence."""
+        if not user_id or not isinstance(user_id, str):
+            logger.error("Invalid user ID: must be a non-empty string")
+            return False
+        
+        if len(user_id.strip()) == 0:
+            logger.error("Invalid user ID: cannot be empty or whitespace")
+            return False
+            
+        # Basic validation - could be enhanced with regex
+        if len(user_id) > 128:  # Firebase document ID limit
+            logger.error("Invalid user ID: too long (max 128 characters)")
+            return False
+            
+        return True
 
 # Legacy support functions for backward compatibility
 # TODO: Remove in Phase 2
