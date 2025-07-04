@@ -18,13 +18,9 @@
 @import url('components/responsive.css');             /* Responsive utilities */
 @import url('lessons.css');                           /* All lesson functionality */
 
-/* Page-Specific Styles */
-@import url('components/lesson.css');                 /* Lesson components */
-
 /* Utilities - Load Last */
 @import url('utils/helpers.css');
 @import url('utils/animations.css');
-@import url('utils/responsive.css');
 
 /* Essential Global Styles Only */
 body {

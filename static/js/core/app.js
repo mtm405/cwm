@@ -332,7 +332,7 @@ export class App {
             console.log('📚 Initializing lesson page...');
             
             // Import lesson system modules
-            const { LessonSystem } = await import('../lesson/lessonSystem.js');
+            const { default: LessonSystem } = await import('../lesson/lesson-system.js');
             
             // Initialize lesson system
             const lessonSystem = new LessonSystem();

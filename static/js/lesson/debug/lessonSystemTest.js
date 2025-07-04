@@ -4,7 +4,7 @@
  */
 
 // Import our new lesson system
-import { LessonSystem } from '../lessonSystem.js';
+import LessonSystem from '../lesson-system.js';
 import { LessonDebugger } from '../debug/lessonDebugger.js';
 
 class LessonSystemTest {
@@ -275,24 +275,6 @@ console.log('Or navigate to any lesson page with ?test=true');
 
 // Export for module usage
 export { LessonSystemTest };
-            const result = await test.testFunction();
-            this.results.push({
-                name: test.name,
-                success: true,
-                result,
-                error: null
-            });
-            console.log(`✅ ${test.name} passed`);
-        } catch (error) {
-            this.results.push({
-                name: test.name,
-                success: false,
-                result: null,
-                error: error.message
-            });
-            console.error(`❌ ${test.name} failed:`, error);
-        }
-    }
     
     async testModuleLoading() {
         // Test if modules can be imported
