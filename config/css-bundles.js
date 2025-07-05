@@ -40,11 +40,7 @@ const CSS_BUNDLES = {
     
     lessons: {
         files: [
-            'static/css/components/lesson.css',
-            'static/css/components/lesson-block-types.css',
-            'static/css/components/lesson-blocks-enhanced.css',
-            'static/css/components/lesson-progress-enhanced.css',
-            'static/css/components/lesson-content-blocks.css'
+            'static/css/lesson.css'
         ],
         priority: 'medium',
         loadStrategy: 'lazy',

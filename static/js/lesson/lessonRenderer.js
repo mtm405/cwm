@@ -14,7 +14,7 @@ export function renderLessonBlocks(blocks, lessonProgress) {
 function createBlockElement(block, index, lessonProgress) {
     if (!block) return null;
     const article = document.createElement('article');
-    article.className = `lesson-block ${block.type || 'unknown'}-block`;
+    article.className = `content-block ${block.type || 'unknown'}-block`;
     article.id = `block-${block.id || index}`;
     article.dataset.blockId = block.id || index;
     article.dataset.blockType = block.type || 'text';
@@ -50,7 +50,7 @@ function createBlockElement(block, index, lessonProgress) {
 
 function createTextBlockHTML(block) {
     return `
-        <div class="lesson-block-header">
+        <div class="block-header">
             <div class="block-type-indicator">
                 <div class="block-icon text-block-icon">
                     <i class="fas fa-book-open"></i>
@@ -65,7 +65,7 @@ function createTextBlockHTML(block) {
                 </div>
             </div>
         </div>
-        <div class="lesson-block-content">
+        <div class="block-content">
             <div class="text-content">
                 ${block.content || ''}
             </div>
@@ -81,7 +81,7 @@ function createTextBlockHTML(block) {
             </div>
             ` : ''}
         </div>
-        <div class="lesson-block-actions">
+        <div class="block-actions">
             <button class="action-btn primary complete-btn" data-block-id="${block.id}">
                 <i class="fas fa-check"></i>
                 <span>Mark as Read</span>
@@ -92,7 +92,7 @@ function createTextBlockHTML(block) {
 
 function createCodeExampleHTML(block) {
     return `
-        <div class="lesson-block-header">
+        <div class="block-header">
             <div class="block-type-indicator">
                 <div class="block-icon code-block-icon">
                     <i class="fas fa-code"></i>
@@ -107,7 +107,7 @@ function createCodeExampleHTML(block) {
                 </button>
             </div>
         </div>
-        <div class="lesson-block-content">
+        <div class="block-content">
             <div class="code-container">
                 <div class="code-header">
                     <span class="code-title">${block.title || 'Example Code'}</span>
@@ -128,7 +128,7 @@ function createCodeExampleHTML(block) {
                 ` : ''}
             </div>
         </div>
-        <div class="lesson-block-actions">
+        <div class="block-actions">
             <button class="action-btn primary complete-btn" data-block-id="${block.id}">
                 <i class="fas fa-check"></i>
                 <span>Mark as Understood</span>
@@ -139,7 +139,7 @@ function createCodeExampleHTML(block) {
 
 function createInteractiveBlockHTML(block) {
     return `
-        <div class="lesson-block-header">
+        <div class="block-header">
             <div class="block-type-indicator">
                 <div class="block-icon interactive-block-icon">
                     <i class="fas fa-laptop-code"></i>
@@ -151,7 +151,7 @@ function createInteractiveBlockHTML(block) {
                 <span class="difficulty-badge ${(block.difficulty || 'beginner').toLowerCase()}">${block.difficulty || 'Beginner'}</span>
             </div>
         </div>
-        <div class="lesson-block-content">
+        <div class="block-content">
             <div class="challenge-content">
                 <div class="challenge-instructions">
                     <div class="instructions-header">
@@ -227,7 +227,7 @@ function createInteractiveBlockHTML(block) {
 
 function createQuizBlockHTML(block) {
     return `
-        <div class="lesson-block-header">
+        <div class="block-header">
             <div class="block-type-indicator">
                 <div class="block-icon quiz-block-icon">
                     <i class="fas fa-brain"></i>
@@ -238,7 +238,7 @@ function createQuizBlockHTML(block) {
                 <span class="quiz-type-badge">Assessment</span>
             </div>
         </div>
-        <div class="lesson-block-content">
+        <div class="block-content">
             <div class="quiz-content">
                 <div class="quiz-intro">
                     <div class="quiz-intro-header">
@@ -262,7 +262,7 @@ function createQuizBlockHTML(block) {
 
 function createDefaultBlockHTML(block) {
     return `
-        <div class="lesson-block-header">
+        <div class="block-header">
             <div class="block-type-indicator">
                 <div class="block-icon unknown-block-icon">
                     <i class="fas fa-question"></i>
@@ -270,7 +270,7 @@ function createDefaultBlockHTML(block) {
                 <span class="block-type-label">Unknown Block Type: ${block.type}</span>
             </div>
         </div>
-        <div class="lesson-block-content">
+        <div class="block-content">
             <div class="unknown-block-content">
                 <p>This block type (${block.type}) is not yet supported.</p>
                 <details>
@@ -336,7 +336,7 @@ export function showBlockFeedback(blockId, feedbackType, message) {
     `;
     
     // Insert feedback
-    const blockActions = blockElement.querySelector('.lesson-block-actions');
+    const blockActions = blockElement.querySelector('.block-actions');
     if (blockActions) {
         blockActions.insertBefore(feedbackElement, blockActions.firstChild);
     }

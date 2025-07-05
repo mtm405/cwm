@@ -27,6 +27,7 @@
     transition: all 0.2s ease;
     border: 2px solid transparent;
     text-decoration: none;
+    color: rgba(var(--primary-rgb), 1);
 }
 
 /* Button sizes */

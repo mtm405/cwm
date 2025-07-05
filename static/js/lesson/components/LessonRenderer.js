@@ -80,7 +80,7 @@ export class LessonRenderer {
     
     async createBlockElement(block, userProgress) {
         const article = document.createElement('article');
-        article.className = `lesson-block ${block.type}-block`;
+        article.className = `content-block ${block.type}-block`;
         article.id = `block-${block.id}`;
         article.dataset.blockId = block.id;
         article.dataset.blockType = block.type;
@@ -106,7 +106,7 @@ export class LessonRenderer {
     
     renderTextBlock(block) {
         return `
-            <div class="lesson-block-header">
+            <div class="block-header">
                 <div class="block-type-indicator">
                     <div class="block-icon text-block-icon">
                         <i class="fas fa-book-open"></i>
@@ -121,10 +121,10 @@ export class LessonRenderer {
                     </div>
                 </div>
             </div>
-            <div class="lesson-block-content">
+            <div class="block-content">
                 <div class="text-content">${this.processContent(block.content || '')}</div>
             </div>
-            <div class="lesson-block-actions">
+            <div class="block-actions">
                 <button class="action-btn primary complete-btn" data-block-id="${block.id}">
                     <i class="fas fa-check"></i>
                     <span>Mark as Read</span>
@@ -135,7 +135,7 @@ export class LessonRenderer {
     
     renderCodeBlock(block) {
         return `
-            <div class="lesson-block-header">
+            <div class="block-header">
                 <div class="block-type-indicator">
                     <div class="block-icon code-block-icon">
                         <i class="fas fa-code"></i>
@@ -150,7 +150,7 @@ export class LessonRenderer {
                     </button>
                 </div>
             </div>
-            <div class="lesson-block-content">
+            <div class="block-content">
                 <div class="code-container">
                     <div class="code-block-wrapper">
                         <pre class="code-content"><code class="language-${block.language || 'python'}">${this.escapeHtml(block.code || '')}</code></pre>
@@ -168,7 +168,7 @@ export class LessonRenderer {
                 </div>
                 ` : ''}
             </div>
-            <div class="lesson-block-actions">
+            <div class="block-actions">
                 <button class="action-btn primary complete-btn" data-block-id="${block.id}">
                     <i class="fas fa-check"></i>
                     <span>Mark as Understood</span>
@@ -179,7 +179,7 @@ export class LessonRenderer {
     
     renderInteractiveBlock(block) {
         return `
-            <div class="lesson-block-header">
+            <div class="block-header">
                 <div class="block-type-indicator">
                     <div class="block-icon interactive-block-icon">
                         <i class="fas fa-laptop-code"></i>
@@ -191,7 +191,7 @@ export class LessonRenderer {
                     <span class="difficulty-badge ${(block.difficulty || 'beginner').toLowerCase()}">${block.difficulty || 'Beginner'}</span>
                 </div>
             </div>
-            <div class="lesson-block-content">
+            <div class="block-content">
                 <div class="challenge-content">
                     <div class="challenge-instructions">
                         <div class="instructions-header">
@@ -237,7 +237,7 @@ export class LessonRenderer {
     
     renderQuizBlock(block) {
         return `
-            <div class="lesson-block-header">
+            <div class="block-header">
                 <div class="block-type-indicator">
                     <div class="block-icon quiz-block-icon">
                         <i class="fas fa-brain"></i>
@@ -253,7 +253,7 @@ export class LessonRenderer {
                     </div>
                 </div>
             </div>
-            <div class="lesson-block-content">
+            <div class="block-content">
                 <div class="quiz-content">
                     <div class="quiz-intro">
                         <div class="quiz-intro-header">

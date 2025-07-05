@@ -16,7 +16,7 @@
 @import url('components/auth.css');                   /* Authentication forms */
 @import url('components/notifications.css');          /* Toast notifications */
 @import url('components/responsive.css');             /* Responsive utilities */
-@import url('lessons.css');                           /* All lesson functionality */
+@import url('lesson.css');                            /* Lesson page styles */
 
 /* Utilities - Load Last */
 @import url('utils/helpers.css');
