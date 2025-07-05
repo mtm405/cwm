@@ -15,6 +15,7 @@ from flask_login import LoginManager, login_user, logout_user, current_user, log
 # Import auth debugging
 try:
     from debug_auth_token import integrate_auth_debugger, AuthTokenDebugger
+    from system_auth_fix import integrate_system_auth_fix
     AUTH_DEBUG_AVAILABLE = True
 except ImportError:
     AUTH_DEBUG_AVAILABLE = False
@@ -41,7 +42,8 @@ app.secret_key = config.SECRET_KEY
 if AUTH_DEBUG_AVAILABLE:
     try:
         integrate_auth_debugger(app)
-        logger.info("✅ Auth debugging integrated successfully")
+        integrate_system_auth_fix(app)
+        logger.info("✅ Auth debugging and fixing integrated successfully")
     except Exception as e:
         logger.warning(f"Failed to integrate auth debugging: {e}")
 else:

@@ -38,24 +38,40 @@ def get_daily_challenge():
         # Get today's date
         today = datetime.now().strftime('%Y-%m-%d')
         
-        # Try to get challenge from Firebase
+        # Try to get challenge from Firebase first
         challenge = None
         if firebase_service and firebase_service.is_available():
-            challenge = firebase_service.get_daily_challenge(today)
+            # Try to get challenge with today's date as document ID
+            challenge_ref = firebase_service.db.collection('daily_challenges').document(today)
+            challenge_doc = challenge_ref.get()
+            
+            if challenge_doc.exists:
+                challenge = challenge_doc.to_dict()
+                challenge['id'] = challenge_doc.id
+            else:
+                # Try to find a challenge for today in the collection
+                challenges_ref = firebase_service.db.collection('daily_challenges')
+                query = challenges_ref.where('date', '==', today).limit(1)
+                challenges = list(query.stream())
+                
+                if challenges:
+                    challenge = challenges[0].to_dict()
+                    challenge['id'] = challenges[0].id
         
         # If no challenge found, use fallback
         if not challenge:
             challenge = get_fallback_challenge(today)
         
-        # Add helper costs if not present
-        if 'hint_cost' not in challenge:
-            challenge['hint_cost'] = 25
-        if 'skip_cost' not in challenge:
-            challenge['skip_cost'] = 50
+        # Ensure the challenge has the required fields and normalize the data structure
+        if not challenge:
+            challenge = get_fallback_challenge(today)
+        
+        # Normalize challenge data structure for compatibility
+        normalized_challenge = normalize_challenge_data(challenge)
         
         return jsonify({
             'success': True,
-            'challenge': challenge,
+            'challenge': normalized_challenge,
             'date': today
         })
         
@@ -103,7 +119,7 @@ def use_helper(user):
     """Use a helper (hint or skip) for today's challenge"""
     try:
         data = request.get_json()
-        helper_type = data.get('type')  # 'hint' or 'skip'
+        helper_type = data.get('helperType') or data.get('type')  # Support both formats
         
         if helper_type not in ['hint', 'skip']:
             return jsonify({
@@ -129,10 +145,18 @@ def use_helper(user):
         # Get challenge to determine cost
         challenge = None
         if firebase_service and firebase_service.is_available():
-            challenge = firebase_service.get_daily_challenge(today)
+            challenge_ref = firebase_service.db.collection('daily_challenges').document(today)
+            challenge_doc = challenge_ref.get()
+            
+            if challenge_doc.exists:
+                challenge = challenge_doc.to_dict()
+                challenge['id'] = challenge_doc.id
         
         if not challenge:
             challenge = get_fallback_challenge(today)
+        
+        # Normalize challenge data
+        challenge = normalize_challenge_data(challenge)
         
         # Determine cost
         cost = challenge.get('hint_cost', 25) if helper_type == 'hint' else challenge.get('skip_cost', 50)
@@ -174,6 +198,8 @@ def use_helper(user):
         else:  # skip
             response_data['message'] = 'Challenge skipped! You can try again tomorrow.'
             response_data['solution'] = challenge.get('solution', 'Solution not available')
+            response_data['xpAwarded'] = challenge.get('xp_reward', 25)  # Award some XP for participation
+            response_data['currentStreak'] = 1  # TODO: Implement proper streak calculation
         
         return jsonify(response_data)
         
@@ -190,8 +216,8 @@ def submit_challenge(user):
     """Submit a challenge solution"""
     try:
         data = request.get_json()
-        challenge_id = data.get('challenge_id')
-        solution = data.get('solution')
+        challenge_id = data.get('challengeId') or data.get('challenge_id')
+        solution = data.get('code') or data.get('solution')
         challenge_type = data.get('type', 'code_challenge')
         
         if not challenge_id or not solution:
@@ -206,22 +232,70 @@ def submit_challenge(user):
         
         challenge = None
         if firebase_service and firebase_service.is_available():
-            challenge = firebase_service.get_daily_challenge(today)
+            challenge_ref = firebase_service.db.collection('daily_challenges').document(today)
+            challenge_doc = challenge_ref.get()
+            
+            if challenge_doc.exists:
+                challenge = challenge_doc.to_dict()
+                challenge['id'] = challenge_doc.id
         
         if not challenge:
             challenge = get_fallback_challenge(today)
         
+        # Normalize challenge data
+        challenge = normalize_challenge_data(challenge)
+        
         # Validate solution based on challenge type
         is_correct = False
         feedback = ""
+        test_results = []
         
         if challenge_type == 'code_challenge':
-            # For code challenges, check if solution matches expected output
-            expected_output = challenge.get('expected_output', '')
-            # In a real implementation, you'd execute the code safely
-            # For now, we'll do a simple string comparison
-            is_correct = solution.strip() == expected_output.strip()
-            feedback = "Correct!" if is_correct else "Not quite right. Try again!"
+            # For code challenges, execute the code and check output
+            try:
+                import io
+                import sys
+                from contextlib import redirect_stdout
+                
+                # Create a string buffer to capture output
+                output_buffer = io.StringIO()
+                
+                # Redirect stdout to capture print statements
+                with redirect_stdout(output_buffer):
+                    # Execute the code
+                    exec(solution)
+                
+                # Get the output
+                actual_output = output_buffer.getvalue().strip()
+                expected_output = challenge.get('expected_output', '').strip()
+                
+                is_correct = actual_output == expected_output
+                
+                # Create test results
+                if is_correct:
+                    test_results.append({
+                        'name': 'Output Test',
+                        'passed': True,
+                        'expected': expected_output,
+                        'output': actual_output
+                    })
+                    feedback = "Perfect! Your solution produces the correct output."
+                else:
+                    test_results.append({
+                        'name': 'Output Test',
+                        'passed': False,
+                        'expected': expected_output,
+                        'output': actual_output
+                    })
+                    feedback = "Your solution runs but doesn't produce the expected output."
+                    
+            except Exception as e:
+                test_results.append({
+                    'name': 'Execution Test',
+                    'passed': False,
+                    'error': str(e)
+                })
+                feedback = f"Code execution error: {str(e)}"
         
         elif challenge_type == 'quiz':
             # For quiz challenges, check answers
@@ -270,11 +344,12 @@ def submit_challenge(user):
         return jsonify({
             'success': True,
             'correct': is_correct,
-            'feedback': feedback,
-            'xp_awarded': xp_awarded,
-            'coins_awarded': coins_awarded,
-            'new_xp': user.get('xp', 0) + xp_awarded,
-            'new_coins': user.get('pycoins', 0) + coins_awarded
+            'message': feedback,
+            'testResults': test_results,
+            'xp_earned': xp_awarded,
+            'coins_earned': coins_awarded,
+            'new_balance': user.get('pycoins', 0) + coins_awarded,
+            'streak': 1  # TODO: Implement proper streak calculation
         })
         
     except Exception as e:
@@ -282,6 +357,61 @@ def submit_challenge(user):
         return jsonify({
             'success': False,
             'error': 'Failed to submit challenge'
+        }), 500
+
+@challenge_api.route('/run-code', methods=['POST'])
+@require_auth
+def run_code(user):
+    """Execute user code and return output"""
+    try:
+        data = request.get_json()
+        code = data.get('code', '')
+        language = data.get('language', 'python')
+        
+        if not code.strip():
+            return jsonify({
+                'success': False,
+                'error': 'No code provided'
+            }), 400
+            
+        # For security, we'll use a simple eval approach (in production, use a sandboxed environment)
+        # This is a basic implementation - in production you'd want to use Docker or a proper sandbox
+        
+        try:
+            # Capture output
+            import io
+            import sys
+            from contextlib import redirect_stdout
+            
+            # Create a string buffer to capture output
+            output_buffer = io.StringIO()
+            
+            # Redirect stdout to capture print statements
+            with redirect_stdout(output_buffer):
+                # Execute the code
+                exec(code)
+            
+            # Get the output
+            output = output_buffer.getvalue()
+            
+            return jsonify({
+                'success': True,
+                'output': output,
+                'error': None
+            })
+            
+        except Exception as e:
+            return jsonify({
+                'success': False,
+                'output': '',
+                'error': str(e)
+            })
+            
+    except Exception as e:
+        logger.error(f"Error running code: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Failed to execute code'
         }), 500
 
 def get_fallback_challenge(date_str):
@@ -311,3 +441,50 @@ def get_fallback_challenge(date_str):
         'date': date_str,
         'created_at': datetime.now().isoformat()
     }
+
+def normalize_challenge_data(challenge):
+    """Normalize challenge data to ensure consistent structure"""
+    if not challenge:
+        return None
+    
+    # Create a normalized copy
+    normalized = challenge.copy()
+    
+    # Ensure required fields exist
+    if 'type' not in normalized:
+        normalized['type'] = 'code_challenge'  # Default type
+    
+    if 'estimated_time' not in normalized:
+        normalized['estimated_time'] = 15  # Default 15 minutes
+    
+    if 'hint_cost' not in normalized:
+        normalized['hint_cost'] = 25
+    
+    if 'skip_cost' not in normalized:
+        normalized['skip_cost'] = 50
+    
+    # Normalize reward fields
+    if 'coin_reward' not in normalized:
+        normalized['coin_reward'] = normalized.get('pycoins_reward', 10)
+    
+    if 'xp_reward' not in normalized:
+        normalized['xp_reward'] = 50
+    
+    # Normalize content structure for code challenges
+    if normalized['type'] == 'code_challenge':
+        if 'content' not in normalized:
+            normalized['content'] = {}
+        
+        # If we have old-style code_template, convert to new structure
+        if 'code_template' in normalized and 'initial_code' not in normalized['content']:
+            normalized['content']['initial_code'] = normalized['code_template']
+        
+        # Ensure initial_code exists
+        if 'initial_code' not in normalized['content']:
+            normalized['content']['initial_code'] = '# Write your code here\npass'
+        
+        # Ensure instructions exist
+        if 'instructions' not in normalized['content']:
+            normalized['content']['instructions'] = normalized.get('description', 'Complete the coding challenge.')
+    
+    return normalized

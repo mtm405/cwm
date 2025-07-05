@@ -1,0 +1,86 @@
+{
+  "id": "python-precedence-03",
+  "title": "Operator Precedence in Python",
+  "description": "Master the sequence of execution based on operator precedence in Python expressions",
+  "order": 3,
+  "difficulty": "intermediate",
+  "estimated_time": 50,
+  "prerequisites": ["python-datatypes-01", "python-operations-02"],
+  "tags": ["operators", "precedence", "expressions", "arithmetic", "logical"],
+  "xp_reward": 120,
+  "pycoins_reward": 25,
+  "quiz_id": "precedence-quiz",
+  "created_at": "2025-01-05T10:00:00Z",
+  "updated_at": "2025-01-05T10:00:00Z",
+  "is_published": true,
+  "subtopics": [
+    {
+      "id": "introduction",
+      "title": "Understanding Precedence",
+      "order": 0,
+      "blocks": [
+        {
+          "id": "intro-block",
+          "type": "text",
+          "order": 0,
+          "title": "Understanding Operator Precedence",
+          "content": "# Operator Precedence in Python\n\nWhen Python evaluates an expression with multiple operators, it follows specific rules to determine which operations to perform first. This is called **operator precedence**.\n\nJust like in mathematics where multiplication comes before addition (PEMDAS/BODMAS), Python has its own hierarchy of operations:\n\n1. **Parentheses** - Highest priority\n2. **Exponentiation** (`**`)\n3. **Unary operators** (`+x`, `-x`)\n4. **Multiplication/Division** (`*`, `/`, `//`, `%`)\n5. **Addition/Subtraction** (`+`, `-`)\n6. **Comparisons** (`<`, `>`, `<=`, `>=`, `==`, `!=`)\n7. **Boolean operators** (`not`, `and`, `or`)\n8. **Assignment operators** (`=`, `+=`, `-=`, etc.)\n\nUnderstanding precedence helps you write correct expressions and avoid bugs!"
+        }
+      ]
+    },
+    {
+      "id": "arithmetic-precedence",
+      "title": "Arithmetic Precedence",
+      "order": 1,
+      "blocks": [
+        {
+          "id": "basic-precedence-example",
+          "type": "code_example",
+          "order": 0,
+          "title": "Basic Arithmetic Precedence",
+          "code": "# Without parentheses - follows precedence rules\nresult1 = 2 + 3 * 4\nprint(f\"2 + 3 * 4 = {result1}\")  # 14 (not 20!)\n# Evaluated as: 2 + (3 * 4) = 2 + 12 = 14\n\n# With parentheses - override precedence\nresult2 = (2 + 3) * 4\nprint(f\"(2 + 3) * 4 = {result2}\")  # 20\n# Evaluated as: 5 * 4 = 20\n\n# Multiple operators\nresult3 = 10 + 5 * 2 - 3\nprint(f\"10 + 5 * 2 - 3 = {result3}\")  # 17\n# Step by step:\n# 1. 5 * 2 = 10 (multiplication first)\n# 2. 10 + 10 = 20 (addition)\n# 3. 20 - 3 = 17 (subtraction)",
+          "explanation": "Multiplication and division have higher precedence than addition and subtraction. Operations of the same precedence are evaluated left to right. Use parentheses to override default precedence."
+        }
+      ]
+    },
+    {
+      "id": "practice",
+      "title": "Practice & Assessment",
+      "order": 2,
+      "blocks": [
+        {
+          "id": "precedence-quiz",
+          "type": "quiz",
+          "order": 0,
+          "title": "Precedence Knowledge Check",
+          "description": "Test your understanding of operator precedence",
+          "questions": [
+            {
+              "id": "q1",
+              "type": "multiple_choice",
+              "question": "What is the result of: 10 + 5 * 2?",
+              "options": ["30", "20", "15", "25"],
+              "correct_answer": 1,
+              "explanation": "Multiplication has higher precedence than addition: 5 * 2 = 10, then 10 + 10 = 20."
+            },
+            {
+              "id": "q2",
+              "type": "multiple_choice",
+              "question": "What is the result of: -3 ** 2?",
+              "options": ["9", "-9", "6", "-6"],
+              "correct_answer": 1,
+              "explanation": "Exponentiation has higher precedence than unary minus: 3 ** 2 = 9, then -9."
+            },
+            {
+              "id": "q3",
+              "type": "true_false",
+              "question": "In the expression 'True or False and False', the 'and' operation is performed first.",
+              "correct_answer": true,
+              "explanation": "'and' has higher precedence than 'or', so 'False and False' is evaluated first, resulting in False, then 'True or False' gives True."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

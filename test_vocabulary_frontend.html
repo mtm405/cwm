@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocabulary Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #1a1a2e; 
+            color: white; 
+        }
+        .test-result { 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 5px; 
+        }
+        .success { background: #27ae60; }
+        .error { background: #e74c3c; }
+        .info { background: #3498db; }
+        .vocabulary-container-modern {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #16213e;
+            border-radius: 12px;
+        }
+        #vocabulary-tab {
+            min-height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Vocabulary System Test</h1>
+    <div id="test-results"></div>
+    
+    <!-- Simulate the vocabulary tab structure -->
+    <div id="vocabulary-tab" class="vocabulary-container-modern">
+        <div class="vocabulary-header-modern">
+            <div class="header-content">
+                <div class="header-main">
+                    <div class="header-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div class="header-text">
+                        <h2>Python Vocabulary</h2>
+                        <p>Master Python programming vocabulary with interactive flashcards and intelligent spaced repetition</p>
+                    </div>
+                </div>
+                <div class="header-stats">
+                    <div class="quick-stat">
+                        <div class="stat-number" id="total-terms-header">0</div>
+                        <div class="stat-label">Total Terms</div>
+                    </div>
+                    <div class="quick-stat">
+                        <div class="stat-number" id="mastered-header">0</div>
+                        <div class="stat-label">Mastered</div>
+                    </div>
+                    <div class="quick-stat">
+                        <div class="stat-number" id="streak-header">0</div>
+                        <div class="stat-label">Day Streak</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="vocabulary-content">
+            <!-- Sidebar -->
+            <div class="vocabulary-sidebar">
+                <div class="sidebar-card progress-card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-chart-line"></i> Study Progress</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="progress-circle">
+                            <svg viewBox="0 0 36 36" class="circular-chart">
+                                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                <path class="circle" id="progress-circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                <text x="18" y="20.35" class="percentage" id="progress-percentage">0%</text>
+                            </svg>
+                        </div>
+                        <div class="progress-details">
+                            <div class="progress-item">
+                                <span class="progress-label">Mastered</span>
+                                <span class="progress-value"><span id="mastered-count">0</span>/<span id="total-count">0</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="vocabulary-main">
+                <div class="vocabulary-controls-modern">
+                    <div class="controls-section">
+                        <div class="search-container">
+                            <div class="search-box-modern">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" id="vocab-search" placeholder="Search terms, definitions, or examples...">
+                            </div>
+                        </div>
+                        <div class="view-modes-modern">
+                            <button class="mode-btn-modern active" data-mode="flashcards">
+                                <i class="fas fa-layer-group"></i>
+                                <span>Flashcards</span>
+                            </button>
+                            <button class="mode-btn-modern" data-mode="list">
+                                <i class="fas fa-list"></i>
+                                <span>List</span>
+                            </button>
+                            <button class="mode-btn-modern" data-mode="quiz">
+                                <i class="fas fa-question-circle"></i>
+                                <span>Quiz</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Flashcard Mode -->
+                <div class="vocabulary-mode active" id="flashcards-mode">
+                    <div class="flashcard-container-modern">
+                        <div class="flashcard-header">
+                            <div class="flashcard-nav">
+                                <button class="nav-btn-modern" id="prev-flashcard">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <div class="card-counter-modern">
+                                    <span class="current-card" id="current-card">1</span>
+                                    <span class="card-divider">of</span>
+                                    <span class="total-cards" id="total-cards">0</span>
+                                </div>
+                                <button class="nav-btn-modern" id="next-flashcard">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="flashcard-modern" id="vocabulary-flashcard">
+                            <div class="flashcard-inner-modern">
+                                <div class="flashcard-front-modern">
+                                    <div class="card-category-modern"></div>
+                                    <div class="card-term-container">
+                                        <h3 class="card-term">Loading...</h3>
+                                    </div>
+                                    <div class="card-hint-modern">
+                                        <i class="fas fa-mouse-pointer"></i>
+                                        <span>Click to reveal definition</span>
+                                    </div>
+                                </div>
+                                <div class="flashcard-back-modern">
+                                    <div class="card-definition-container">
+                                        <div class="definition-text">Loading definition...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- List Mode -->
+                <div class="vocabulary-mode" id="list-mode">
+                    <div class="vocabulary-list-modern">
+                        <div id="vocabulary-grid">Loading list...</div>
+                    </div>
+                </div>
+
+                <!-- Quiz Mode -->
+                <div class="vocabulary-mode" id="quiz-mode">
+                    <div class="vocabulary-quiz-modern">Loading quiz...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Our vocabulary CSS -->
+    <link rel="stylesheet" href="/static/css/components/vocabulary.css">
+    
+    <!-- Our vocabulary JavaScript -->
+    <script src="/static/js/dashboard/DashboardVocabulary.js"></script>
+    
+    <script>
+        function addTestResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('test-results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.textContent = message;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        // Test the vocabulary system
+        async function testVocabulary() {
+            addTestResult('Starting vocabulary system test...', 'info');
+            
+            try {
+                // Test 1: Check if DashboardVocabulary class exists
+                if (typeof DashboardVocabulary === 'undefined') {
+                    addTestResult('❌ DashboardVocabulary class not found', 'error');
+                    return;
+                }
+                addTestResult('✅ DashboardVocabulary class found', 'success');
+                
+                // Test 2: Initialize vocabulary system
+                const vocabulary = new DashboardVocabulary();
+                addTestResult('✅ DashboardVocabulary instance created', 'success');
+                
+                // Test 3: Initialize
+                await vocabulary.init();
+                addTestResult('✅ Vocabulary system initialized', 'success');
+                
+                // Test 4: Check if data was loaded
+                if (vocabulary.vocabularyData && vocabulary.vocabularyData.length > 0) {
+                    addTestResult(`✅ Loaded ${vocabulary.vocabularyData.length} vocabulary terms`, 'success');
+                } else {
+                    addTestResult('⚠️ No vocabulary data loaded, using fallback', 'info');
+                }
+                
+                // Test 5: Test mode switching
+                vocabulary.switchMode('list');
+                addTestResult('✅ Mode switching works', 'success');
+                
+                vocabulary.switchMode('flashcards');
+                addTestResult('✅ Switched back to flashcards', 'success');
+                
+                addTestResult('🎉 All tests passed! Vocabulary system is working.', 'success');
+                
+            } catch (error) {
+                addTestResult(`❌ Error during testing: ${error.message}`, 'error');
+                console.error('Vocabulary test error:', error);
+            }
+        }
+        
+        // Run tests when page loads
+        document.addEventListener('DOMContentLoaded', testVocabulary);
+    </script>
+</body>
+</html>

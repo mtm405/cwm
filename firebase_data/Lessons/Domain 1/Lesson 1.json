@@ -13,19 +13,31 @@
   "created_at": "2025-01-05T10:00:00Z",
   "updated_at": "2025-01-05T10:00:00Z",
   "is_published": true,
-  "blocks": [
+  "subtopics": [
     {
-      "id": "intro-block",
-      "type": "text",
+      "id": "subtopic-0",
+      "title": "Introduction",
       "order": 0,
-      "title": "Introduction to Python Data Types",
-      "content": "# Python Data Types\n\nEvery value in Python has a type. Understanding data types is crucial because it determines what operations you can perform with your data. Python has four fundamental data types that we'll explore:\n\n1. **str (String)** - Text data enclosed in quotes\n2. **int (Integer)** - Whole numbers without decimal points\n3. **float (Floating-point)** - Numbers with decimal points\n4. **bool (Boolean)** - True or False values\n\nLet's dive into each type and learn how to identify them!"
+      "blocks": [
+        {
+          "id": "intro-block",
+          "type": "text",
+          "order": 0,
+          "title": "Introduction to Python Data Types",
+          "content": "# Python Data Types\n\nEvery value in Python has a type. Understanding data types is crucial because it determines what operations you can perform with your data. Python has four fundamental data types that we'll explore:\n\n1. **str (String)** - Text data enclosed in quotes\n2. **int (Integer)** - Whole numbers without decimal points\n3. **float (Floating-point)** - Numbers with decimal points\n4. **bool (Boolean)** - True or False values\n\nLet's dive into each type and learn how to identify them!"
+        }
+      ]
     },
     {
-      "id": "string-example",
-      "type": "code_example",
+      "id": "subtopic-1",
+      "title": "String & Integer Types",
       "order": 1,
-      "title": "String Data Type",
+      "blocks": [
+        {
+          "id": "string-example",
+          "type": "code_example",
+          "order": 0,
+          "title": "String Data Type",
       "code": "# String examples\nname = \"Alice\"              # Text in double quotes\nmessage = 'Hello, World!'   # Text in single quotes\nage_text = \"16\"            # Numbers in quotes are strings!\nmultiline = '''This is\na multiline\nstring'''                   # Triple quotes for multiple lines\n\n# Checking the type\nprint(type(name))          # <class 'str'>\nprint(type(age_text))      # <class 'str'> - not a number!",
       "explanation": "Strings are sequences of characters enclosed in quotes. You can use single (''), double (\"\"), or triple (''' or \"\"\") quotes. Remember: anything inside quotes becomes a string, even numbers!"
     },

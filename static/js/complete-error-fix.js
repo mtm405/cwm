@@ -222,15 +222,43 @@
             }
             
             try {
-                // Clean and pad the string
-                let cleaned = str.replace(/[^A-Za-z0-9+/]/g, '');
+                // Clean and pad the string properly
+                let cleaned = str.replace(/[^A-Za-z0-9+/=_-]/g, '');
+                
+                // Handle URL-safe base64
+                cleaned = cleaned.replace(/-/g, '+').replace(/_/g, '/');
+                
+                // Add proper padding
                 while (cleaned.length % 4) {
                     cleaned += '=';
                 }
+                
                 return originalAtob(cleaned);
             } catch (error) {
                 console.warn('Base64 decode failed for:', str.substring(0, 20) + '...', error);
                 return '';
+            }
+        };
+        
+        // Enhanced safe base64 decode utility
+        window.safeBase64Decode = function(str) {
+            if (!str || typeof str !== 'string') return null;
+
+            try {
+                // Add padding if missing
+                let paddedStr = str;
+                while (paddedStr.length % 4) {
+                    paddedStr += '=';
+                }
+
+                // Replace URL-safe characters
+                paddedStr = paddedStr.replace(/-/g, '+').replace(/_/g, '/');
+
+                // Decode
+                return originalAtob(paddedStr);
+            } catch (error) {
+                console.warn('⚠️ Base64 decode failed:', error.message);
+                return null;
             }
         };
         
@@ -248,7 +276,7 @@
                     return false;
                 }
                 
-                const payload = atob(parts[1]);
+                const payload = window.safeBase64Decode(parts[1]);
                 if (!payload) {
                     console.warn('❌ Failed to decode token payload');
                     return false;

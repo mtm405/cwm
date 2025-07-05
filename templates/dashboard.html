@@ -123,32 +123,359 @@
 
         <!-- Vocabulary Tab -->
         <div class="tab-pane" id="vocabulary-tab">
-            <div class="placeholder-content">
-                <i class="fas fa-book"></i>
-                <h3>Python Vocabulary</h3>
-                <p>Build your Python programming vocabulary with interactive flashcards, term explanations, and practice exercises.</p>
-                <div class="feature-list">
-                    <div class="feature-item">
-                        <i class="fas fa-layer-group"></i>
-                        <span>Flashcards</span>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span>Term Dictionary</span>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Practice Quizzes</span>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fas fa-brain"></i>
-                        <span>Spaced Repetition</span>
+            <div class="vocabulary-container-modern">
+                <!-- Enhanced Header Section -->
+                <div class="vocabulary-header-modern">
+                    <div class="header-content">
+                        <div class="header-main">
+                            <div class="header-icon">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <div class="header-text">
+                                <h2>Python Vocabulary</h2>
+                                <p>Master Python programming vocabulary with interactive flashcards and intelligent spaced repetition</p>
+                            </div>
+                        </div>
+                        <div class="header-stats">
+                            <div class="quick-stat">
+                                <div class="stat-number" id="total-terms-header">0</div>
+                                <div class="stat-label">Total Terms</div>
+                            </div>
+                            <div class="quick-stat">
+                                <div class="stat-number" id="mastered-header">0</div>
+                                <div class="stat-label">Mastered</div>
+                            </div>
+                            <div class="quick-stat">
+                                <div class="stat-number" id="streak-header">0</div>
+                                <div class="stat-label">Day Streak</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <span class="coming-soon-badge">Coming Soon</span>
-                <button class="notify-button">
-                    <i class="fas fa-bell"></i> Notify me when available
-                </button>
+
+                <div class="vocabulary-content">
+                    <!-- Enhanced Sidebar -->
+                    <div class="vocabulary-sidebar">
+                        <!-- Study Progress Card -->
+                        <div class="sidebar-card progress-card">
+                            <div class="card-header">
+                                <h6><i class="fas fa-chart-line"></i> Study Progress</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="progress-circle">
+                                    <svg viewBox="0 0 36 36" class="circular-chart">
+                                        <path class="circle-bg" d="M18 2.0845
+                                            a 15.9155 15.9155 0 0 1 0 31.831
+                                            a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <path class="circle" id="progress-circle" stroke-dasharray="0, 100" d="M18 2.0845
+                                            a 15.9155 15.9155 0 0 1 0 31.831
+                                            a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <text x="18" y="20.35" class="percentage" id="progress-percentage">0%</text>
+                                    </svg>
+                                </div>
+                                <div class="progress-details">
+                                    <div class="progress-item">
+                                        <span class="progress-label">Mastered</span>
+                                        <span class="progress-value"><span id="mastered-count">0</span>/<span id="total-count">0</span></span>
+                                    </div>
+                                    <div class="progress-item">
+                                        <span class="progress-label">Learning</span>
+                                        <span class="progress-value" id="learning-count">0</span>
+                                    </div>
+                                    <div class="progress-item">
+                                        <span class="progress-label">New</span>
+                                        <span class="progress-value" id="new-count">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Study Streak Card -->
+                        <div class="sidebar-card streak-card">
+                            <div class="card-header">
+                                <h6><i class="fas fa-fire"></i> Study Streak</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="streak-display">
+                                    <div class="streak-number">
+                                        <span id="study-streak">0</span>
+                                        <span class="streak-fire">🔥</span>
+                                    </div>
+                                    <div class="streak-label">Days in a row</div>
+                                </div>
+                                <div class="streak-motivation" id="streak-motivation">
+                                    Keep it up! Study today to maintain your streak.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Category Filters -->
+                        <div class="sidebar-card category-card">
+                            <div class="card-header">
+                                <h6><i class="fas fa-tags"></i> Categories</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="category-filters">
+                                    <button class="category-filter-modern active" data-category="all">
+                                        <span class="category-icon">📚</span>
+                                        <span class="category-name">All Terms</span>
+                                        <span class="category-count">0</span>
+                                    </button>
+                                    <!-- Categories will be populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Performance Stats -->
+                        <div class="sidebar-card performance-card">
+                            <div class="card-header">
+                                <h6><i class="fas fa-trophy"></i> Performance</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="performance-stats">
+                                    <div class="perf-metric">
+                                        <div class="perf-icon">🎯</div>
+                                        <div class="perf-content">
+                                            <div class="perf-value" id="session-accuracy">0%</div>
+                                            <div class="perf-label">Session Accuracy</div>
+                                        </div>
+                                    </div>
+                                    <div class="perf-metric">
+                                        <div class="perf-icon">📊</div>
+                                        <div class="perf-content">
+                                            <div class="perf-value" id="cards-studied">0</div>
+                                            <div class="perf-label">Cards Studied</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Content Area -->
+                    <div class="vocabulary-main">
+                        <!-- Enhanced Control Bar -->
+                        <div class="vocabulary-controls-modern">
+                            <div class="controls-section">
+                                <div class="search-container">
+                                    <div class="search-box-modern">
+                                        <i class="fas fa-search search-icon"></i>
+                                        <input type="text" id="vocab-search" placeholder="Search terms, definitions, or examples...">
+                                        <button class="search-clear" id="search-clear" style="display: none;">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="view-modes-modern">
+                                    <button class="mode-btn-modern active" data-mode="flashcards">
+                                        <i class="fas fa-layer-group"></i>
+                                        <span>Flashcards</span>
+                                    </button>
+                                    <button class="mode-btn-modern" data-mode="list">
+                                        <i class="fas fa-list"></i>
+                                        <span>List</span>
+                                    </button>
+                                    <button class="mode-btn-modern" data-mode="quiz">
+                                        <i class="fas fa-question-circle"></i>
+                                        <span>Quiz</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="controls-actions">
+                                <button class="action-btn shuffle-btn" id="shuffle-cards">
+                                    <i class="fas fa-random"></i>
+                                    <span>Shuffle</span>
+                                </button>
+                                <button class="action-btn settings-btn" id="study-settings">
+                                    <i class="fas fa-cog"></i>
+                                    <span>Settings</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Enhanced Flashcard Mode -->
+                        <div class="vocabulary-mode active" id="flashcards-mode">
+                            <div class="flashcard-container-modern">
+                                <!-- Flashcard Navigation -->
+                                <div class="flashcard-header">
+                                    <div class="flashcard-nav">
+                                        <button class="nav-btn-modern" id="prev-flashcard">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                        <div class="card-counter-modern">
+                                            <span class="current-card" id="current-card">1</span>
+                                            <span class="card-divider">of</span>
+                                            <span class="total-cards" id="total-cards">0</span>
+                                        </div>
+                                        <button class="nav-btn-modern" id="next-flashcard">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                    <div class="flashcard-actions-header">
+                                        <div class="difficulty-display" id="difficulty-display">
+                                            <span class="difficulty-badge" id="current-difficulty">New</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Enhanced Flashcard -->
+                                <div class="flashcard-modern" id="vocabulary-flashcard">
+                                    <div class="flashcard-inner-modern">
+                                        <div class="flashcard-front-modern">
+                                            <div class="card-category-modern"></div>
+                                            <div class="card-term-container">
+                                                <h3 class="card-term"></h3>
+                                                <div class="card-type-indicator"></div>
+                                            </div>
+                                            <div class="card-hint-modern">
+                                                <i class="fas fa-mouse-pointer"></i>
+                                                <span>Click to reveal definition</span>
+                                            </div>
+                                        </div>
+                                        <div class="flashcard-back-modern">
+                                            <div class="card-definition-container">
+                                                <div class="definition-text"></div>
+                                                <div class="card-example-modern">
+                                                    <div class="example-header">
+                                                        <i class="fas fa-code"></i>
+                                                        <span>Example</span>
+                                                    </div>
+                                                    <div class="example-code">
+                                                        <pre><code class="language-python card-example-code"></code></pre>
+                                                    </div>
+                                                </div>
+                                                <div class="card-tags-modern"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Enhanced Difficulty Controls -->
+                                <div class="flashcard-actions-modern">
+                                    <div class="difficulty-question">
+                                        <h6>How well did you know this term?</h6>
+                                    </div>
+                                    <div class="difficulty-buttons">
+                                        <button class="difficulty-btn again-btn" data-action="again">
+                                            <div class="btn-icon">😅</div>
+                                            <div class="btn-text">Again</div>
+                                            <div class="btn-time">~1min</div>
+                                        </button>
+                                        <button class="difficulty-btn hard-btn" data-action="hard">
+                                            <div class="btn-icon">🤔</div>
+                                            <div class="btn-text">Hard</div>
+                                            <div class="btn-time">~6min</div>
+                                        </button>
+                                        <button class="difficulty-btn good-btn" data-action="good">
+                                            <div class="btn-icon">👍</div>
+                                            <div class="btn-text">Good</div>
+                                            <div class="btn-time">~1d</div>
+                                        </button>
+                                        <button class="difficulty-btn easy-btn" data-action="easy">
+                                            <div class="btn-icon">🚀</div>
+                                            <div class="btn-text">Easy</div>
+                                            <div class="btn-time">~4d</div>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Enhanced List Mode -->
+                        <div class="vocabulary-mode" id="list-mode">
+                            <div class="vocabulary-list-modern">
+                                <div class="list-header">
+                                    <div class="list-filters">
+                                        <select class="filter-select" id="difficulty-filter">
+                                            <option value="all">All Difficulties</option>
+                                            <option value="new">New Terms</option>
+                                            <option value="learning">Learning</option>
+                                            <option value="mastered">Mastered</option>
+                                        </select>
+                                        <select class="filter-select" id="sort-filter">
+                                            <option value="alphabetical">Alphabetical</option>
+                                            <option value="difficulty">By Difficulty</option>
+                                            <option value="recent">Recently Added</option>
+                                        </select>
+                                    </div>
+                                    <div class="list-view-options">
+                                        <button class="view-option active" data-view="card">
+                                            <i class="fas fa-th"></i>
+                                        </button>
+                                        <button class="view-option" data-view="table">
+                                            <i class="fas fa-list"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="vocabulary-grid" id="vocabulary-grid">
+                                    <!-- Terms will be populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Enhanced Quiz Mode -->
+                        <div class="vocabulary-mode" id="quiz-mode">
+                            <div class="vocabulary-quiz-modern">
+                                <div class="quiz-header-modern">
+                                    <div class="quiz-title">
+                                        <h4><i class="fas fa-brain"></i> Vocabulary Quiz</h4>
+                                        <p>Test your knowledge and reinforce learning</p>
+                                    </div>
+                                    <div class="quiz-progress-modern">
+                                        <div class="progress-ring">
+                                            <svg class="progress-ring-svg">
+                                                <circle class="progress-ring-circle-bg" cx="30" cy="30" r="25"></circle>
+                                                <circle class="progress-ring-circle" cx="30" cy="30" r="25" id="quiz-progress-ring"></circle>
+                                            </svg>
+                                            <div class="progress-ring-text">
+                                                <span class="question-number" id="quiz-current">1</span>
+                                                <span class="question-total">/<span id="quiz-total">10</span></span>
+                                            </div>
+                                        </div>
+                                        <div class="quiz-stats">
+                                            <div class="quiz-stat">
+                                                <span class="stat-label">Correct</span>
+                                                <span class="stat-value" id="quiz-correct">0</span>
+                                            </div>
+                                            <div class="quiz-stat">
+                                                <span class="stat-label">Score</span>
+                                                <span class="stat-value" id="quiz-score">0%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="quiz-question-modern">
+                                    <div class="question-card">
+                                        <div class="question-header">
+                                            <span class="question-type" id="question-type">Definition</span>
+                                            <span class="question-difficulty" id="question-difficulty">Intermediate</span>
+                                        </div>
+                                        <h5 class="question-text" id="quiz-question-text"></h5>
+                                        <div class="quiz-options-modern">
+                                            <!-- Options will be populated dynamically -->
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="quiz-actions-modern">
+                                    <button class="quiz-btn submit-btn" id="quiz-submit">
+                                        <i class="fas fa-check"></i>
+                                        <span>Submit Answer</span>
+                                    </button>
+                                    <button class="quiz-btn next-btn" id="quiz-next" style="display: none;">
+                                        <i class="fas fa-arrow-right"></i>
+                                        <span>Next Question</span>
+                                    </button>
+                                    <button class="quiz-btn skip-btn" id="quiz-skip">
+                                        <i class="fas fa-forward"></i>
+                                        <span>Skip</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -249,6 +576,12 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- ACE Editor for Code Challenges -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-python.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/theme-monokai.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ext-language_tools.js"></script>
+
 <!-- Dashboard-specific JavaScript -->
 <script src="{{ url_for('static', filename='js/components/dashboard.js') }}"></script>
 <script src="{{ url_for('static', filename='js/components/dashboard-greeting.js') }}"></script>
@@ -256,7 +589,13 @@
 <script src="{{ url_for('static', filename='js/components/dashboard-placeholders.js') }}"></script>
 <script src="{{ url_for('static', filename='js/components/progress-bar-manager.js') }}"></script>
 <script src="{{ url_for('static', filename='js/modules/tab-system.js') }}"></script>
+
+<!-- Dashboard Module Components -->
 <script type="module" src="{{ url_for('static', filename='js/dashboard/DashboardChallengeManager.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/DashboardLeaderboard.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/DashboardVocabulary.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/DashboardStreakTracker.js') }}"></script>
+
 <script>
 // Initialize dashboard components after loading
 document.addEventListener('DOMContentLoaded', function() {
@@ -283,10 +622,19 @@ document.addEventListener('DOMContentLoaded', function() {
         window.dashboardPlaceholders.init();
     }
     
+    // Initialize vocabulary system
+    if (typeof DashboardVocabulary !== 'undefined') {
+        window.dashboardVocabulary = new DashboardVocabulary();
+        window.dashboardVocabulary.init();
+    }
+    
     // Progress bar manager is auto-initialized
 });
 </script>
 
 <!-- Include Vocabulary Module -->
-<script src="{{ url_for('static', filename='js/vocabulary.js') }}"></script>
+<!-- <script src="{{ url_for('static', filename='js/vocabulary.js') }}"></script> -->
+<!-- <script src="{{ url_for('static', filename='js/vocabulary-system.js') }}"></script> -->
+<!-- <script src="{{ url_for('static', filename='js/vocabulary/VocabularyManager.js') }}"></script> -->
+<!-- <script src="{{ url_for('static', filename='js/vocabulary/VocabularySettings.js') }}"></script> -->
 {% endblock %}

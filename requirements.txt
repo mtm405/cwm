@@ -9,6 +9,11 @@ requests>=2.31.0
 # Firebase & Database
 firebase-admin==6.2.0
 
+# Google Authentication
+google-auth>=2.23.0
+google-auth-oauthlib>=1.1.0
+google-auth-httplib2>=0.1.1
+
 # Environment & Configuration
 python-dotenv==1.0.0
 
@@ -20,11 +25,6 @@ Werkzeug>=3.0.0
 # Input Validation & Sanitization
 bleach>=6.0.0
 html5lib>=1.1
-
-# Rate Limiting & Security
-Flask-Limiter>=3.5.0
-
-# Template Caching
 Flask-Caching>=2.1.0
 
 # Development & Testing

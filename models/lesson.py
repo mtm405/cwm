@@ -204,17 +204,21 @@ def get_all_lessons() -> List[Dict[str, Any]]:
     # Try Firebase first
     if firebase_service and firebase_service.is_available():
         lessons = firebase_service.get_all_lessons()
-        if lessons:
+        if lessons is not None and len(lessons) > 0:  # Only use Firebase if it has lessons
             # Enhance lessons with missing fields needed for the template
             for lesson in lessons:
                 _enhance_lesson_data(lesson)
             logger.info(f"Loaded {len(lessons)} lessons from Firebase")
             return lessons
         else:
-            logger.warning("No lessons found in Firebase, using mock data")
+            logger.warning(f"Firebase available but returned {len(lessons) if lessons else 'None'} lessons, falling back to mock")
+    else:
+        logger.warning("Firebase not available, using mock data")
     
-    # Fallback to mock
+    # Fallback to mock data
     lessons = get_mock_lessons()
+    logger.info(f"Loaded {len(lessons)} lessons from mock data")
+    return lessons
     logger.info(f"Loaded {len(lessons)} lessons from mock data")
     return lessons
 
@@ -261,6 +265,20 @@ def _enhance_lesson_data(lesson: Dict[str, Any]) -> None:
         ]
         # Update total_subtopics to match
         lesson['total_subtopics'] = len(lesson['subtopics'])
+    
+    # Convert string subtopics to objects with IDs if needed
+    if lesson['subtopics'] and isinstance(lesson['subtopics'][0], str):
+        lesson['subtopics'] = [
+            {
+                'id': f"subtopic-{i}",
+                'title': title,
+                'order': i
+            }
+            for i, title in enumerate(lesson['subtopics'])
+        ]
+    
+    # Set has_subtopics flag based on subtopics array
+    lesson['has_subtopics'] = len(lesson.get('subtopics', [])) > 1
     
     # Ensure xp_reward exists
     if 'xp_reward' not in lesson:

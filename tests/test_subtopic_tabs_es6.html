@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subtopic Tabs Test - ES6 Compatible</title>
+    <style>
+        :root {
+            --primary-color: #6C63FF;
+            --primary-color-rgb: 108, 99, 255;
+            --bg-card: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --text-secondary: #666666;
+            --border-color: #e0e0e0;
+            --success-color: #4CAF50;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 2rem;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+        
+        .debug-section {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .debug-section h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        
+        .debug-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .debug-button:hover {
+            background: #5a52e8;
+        }
+        
+        /* Include the subtopic tabs CSS fix */
+        .subtopic-tabs-container {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 12px !important;
+            padding: 1rem !important;
+            margin-bottom: 2rem !important;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        .subtopic-tabs {
+            display: flex !important;
+            gap: 0.5rem !important;
+            margin-bottom: 1rem !important;
+            overflow-x: auto !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        .subtopic-tab {
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+            padding: 0.75rem 1rem !important;
+            border: 2px solid var(--border-color, #e0e0e0) !important;
+            border-radius: 8px !important;
+            background: var(--bg-secondary, #f5f5f5) !important;
+            color: var(--text-secondary, #666666) !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            font-size: 0.9rem !important;
+            font-weight: 500 !important;
+            white-space: nowrap !important;
+            position: relative !important;
+            min-width: fit-content !important;
+            margin: 0 !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        .subtopic-tab:hover {
+            border-color: var(--primary-color, #6C63FF) !important;
+            background: var(--primary-color, #6C63FF) !important;
+            color: white !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3) !important;
+        }
+        
+        .subtopic-tab.active {
+            border-color: var(--primary-color, #6C63FF) !important;
+            background: var(--primary-color, #6C63FF) !important;
+            color: white !important;
+            font-weight: 600 !important;
+            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3) !important;
+        }
+        
+        .subtopic-check {
+            font-size: 0.8rem !important;
+            opacity: 0.6 !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .subtopic-check.completed {
+            opacity: 1 !important;
+            color: var(--success-color, #4CAF50) !important;
+        }
+        
+        .subtopic-tab.active .subtopic-check {
+            opacity: 1 !important;
+            color: white !important;
+        }
+        
+        .subtopic-title {
+            font-weight: 600 !important;
+        }
+        
+        .subtopic-order {
+            background: rgba(255, 255, 255, 0.2) !important;
+            color: white !important;
+            border-radius: 50% !important;
+            width: 20px !important;
+            height: 20px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 0.75rem !important;
+            font-weight: 700 !important;
+            margin-left: auto !important;
+            min-width: 20px !important;
+            min-height: 20px !important;
+        }
+        
+        .subtopic-tab:not(.active) .subtopic-order {
+            background: var(--text-secondary, #666666) !important;
+            color: white !important;
+        }
+        
+        .status-indicator {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: 0.5rem;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .test-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            white-space: pre-wrap;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Subtopic Tabs Test - ES6 Compatible</h1>
+        
+        <div class="debug-section">
+            <h3>Debug Controls</h3>
+            <button class="debug-button" onclick="testSubtopicTabs()">Test Subtopic Tabs</button>
+            <button class="debug-button" onclick="debugSubtopicTabs()">Debug Tabs</button>
+            <button class="debug-button" onclick="forceInitializeSubtopicTabs()">Force Initialize</button>
+            <button class="debug-button" onclick="testCSSVariables()">Test CSS Variables</button>
+            <button class="debug-button" onclick="clearResults()">Clear Results</button>
+        </div>
+        
+        <!-- Test Subtopic Tabs -->
+        <div class="subtopic-tabs-container">
+            <nav class="subtopic-tabs" role="tablist">
+                <button class="subtopic-tab active" role="tab" data-subtopic-id="subtopic-0" data-subtopic-index="0" onclick="switchSubtopic('subtopic-0', 0)" aria-selected="true" id="tab-subtopic-0" aria-controls="panel-subtopic-0">
+                    <i class="fas fa-check-circle subtopic-check"></i>
+                    <span class="subtopic-title">Introduction</span>
+                    <span class="subtopic-order">1</span>
+                </button>
+                
+                <button class="subtopic-tab" role="tab" data-subtopic-id="subtopic-1" data-subtopic-index="1" onclick="switchSubtopic('subtopic-1', 1)" aria-selected="false" id="tab-subtopic-1" aria-controls="panel-subtopic-1">
+                    <i class="fas fa-check-circle subtopic-check"></i>
+                    <span class="subtopic-title">Variables</span>
+                    <span class="subtopic-order">2</span>
+                </button>
+                
+                <button class="subtopic-tab" role="tab" data-subtopic-id="subtopic-2" data-subtopic-index="2" onclick="switchSubtopic('subtopic-2', 2)" aria-selected="false" id="tab-subtopic-2" aria-controls="panel-subtopic-2">
+                    <i class="fas fa-check-circle subtopic-check completed"></i>
+                    <span class="subtopic-title">Data Types</span>
+                    <span class="subtopic-order">3</span>
+                </button>
+                
+                <button class="subtopic-tab" role="tab" data-subtopic-id="subtopic-3" data-subtopic-index="3" onclick="switchSubtopic('subtopic-3', 3)" aria-selected="false" id="tab-subtopic-3" aria-controls="panel-subtopic-3">
+                    <i class="fas fa-check-circle subtopic-check"></i>
+                    <span class="subtopic-title">Practice</span>
+                    <span class="subtopic-order">4</span>
+                </button>
+            </nav>
+        </div>
+        
+        <div id="test-results" class="test-result" style="display: none;"></div>
+    </div>
+
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script>
+        // Mock lesson data for testing
+        window.lessonData = {
+            id: 'test-lesson',
+            title: 'Test Lesson',
+            subtopics: [
+                {
+                    id: 'subtopic-0',
+                    title: 'Introduction',
+                    order: 0,
+                    blocks: []
+                },
+                {
+                    id: 'subtopic-1',
+                    title: 'Variables',
+                    order: 1,
+                    blocks: []
+                },
+                {
+                    id: 'subtopic-2',
+                    title: 'Data Types',
+                    order: 2,
+                    blocks: []
+                },
+                {
+                    id: 'subtopic-3',
+                    title: 'Practice',
+                    order: 3,
+                    blocks: []
+                }
+            ],
+            has_subtopics: true,
+            current_subtopic_index: 0
+        };
+        
+        window.lessonProgress = {
+            completed_subtopics: ['subtopic-2']
+        };
+        
+        // Load the subtopic tab manager
+        const script = document.createElement('script');
+        script.src = 'static/js/lesson/subtopicTabManager.js';
+        script.onload = function() {
+            console.log('✅ Subtopic Tab Manager loaded');
+            // Initialize after a short delay to ensure DOM is ready
+            setTimeout(() => {
+                if (typeof SubtopicTabManager !== 'undefined') {
+                    window.subtopicManager = new SubtopicTabManager();
+                    logResult('✅ SubtopicTabManager initialized successfully');
+                } else {
+                    logResult('❌ SubtopicTabManager class not found');
+                }
+            }, 100);
+        };
+        script.onerror = function() {
+            logResult('❌ Failed to load subtopic tab manager script');
+        };
+        document.head.appendChild(script);
+        
+        // Test functions
+        function testSubtopicTabs() {
+            logResult('🧪 Testing Subtopic Tabs...');
+            
+            const container = document.querySelector('.subtopic-tabs-container');
+            const tabs = document.querySelectorAll('.subtopic-tab');
+            
+            let testResults = [];
+            
+            // Test 1: Container visibility
+            if (container) {
+                const styles = window.getComputedStyle(container);
+                const isVisible = styles.display !== 'none' && styles.visibility !== 'hidden' && styles.opacity !== '0';
+                testResults.push(`Container visible: ${isVisible ? '✅' : '❌'}`);
+                testResults.push(`  - Display: ${styles.display}`);
+                testResults.push(`  - Visibility: ${styles.visibility}`);
+                testResults.push(`  - Opacity: ${styles.opacity}`);
+            } else {
+                testResults.push('Container: ❌ Not found');
+            }
+            
+            // Test 2: Tabs visibility
+            testResults.push(`\\nTabs found: ${tabs.length}`);
+            tabs.forEach((tab, index) => {
+                const styles = window.getComputedStyle(tab);
+                const isVisible = styles.display !== 'none' && styles.visibility !== 'hidden' && styles.opacity !== '0';
+                testResults.push(`Tab ${index}: ${isVisible ? '✅' : '❌'}`);
+                testResults.push(`  - Background: ${styles.backgroundColor}`);
+                testResults.push(`  - Color: ${styles.color}`);
+                testResults.push(`  - Border: ${styles.borderColor}`);
+            });
+            
+            // Test 3: Event listeners
+            testResults.push(`\\nEvent listeners test:`);
+            const firstTab = tabs[0];
+            if (firstTab) {
+                const hasClickListener = firstTab.onclick !== null;
+                testResults.push(`Click listener: ${hasClickListener ? '✅' : '❌'}`);
+            }
+            
+            // Test 4: Manager instance
+            testResults.push(`\\nManager instance: ${window.subtopicManager ? '✅' : '❌'}`);
+            if (window.subtopicManager) {
+                testResults.push(`  - Lesson ID: ${window.subtopicManager.lessonId}`);
+                testResults.push(`  - Subtopics: ${window.subtopicManager.subtopics.length}`);
+                testResults.push(`  - Current index: ${window.subtopicManager.currentSubtopicIndex}`);
+            }
+            
+            logResult(testResults.join('\\n'));
+        }
+        
+        function testCSSVariables() {
+            logResult('🎨 Testing CSS Variables...');
+            
+            const root = document.documentElement;
+            const computedStyle = window.getComputedStyle(root);
+            
+            const variables = [
+                '--primary-color',
+                '--bg-card',
+                '--bg-secondary',
+                '--text-secondary',
+                '--border-color',
+                '--success-color'
+            ];
+            
+            let results = [];
+            variables.forEach(variable => {
+                const value = computedStyle.getPropertyValue(variable);
+                results.push(`${variable}: ${value || 'Not defined'}`);
+            });
+            
+            logResult(results.join('\\n'));
+        }
+        
+        function switchSubtopic(subtopicId, subtopicIndex) {
+            logResult(`🔄 Switching to subtopic: ${subtopicId} (index: ${subtopicIndex})`);
+            
+            if (window.subtopicManager) {
+                window.subtopicManager.switchToSubtopic(subtopicId, subtopicIndex);
+            } else {
+                // Manual tab switching for testing
+                document.querySelectorAll('.subtopic-tab').forEach((tab, index) => {
+                    tab.classList.toggle('active', index === subtopicIndex);
+                });
+            }
+        }
+        
+        function logResult(message) {
+            const results = document.getElementById('test-results');
+            results.style.display = 'block';
+            results.textContent += new Date().toLocaleTimeString() + ': ' + message + '\\n';
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        function clearResults() {
+            document.getElementById('test-results').textContent = '';
+        }
+        
+        // Initialize on DOM load
+        document.addEventListener('DOMContentLoaded', function() {
+            logResult('🔄 DOM loaded, initializing test page...');
+            
+            // Test immediate visibility
+            setTimeout(() => {
+                const container = document.querySelector('.subtopic-tabs-container');
+                const tabs = document.querySelectorAll('.subtopic-tab');
+                
+                if (container && tabs.length > 0) {
+                    logResult(`✅ Initial state: Container found, ${tabs.length} tabs visible`);
+                } else {
+                    logResult('❌ Initial state: Container or tabs not found');
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

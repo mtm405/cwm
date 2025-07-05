@@ -16,16 +16,53 @@ class SubtopicTabManager {
     init() {
         console.log('🔄 Initializing Subtopic Tab Manager...');
         
+        // Debug: Check if we're in the right context
+        console.log('🌍 Current URL:', window.location.href);
+        console.log('📄 Document ready state:', document.readyState);
+        
         // Get lesson data from global variables
         if (window.lessonData) {
             this.lessonId = window.lessonData.id;
             this.subtopics = window.lessonData.subtopics || [];
             this.currentSubtopicIndex = window.lessonData.current_subtopic_index || 0;
+            
+            // If subtopics is an array of strings, convert to objects
+            if (this.subtopics.length > 0 && typeof this.subtopics[0] === 'string') {
+                this.subtopics = this.subtopics.map((title, index) => ({
+                    id: `subtopic-${index}`,
+                    title: title,
+                    order: index,
+                    blocks: []
+                }));
+            }
+            
+            console.log('📚 Lesson Data:', {
+                lessonId: this.lessonId,
+                subtopicsCount: this.subtopics.length,
+                currentIndex: this.currentSubtopicIndex,
+                hasSubtopics: window.lessonData.has_subtopics,
+                subtopicsType: typeof this.subtopics[0]
+            });
+        } else {
+            console.warn('⚠️ No lesson data found on window object');
         }
 
         // Get progress data
         if (window.lessonProgress) {
             this.completedSubtopics = window.lessonProgress.completed_subtopics || [];
+            console.log('📈 Progress Data:', this.completedSubtopics);
+        } else {
+            console.warn('⚠️ No lesson progress data found');
+        }
+
+        // Check if subtopic tabs container exists
+        const container = document.querySelector('.subtopic-tabs-container');
+        if (container) {
+            console.log('✅ Subtopic tabs container found:', container);
+            console.log('📊 Container styles:', window.getComputedStyle(container));
+        } else {
+            console.error('❌ Subtopic tabs container NOT found in DOM');
+            console.log('🔍 Available elements:', document.querySelectorAll('[class*="subtopic"]'));
         }
 
         this.setupEventListeners();
@@ -35,12 +72,29 @@ class SubtopicTabManager {
     }
 
     setupEventListeners() {
+        console.log('🔗 Setting up subtopic tab event listeners...');
+        
         // Tab click events
-        document.querySelectorAll('.subtopic-tab').forEach(tab => {
+        const tabs = document.querySelectorAll('.subtopic-tab');
+        console.log(`📋 Found ${tabs.length} subtopic tabs`);
+        
+        if (tabs.length === 0) {
+            console.warn('⚠️ No subtopic tabs found! Checking for container...');
+            const container = document.querySelector('.subtopic-tabs-container');
+            if (container) {
+                console.log('✅ Container exists:', container);
+            } else {
+                console.error('❌ No subtopic tabs container found!');
+            }
+        }
+        
+        tabs.forEach((tab, index) => {
+            console.log(`🏷️ Setting up tab ${index}:`, tab);
             tab.addEventListener('click', (e) => {
                 e.preventDefault();
                 const subtopicId = tab.dataset.subtopicId;
                 const subtopicIndex = parseInt(tab.dataset.subtopicIndex);
+                console.log(`🖱️ Tab clicked: ${subtopicId} (index: ${subtopicIndex})`);
                 this.switchToSubtopic(subtopicId, subtopicIndex);
             });
         });
@@ -99,7 +153,7 @@ class SubtopicTabManager {
             }
         });
     }
-
+    
     loadSubtopicContent(subtopicId, subtopicIndex) {
         console.log(`📖 Loading content for subtopic: ${subtopicId}`);
         
@@ -450,26 +504,283 @@ class SubtopicTabManager {
             });
         }
     }
+
+    // Diagnostic function to check CSS styling
+    diagnoseTabStyling() {
+        console.log('🔍 Diagnosing subtopic tab styling...');
+        
+        const tabs = document.querySelectorAll('.subtopic-tab');
+        const container = document.querySelector('.subtopic-tabs-container');
+        
+        console.log('📊 Styling Diagnostics:');
+        console.log('- Tab count:', tabs.length);
+        console.log('- Container exists:', !!container);
+        
+        if (container) {
+            const containerStyles = window.getComputedStyle(container);
+            console.log('- Container display:', containerStyles.display);
+            console.log('- Container visibility:', containerStyles.visibility);
+            console.log('- Container opacity:', containerStyles.opacity);
+        }
+        
+        tabs.forEach((tab, index) => {
+            const styles = window.getComputedStyle(tab);
+            console.log(`- Tab ${index}:`, {
+                display: styles.display,
+                visibility: styles.visibility,
+                opacity: styles.opacity,
+                backgroundColor: styles.backgroundColor,
+                borderColor: styles.borderColor,
+                color: styles.color,
+                fontSize: styles.fontSize,
+                fontWeight: styles.fontWeight,
+                padding: styles.padding,
+                border: styles.border,
+                borderRadius: styles.borderRadius,
+                transform: styles.transform,
+                boxShadow: styles.boxShadow
+            });
+        });
+        
+        // Check if CSS variables are available
+        const root = document.documentElement;
+        const computedStyle = window.getComputedStyle(root);
+        console.log('🎨 CSS Variables:');
+        console.log('- --primary-color:', computedStyle.getPropertyValue('--primary-color'));
+        console.log('- --bg-secondary:', computedStyle.getPropertyValue('--bg-secondary'));
+        console.log('- --text-secondary:', computedStyle.getPropertyValue('--text-secondary'));
+        console.log('- --border-color:', computedStyle.getPropertyValue('--border-color'));
+        
+        return {
+            tabCount: tabs.length,
+            containerExists: !!container,
+            cssVariables: {
+                primaryColor: computedStyle.getPropertyValue('--primary-color'),
+                bgSecondary: computedStyle.getPropertyValue('--bg-secondary'),
+                textSecondary: computedStyle.getPropertyValue('--text-secondary'),
+                borderColor: computedStyle.getPropertyValue('--border-color')
+            }
+        };
+    }
 }
 
-// Global functions for template usage
-window.switchSubtopic = function(subtopicId, subtopicIndex) {
+// ES6 async initialization helper
+const initializeSubtopicTabsAsync = async () => {
+    console.log('🔄 Async initialization starting...');
+    
+    // Wait for potential async data to load
+    const waitForData = (timeout = 5000) => {
+        return new Promise((resolve) => {
+            const checkData = () => {
+                if (window.lessonData || document.querySelector('.subtopic-tabs-container')) {
+                    resolve(true);
+                } else if (timeout <= 0) {
+                    resolve(false);
+                } else {
+                    setTimeout(checkData, 100);
+                    timeout -= 100;
+                }
+            };
+            checkData();
+        });
+    };
+    
+    const dataReady = await waitForData();
+    
+    if (dataReady) {
+        console.log('✅ Data ready for subtopic tabs initialization');
+        
+        const shouldInitialize = (
+            window.lessonData && 
+            (
+                window.lessonData.has_subtopics || 
+                (window.lessonData.subtopics && window.lessonData.subtopics.length > 1) ||
+                document.querySelector('.subtopic-tabs-container') ||
+                document.querySelectorAll('.subtopic-tab').length > 0
+            )
+        );
+        
+        if (shouldInitialize && !window.subtopicManager) {
+            try {
+                window.subtopicManager = new SubtopicTabManager();
+                console.log('✅ Async subtopic tab manager initialized');
+            } catch (error) {
+                console.error('❌ Async initialization error:', error);
+            }
+        }
+    } else {
+        console.log('⚠️ Async initialization timeout - no data found');
+    }
+};
+
+// Global functions for template usage - ES6 compatible
+window.switchSubtopic = (subtopicId, subtopicIndex) => {
     if (window.subtopicManager) {
         window.subtopicManager.switchToSubtopic(subtopicId, subtopicIndex);
     }
 };
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    if (window.lessonData && window.lessonData.has_subtopics) {
-        window.subtopicManager = new SubtopicTabManager();
-        console.log('✅ Subtopic tab system initialized');
-    }
+// Initialize when DOM is loaded - ES6 compatible with enhanced error handling
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🔄 DOM loaded, checking for subtopic tabs...');
+    
+    // Wait for potential async data loading
+    const initializeSubtopicTabs = () => {
+        const debugInfo = {
+            lessonData: !!window.lessonData,
+            hasSubtopics: window.lessonData?.has_subtopics,
+            subtopicsArray: window.lessonData?.subtopics,
+            subtopicsLength: window.lessonData?.subtopics?.length,
+            container: !!document.querySelector('.subtopic-tabs-container'),
+            tabElements: document.querySelectorAll('.subtopic-tab').length
+        };
+        
+        console.log('📊 Available data:', debugInfo);
+        
+        // Enhanced condition checking with fallback options
+        const shouldInitialize = (
+            window.lessonData && 
+            (
+                window.lessonData.has_subtopics || 
+                (window.lessonData.subtopics && window.lessonData.subtopics.length > 1) ||
+                document.querySelector('.subtopic-tabs-container') ||
+                document.querySelectorAll('.subtopic-tab').length > 0
+            )
+        );
+        
+        if (shouldInitialize) {
+            console.log('✅ Initializing subtopic tab system...');
+            try {
+                window.subtopicManager = new SubtopicTabManager();
+                console.log('✅ Subtopic tab manager successfully created');
+            } catch (error) {
+                console.error('❌ Error creating subtopic tab manager:', error);
+                console.error('Stack trace:', error.stack);
+            }
+        } else {
+            console.log('⚠️ Subtopic tab system not initialized:', {
+                noLessonData: !window.lessonData,
+                noHasSubtopics: !window.lessonData?.has_subtopics,
+                noSubtopicsArray: !window.lessonData?.subtopics || window.lessonData.subtopics.length <= 1,
+                noContainer: !document.querySelector('.subtopic-tabs-container'),
+                noTabElements: document.querySelectorAll('.subtopic-tab').length === 0
+            });
+        }
+    };
+    
+    // Try immediate initialization
+    initializeSubtopicTabs();
+    
+    // Also try after a short delay in case data is still loading
+    setTimeout(() => {
+        if (!window.subtopicManager) {
+            console.log('🔄 Retrying subtopic tab initialization...');
+            initializeSubtopicTabs();
+        }
+    }, 100);
+    
+    // Try async initialization as a fallback
+    setTimeout(() => {
+        if (!window.subtopicManager) {
+            console.log('🔄 Trying async initialization...');
+            initializeSubtopicTabsAsync();
+        }
+    }, 500);
 });
 
-// Handle browser back/forward buttons
-window.addEventListener('popstate', function(event) {
+// Handle browser back/forward buttons - ES6 compatible
+window.addEventListener('popstate', (event) => {
     if (event.state && event.state.subtopicId && window.subtopicManager) {
         window.subtopicManager.switchToSubtopic(event.state.subtopicId, event.state.subtopicIndex);
     }
 });
+
+// Debugging helper functions - ES6 compatible
+window.debugSubtopicTabs = () => {
+    console.log('🔍 Subtopic Tabs Debug Information');
+    console.log('==================================');
+    
+    const debugData = {
+        managerInstance: !!window.subtopicManager,
+        lessonData: window.lessonData,
+        hasSubtopicsFlag: window.lessonData?.has_subtopics,
+        subtopicsArray: window.lessonData?.subtopics,
+        containerElement: document.querySelector('.subtopic-tabs-container'),
+        tabElements: document.querySelectorAll('.subtopic-tab'),
+        tabCount: document.querySelectorAll('.subtopic-tab').length
+    };
+    
+    Object.entries(debugData).forEach(([key, value], index) => {
+        console.log(`${index + 1}. ${key}:`, value);
+    });
+    
+    // Check CSS visibility
+    const container = document.querySelector('.subtopic-tabs-container');
+    if (container) {
+        const styles = window.getComputedStyle(container);
+        console.log('8. Container styles:', {
+            display: styles.display,
+            visibility: styles.visibility,
+            opacity: styles.opacity,
+            border: styles.border,
+            height: styles.height,
+            width: styles.width
+        });
+    }
+    
+    // If manager exists, show manager state
+    if (window.subtopicManager) {
+        console.log('9. Manager state:', {
+            lessonId: window.subtopicManager.lessonId,
+            subtopics: window.subtopicManager.subtopics,
+            currentIndex: window.subtopicManager.currentSubtopicIndex,
+            completedSubtopics: window.subtopicManager.completedSubtopics
+        });
+        
+        // Run styling diagnostics
+        console.log('10. Running styling diagnostics...');
+        window.subtopicManager.diagnoseTabStyling();
+    }
+    
+    console.log('==================================');
+    return debugData;
+};
+
+window.forceInitializeSubtopicTabs = () => {
+    console.log('🔧 Force initializing subtopic tabs...');
+    
+    if (window.subtopicManager) {
+        console.log('⚠️ Manager already exists, destroying first...');
+        delete window.subtopicManager;
+    }
+    
+    // Force create subtopic data if it doesn't exist
+    if (!window.lessonData) {
+        console.log('📝 Creating mock lesson data...');
+        window.lessonData = {
+            id: 'test-lesson',
+            title: 'Test Lesson',
+            subtopics: [
+                { id: 'subtopic-0', title: 'Introduction', order: 0 },
+                { id: 'subtopic-1', title: 'Practice', order: 1 },
+                { id: 'subtopic-2', title: 'Assessment', order: 2 }
+            ],
+            has_subtopics: true,
+            current_subtopic_index: 0
+        };
+    } else if (!window.lessonData.has_subtopics) {
+        console.log('🔧 Setting has_subtopics flag...');
+        window.lessonData.has_subtopics = true;
+    }
+    
+    // Initialize manager
+    try {
+        window.subtopicManager = new SubtopicTabManager();
+        console.log('✅ Subtopic tab manager force initialized');
+        return window.subtopicManager;
+    } catch (error) {
+        console.error('❌ Error force initializing subtopic tab manager:', error);
+        console.error('Stack trace:', error.stack);
+        return null;
+    }
+};

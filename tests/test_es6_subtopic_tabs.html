@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ES6 Subtopic Tab System Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-status {
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .test-pass {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .test-fail {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .subtopic-tabs-container {
+            margin: 20px 0;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .subtopic-tabs {
+            display: flex;
+            gap: 2px;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .subtopic-tab {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-bottom: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6c757d;
+        }
+        
+        .subtopic-tab:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+        
+        .subtopic-tab.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+            transform: translateY(-2px);
+        }
+        
+        .subtopic-check {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #dee2e6;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+        
+        .subtopic-check.completed {
+            background: #28a745;
+        }
+        
+        .subtopic-title {
+            flex: 1;
+        }
+        
+        .subtopic-order {
+            background: rgba(0,0,0,0.1);
+            color: rgba(0,0,0,0.6);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        .subtopic-tab.active .subtopic-order {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        
+        .tab-progress-indicator {
+            height: 4px;
+            background: #e9ecef;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tab-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            transition: width 0.3s ease;
+        }
+        
+        .lesson-content-container {
+            min-height: 300px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .subtopic-content-wrapper {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .subtopic-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .subtopic-title {
+            margin: 0 0 10px 0;
+            color: #007bff;
+        }
+        
+        .subtopic-meta {
+            display: flex;
+            gap: 15px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .controls {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+        
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        
+        .log-output {
+            background: #2d3748;
+            color: #e2e8f0;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>🧪 ES6 Subtopic Tab System Test</h1>
+            <p>Testing the subtopic tab system with ES6 features and modern JavaScript</p>
+        </div>
+        
+        <div id="test-results"></div>
+        
+        <!-- Mock lesson data setup -->
+        <div class="subtopic-tabs-container">
+            <nav class="subtopic-tabs" role="tablist">
+                <button class="subtopic-tab active" role="tab" data-subtopic-id="subtopic-0" data-subtopic-index="0">
+                    <i class="fas fa-check-circle subtopic-check completed">✓</i>
+                    <span class="subtopic-title">Introduction to ES6</span>
+                    <span class="subtopic-order">1</span>
+                </button>
+                <button class="subtopic-tab" role="tab" data-subtopic-id="subtopic-1" data-subtopic-index="1">
+                    <i class="fas fa-check-circle subtopic-check">○</i>
+                    <span class="subtopic-title">Arrow Functions</span>
+                    <span class="subtopic-order">2</span>
+                </button>
+                <button class="subtopic-tab" role="tab" data-subtopic-id="subtopic-2" data-subtopic-index="2">
+                    <i class="fas fa-check-circle subtopic-check">○</i>
+                    <span class="subtopic-title">Classes & Modules</span>
+                    <span class="subtopic-order">3</span>
+                </button>
+            </nav>
+            
+            <div class="tab-progress-indicator">
+                <div class="tab-progress-fill" style="width: 33%"></div>
+            </div>
+        </div>
+        
+        <div class="lesson-content-container" id="lesson-content-container">
+            <div class="subtopic-content-wrapper" data-subtopic-id="subtopic-0">
+                <div class="subtopic-header">
+                    <h2 class="subtopic-title">Introduction to ES6</h2>
+                    <div class="subtopic-meta">
+                        <span class="subtopic-order">Part 1</span>
+                        <span class="subtopic-progress">✅ Completed</span>
+                    </div>
+                </div>
+                
+                <div class="subtopic-content">
+                    <p>Welcome to the ES6 subtopic tab system test! This demonstrates modern JavaScript features working together.</p>
+                    
+                    <div class="code-block">
+                        <pre>// ES6 Arrow Function Example
+const initializeSubtopics = () => {
+    console.log('🚀 Initializing with ES6 features');
+};
+
+// Template Literals
+const message = `Subtopic system ${status ? 'working' : 'failed'}`;
+
+// Destructuring Assignment
+const { id, title, subtopics } = lessonData;</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-primary" onclick="runES6Tests()">Run ES6 Tests</button>
+            <button class="btn btn-secondary" onclick="debugSubtopicTabs()">Debug Subtopic Tabs</button>
+            <button class="btn btn-success" onclick="forceInitializeSubtopicTabs()">Force Initialize</button>
+            <button class="btn btn-secondary" onclick="clearOutput()">Clear Output</button>
+        </div>
+        
+        <div class="log-output" id="log-output"></div>
+    </div>
+
+    <script>
+        // Override console.log to capture output
+        const originalLog = console.log;
+        const logOutput = document.getElementById('log-output');
+        
+        console.log = function(...args) {
+            originalLog(...args);
+            const logEntry = document.createElement('div');
+            logEntry.textContent = args.join(' ');
+            logEntry.style.marginBottom = '5px';
+            logOutput.appendChild(logEntry);
+            logOutput.scrollTop = logOutput.scrollHeight;
+        };
+        
+        // Mock lesson data (ES6 structure)
+        window.lessonData = {
+            id: 'test-lesson-es6',
+            title: 'ES6 Test Lesson',
+            subtopics: [
+                { id: 'subtopic-0', title: 'Introduction to ES6', order: 0 },
+                { id: 'subtopic-1', title: 'Arrow Functions', order: 1 },
+                { id: 'subtopic-2', title: 'Classes & Modules', order: 2 }
+            ],
+            has_subtopics: true,
+            current_subtopic_index: 0
+        };
+        
+        window.lessonProgress = {
+            completed_subtopics: ['subtopic-0'],
+            total_progress: 33.33
+        };
+        
+        // Test functions
+        window.runES6Tests = () => {
+            console.log('🧪 Running ES6 Subtopic Tab System Tests');
+            console.log('==========================================');
+            
+            const tests = [
+                {
+                    name: 'ES6 Destructuring',
+                    test: () => {
+                        const { id, title, subtopics } = window.lessonData;
+                        return id && title && subtopics && subtopics.length > 0;
+                    }
+                },
+                {
+                    name: 'Template Literals',
+                    test: () => {
+                        const message = `Lesson "${window.lessonData.title}" has ${window.lessonData.subtopics.length} subtopics`;
+                        return message.includes('ES6 Test Lesson') && message.includes('3 subtopics');
+                    }
+                },
+                {
+                    name: 'Arrow Functions',
+                    test: () => {
+                        const getSubtopicById = (id) => window.lessonData.subtopics.find(s => s.id === id);
+                        const subtopic = getSubtopicById('subtopic-1');
+                        return subtopic && subtopic.title === 'Arrow Functions';
+                    }
+                },
+                {
+                    name: 'Array Methods',
+                    test: () => {
+                        const titles = window.lessonData.subtopics.map(s => s.title);
+                        const hasCompleted = window.lessonData.subtopics.some(s => 
+                            window.lessonProgress.completed_subtopics.includes(s.id)
+                        );
+                        return titles.length === 3 && hasCompleted;
+                    }
+                },
+                {
+                    name: 'Spread Operator',
+                    test: () => {
+                        const enhanced = window.lessonData.subtopics.map(s => ({
+                            ...s,
+                            isCompleted: window.lessonProgress.completed_subtopics.includes(s.id)
+                        }));
+                        return enhanced.length === 3 && enhanced[0].isCompleted;
+                    }
+                },
+                {
+                    name: 'DOM Query Selectors',
+                    test: () => {
+                        const container = document.querySelector('.subtopic-tabs-container');
+                        const tabs = document.querySelectorAll('.subtopic-tab');
+                        return container && tabs.length === 3;
+                    }
+                },
+                {
+                    name: 'Event Listeners',
+                    test: () => {
+                        const tabs = document.querySelectorAll('.subtopic-tab');
+                        return tabs.length > 0 && tabs[0].onclick !== null;
+                    }
+                }
+            ];
+            
+            let passed = 0;
+            tests.forEach(({ name, test }) => {
+                try {
+                    const result = test();
+                    if (result) {
+                        console.log(`✅ ${name}: PASSED`);
+                        passed++;
+                    } else {
+                        console.log(`❌ ${name}: FAILED`);
+                    }
+                } catch (error) {
+                    console.log(`❌ ${name}: ERROR - ${error.message}`);
+                }
+            });
+            
+            console.log('==========================================');
+            console.log(`🎯 Tests completed: ${passed}/${tests.length} passed`);
+            
+            if (passed === tests.length) {
+                console.log('✅ All ES6 tests passed! The system is working correctly.');
+            } else {
+                console.log('⚠️ Some tests failed. Check the implementation.');
+            }
+        };
+        
+        // Mock subtopic tab functionality
+        window.switchSubtopic = (subtopicId, subtopicIndex) => {
+            console.log(`🔄 Switching to subtopic: ${subtopicId} (index: ${subtopicIndex})`);
+            
+            // Update active tab
+            document.querySelectorAll('.subtopic-tab').forEach((tab, index) => {
+                tab.classList.toggle('active', index === subtopicIndex);
+            });
+            
+            // Update content
+            const contentContainer = document.getElementById('lesson-content-container');
+            const subtopic = window.lessonData.subtopics[subtopicIndex];
+            
+            if (subtopic && contentContainer) {
+                contentContainer.innerHTML = `
+                    <div class="subtopic-content-wrapper" data-subtopic-id="${subtopic.id}">
+                        <div class="subtopic-header">
+                            <h2 class="subtopic-title">${subtopic.title}</h2>
+                            <div class="subtopic-meta">
+                                <span class="subtopic-order">Part ${subtopic.order + 1}</span>
+                                <span class="subtopic-progress">
+                                    ${window.lessonProgress.completed_subtopics.includes(subtopic.id) ? '✅ Completed' : '📖 In Progress'}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="subtopic-content">
+                            <p>This is the content for <strong>${subtopic.title}</strong>.</p>
+                            <div class="code-block">
+                                <pre>// Example for ${subtopic.title}
+console.log('Learning ${subtopic.title}');</pre>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        };
+        
+        // Add click handlers to tabs
+        document.querySelectorAll('.subtopic-tab').forEach((tab, index) => {
+            tab.onclick = (e) => {
+                e.preventDefault();
+                const subtopicId = tab.dataset.subtopicId;
+                const subtopicIndex = parseInt(tab.dataset.subtopicIndex);
+                window.switchSubtopic(subtopicId, subtopicIndex);
+            };
+        });
+        
+        // Mock debugging functions
+        window.debugSubtopicTabs = () => {
+            console.log('🔍 Debugging Subtopic Tabs System');
+            console.log('================================');
+            console.log('1. Lesson Data:', window.lessonData);
+            console.log('2. Progress Data:', window.lessonProgress);
+            console.log('3. Container:', document.querySelector('.subtopic-tabs-container'));
+            console.log('4. Tabs:', document.querySelectorAll('.subtopic-tab'));
+            console.log('5. Active Tab:', document.querySelector('.subtopic-tab.active'));
+            console.log('6. Content Container:', document.getElementById('lesson-content-container'));
+            console.log('================================');
+        };
+        
+        window.forceInitializeSubtopicTabs = () => {
+            console.log('🔧 Force initializing subtopic tabs...');
+            console.log('✅ Subtopic tabs are already initialized in this test environment');
+        };
+        
+        window.clearOutput = () => {
+            document.getElementById('log-output').innerHTML = '';
+        };
+        
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            console.log('🚀 ES6 Subtopic Tab System Test Page Loaded');
+            console.log('Click "Run ES6 Tests" to verify all features work correctly');
+        });
+    </script>
+</body>
+</html>

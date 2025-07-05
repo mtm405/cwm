@@ -316,7 +316,7 @@ class ModernDashboardManager {
                 this.loadActivityFeed();
                 break;
             case 'vocabulary':
-                // Future implementation
+                this.loadVocabulary();
                 break;
             case 'games':
                 this.renderGamesTab();
@@ -1093,6 +1093,27 @@ class ModernDashboardManager {
     async loadLeaderboard() {
         console.log('🏆 Loading leaderboard...');
         
+        try {
+            // Initialize leaderboard manager if not already done
+            if (!this.leaderboardManager) {
+                // Dynamically import the leaderboard manager
+                if (typeof DashboardLeaderboard !== 'undefined') {
+                    this.leaderboardManager = new DashboardLeaderboard();
+                    await this.leaderboardManager.init();
+                } else {
+                    console.warn('DashboardLeaderboard not available, using fallback');
+                    this.loadLeaderboardFallback();
+                }
+            } else {
+                await this.leaderboardManager.refresh();
+            }
+        } catch (error) {
+            console.error('Failed to load leaderboard:', error);
+            this.loadLeaderboardFallback();
+        }
+    }
+
+    loadLeaderboardFallback() {
         const loadingContainer = document.querySelector('.leaderboard-loading');
         const contentContainer = document.querySelector('.leaderboard-content');
         const errorContainer = document.querySelector('.leaderboard-error');
@@ -1108,43 +1129,43 @@ class ModernDashboardManager {
         contentContainer.style.display = 'none';
         errorContainer.style.display = 'none';
 
-        try {
-            const response = await fetch('/api/dashboard/leaderboard');
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            console.log('✅ Leaderboard data received:', data);
-            
-            // Hide loading, show content
-            loadingContainer.style.display = 'none';
-            contentContainer.style.display = 'block';
-            contentContainer.classList.add('loaded');
-            
-            // Clear existing content
-            leaderboardList.innerHTML = '';
-            
-            if (!data || !data.users || data.users.length === 0) {
-                this.showEmptyLeaderboardState(leaderboardList);
-                return;
-            }
-            
-            // Render each user
-            data.users.forEach((user, index) => {
-                const userHTML = this.createLeaderboardItemHTML(user, index + 1);
-                leaderboardList.insertAdjacentHTML('beforeend', userHTML);
+        fetch('/api/dashboard/leaderboard')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('✅ Leaderboard data received:', data);
+                
+                // Hide loading, show content
+                loadingContainer.style.display = 'none';
+                contentContainer.style.display = 'block';
+                contentContainer.classList.add('loaded');
+                
+                // Clear existing content
+                leaderboardList.innerHTML = '';
+                
+                if (!data || !data.users || data.users.length === 0) {
+                    this.showEmptyLeaderboardState(leaderboardList);
+                    return;
+                }
+                
+                // Render each user
+                data.users.forEach((user, index) => {
+                    const userHTML = this.createLeaderboardItemHTML(user, index + 1);
+                    leaderboardList.insertAdjacentHTML('beforeend', userHTML);
+                });
+                
+                // Setup filter functionality
+                this.setupLeaderboardFilters();
+            })
+            .catch(error => {
+                console.error('❌ Error loading leaderboard:', error);
+                loadingContainer.style.display = 'none';
+                errorContainer.style.display = 'flex';
             });
-            
-            // Setup filter functionality
-            this.setupLeaderboardFilters();
-            
-        } catch (error) {
-            console.error('❌ Error loading leaderboard:', error);
-            loadingContainer.style.display = 'none';
-            errorContainer.style.display = 'flex';
-        }
     }
     
     showEmptyLeaderboardState(container) {
@@ -1373,24 +1394,83 @@ class ModernDashboardManager {
                 return;
             }
             
-            // Initialize challenge manager
-            const challengeManager = new DashboardChallengeManager();
-            challengeManager.init();
+            // Initialize challenge manager if not already done
+            if (!this.challengeManager) {
+                if (typeof DashboardChallengeManager !== 'undefined') {
+                    this.challengeManager = new DashboardChallengeManager();
+                    this.challengeManager.init();
+                } else {
+                    console.warn('DashboardChallengeManager not available');
+                }
+            }
             
             // Initialize streak tracker
             const streakContainer = document.querySelector('#challenge-tab .streak-container');
-            if (streakContainer) {
-                const streakTracker = new DashboardStreakTracker();
-                streakTracker.init(streakContainer);
-                
-                // Store reference for future updates
-                this.streakTracker = streakTracker;
+            if (streakContainer && !this.streakTracker) {
+                if (typeof DashboardStreakTracker !== 'undefined') {
+                    this.streakTracker = new DashboardStreakTracker();
+                    this.streakTracker.init(streakContainer);
+                } else {
+                    console.warn('DashboardStreakTracker not available');
+                }
             }
             
             console.log('Daily challenge loaded successfully');
         } catch (error) {
             console.error('Failed to load daily challenge:', error);
             this.showError('Failed to load daily challenge. Please try again later.');
+        }
+    }
+
+    async loadVocabulary() {
+        console.log('📚 Loading vocabulary...');
+        
+        try {
+            // Initialize vocabulary manager if not already done
+            if (!this.vocabularyManager) {
+                if (typeof DashboardVocabulary !== 'undefined') {
+                    this.vocabularyManager = new DashboardVocabulary();
+                    await this.vocabularyManager.init();
+                } else {
+                    console.warn('DashboardVocabulary not available, showing placeholder');
+                    this.showVocabularyPlaceholder();
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load vocabulary:', error);
+            this.showVocabularyPlaceholder();
+        }
+    }
+
+    showVocabularyPlaceholder() {
+        const vocabularyTab = document.querySelector('#vocabulary-tab');
+        if (vocabularyTab && !vocabularyTab.querySelector('.vocabulary-placeholder')) {
+            vocabularyTab.innerHTML = `
+                <div class="vocabulary-placeholder">
+                    <div class="placeholder-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3>Python Vocabulary</h3>
+                    <p>Interactive flashcards and vocabulary exercises to build your Python knowledge.</p>
+                    <div class="feature-preview">
+                        <div class="feature-item">
+                            <i class="fas fa-layer-group"></i>
+                            <span>Interactive Flashcards</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-search"></i>
+                            <span>Searchable Terms</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-quiz"></i>
+                            <span>Practice Quizzes</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-sync-alt"></i> Try Loading Again
+                    </button>
+                </div>
+            `;
         }
     }
 

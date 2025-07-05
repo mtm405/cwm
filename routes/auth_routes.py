@@ -3,6 +3,8 @@ Authentication routes for Code with Morais
 Handles Google OAuth authentication and user sessions
 """
 import os
+import jwt
+import datetime
 from flask import Blueprint, request, jsonify, session, current_app, render_template
 from firebase_admin import auth as firebase_auth
 import logging
@@ -16,6 +18,33 @@ auth_bp = Blueprint('auth', __name__)
 # Get Firebase service from app context
 def get_firebase_service():
     return current_app.config.get('firebase_service')
+
+def generate_jwt_token(user_id: str, user_email: str, user_data: Dict[str, Any]) -> str:
+    """Generate a JWT token for the user"""
+    try:
+        secret_key = current_app.config.get('SECRET_KEY', 'fallback-secret-key')
+        
+        payload = {
+            'sub': user_id,  # Subject (user ID)
+            'email': user_email,
+            'name': user_data.get('display_name', user_data.get('username', user_email)),
+            'picture': user_data.get('profile_picture', ''),
+            'given_name': user_data.get('display_name', '').split(' ')[0] if user_data.get('display_name') else '',
+            'family_name': ' '.join(user_data.get('display_name', '').split(' ')[1:]) if user_data.get('display_name') and len(user_data.get('display_name', '').split(' ')) > 1 else '',
+            'is_admin': user_data.get('is_admin', False),
+            'xp': user_data.get('xp', 0),
+            'level': user_data.get('level', 1),
+            'iat': datetime.datetime.utcnow(),
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7)  # Token expires in 7 days
+        }
+        
+        token = jwt.encode(payload, secret_key, algorithm='HS256')
+        logger.info(f"Generated JWT token for user: {user_email}")
+        return token
+        
+    except Exception as e:
+        logger.error(f"Error generating JWT token: {str(e)}")
+        return None
 
 def verify_google_token(id_token_str: str) -> Optional[Dict[str, Any]]:
     """Verify Google OAuth ID token using the google-auth library."""
@@ -35,6 +64,37 @@ def verify_google_token(id_token_str: str) -> Optional[Dict[str, Any]]:
         return None
     except Exception as e:
         logger.error(f"An unexpected error occurred during token verification: {str(e)}")
+        return None
+
+def verify_jwt_token(token: str) -> Optional[Dict[str, Any]]:
+    """Verify and decode a JWT token"""
+    try:
+        secret_key = current_app.config.get('SECRET_KEY', 'fallback-secret-key')
+        
+        # Decode and verify the token
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        
+        # Check if token is expired
+        if 'exp' in payload:
+            exp_timestamp = payload['exp']
+            if isinstance(exp_timestamp, datetime.datetime):
+                exp_timestamp = exp_timestamp.timestamp()
+            
+            if exp_timestamp < datetime.datetime.utcnow().timestamp():
+                logger.warning("JWT token is expired")
+                return None
+        
+        logger.info(f"JWT token verified successfully for user: {payload.get('email')}")
+        return payload
+        
+    except jwt.ExpiredSignatureError:
+        logger.warning("JWT token is expired")
+        return None
+    except jwt.InvalidTokenError as e:
+        logger.warning(f"Invalid JWT token: {str(e)}")
+        return None
+    except Exception as e:
+        logger.error(f"Error verifying JWT token: {str(e)}")
         return None
 
 @auth_bp.route('/google/callback', methods=['POST'])
@@ -135,11 +195,12 @@ def google_callback():
                 # Force session save
                 session.permanent = True
                 
-                return jsonify({
+                # Generate JWT token
+                jwt_token = generate_jwt_token(user_id, user_email, user_data)
+                
+                response_data = {
                     'success': True,
                     'redirect_url': '/dashboard',
-                    'token': id_token,  # Return the Google ID token for frontend storage
-                    'user_token': id_token,  # Also store as user_token for compatibility
                     'user': {
                         'uid': user_id,
                         'email': user_email,
@@ -152,7 +213,17 @@ def google_callback():
                         'pycoins': user_data.get('pycoins', 0),
                         'streak': user_data.get('streak', 0)
                     }
-                })
+                }
+                
+                # Add JWT token if generated successfully
+                if jwt_token:
+                    response_data['token'] = jwt_token
+                    response_data['user_token'] = jwt_token  # For compatibility with existing code
+                    logger.info(f"JWT token included in response for user: {user_email}")
+                else:
+                    logger.warning(f"Failed to generate JWT token for user: {user_email}")
+                
+                return jsonify(response_data)
             except Exception as e:
                 logger.error(f"Error managing user data: {str(e)}")
                 # Still set basic session even if user data fails
@@ -164,13 +235,28 @@ def google_callback():
                 session['authenticated'] = True
                 session.permanent = True
                 
-                return jsonify({
+                # Generate fallback JWT token with basic data
+                basic_user_data = {
+                    'username': user_name,
+                    'display_name': user_name,
+                    'profile_picture': user_picture,
+                    'is_admin': False,
+                    'xp': 0,
+                    'level': 1
+                }
+                jwt_token = generate_jwt_token(user_id, user_email, basic_user_data)
+                
+                response = {
                     'success': True, 
                     'redirect_url': '/dashboard',
-                    'token': id_token,  # Return the Google ID token for frontend storage
-                    'user_token': id_token,  # Also store as user_token for compatibility
                     'warning': 'User data sync failed'
-                })
+                }
+                
+                if jwt_token:
+                    response['token'] = jwt_token
+                    response['user_token'] = jwt_token
+                
+                return jsonify(response)
         else:
             # Firebase not available, set basic session
             session['user_id'] = user_id
@@ -181,13 +267,28 @@ def google_callback():
             session['authenticated'] = True
             session.permanent = True
             
-            return jsonify({
+            # Generate JWT token with basic data
+            basic_user_data = {
+                'username': user_name,
+                'display_name': user_name,
+                'profile_picture': user_picture,
+                'is_admin': False,
+                'xp': 0,
+                'level': 1
+            }
+            jwt_token = generate_jwt_token(user_id, user_email, basic_user_data)
+            
+            response = {
                 'success': True, 
                 'redirect_url': '/dashboard',
-                'token': id_token,  # Return the Google ID token for frontend storage
-                'user_token': id_token,  # Also store as user_token for compatibility
                 'warning': 'Firebase unavailable'
-            })
+            }
+            
+            if jwt_token:
+                response['token'] = jwt_token
+                response['user_token'] = jwt_token
+            
+            return jsonify(response)
     except Exception as e:
         logger.error(f"Google callback error: {str(e)}")
         return jsonify({'success': False, 'error': 'Authentication failed'}), 500
@@ -382,40 +483,40 @@ def auth_debug():
         logger.error(f"Error rendering auth debug page: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-@auth_bp.route('/api/auth/refresh-token', methods=['POST'])
-def refresh_token():
-    """Handle token refresh requests"""
+@auth_bp.route('/validate', methods=['POST'])
+def validate_token():
+    """Validate a JWT token and return user information"""
     try:
-        data = request.get_json()
-        if not data:
-            return jsonify({'success': False, 'error': 'No data provided'}), 400
+        # Get token from Authorization header or request body
+        auth_header = request.headers.get('Authorization')
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]
+        else:
+            data = request.get_json()
+            token = data.get('token') if data else None
         
-        # Check if user is authenticated via session
-        if 'user_id' in session:
-            # User is authenticated via session, no need to refresh
-            return jsonify({
-                'success': True,
-                'message': 'Session-based authentication active',
-                'token': 'session_authenticated'
-            })
+        if not token:
+            return jsonify({'success': False, 'error': 'No token provided'}), 400
         
-        # Extract user info from request
-        user_id = data.get('userId') or data.get('user_id')
-        email = data.get('email')
+        # Verify the token
+        payload = verify_jwt_token(token)
+        if not payload:
+            return jsonify({'success': False, 'error': 'Invalid or expired token'}), 401
         
-        if not user_id and not email:
-            return jsonify({'success': False, 'error': 'User ID or email required'}), 400
-        
-        # For now, return a session-based response
-        # In a full implementation, this would generate a new JWT token
-        logger.info(f"Token refresh requested for user: {user_id or email}")
-        
+        # Return user information
         return jsonify({
-            'success': False,
-            'error': 'Token refresh not implemented - using session authentication',
-            'message': 'Please log in again if needed'
-        }), 501
+            'success': True,
+            'user': {
+                'uid': payload.get('sub'),
+                'email': payload.get('email'),
+                'name': payload.get('name'),
+                'picture': payload.get('picture'),
+                'is_admin': payload.get('is_admin', False),
+                'xp': payload.get('xp', 0),
+                'level': payload.get('level', 1)
+            }
+        })
         
     except Exception as e:
-        logger.error(f"Token refresh error: {str(e)}")
-        return jsonify({'success': False, 'error': 'Internal server error'}), 500
+        logger.error(f"Token validation error: {str(e)}")
+        return jsonify({'success': False, 'error': 'Token validation failed'}), 500

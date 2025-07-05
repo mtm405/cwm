@@ -51,8 +51,8 @@
                     <h4>Topics:</h4>
                     <ul>
                         {% for topic in lesson.subtopics %}
-                        <li class="{% if loop.index0 < lesson.completed_subtopics %}completed{% endif %}">
-                            <i class="fas fa-check-circle"></i> {{ topic }}
+                        <li class="{% if topic.completed %}completed{% endif %}">
+                            <i class="fas fa-check-circle"></i> {{ topic.title if topic is mapping else topic }}
                         </li>
                         {% endfor %}
                     </ul>

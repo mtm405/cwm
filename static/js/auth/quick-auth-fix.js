@@ -31,18 +31,23 @@
         const authToken = localStorage.getItem('auth_token') || localStorage.getItem('cwm_user_token');
         if (authToken && authToken.includes('.')) {
             try {
-                const payload = JSON.parse(atob(authToken.split('.')[1]));
-                
-                const userInfo = {
-                    id: payload.sub || payload.user_id,
-                    email: payload.email,
-                    name: payload.name,
-                    picture: payload.picture,
-                    given_name: payload.given_name,
-                    family_name: payload.family_name
-                };
-                
-                if (userInfo.id || userInfo.email) {
+                const parts = authToken.split('.');
+                if (parts.length === 3) {
+                    // Safe base64 decode
+                    const payloadStr = safeBase64Decode(parts[1]);
+                    if (payloadStr) {
+                        const payload = JSON.parse(payloadStr);
+                        
+                        const userInfo = {
+                            id: payload.sub || payload.user_id,
+                            email: payload.email,
+                            name: payload.name,
+                            picture: payload.picture,
+                            given_name: payload.given_name,
+                            family_name: payload.family_name
+                        };
+                        
+                        if (userInfo.id || userInfo.email) {
                     window.currentUser = userInfo;
                     localStorage.setItem('cwm_user_profile', JSON.stringify(userInfo));
                     console.log('✅ Extracted and restored user from token:', userInfo);

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subtopic Tabs Test - Fixed</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bundles/lessons.css') }}">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: #0a0a23;
+            color: #ffffff;
+            margin: 0;
+            padding: 2rem;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .debug-section {
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        .debug-button {
+            background: #6C63FF;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0.25rem;
+        }
+        .debug-button:hover {
+            background: #5a52d5;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Subtopic Tabs Test - ES6 Fixed Version</h1>
+        
+        <div class="debug-section">
+            <h2>Debug Controls</h2>
+            <button class="debug-button" onclick="window.debugSubtopicTabs()">🔍 Debug Info</button>
+            <button class="debug-button" onclick="window.forceInitializeSubtopicTabs()">🔧 Force Initialize</button>
+            <button class="debug-button" onclick="console.clear()">🧹 Clear Console</button>
+        </div>
+
+        <!-- Lesson Container (simulated) -->
+        <div class="lesson-container">
+            <!-- Subtopic Navigation Tabs -->
+            <div class="subtopic-tabs-container">
+                <nav class="subtopic-tabs" role="tablist">
+                    <button 
+                        class="subtopic-tab active"
+                        role="tab"
+                        data-subtopic-id="subtopic-0"
+                        data-subtopic-index="0"
+                        onclick="window.switchSubtopic('subtopic-0', 0)"
+                        aria-selected="true"
+                        id="tab-subtopic-0"
+                    >
+                        <i class="fas fa-check-circle subtopic-check"></i>
+                        <span class="subtopic-title">Introduction</span>
+                        <span class="subtopic-order">1</span>
+                    </button>
+                    
+                    <button 
+                        class="subtopic-tab"
+                        role="tab"
+                        data-subtopic-id="subtopic-1"
+                        data-subtopic-index="1"
+                        onclick="window.switchSubtopic('subtopic-1', 1)"
+                        aria-selected="false"
+                        id="tab-subtopic-1"
+                    >
+                        <i class="fas fa-check-circle subtopic-check"></i>
+                        <span class="subtopic-title">Practice</span>
+                        <span class="subtopic-order">2</span>
+                    </button>
+                    
+                    <button 
+                        class="subtopic-tab"
+                        role="tab"
+                        data-subtopic-id="subtopic-2"
+                        data-subtopic-index="2"
+                        onclick="window.switchSubtopic('subtopic-2', 2)"
+                        aria-selected="false"
+                        id="tab-subtopic-2"
+                    >
+                        <i class="fas fa-check-circle subtopic-check"></i>
+                        <span class="subtopic-title">Assessment</span>
+                        <span class="subtopic-order">3</span>
+                    </button>
+                </nav>
+                
+                <!-- Tab Progress Indicator -->
+                <div class="tab-progress-indicator">
+                    <div class="tab-progress-fill" style="width: 33%"></div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <main class="lesson-content-wrapper">
+                <div id="lesson-content-container" class="content-blocks-container">
+                    <div class="content-block text-block">
+                        <div class="block-content">
+                            <h3>Test Content</h3>
+                            <p>This is a test lesson to verify subtopic tabs are working correctly.</p>
+                            <p>Open the browser console and use the debug buttons above to test functionality.</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Mock lesson data -->
+    <script>
+        // Inject lesson data similar to how the backend does it
+        window.lessonData = {
+            "id": "test-lesson",
+            "title": "Test Lesson with Subtopics",
+            "description": "A test lesson to verify subtopic tab functionality",
+            "subtopics": [
+                {
+                    "id": "subtopic-0",
+                    "title": "Introduction",
+                    "order": 0
+                },
+                {
+                    "id": "subtopic-1", 
+                    "title": "Practice",
+                    "order": 1
+                },
+                {
+                    "id": "subtopic-2",
+                    "title": "Assessment", 
+                    "order": 2
+                }
+            ],
+            "has_subtopics": true,
+            "current_subtopic_index": 0
+        };
+        
+        window.lessonProgress = {
+            "completed_subtopics": []
+        };
+        
+        console.log('🎯 Test page loaded with lesson data:', window.lessonData);
+    </script>
+    
+    <!-- Load the fixed subtopic tab manager -->
+    <script src="/static/js/lesson/subtopicTabManager.js"></script>
+    
+    <script>
+        // Additional test logging
+        window.addEventListener('load', function() {
+            console.log('📋 Page fully loaded, checking subtopic tabs...');
+            
+            // Wait a bit for everything to initialize
+            setTimeout(() => {
+                console.log('🔍 Running automatic debug check...');
+                if (window.debugSubtopicTabs) {
+                    window.debugSubtopicTabs();
+                } else {
+                    console.error('❌ Debug function not found!');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

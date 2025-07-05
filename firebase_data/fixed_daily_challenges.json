@@ -1,0 +1,199 @@
+{
+  "daily_challenges": {
+    "2025-07-05": {
+      "id": "challenge-20250705",
+      "date": "2025-07-05",
+      "title": "FizzBuzz Classic",
+      "description": "Implement the classic FizzBuzz problem",
+      "type": "code_challenge",
+      "difficulty": "beginner",
+      "estimated_time": 15,
+      "content": {
+        "instructions": "Write a program that prints numbers 1 to 20, but for multiples of 3 print 'Fizz', for multiples of 5 print 'Buzz', and for multiples of both print 'FizzBuzz'.",
+        "initial_code": "# Write your FizzBuzz solution here\nfor i in range(1, 21):\n    # Your code here\n    pass"
+      },
+      "expected_output": "1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz\n16\n17\nFizz\n19\nBuzz",
+      "xp_reward": 120,
+      "coin_reward": 40,
+      "hint_cost": 25,
+      "skip_cost": 50,
+      "hints": [
+        "Use the modulo operator (%) to check if a number is divisible by another",
+        "Check for multiples of both 3 and 5 first, then individual multiples",
+        "Use if-elif-else statements to handle different cases"
+      ],
+      "solution": "for i in range(1, 21):\n    if i % 15 == 0:\n        print(\"FizzBuzz\")\n    elif i % 3 == 0:\n        print(\"Fizz\")\n    elif i % 5 == 0:\n        print(\"Buzz\")\n    else:\n        print(i)",
+      "created_at": "2025-07-05T00:00:00Z",
+      "active_date": "2025-07-05",
+      "expiration_date": "2025-07-06"
+    },
+    
+    "2025-07-06": {
+      "id": "challenge-20250706",
+      "date": "2025-07-06",
+      "title": "List Comprehension Challenge",
+      "description": "Create a list comprehension that filters even numbers from 1 to 20 and squares them",
+      "type": "code_challenge",
+      "difficulty": "intermediate",
+      "estimated_time": 10,
+      "content": {
+        "instructions": "Use list comprehension to create a list of squares of even numbers from 1 to 20.",
+        "initial_code": "# Create a list of even squares using list comprehension\neven_squares = # Your code here\n\nprint(even_squares)"
+      },
+      "expected_output": "[4, 16, 36, 64, 100, 144, 196, 256, 324, 400]",
+      "xp_reward": 150,
+      "coin_reward": 50,
+      "hint_cost": 25,
+      "skip_cost": 50,
+      "hints": [
+        "Use modulo operator % to check if a number is even",
+        "List comprehension syntax: [expression for item in iterable if condition]",
+        "To square a number, use ** 2 or multiply it by itself"
+      ],
+      "solution": "[x**2 for x in range(1, 21) if x % 2 == 0]",
+      "created_at": "2025-07-06T00:00:00Z",
+      "active_date": "2025-07-06",
+      "expiration_date": "2025-07-07"
+    },
+    
+    "2025-07-07": {
+      "id": "challenge-20250707",
+      "date": "2025-07-07",
+      "title": "String Manipulation Challenge",
+      "description": "Create a function that counts vowels in a given string (case-insensitive)",
+      "type": "code_challenge",
+      "difficulty": "beginner",
+      "estimated_time": 8,
+      "content": {
+        "instructions": "Write a function that counts the number of vowels (a, e, i, o, u) in a string, ignoring case.",
+        "initial_code": "def count_vowels(text):\n    # Your code here\n    pass\n\n# Test your function\ntest_string = \"Code with Morais\"\nresult = count_vowels(test_string)\nprint(f\"Vowels in '{test_string}': {result}\")"
+      },
+      "expected_output": "Vowels in 'Code with Morais': 6",
+      "xp_reward": 100,
+      "coin_reward": 30,
+      "hint_cost": 25,
+      "skip_cost": 50,
+      "hints": [
+        "Consider both uppercase and lowercase vowels",
+        "You can iterate through each character in the string",
+        "Use the 'in' operator to check if a character is a vowel"
+      ],
+      "solution": "def count_vowels(text):\n    vowels = 'aeiouAEIOU'\n    return sum(1 for char in text if char in vowels)",
+      "created_at": "2025-07-07T00:00:00Z",
+      "active_date": "2025-07-07",
+      "expiration_date": "2025-07-08"
+    },
+    
+    "2025-07-08": {
+      "id": "challenge-20250708",
+      "date": "2025-07-08",
+      "title": "Dictionary Challenge",
+      "description": "Find the student with the highest grade from a dictionary",
+      "type": "code_challenge",
+      "difficulty": "intermediate",
+      "estimated_time": 12,
+      "content": {
+        "instructions": "Given a dictionary of student names and grades, find and return the name of the student with the highest grade.",
+        "initial_code": "# Student grades data\nstudents_grades = {\n    \"Ana\": 95,\n    \"Bruno\": 87,\n    \"Carlos\": 92,\n    \"Diana\": 98,\n    \"Eduardo\": 89\n}\n\n# Find the student with the highest grade\ntop_student = # Your code here\nprint(f\"Top student: {top_student}\")"
+      },
+      "expected_output": "Top student: Diana",
+      "xp_reward": 130,
+      "coin_reward": 35,
+      "hint_cost": 25,
+      "skip_cost": 50,
+      "hints": [
+        "Use the max() function with a key parameter",
+        "The key should be a function that returns the value to compare",
+        "You can use dict.get as the key function"
+      ],
+      "solution": "max(students_grades, key=students_grades.get)",
+      "created_at": "2025-07-08T00:00:00Z",
+      "active_date": "2025-07-08",
+      "expiration_date": "2025-07-09"
+    },
+    
+    "2025-07-09": {
+      "id": "challenge-20250709",
+      "date": "2025-07-09",
+      "title": "Function Definition Challenge",
+      "description": "Create a function that calculates the factorial of a number",
+      "type": "code_challenge",
+      "difficulty": "intermediate",
+      "estimated_time": 15,
+      "content": {
+        "instructions": "Write a function that calculates the factorial of a positive integer. Remember: factorial of n is n! = n × (n-1) × (n-2) × ... × 1",
+        "initial_code": "def factorial(n):\n    # Your code here\n    pass\n\n# Test your function\nresult = factorial(5)\nprint(f\"Factorial of 5 is: {result}\")"
+      },
+      "expected_output": "Factorial of 5 is: 120",
+      "xp_reward": 140,
+      "coin_reward": 45,
+      "hint_cost": 25,
+      "skip_cost": 50,
+      "hints": [
+        "You can use a loop to multiply numbers from 1 to n",
+        "Remember that factorial of 0 and 1 is 1",
+        "Start with result = 1 and multiply by each number"
+      ],
+      "solution": "def factorial(n):\n    if n <= 1:\n        return 1\n    result = 1\n    for i in range(2, n + 1):\n        result *= i\n    return result",
+      "created_at": "2025-07-09T00:00:00Z",
+      "active_date": "2025-07-09",
+      "expiration_date": "2025-07-10"
+    },
+    
+    "2025-07-10": {
+      "id": "challenge-20250710",
+      "date": "2025-07-10",
+      "title": "Loop Practice Challenge",
+      "description": "Print a pattern using nested loops",
+      "type": "code_challenge",
+      "difficulty": "beginner",
+      "estimated_time": 10,
+      "content": {
+        "instructions": "Use nested loops to print a triangle pattern of stars. The triangle should have 5 rows.",
+        "initial_code": "# Print a triangle pattern with 5 rows\n# Row 1: *\n# Row 2: **\n# Row 3: ***\n# Row 4: ****\n# Row 5: *****\n\n# Your code here"
+      },
+      "expected_output": "*\n**\n***\n****\n*****",
+      "xp_reward": 110,
+      "coin_reward": 25,
+      "hint_cost": 25,
+      "skip_cost": 50,
+      "hints": [
+        "Use a nested loop: outer loop for rows, inner loop for stars",
+        "The number of stars in each row equals the row number",
+        "Use range(1, 6) for 5 rows"
+      ],
+      "solution": "for i in range(1, 6):\n    for j in range(i):\n        print('*', end='')\n    print()",
+      "created_at": "2025-07-10T00:00:00Z",
+      "active_date": "2025-07-10",
+      "expiration_date": "2025-07-11"
+    },
+    
+    "2025-07-11": {
+      "id": "challenge-20250711",
+      "date": "2025-07-11",
+      "title": "List Operations Challenge",
+      "description": "Manipulate a list of numbers using various list methods",
+      "type": "code_challenge",
+      "difficulty": "intermediate",
+      "estimated_time": 12,
+      "content": {
+        "instructions": "Given a list of numbers, remove duplicates, sort in ascending order, and find the sum of unique numbers.",
+        "initial_code": "# Given list with duplicates\nnumbers = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5]\n\n# Remove duplicates, sort, and find sum\n# Your code here\nunique_numbers = # Step 1: remove duplicates\nsorted_numbers = # Step 2: sort the list\ntotal_sum = # Step 3: find the sum\n\nprint(f\"Unique numbers: {sorted_numbers}\")\nprint(f\"Sum: {total_sum}\")"
+      },
+      "expected_output": "Unique numbers: [1, 2, 3, 4, 5, 6, 9]\nSum: 30",
+      "xp_reward": 135,
+      "coin_reward": 40,
+      "hint_cost": 25,
+      "skip_cost": 50,
+      "hints": [
+        "Use set() to remove duplicates",
+        "Convert back to list and use sort() or sorted()",
+        "Use sum() function to calculate the total"
+      ],
+      "solution": "unique_numbers = list(set(numbers))\nsorted_numbers = sorted(unique_numbers)\ntotal_sum = sum(sorted_numbers)",
+      "created_at": "2025-07-11T00:00:00Z",
+      "active_date": "2025-07-11",
+      "expiration_date": "2025-07-12"
+    }
+  }
+}

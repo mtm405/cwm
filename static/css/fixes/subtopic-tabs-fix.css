@@ -1,0 +1,226 @@
+/* Subtopic Tabs CSS Fix - Enhanced Compatibility */
+/* Ensures subtopic tabs are visible and properly styled */
+
+/* Force subtopic tabs container to be visible */
+.subtopic-tabs-container {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+    margin-bottom: 2rem !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Force subtopic tabs navigation to be visible */
+.subtopic-tabs {
+    display: flex !important;
+    gap: 0.5rem !important;
+    margin-bottom: 1rem !important;
+    overflow-x: auto !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Force individual tabs to be visible with fallback colors */
+.subtopic-tab {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    padding: 0.75rem 1rem !important;
+    border: 2px solid #e0e0e0 !important; /* Fallback border color */
+    border-radius: 8px !important;
+    background: #f5f5f5 !important; /* Fallback background color */
+    color: #666666 !important; /* Fallback text color */
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    white-space: nowrap !important;
+    position: relative !important;
+    min-width: fit-content !important;
+    margin: 0 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Apply CSS variables if available, otherwise use fallback */
+.subtopic-tab {
+    border-color: var(--border-color, #e0e0e0) !important;
+    background: var(--bg-secondary, #f5f5f5) !important;
+    color: var(--text-secondary, #666666) !important;
+}
+
+/* Hover states with fallback colors */
+.subtopic-tab:hover {
+    border-color: #6C63FF !important; /* Fallback primary color */
+    background: #6C63FF !important;
+    color: white !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3) !important; /* Fallback shadow */
+}
+
+.subtopic-tab:hover {
+    border-color: var(--primary-color, #6C63FF) !important;
+    background: var(--primary-color, #6C63FF) !important;
+    color: white !important;
+}
+
+/* Active states with fallback colors */
+.subtopic-tab.active {
+    border-color: #6C63FF !important; /* Fallback primary color */
+    background: #6C63FF !important;
+    color: white !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3) !important; /* Fallback shadow */
+}
+
+.subtopic-tab.active {
+    border-color: var(--primary-color, #6C63FF) !important;
+    background: var(--primary-color, #6C63FF) !important;
+    color: white !important;
+}
+
+/* Focus states for accessibility */
+.subtopic-tab:focus {
+    outline: 2px solid #6C63FF !important; /* Fallback primary color */
+    outline-offset: 2px !important;
+}
+
+.subtopic-tab:focus {
+    outline-color: var(--primary-color, #6C63FF) !important;
+}
+
+/* Subtopic check icon */
+.subtopic-check {
+    font-size: 0.8rem !important;
+    opacity: 0.6 !important;
+    transition: all 0.3s ease !important;
+}
+
+.subtopic-check.completed {
+    opacity: 1 !important;
+    color: #4CAF50 !important; /* Fallback success color */
+}
+
+.subtopic-check.completed {
+    color: var(--success-color, #4CAF50) !important;
+}
+
+.subtopic-tab.active .subtopic-check {
+    opacity: 1 !important;
+    color: white !important;
+}
+
+/* Subtopic title */
+.subtopic-title {
+    font-weight: 600 !important;
+    flex: 1 !important;
+}
+
+/* Subtopic order indicator */
+.subtopic-order {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    border-radius: 50% !important;
+    width: 20px !important;
+    height: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    margin-left: auto !important;
+    min-width: 20px !important;
+    min-height: 20px !important;
+}
+
+.subtopic-tab:not(.active) .subtopic-order {
+    background: #666666 !important; /* Fallback secondary color */
+    color: white !important;
+}
+
+.subtopic-tab:not(.active) .subtopic-order {
+    background: var(--text-secondary, #666666) !important;
+    color: var(--bg-primary, white) !important;
+}
+
+/* Theme-specific overrides */
+.theme-light .subtopic-tab {
+    background: #f8f9fa !important;
+    border-color: #dee2e6 !important;
+    color: #495057 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.theme-light .subtopic-tab:hover,
+.theme-light .subtopic-tab.active {
+    background: #6C63FF !important;
+    border-color: #6C63FF !important;
+    color: white !important;
+}
+
+.theme-light .subtopic-tab:not(.active) .subtopic-order {
+    background: #6c757d !important;
+    color: white !important;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .subtopic-tab {
+        border-width: 3px !important;
+        font-weight: 700 !important;
+    }
+    
+    .subtopic-tab:hover,
+    .subtopic-tab.active {
+        background: #000000 !important;
+        color: #ffffff !important;
+        border-color: #000000 !important;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .subtopic-tab {
+        transition: none !important;
+    }
+    
+    .subtopic-tab:hover {
+        transform: none !important;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .subtopic-tabs-container {
+        padding: 0.75rem !important;
+    }
+    
+    .subtopic-tabs {
+        gap: 0.25rem !important;
+    }
+    
+    .subtopic-tab {
+        padding: 0.5rem 0.75rem !important;
+        font-size: 0.8rem !important;
+    }
+    
+    .subtopic-order {
+        width: 18px !important;
+        height: 18px !important;
+        font-size: 0.7rem !important;
+    }
+}
+
+/* Force visibility for any edge cases */
+.lesson-container .subtopic-tabs-container .subtopic-tabs .subtopic-tab {
+    position: relative !important;
+    z-index: 1 !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}

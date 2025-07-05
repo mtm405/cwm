@@ -1,0 +1,184 @@
+{
+  "python_vocabulary": [
+    {
+      "id": "variable",
+      "term": "Variable",
+      "definition": "A named storage location that holds a value that can be modified during program execution.",
+      "example": "x = 10\nname = \"Python\"",
+      "category": "Basics",
+      "difficulty": "beginner",
+      "tags": ["storage", "data", "assignment"]
+    },
+    {
+      "id": "function",
+      "term": "Function",
+      "definition": "A reusable block of code that performs a specific task and can accept inputs (parameters) and return outputs.",
+      "example": "def greet(name):\n    return f\"Hello, {name}!\"",
+      "category": "Basics",
+      "difficulty": "beginner",
+      "tags": ["reusable", "parameters", "return"]
+    },
+    {
+      "id": "list",
+      "term": "List",
+      "definition": "An ordered collection of items that can be modified. Lists are mutable and can contain different data types.",
+      "example": "fruits = [\"apple\", \"banana\", \"orange\"]\nfruits.append(\"grape\")",
+      "category": "Data Structures",
+      "difficulty": "beginner",
+      "tags": ["collection", "ordered", "mutable"]
+    },
+    {
+      "id": "dictionary",
+      "term": "Dictionary",
+      "definition": "A collection of key-value pairs where each key is unique and maps to a value.",
+      "example": "person = {\"name\": \"Alice\", \"age\": 30}\nprint(person[\"name\"])",
+      "category": "Data Structures",
+      "difficulty": "beginner",
+      "tags": ["key-value", "mapping", "unique"]
+    },
+    {
+      "id": "loop",
+      "term": "Loop",
+      "definition": "A programming construct that repeats a group of commands while a condition is true.",
+      "example": "for i in range(5):\n    print(i)",
+      "category": "Control Flow",
+      "difficulty": "beginner",
+      "tags": ["iteration", "repeat", "condition"]
+    },
+    {
+      "id": "conditional",
+      "term": "Conditional",
+      "definition": "A programming construct that executes different code blocks based on whether a condition is true or false.",
+      "example": "if age >= 18:\n    print(\"Adult\")\nelse:\n    print(\"Minor\")",
+      "category": "Control Flow",
+      "difficulty": "beginner",
+      "tags": ["decision", "if-else", "boolean"]
+    },
+    {
+      "id": "string",
+      "term": "String",
+      "definition": "A sequence of characters enclosed in quotes, used to represent text data.",
+      "example": "message = \"Hello, World!\"\nprint(message.upper())",
+      "category": "Data Types",
+      "difficulty": "beginner",
+      "tags": ["text", "characters", "sequence"]
+    },
+    {
+      "id": "integer",
+      "term": "Integer",
+      "definition": "A whole number without a decimal point, positive or negative.",
+      "example": "age = 25\ncount = -10",
+      "category": "Data Types",
+      "difficulty": "beginner",
+      "tags": ["whole number", "numeric", "int"]
+    },
+    {
+      "id": "float",
+      "term": "Float",
+      "definition": "A number with a decimal point, used to represent real numbers.",
+      "example": "price = 19.99\ntemperature = -5.5",
+      "category": "Data Types",
+      "difficulty": "beginner",
+      "tags": ["decimal", "real number", "floating-point"]
+    },
+    {
+      "id": "boolean",
+      "term": "Boolean",
+      "definition": "A data type that can only hold one of two values: True or False.",
+      "example": "is_active = True\nhas_permission = False",
+      "category": "Data Types",
+      "difficulty": "beginner",
+      "tags": ["true", "false", "logical"]
+    },
+    {
+      "id": "class",
+      "term": "Class",
+      "definition": "A blueprint for creating objects that defines attributes and methods.",
+      "example": "class Person:\n    def __init__(self, name):\n        self.name = name",
+      "category": "Object-Oriented Programming",
+      "difficulty": "intermediate",
+      "tags": ["blueprint", "objects", "attributes"]
+    },
+    {
+      "id": "object",
+      "term": "Object",
+      "definition": "An instance of a class that contains data (attributes) and functions (methods).",
+      "example": "person = Person(\"Alice\")\nprint(person.name)",
+      "category": "Object-Oriented Programming",
+      "difficulty": "intermediate",
+      "tags": ["instance", "data", "methods"]
+    },
+    {
+      "id": "method",
+      "term": "Method",
+      "definition": "A function that belongs to a class and operates on instances of that class.",
+      "example": "class Calculator:\n    def add(self, a, b):\n        return a + b",
+      "category": "Object-Oriented Programming",
+      "difficulty": "intermediate",
+      "tags": ["class function", "instance", "behavior"]
+    },
+    {
+      "id": "inheritance",
+      "term": "Inheritance",
+      "definition": "A mechanism where a new class inherits properties and methods from an existing class.",
+      "example": "class Animal:\n    def speak(self):\n        pass\n\nclass Dog(Animal):\n    def speak(self):\n        return \"Woof!\"",
+      "category": "Object-Oriented Programming",
+      "difficulty": "intermediate",
+      "tags": ["extends", "parent", "child"]
+    },
+    {
+      "id": "module",
+      "term": "Module",
+      "definition": "A file containing Python code that can be imported and used in other programs.",
+      "example": "import math\nprint(math.pi)",
+      "category": "Modules",
+      "difficulty": "intermediate",
+      "tags": ["import", "file", "reusable"]
+    },
+    {
+      "id": "package",
+      "term": "Package",
+      "definition": "A collection of related modules organized in a directory structure.",
+      "example": "from mypackage.module1 import function1",
+      "category": "Modules",
+      "difficulty": "intermediate",
+      "tags": ["collection", "directory", "organization"]
+    },
+    {
+      "id": "exception",
+      "term": "Exception",
+      "definition": "An error that occurs during program execution that can be caught and handled.",
+      "example": "try:\n    result = 10 / 0\nexcept ZeroDivisionError:\n    print(\"Cannot divide by zero\")",
+      "category": "Error Handling",
+      "difficulty": "intermediate",
+      "tags": ["error", "try-except", "handling"]
+    },
+    {
+      "id": "lambda",
+      "term": "Lambda",
+      "definition": "A small anonymous function that can have any number of arguments but can only have one expression.",
+      "example": "square = lambda x: x ** 2\nprint(square(5))",
+      "category": "Advanced",
+      "difficulty": "intermediate",
+      "tags": ["anonymous", "expression", "functional"]
+    },
+    {
+      "id": "generator",
+      "term": "Generator",
+      "definition": "A function that returns an iterator object which can be iterated over to produce a sequence of values.",
+      "example": "def countdown(n):\n    while n > 0:\n        yield n\n        n -= 1",
+      "category": "Advanced",
+      "difficulty": "advanced",
+      "tags": ["iterator", "yield", "memory-efficient"]
+    },
+    {
+      "id": "decorator",
+      "term": "Decorator",
+      "definition": "A function that takes another function as input and extends its behavior without explicitly modifying it.",
+      "example": "@property\ndef name(self):\n    return self._name",
+      "category": "Advanced",
+      "difficulty": "advanced",
+      "tags": ["function modifier", "wrapper", "enhancement"]
+    }
+  ]
+}

@@ -1,0 +1,983 @@
+[
+  {
+    "quiz_id": "datatypes-quiz",
+    "prerequisites": [],
+    "difficulty": "beginner",
+    "title": "Python Data Types: str, int, float, and bool",
+    "created_at": "2025-01-05T10:00:00Z",
+    "total_subtopics": 6,
+    "subtopics": [
+      {
+        "id": "introduction",
+        "title": "Introduction to Data Types",
+        "order": 0,
+        "blocks": [
+          {
+            "title": "Introduction to Python Data Types",
+            "order": 0,
+            "type": "text",
+            "content": "# Python Data Types\n\nEvery value in Python has a type. Understanding data types is crucial because it determines what operations you can perform with your data. Python has four fundamental data types that we'll explore:\n\n1. **str (String)** - Text data enclosed in quotes\n2. **int (Integer)** - Whole numbers without decimal points\n3. **float (Floating-point)** - Numbers with decimal points\n4. **bool (Boolean)** - True or False values\n\nLet's dive into each type and learn how to identify them!",
+            "id": "intro-block"
+          }
+        ]
+      },
+      {
+        "id": "strings",
+        "title": "String Data Type",
+        "order": 1,
+        "blocks": [
+          {
+            "title": "String Examples",
+            "code": "# String examples\nname = \"Alice\"              # Text in double quotes\nmessage = 'Hello, World!'   # Text in single quotes\nage_text = \"16\"            # Numbers in quotes are strings!\nmultiline = '''This is\na multiline\nstring'''                   # Triple quotes for multiple lines\n\n# Checking the type\nprint(type(name))          # <class 'str'>\nprint(type(age_text))      # <class 'str'> - not a number!",
+            "explanation": "Strings are sequences of characters enclosed in quotes. You can use single (''), double (\"\"), or triple (''' or \"\"\") quotes. Remember: anything inside quotes becomes a string, even numbers!",
+            "order": 0,
+            "type": "code_example",
+            "id": "string-example"
+          }
+        ]
+      },
+      {
+        "id": "integers",
+        "title": "Integer Data Type",
+        "order": 2,
+        "blocks": [
+          {
+            "title": "Integer Examples",
+            "code": "# Integer examples\nage = 16                   # Positive whole number\nscore = -5                 # Negative whole number\ncount = 0                  # Zero is also an integer\nbig_number = 1_000_000     # Underscores for readability\n\n# Checking the type\nprint(type(age))           # <class 'int'>\nprint(type(score))         # <class 'int'>\n\n# Common mistake\nwrong = \"16\"               # This is a string, not an integer!\nprint(type(wrong))         # <class 'str'>",
+            "explanation": "Integers are whole numbers without decimal points. They can be positive, negative, or zero. Python allows underscores in large numbers for better readability.",
+            "order": 0,
+            "type": "code_example",
+            "id": "integer-example"
+          }
+        ]
+      },
+      {
+        "id": "floats",
+        "title": "Float Data Type",
+        "order": 3,
+        "blocks": [
+          {
+            "title": "Float Examples",
+            "code": "# Float examples\nheight = 5.7               # Decimal number\ntemperature = -10.5        # Negative decimal\npi = 3.14159              # Many decimal places\nscientific = 1.5e-4       # Scientific notation (0.00015)\n\n# Checking the type\nprint(type(height))        # <class 'float'>\nprint(type(pi))           # <class 'float'>\n\n# Important: Division always returns a float\nresult = 10 / 2           # Even though 10÷2=5\nprint(result)             # 5.0\nprint(type(result))       # <class 'float'>",
+            "explanation": "Floats represent decimal numbers. They're called 'floating-point' because the decimal point can 'float' to different positions. Division in Python always returns a float, even when dividing evenly.",
+            "order": 0,
+            "type": "code_example",
+            "id": "float-example"
+          }
+        ]
+      },
+      {
+        "id": "booleans",
+        "title": "Boolean Data Type",
+        "order": 4,
+        "blocks": [
+          {
+            "title": "Boolean Examples",
+            "code": "# Boolean examples\nis_student = True          # Note the capital T\nhas_homework = False       # Note the capital F\n\n# Booleans from comparisons\nage = 16\ncan_drive = age >= 16      # True\nis_adult = age >= 18       # False\n\n# Checking the type\nprint(type(is_student))    # <class 'bool'>\nprint(type(can_drive))     # <class 'bool'>\n\n# Common mistake\nwrong_bool = \"True\"       # This is a string!\nprint(type(wrong_bool))    # <class 'str'>",
+            "explanation": "Booleans represent truth values: True or False. They're often the result of comparisons or logical operations. Remember: True and False must be capitalized in Python!",
+            "order": 0,
+            "type": "code_example",
+            "id": "boolean-example"
+          }
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Practice & Assessment",
+        "order": 5,
+        "blocks": [
+          {
+            "order": 0,
+            "hints": [
+              "Use the type() function to check the data type",
+              "Compare with int, str, float, and bool",
+              "Use if-elif statements to check each type"
+            ],
+            "starter_code": "def identify_type(value):\n    # Your code here\n    # Return \"integer\", \"string\", \"float\", or \"boolean\"\n    pass\n\n# Test your function\nprint(identify_type(42))        # Should return \"integer\"\nprint(identify_type(\"42\"))      # Should return \"string\"\nprint(identify_type(42.0))      # Should return \"float\"\nprint(identify_type(True))      # Should return \"boolean\"",
+            "title": "Identify the Data Type",
+            "language": "python",
+            "id": "type-identification-exercise",
+            "solution": "def identify_type(value):\n    if type(value) == int:\n        return \"integer\"\n    elif type(value) == str:\n        return \"string\"\n    elif type(value) == float:\n        return \"float\"\n    elif type(value) == bool:\n        return \"boolean\"\n    else:\n        return \"unknown type\"\n\n# Test\nprint(identify_type(42))        # \"integer\"\nprint(identify_type(\"42\"))      # \"string\"\nprint(identify_type(42.0))      # \"float\"\nprint(identify_type(True))      # \"boolean\"",
+            "type": "interactive",
+            "instructions": "Write a function that takes a value and returns a string describing its type in plain English."
+          },
+          {
+            "title": "Data Types Knowledge Check",
+            "order": 1,
+            "questions": [
+              {
+                "question": "What is the data type of x = '123'?",
+                "options": [
+                  "int",
+                  "str",
+                  "float",
+                  "bool"
+                ],
+                "explanation": "Even though it contains numbers, anything in quotes is a string.",
+                "type": "multiple_choice",
+                "correct_answer": 1,
+                "id": "q1"
+              },
+              {
+                "question": "Which of these will result in a float type?",
+                "options": [
+                  "x = 10",
+                  "x = 10 / 2",
+                  "x = 10 // 2",
+                  "x = '10.0'"
+                ],
+                "explanation": "Division (/) always returns a float in Python, even when dividing evenly.",
+                "type": "multiple_choice",
+                "correct_answer": 1,
+                "id": "q2"
+              },
+              {
+                "question": "The value False is of type bool.",
+                "explanation": "False (with capital F) is one of Python's two boolean values.",
+                "type": "true_false",
+                "correct_answer": true,
+                "id": "q3"
+              },
+              {
+                "question": "What type is the result of: type(42).__name__?",
+                "options": [
+                  "<class 'int'>",
+                  "int",
+                  "integer",
+                  "str"
+                ],
+                "explanation": "The __name__ attribute gives the type name as a string without the class notation.",
+                "type": "multiple_choice",
+                "correct_answer": 1,
+                "id": "q4"
+              },
+              {
+                "question": "A variable in Python can change its data type during program execution.",
+                "explanation": "Python is dynamically typed, allowing variables to hold different types of values.",
+                "type": "true_false",
+                "correct_answer": true,
+                "id": "q5"
+              }
+            ],
+            "description": "Test your understanding of Python data types",
+            "type": "quiz",
+            "id": "datatypes-quiz"
+          }
+        ]
+      }
+    ],
+    "updated_at": "2025-01-05T10:00:00Z",
+    "tags": [
+      "data types",
+      "variables",
+      "python",
+      "str",
+      "int",
+      "float",
+      "bool"
+    ],
+    "category": "python",
+    "order": 1,
+    "has_subtopics": true,
+    "estimated_time": 45,
+    "is_published": true,
+    "id": "python-datatypes-01",
+    "pycoins_reward": 20,
+    "description": "Learn to evaluate expressions and identify the data types Python assigns to variables",
+    "xp_reward": 100
+  },
+  {
+    "grading_rubric": {
+      "90-100": {
+        "feedback": "Excellent! You have mastered Python data types and operators.",
+        "grade": "A"
+      },
+      "70-79": {
+        "feedback": "Satisfactory. Review operator precedence and type conversions.",
+        "grade": "C"
+      },
+      "60-69": {
+        "feedback": "Below average. Significant review needed in multiple areas.",
+        "grade": "D"
+      },
+      "0-59": {
+        "feedback": "Needs improvement. Please review all lessons before retaking.",
+        "grade": "F"
+      },
+      "80-89": {
+        "feedback": "Good work! You have a strong understanding with minor areas to review.",
+        "grade": "B"
+      }
+    },
+    "retake_delay": 24,
+    "prerequisites": [
+      "python-datatypes-01",
+      "python-operations-02",
+      "python-precedence-03",
+      "python-operators-04"
+    ],
+    "difficulty": "intermediate",
+    "order": 1,
+    "created_at": "2025-01-05T10:00:00Z",
+    "updated_at": "2025-01-05T10:00:00Z",
+    "total_points": 100,
+    "total_subtopics": 0,
+    "time_limit": 90,
+    "type": "assessment",
+    "category": "python",
+    "sections": [
+      {
+        "points": 30,
+        "id": "section-1",
+        "questions": [
+          {
+            "points": 3,
+            "options": [
+              "'int'",
+              "'float'",
+              "'str'",
+              "'number'"
+            ],
+            "explanation": "Division (/) always returns a float in Python, even when dividing evenly. So 10/2 = 5.0 (float).",
+            "correct_answer": 1,
+            "type": "multiple_choice",
+            "question": "What is the result of: type(10 / 2).__name__?",
+            "id": "mc1"
+          },
+          {
+            "points": 3,
+            "options": [
+              "'Pyt'",
+              "'hon'",
+              "'tho'",
+              "'on'"
+            ],
+            "explanation": "[-3:] means 'from 3 positions from the end to the end', which gives us 'hon'.",
+            "correct_answer": 1,
+            "type": "multiple_choice",
+            "question": "What does 'Python'[-3:] return?",
+            "id": "mc2"
+          },
+          {
+            "points": 3,
+            "options": [
+              "20",
+              "11",
+              "200",
+              "50"
+            ],
+            "explanation": "Following precedence: 4**2=16, 3*16=48, 48//5=9, 2+9=11.",
+            "correct_answer": 1,
+            "type": "multiple_choice",
+            "question": "What is the value of: 2 + 3 * 4 ** 2 // 5?",
+            "id": "mc3"
+          },
+          {
+            "points": 3,
+            "options": [
+              "temp = a; a = b; b = temp",
+              "a, b = b, a",
+              "a += b; b = a - b; a -= b",
+              "Both A and B work"
+            ],
+            "explanation": "Both methods work, but Python's tuple unpacking (a, b = b, a) is more Pythonic and readable.",
+            "correct_answer": 3,
+            "type": "multiple_choice",
+            "question": "Which operator would you use to swap two variables' values efficiently?",
+            "id": "mc4"
+          },
+          {
+            "points": 3,
+            "options": [
+              "False",
+              "True",
+              "0",
+              "'0'"
+            ],
+            "explanation": "'0' is a non-empty string, so bool('0') returns True. Only empty strings return False.",
+            "correct_answer": 1,
+            "type": "multiple_choice",
+            "question": "What type does bool('0') return?",
+            "id": "mc5"
+          },
+          {
+            "points": 3,
+            "correct_answer": false,
+            "explanation": "Each [] creates a new list object. Even though they're equal in value, they're different objects in memory.",
+            "type": "true_false",
+            "question": "The expression [] is [] returns True.",
+            "id": "mc6"
+          },
+          {
+            "points": 3,
+            "correct_answer": false,
+            "explanation": "append() adds only one element. Use extend() to add multiple elements from an iterable.",
+            "type": "true_false",
+            "question": "list.append() can be used to add multiple elements at once.",
+            "id": "mc7"
+          },
+          {
+            "points": 3,
+            "options": [
+              "'hello5'",
+              "TypeError",
+              "'hello hello hello hello hello'",
+              "5"
+            ],
+            "explanation": "Python doesn't automatically convert types for string concatenation. You need str(5) to concatenate.",
+            "correct_answer": 1,
+            "type": "multiple_choice",
+            "question": "What's the result of: 'hello' + 5?",
+            "id": "mc8"
+          },
+          {
+            "points": 3,
+            "options": [
+              "and",
+              "not",
+              "or",
+              "=="
+            ],
+            "explanation": "Among logical operators, 'not' has the highest precedence, followed by 'and', then 'or'.",
+            "correct_answer": 1,
+            "type": "multiple_choice",
+            "question": "Which has the highest precedence?",
+            "id": "mc9"
+          },
+          {
+            "points": 3,
+            "correct_answer": true,
+            "explanation": "For basic types like int and float, += is just syntactic sugar for x = x + 1.",
+            "type": "true_false",
+            "question": "x += 1 is always identical to x = x + 1",
+            "id": "mc10"
+          }
+        ],
+        "description": "Test your conceptual understanding",
+        "title": "Part 1: Multiple Choice Questions"
+      },
+      {
+        "points": 20,
+        "id": "section-2",
+        "questions": [
+          {
+            "points": 5,
+            "code": "x = '42'\ny = 8\nresult = int(x) + y // 2\nprint(result, type(result))",
+            "explanation": "int('42') = 42, y // 2 = 8 // 2 = 4, so 42 + 4 = 46 (integer)",
+            "correct_answer": "46 <class 'int'>",
+            "type": "code_analysis",
+            "question": "What is the output of this code?",
+            "id": "ca1"
+          },
+          {
+            "points": 5,
+            "code": "nums = [1, 2, 3]\nnums.append(4)\nnums.insert(0, 0)\nnums.remove(2)\nnums.sort(reverse=True)\nprint(nums)",
+            "explanation": "After append: [1,2,3,4], after insert: [0,1,2,3,4], after remove(2): [0,1,3,4], after reverse sort: [4,3,1,0]",
+            "correct_answer": "[4, 3, 1, 0]",
+            "type": "code_analysis",
+            "question": "What is the final value of the list?",
+            "id": "ca2"
+          },
+          {
+            "points": 5,
+            "code": "result = not False and True or False and True\nprint(result)",
+            "explanation": "Following precedence: not False = True, True and True = True, False and True = False, True or False = True",
+            "correct_answer": "True",
+            "type": "code_analysis",
+            "question": "What does this expression evaluate to?",
+            "id": "ca3"
+          },
+          {
+            "points": 5,
+            "code": "a = [1, 2, 3]\nb = a\nc = a[:]\nb.append(4)\nc.append(5)\nprint(len(a), len(b), len(c))",
+            "explanation": "b = a makes b reference the same list as a. c = a[:] creates a copy. When b.append(4), both a and b show the change.",
+            "correct_answer": "4 4 4",
+            "type": "code_analysis",
+            "question": "What is printed?",
+            "id": "ca4"
+          }
+        ],
+        "description": "Analyze code snippets and predict outputs",
+        "title": "Part 2: Code Analysis"
+      },
+      {
+        "points": 35,
+        "id": "section-3",
+        "questions": [
+          {
+            "points": 10,
+            "starter_code": "def sum_numeric_values(mixed_list):\n    # Your code here\n    pass\n\n# Test: sum_numeric_values([1, '2', 3.5, 'hello', '4.5', True])\n# Should return: 12.0 (1 + 2 + 3.5 + 4.5 + 1)",
+            "test_cases": [
+              {
+                "input": "[1, '2', 3.5, 'hello', '4.5', True]",
+                "expected": "12.0"
+              },
+              {
+                "input": "['10', 20, '30.5', 'abc', False]",
+                "expected": "60.5"
+              }
+            ],
+            "type": "coding_problem",
+            "question": "Write a function that takes a mixed list of integers, floats, and strings. Convert all numeric strings to their appropriate numeric type (int if possible, otherwise float), and return the sum of all numeric values.",
+            "id": "ps1"
+          },
+          {
+            "points": 10,
+            "starter_code": "def evaluate_expression(expr):\n    # Your code here\n    # Hint: For this assessment, you may use eval() with safety checks\n    pass\n\n# Test: evaluate_expression('2 + 3 * 4')\n# Should return: 14",
+            "test_cases": [
+              {
+                "input": "'2 + 3 * 4'",
+                "expected": "14"
+              },
+              {
+                "input": "'(2 + 3) * 4'",
+                "expected": "20"
+              }
+            ],
+            "type": "coding_problem",
+            "question": "Create a function that evaluates a simple mathematical expression string containing only numbers, +, -, *, and parentheses. Respect operator precedence.",
+            "id": "ps2"
+          },
+          {
+            "points": 15,
+            "starter_code": "def process_grades(scores):\n    # Your code here\n    # Return tuple: (average, letter_grade)\n    pass\n\n# Test: process_grades([85, 92, 78, 95, 60])\n# Should drop 60, average = 87.5, return (87.5, 'B')",
+            "test_cases": [
+              {
+                "input": "[85, 92, 78, 95, 60]",
+                "expected": "(87.5, 'B')"
+              },
+              {
+                "input": "[95, 98, 92, 100]",
+                "expected": "(97.67, 'A')"
+              }
+            ],
+            "type": "coding_problem",
+            "question": "Write a function that processes student grades. It should take a list of scores, drop the lowest score, calculate the average of the remaining scores, and return both the average and the appropriate letter grade (A: 90+, B: 80-89, C: 70-79, D: 60-69, F: <60).",
+            "id": "ps3"
+          }
+        ],
+        "description": "Write code to solve specific problems",
+        "title": "Part 3: Problem Solving"
+      },
+      {
+        "points": 15,
+        "id": "section-4",
+        "questions": [
+          {
+            "points": 15,
+            "starter_code": "def calculate_total(items, is_member=False):\n    '''\n    items: list of prices (can be strings or numbers)\n    is_member: boolean indicating membership status\n    \n    Returns dictionary with:\n    - subtotal: sum before discounts\n    - discount_amount: total discount applied\n    - tax_amount: tax calculated after discounts\n    - final_total: final amount to pay\n    '''\n    # Your code here\n    pass\n\n# Test: calculate_total(['29.99', 45.50, '35.00'], True)\n# Subtotal: 110.49, gets both discounts, then tax",
+            "test_cases": [
+              {
+                "input": "['29.99', 45.50, '35.00'], is_member=True",
+                "expected_keys": [
+                  "subtotal",
+                  "discount_amount",
+                  "tax_amount",
+                  "final_total"
+                ],
+                "description": "Member with total > $100"
+              }
+            ],
+            "requirements": [
+              "Accept a list of items with prices (can be strings or numbers)",
+              "Apply a 10% discount if total > $100",
+              "Apply an additional 5% member discount if user is a member",
+              "Add 8% tax after all discounts",
+              "Return a detailed breakdown"
+            ],
+            "type": "project_problem",
+            "question": "Create a shopping cart price calculator that handles various discounts and tax calculations.",
+            "id": "rw1"
+          }
+        ],
+        "description": "Apply your knowledge to a practical scenario",
+        "title": "Part 4: Real-World Application"
+      }
+    ],
+    "passing_score": 70,
+    "title": "Comprehensive Assessment: Data Types and Operators",
+    "has_subtopics": false,
+    "allow_retake": true,
+    "estimated_time": 90,
+    "id": "python-datatypes-operators-assessment",
+    "is_published": true,
+    "resources": [
+      {
+        "type": "hint",
+        "content": "Remember: int() fails on strings with decimals. Try int() first, then float() in a try-except block.",
+        "title": "Type Conversion Tips"
+      },
+      {
+        "type": "reference",
+        "content": "() → ** → +x,-x → *,/,//,% → +,- → ==,!=,<,>,<=,>= → not → and → or → =",
+        "title": "Operator Precedence Table"
+      }
+    ],
+    "description": "Test your mastery of Python data types, operations, precedence, and operator selection",
+    "xp_reward": 100
+  },
+  {
+    "quiz_id": "operations-quiz",
+    "prerequisites": [
+      "python-datatypes-01"
+    ],
+    "difficulty": "intermediate",
+    "title": "Data Type Operations and List Manipulations",
+    "created_at": "2025-01-05T10:00:00Z",
+    "category": "python",
+    "updated_at": "2025-01-05T10:00:00Z",
+    "total_subtopics": 0,
+    "tags": [
+      "type conversion",
+      "indexing",
+      "slicing",
+      "lists",
+      "data structures"
+    ],
+    "order": 2,
+    "blocks": [
+      {
+        "id": "intro-block",
+        "order": 0,
+        "type": "text",
+        "content": "# Data Type Operations in Python\n\nNow that you understand Python's basic data types, let's explore how to manipulate them. This lesson covers:\n\n1. **Type Conversion** - Converting between different data types\n2. **Indexing** - Accessing individual elements in sequences\n3. **Slicing** - Extracting portions of sequences\n4. **List Operations** - Creating and manipulating lists\n\nThese operations are fundamental to working with data in Python!",
+        "title": "Introduction to Data Operations"
+      },
+      {
+        "id": "type-conversion-example",
+        "code": "# Converting strings to numbers\nage_str = \"18\"\nage_int = int(age_str)      # String to integer\nprint(f\"String: {age_str}, Type: {type(age_str)}\")\nprint(f\"Integer: {age_int}, Type: {type(age_int)}\")\n\n# Converting to float\nprice_str = \"19.99\"\nprice_float = float(price_str)  # String to float\nprint(f\"Float: {price_float}, Type: {type(price_float)}\")\n\n# Converting numbers to strings\nscore = 95\nscore_str = str(score)      # Integer to string\nprint(f\"String: '{score_str}', Type: {type(score_str)}\")\n\n# Be careful with invalid conversions!\n# This would cause an error:\n# int(\"hello\")  # ValueError: invalid literal for int()",
+        "explanation": "Type conversion (or casting) allows you to convert values from one type to another. Use int(), float(), str(), and bool() functions. Be careful - not all conversions are valid!",
+        "order": 1,
+        "type": "code_example",
+        "title": "Type Conversion Basics"
+      },
+      {
+        "id": "boolean-conversion-example",
+        "code": "# Converting to boolean\n# Empty values are False, non-empty are True\nprint(bool(\"\"))          # False (empty string)\nprint(bool(\"Hello\"))     # True (non-empty string)\nprint(bool(0))           # False (zero)\nprint(bool(42))          # True (non-zero)\nprint(bool([]))          # False (empty list)\nprint(bool([1, 2, 3]))   # True (non-empty list)\n\n# Practical example\nuser_input = input(\"Enter your name (or press Enter to skip): \")\nif bool(user_input):  # Same as: if user_input:\n    print(f\"Hello, {user_input}!\")\nelse:\n    print(\"No name provided.\")",
+        "explanation": "In Python, empty values (empty strings, 0, empty lists) convert to False, while non-empty values convert to True. This is useful for checking if data exists.",
+        "order": 2,
+        "type": "code_example",
+        "title": "Boolean Conversions"
+      },
+      {
+        "id": "indexing-example",
+        "code": "# Indexing strings\nword = \"Python\"\n# Positive:  0  1  2  3  4  5\n# Letters:   P  y  t  h  o  n\n# Negative: -6 -5 -4 -3 -2 -1\n\nprint(word[0])     # 'P' (first character)\nprint(word[5])     # 'n' (last character)\nprint(word[-1])    # 'n' (last, using negative)\nprint(word[-6])    # 'P' (first, using negative)\n\n# Indexing lists\nscores = [85, 92, 78, 95, 88]\nprint(scores[0])   # 85 (first element)\nprint(scores[-1])  # 88 (last element)\n\n# Modifying list elements (strings are immutable!)\nscores[0] = 90     # Changes first element to 90\nprint(scores)      # [90, 92, 78, 95, 88]",
+        "explanation": "Indexing lets you access individual elements using square brackets. Python uses 0-based indexing (first element is at index 0). Negative indices count from the end.",
+        "order": 3,
+        "type": "code_example",
+        "title": "Indexing Sequences"
+      },
+      {
+        "id": "slicing-example",
+        "code": "# Slicing syntax: sequence[start:end:step]\ntext = \"Python Programming\"\n\n# Basic slicing\nprint(text[0:6])     # 'Python' (index 0 to 5)\nprint(text[7:18])    # 'Programming'\nprint(text[:6])      # 'Python' (start to 5)\nprint(text[7:])      # 'Programming' (7 to end)\n\n# Using step\nprint(text[::2])     # 'Pto rgamn' (every 2nd char)\nprint(text[1::2])    # 'yhnPormig' (odd positions)\nprint(text[::-1])    # 'gnimmargorP nohtyP' (reversed)\n\n# Slicing lists\nnumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]\nprint(numbers[2:7])  # [2, 3, 4, 5, 6]\nprint(numbers[::3])  # [0, 3, 6, 9] (every 3rd)",
+        "explanation": "Slicing extracts portions of sequences. The syntax is [start:end:step]. The end index is exclusive (not included). Omitting values uses defaults: start=0, end=length, step=1.",
+        "order": 4,
+        "type": "code_example",
+        "title": "Slicing Sequences"
+      },
+      {
+        "title": "Smart Type Converter",
+        "hints": [
+          "Use try-except blocks to handle conversion errors",
+          "Try int() first, as it's more restrictive",
+          "If int() fails, try float() before giving up"
+        ],
+        "starter_code": "def smart_convert(value):\n    # Your code here\n    # Try to convert to int first, then float\n    # If both fail, return the original string\n    pass\n\n# Test cases\nprint(smart_convert(\"42\"))      # Should return 42 (int)\nprint(smart_convert(\"3.14\"))    # Should return 3.14 (float)\nprint(smart_convert(\"hello\"))   # Should return \"hello\" (str)\nprint(smart_convert(\"123.0\"))   # Should return 123.0 (float)",
+        "id": "type-conversion-exercise",
+        "language": "python",
+        "instructions": "Create a function that attempts to convert a string to the most appropriate numeric type (int or float), or returns the original string if conversion fails.",
+        "type": "interactive",
+        "solution": "def smart_convert(value):\n    # Try integer conversion first\n    try:\n        return int(value)\n    except ValueError:\n        # Try float conversion\n        try:\n            return float(value)\n        except ValueError:\n            # Return original string\n            return value\n\n# Test cases\nprint(smart_convert(\"42\"))      # 42 (int)\nprint(smart_convert(\"3.14\"))    # 3.14 (float)\nprint(smart_convert(\"hello\"))   # \"hello\" (str)\nprint(smart_convert(\"123.0\"))   # 123.0 (float)",
+        "order": 5
+      },
+      {
+        "id": "list-operations-example",
+        "code": "# Creating and modifying lists\nfruits = [\"apple\", \"banana\", \"orange\"]\n\n# Appending (add to end)\nfruits.append(\"grape\")\nprint(fruits)  # ['apple', 'banana', 'orange', 'grape']\n\n# Inserting at specific position\nfruits.insert(1, \"mango\")  # Insert at index 1\nprint(fruits)  # ['apple', 'mango', 'banana', 'orange', 'grape']\n\n# Removing elements\nfruits.remove(\"banana\")  # Remove first occurrence\nprint(fruits)  # ['apple', 'mango', 'orange', 'grape']\n\n# Pop removes and returns an element\nlast = fruits.pop()      # Remove last element\nprint(f\"Removed: {last}, List: {fruits}\")\n\n# Extending lists (adding multiple elements)\nmore_fruits = [\"kiwi\", \"pear\"]\nfruits.extend(more_fruits)\nprint(fruits)  # ['apple', 'mango', 'orange', 'kiwi', 'pear']",
+        "explanation": "Lists are mutable (changeable) sequences. Common operations include append(), insert(), remove(), pop(), and extend(). Each method modifies the list in place.",
+        "order": 6,
+        "type": "code_example",
+        "title": "List Operations"
+      },
+      {
+        "id": "list-sorting-example",
+        "code": "# Sorting lists\nnumbers = [45, 23, 67, 12, 89, 34]\n\n# Sort in place (modifies original list)\nnumbers.sort()\nprint(\"Ascending:\", numbers)  # [12, 23, 34, 45, 67, 89]\n\nnumbers.sort(reverse=True)\nprint(\"Descending:\", numbers) # [89, 67, 45, 34, 23, 12]\n\n# Finding min and max\nscores = [85, 92, 78, 95, 88]\nprint(f\"Highest score: {max(scores)}\")  # 95\nprint(f\"Lowest score: {min(scores)}\")   # 78\nprint(f\"Total scores: {sum(scores)}\")   # 438\nprint(f\"Average: {sum(scores) / len(scores)}\")  # 87.6\n\n# Reversing a list\nletters = ['a', 'b', 'c', 'd']\nletters.reverse()  # Modifies in place\nprint(letters)     # ['d', 'c', 'b', 'a']",
+        "explanation": "Python provides built-in functions for common list operations: sort() for ordering, max() and min() for finding extremes, sum() for totaling, and reverse() for reversing order.",
+        "order": 7,
+        "type": "code_example",
+        "title": "Sorting and Finding Min/Max"
+      },
+      {
+        "title": "List Processing Challenge",
+        "hints": [
+          "Use isinstance() to check if an item is already a number",
+          "Use try-except for safe string-to-number conversion",
+          "Remember to sort the final list before returning"
+        ],
+        "starter_code": "def process_mixed_list(mixed_list):\n    # Your code here\n    # 1. Convert numeric strings to numbers\n    # 2. Remove non-numeric strings\n    # 3. Sort and return the result\n    pass\n\n# Test cases\ntest1 = [\"5\", 2, \"hello\", \"3.14\", 10, \"world\", \"7\"]\nprint(process_mixed_list(test1))  # Should return [2, 3.14, 5, 7, 10]\n\ntest2 = [\"42\", \"abc\", \"0\", \"-5\", \"3.5\"]\nprint(process_mixed_list(test2))  # Should return [-5, 0, 3.5, 42]",
+        "id": "list-manipulation-exercise",
+        "language": "python",
+        "instructions": "Create a function that takes a list of mixed strings and numbers, converts all strings that can be numbers to their numeric types, removes any remaining strings, and returns the sorted numeric list.",
+        "type": "interactive",
+        "solution": "def process_mixed_list(mixed_list):\n    numeric_list = []\n    \n    for item in mixed_list:\n        # If already a number, add it\n        if isinstance(item, (int, float)):\n            numeric_list.append(item)\n        # If string, try to convert\n        elif isinstance(item, str):\n            try:\n                # Try int first\n                numeric_list.append(int(item))\n            except ValueError:\n                try:\n                    # Try float\n                    numeric_list.append(float(item))\n                except ValueError:\n                    # Skip non-numeric strings\n                    pass\n    \n    # Sort and return\n    numeric_list.sort()\n    return numeric_list\n\n# Test cases\ntest1 = [\"5\", 2, \"hello\", \"3.14\", 10, \"world\", \"7\"]\nprint(process_mixed_list(test1))  # [2, 3.14, 5, 7, 10]\n\ntest2 = [\"42\", \"abc\", \"0\", \"-5\", \"3.5\"]\nprint(process_mixed_list(test2))  # [-5, 0, 3.5, 42]",
+        "order": 8
+      },
+      {
+        "id": "operations-quiz",
+        "order": 9,
+        "questions": [
+          {
+            "correct_answer": 2,
+            "options": [
+              "Returns 3",
+              "Returns 3.14",
+              "Raises a ValueError",
+              "Returns 4"
+            ],
+            "explanation": "int() cannot directly convert a string containing a decimal point. You need to convert to float first, then to int.",
+            "type": "multiple_choice",
+            "question": "What happens when you run int('3.14')?",
+            "id": "q1"
+          },
+          {
+            "correct_answer": 1,
+            "options": [
+              "'Pyt'",
+              "'yth'",
+              "'ytho'",
+              "'thon'"
+            ],
+            "explanation": "Slicing [1:4] extracts characters from index 1 up to (but not including) index 4, giving us 'yth'.",
+            "type": "multiple_choice",
+            "question": "What does 'Python'[1:4] return?",
+            "id": "q2"
+          },
+          {
+            "correct_answer": false,
+            "explanation": "append() adds only one element. Use extend() to add multiple elements from another iterable.",
+            "type": "true_false",
+            "question": "The append() method can add multiple elements to a list at once.",
+            "id": "q3"
+          },
+          {
+            "correct_answer": 1,
+            "options": [
+              "bool('0')",
+              "bool(int('0'))",
+              "Both of the above",
+              "Neither of the above"
+            ],
+            "explanation": "bool('0') is True (non-empty string), but bool(int('0')) converts '0' to 0, which is False.",
+            "type": "multiple_choice",
+            "question": "Which converts the string '0' to False?",
+            "id": "q4"
+          },
+          {
+            "correct_answer": false,
+            "explanation": "sort() modifies the list in place and returns None. Use sorted() to get a new sorted list.",
+            "type": "true_false",
+            "question": "list.sort() returns a new sorted list.",
+            "id": "q5"
+          }
+        ],
+        "description": "Test your understanding of type conversion and list operations",
+        "type": "quiz",
+        "title": "Data Operations Knowledge Check"
+      }
+    ],
+    "has_subtopics": false,
+    "estimated_time": 60,
+    "is_published": true,
+    "id": "python-operations-02",
+    "pycoins_reward": 30,
+    "description": "Master data type conversion, indexing, slicing, and list operations in Python",
+    "xp_reward": 150
+  },
+  {
+    "quiz_id": "operators-quiz",
+    "prerequisites": [
+      "python-datatypes-01",
+      "python-operations-02",
+      "python-precedence-03"
+    ],
+    "difficulty": "intermediate",
+    "title": "Selecting Operators to Achieve Results",
+    "created_at": "2025-01-05T10:00:00Z",
+    "category": "python",
+    "updated_at": "2025-01-05T10:00:00Z",
+    "total_subtopics": 0,
+    "tags": [
+      "operators",
+      "arithmetic",
+      "comparison",
+      "logical",
+      "assignment",
+      "identity",
+      "membership"
+    ],
+    "order": 4,
+    "blocks": [
+      {
+        "id": "intro-block",
+        "order": 0,
+        "type": "text",
+        "content": "# Selecting Operators in Python\n\nPython provides a rich set of operators for different purposes. Choosing the right operator is crucial for writing efficient and readable code. This lesson covers:\n\n1. **Arithmetic Operators** - Mathematical calculations\n2. **Assignment Operators** - Storing and updating values\n3. **Comparison Operators** - Comparing values\n4. **Logical Operators** - Combining conditions\n5. **Identity Operators** - Checking object identity\n6. **Membership Operators** - Testing containment\n\nLet's explore when and how to use each type effectively!",
+        "title": "Choosing the Right Operator"
+      },
+      {
+        "id": "arithmetic-operators-example",
+        "code": "# Basic arithmetic operators\na, b = 17, 5\n\nprint(f\"Addition: {a} + {b} = {a + b}\")           # 22\nprint(f\"Subtraction: {a} - {b} = {a - b}\")        # 12\nprint(f\"Multiplication: {a} * {b} = {a * b}\")     # 85\nprint(f\"Division: {a} / {b} = {a / b}\")           # 3.4 (always float)\nprint(f\"Floor Division: {a} // {b} = {a // b}\")   # 3 (integer result)\nprint(f\"Modulo: {a} % {b} = {a % b}\")             # 2 (remainder)\nprint(f\"Exponentiation: {a} ** 2 = {a ** 2}\")     # 289\n\n# Practical uses\n# Calculate average (division)\ngrades = [85, 92, 78, 95, 88]\naverage = sum(grades) / len(grades)\nprint(f\"\\nAverage grade: {average:.2f}\")\n\n# Check if even/odd (modulo)\nnum = 42\nif num % 2 == 0:\n    print(f\"{num} is even\")\n    \n# Calculate area of circle (exponentiation)\nimport math\nradius = 5\narea = math.pi * radius ** 2\nprint(f\"Circle area: {area:.2f}\")",
+        "explanation": "Arithmetic operators perform mathematical operations. Division (/) always returns a float, while floor division (//) returns an integer. The modulo operator (%) is useful for checking divisibility and cycling through values.",
+        "order": 1,
+        "type": "code_example",
+        "title": "Arithmetic Operators"
+      },
+      {
+        "id": "assignment-operators-example",
+        "code": "# Basic assignment\nx = 10\nprint(f\"Initial value: x = {x}\")\n\n# Compound assignment operators\nx += 5    # Same as: x = x + 5\nprint(f\"After x += 5: {x}\")      # 15\n\nx -= 3    # Same as: x = x - 3\nprint(f\"After x -= 3: {x}\")      # 12\n\nx *= 2    # Same as: x = x * 2\nprint(f\"After x *= 2: {x}\")      # 24\n\nx //= 5   # Same as: x = x // 5\nprint(f\"After x //= 5: {x}\")     # 4\n\nx **= 3   # Same as: x = x ** 3\nprint(f\"After x **= 3: {x}\")     # 64\n\n# Practical example: Running total\ntotal = 0\nprices = [19.99, 5.50, 12.75, 8.00]\nfor price in prices:\n    total += price  # Add each price to total\nprint(f\"\\nTotal cost: ${total:.2f}\")\n\n# Multiple assignment\na = b = c = 0  # All variables get the same value\nx, y, z = 1, 2, 3  # Assign multiple values at once\nprint(f\"\\na={a}, b={b}, c={c}\")\nprint(f\"x={x}, y={y}, z={z}\")",
+        "explanation": "Assignment operators store values in variables. Compound operators (+=, -=, etc.) provide a shorthand for updating variables. They make code more concise and often more readable.",
+        "order": 2,
+        "type": "code_example",
+        "title": "Assignment Operators"
+      },
+      {
+        "id": "comparison-operators-example",
+        "code": "# Comparison operators return boolean values\na, b = 10, 20\n\nprint(f\"{a} == {b}: {a == b}\")    # False (equal to)\nprint(f\"{a} != {b}: {a != b}\")    # True (not equal to)\nprint(f\"{a} < {b}: {a < b}\")      # True (less than)\nprint(f\"{a} > {b}: {a > b}\")      # False (greater than)\nprint(f\"{a} <= {b}: {a <= b}\")    # True (less than or equal)\nprint(f\"{a} >= {b}: {a >= b}\")    # False (greater than or equal)\n\n# Practical examples\n# Age verification\nage = 18\nif age >= 18:\n    print(\"\\nYou can vote!\")\n    \n# Grade classification\nscore = 85\nif score >= 90:\n    grade = 'A'\nelif score >= 80:\n    grade = 'B'\nelif score >= 70:\n    grade = 'C'\nelse:\n    grade = 'F'\nprint(f\"Score {score} = Grade {grade}\")\n\n# String comparisons (alphabetical)\nprint(f\"\\n'apple' < 'banana': {'apple' < 'banana'}\")  # True\nprint(f\"'Python' == 'python': {'Python' == 'python'}\")  # False (case-sensitive)",
+        "explanation": "Comparison operators test relationships between values and return boolean results. They're essential for decision-making in programs. String comparisons are case-sensitive and use alphabetical order.",
+        "order": 3,
+        "type": "code_example",
+        "title": "Comparison Operators"
+      },
+      {
+        "id": "logical-operators-example",
+        "code": "# Logical operators: and, or, not\nage = 25\nhas_license = True\nhas_insurance = False\n\n# 'and' - both conditions must be True\ncan_drive = age >= 16 and has_license\nprint(f\"Can drive: {can_drive}\")  # True\n\n# 'or' - at least one condition must be True\nneeds_training = age < 16 or not has_license\nprint(f\"Needs training: {needs_training}\")  # False\n\n# 'not' - inverts the boolean value\nis_insured = not has_insurance\nprint(f\"Is uninsured: {is_insured}\")  # True\n\n# Complex conditions\ncan_rent_car = age >= 25 and has_license and has_insurance\nprint(f\"Can rent car: {can_rent_car}\")  # False\n\n# Short-circuit evaluation\n# 'and' stops at first False, 'or' stops at first True\nresult = False and print(\"This won't print\")\nresult = True or print(\"This won't print either\")\n\n# Practical example: Password validation\npassword = \"SecurePass123\"\nis_long_enough = len(password) >= 8\nhas_digit = any(char.isdigit() for char in password)\nhas_upper = any(char.isupper() for char in password)\n\nis_valid = is_long_enough and has_digit and has_upper\nprint(f\"\\nPassword is valid: {is_valid}\")",
+        "explanation": "Logical operators combine boolean expressions. Python uses short-circuit evaluation: 'and' stops at the first False, 'or' stops at the first True. This can improve performance and prevent errors.",
+        "order": 4,
+        "type": "code_example",
+        "title": "Logical Operators"
+      },
+      {
+        "title": "Calculator Function",
+        "hints": [
+          "Use if-elif statements to check the operation",
+          "Remember to handle division by zero",
+          "Each operation corresponds to a specific operator"
+        ],
+        "starter_code": "def calculate(a, b, operation):\n    # Your code here\n    # operation can be: 'add', 'subtract', 'multiply', 'divide',\n    # 'power', 'modulo', 'floor_divide'\n    pass\n\n# Test cases\nprint(calculate(10, 3, 'add'))          # Should return 13\nprint(calculate(10, 3, 'subtract'))     # Should return 7\nprint(calculate(10, 3, 'multiply'))     # Should return 30\nprint(calculate(10, 3, 'divide'))       # Should return 3.333...\nprint(calculate(10, 3, 'floor_divide')) # Should return 3\nprint(calculate(10, 3, 'modulo'))       # Should return 1\nprint(calculate(2, 8, 'power'))         # Should return 256",
+        "id": "operator-selection-exercise",
+        "language": "python",
+        "instructions": "Create a calculator function that takes two numbers and an operation string, then returns the result using the appropriate operator.",
+        "type": "interactive",
+        "solution": "def calculate(a, b, operation):\n    if operation == 'add':\n        return a + b\n    elif operation == 'subtract':\n        return a - b\n    elif operation == 'multiply':\n        return a * b\n    elif operation == 'divide':\n        if b != 0:\n            return a / b\n        else:\n            return \"Error: Division by zero\"\n    elif operation == 'floor_divide':\n        if b != 0:\n            return a // b\n        else:\n            return \"Error: Division by zero\"\n    elif operation == 'modulo':\n        if b != 0:\n            return a % b\n        else:\n            return \"Error: Division by zero\"\n    elif operation == 'power':\n        return a ** b\n    else:\n        return \"Error: Unknown operation\"\n\n# Test cases\nprint(calculate(10, 3, 'add'))          # 13\nprint(calculate(10, 3, 'subtract'))     # 7\nprint(calculate(10, 3, 'multiply'))     # 30\nprint(calculate(10, 3, 'divide'))       # 3.333...\nprint(calculate(10, 3, 'floor_divide')) # 3\nprint(calculate(10, 3, 'modulo'))       # 1\nprint(calculate(2, 8, 'power'))         # 256",
+        "order": 5
+      },
+      {
+        "id": "identity-operators-example",
+        "code": "# Identity operators: is, is not\n# Check if two variables refer to the same object\n\n# With immutable objects (numbers, strings)\na = 1000\nb = 1000\nc = a\n\nprint(f\"a == b: {a == b}\")      # True (same value)\nprint(f\"a is b: {a is b}\")      # False (different objects)\nprint(f\"a is c: {a is c}\")      # True (same object)\n\n# With mutable objects (lists)\nlist1 = [1, 2, 3]\nlist2 = [1, 2, 3]\nlist3 = list1\n\nprint(f\"\\nlist1 == list2: {list1 == list2}\")  # True (same content)\nprint(f\"list1 is list2: {list1 is list2}\")    # False (different objects)\nprint(f\"list1 is list3: {list1 is list3}\")    # True (same object)\n\n# Membership operators: in, not in\n# Check if a value exists in a sequence\n\n# With strings\ntext = \"Python Programming\"\nprint(f\"\\n'Python' in text: {'Python' in text}\")      # True\nprint(f\"'java' in text: {'java' in text}\")            # False\nprint(f\"'java' not in text: {'java' not in text}\")    # True\n\n# With lists\nfruits = ['apple', 'banana', 'orange']\nprint(f\"\\n'banana' in fruits: {'banana' in fruits}\")  # True\nprint(f\"'grape' in fruits: {'grape' in fruits}\")      # False\n\n# With dictionaries (checks keys by default)\nscores = {'Alice': 92, 'Bob': 87, 'Charlie': 95}\nprint(f\"\\n'Alice' in scores: {'Alice' in scores}\")    # True\nprint(f\"92 in scores: {92 in scores}\")                # False (92 is a value, not a key)\nprint(f\"92 in scores.values(): {92 in scores.values()}\")  # True",
+        "explanation": "Identity operators check if variables refer to the same object in memory. Membership operators test whether a value exists in a sequence. Use 'is' for None checks and object identity, '==' for value equality.",
+        "order": 6,
+        "type": "code_example",
+        "title": "Identity and Membership Operators"
+      },
+      {
+        "id": "operator-combination-example",
+        "code": "# Real-world example: User authentication system\nusers = {\n    'alice@email.com': {'password': 'SecurePass123', 'age': 25, 'premium': True},\n    'bob@email.com': {'password': 'MyPass456', 'age': 17, 'premium': False}\n}\n\ndef can_access_content(email, password, content_rating):\n    # Check if user exists\n    if email not in users:\n        return False, \"User not found\"\n    \n    user = users[email]\n    \n    # Verify password (using ==)\n    if user['password'] != password:\n        return False, \"Invalid password\"\n    \n    # Check age requirement (using >= and and)\n    if content_rating == 'R' and user['age'] < 18:\n        return False, \"Age restriction\"\n    \n    # Check premium requirement (using or)\n    if content_rating == 'Premium' and not user['premium']:\n        return False, \"Premium subscription required\"\n    \n    return True, \"Access granted\"\n\n# Test different scenarios\nprint(can_access_content('alice@email.com', 'SecurePass123', 'R'))\nprint(can_access_content('bob@email.com', 'MyPass456', 'R'))\nprint(can_access_content('bob@email.com', 'MyPass456', 'PG'))\n\n# Example: Smart discount calculator\ndef calculate_discount(price, quantity, is_member, coupon_code=None):\n    discount = 0\n    \n    # Quantity discount (using >= and *=)\n    if quantity >= 10:\n        discount += 0.1  # 10% for bulk\n    elif quantity >= 5:\n        discount += 0.05  # 5% for medium quantity\n    \n    # Member discount (using and)\n    if is_member and price >= 50:\n        discount += 0.15  # Extra 15% for members on large purchases\n    \n    # Coupon discount (using in and or)\n    valid_coupons = ['SAVE20', 'SPECIAL25']\n    if coupon_code in valid_coupons:\n        discount += 0.20 if coupon_code == 'SAVE20' else 0.25\n    \n    # Calculate final price\n    final_price = price * quantity * (1 - discount)\n    \n    return final_price, discount * 100\n\nprice, discount = calculate_discount(30, 5, True, 'SAVE20')\nprint(f\"\\nFinal price: ${price:.2f} (Discount: {discount:.0f}%)\")",
+        "explanation": "Real-world applications often require combining multiple operators. Use clear variable names and comments when logic gets complex. Break complex conditions into smaller, named boolean variables for better readability.",
+        "order": 7,
+        "type": "code_example",
+        "title": "Combining Operators Effectively"
+      },
+      {
+        "title": "Grade Analysis System",
+        "hints": [
+          "Use arithmetic operators to calculate averages",
+          "Use comparison operators for grade boundaries",
+          "Use logical operators to combine conditions for honors",
+          "Consider edge cases like empty score lists"
+        ],
+        "starter_code": "def analyze_student(name, scores, attendance_rate, participation):\n    # Your code here\n    # scores: list of test scores\n    # attendance_rate: percentage (0-100)\n    # participation: boolean\n    \n    # Calculate average score\n    # Determine letter grade (A: 90+, B: 80-89, C: 70-79, D: 60-69, F: <60)\n    # Check if eligible for honors (avg >= 85 and attendance >= 90%)\n    # Apply penalties/bonuses\n    # Return a dictionary with results\n    pass\n\n# Test cases\nresult1 = analyze_student(\n    \"Alice\", \n    [92, 88, 95, 91], \n    attendance_rate=95, \n    participation=True\n)\nprint(result1)\n# Expected: {'name': 'Alice', 'average': 91.5, 'grade': 'A', 'honors': True, ...}\n\nresult2 = analyze_student(\n    \"Bob\", \n    [75, 68, 72, 70], \n    attendance_rate=75, \n    participation=False\n)\nprint(result2)",
+        "id": "complex-operator-exercise",
+        "language": "python",
+        "instructions": "Create a comprehensive grade analysis function that uses various operators to categorize students based on their scores, attendance, and participation.",
+        "type": "interactive",
+        "solution": "def analyze_student(name, scores, attendance_rate, participation):\n    # Calculate average score\n    if not scores:  # Handle empty list\n        return {'error': 'No scores provided'}\n    \n    average = sum(scores) / len(scores)\n    \n    # Determine letter grade\n    if average >= 90:\n        grade = 'A'\n    elif average >= 80:\n        grade = 'B'\n    elif average >= 70:\n        grade = 'C'\n    elif average >= 60:\n        grade = 'D'\n    else:\n        grade = 'F'\n    \n    # Apply attendance penalty/bonus\n    final_average = average\n    if attendance_rate < 70:\n        final_average *= 0.9  # 10% penalty for poor attendance\n    elif attendance_rate >= 95:\n        final_average *= 1.02  # 2% bonus for excellent attendance\n    \n    # Apply participation bonus\n    if participation and average >= 70:\n        final_average += 2  # 2 point bonus\n    \n    # Recalculate grade after adjustments\n    if final_average >= 90:\n        final_grade = 'A'\n    elif final_average >= 80:\n        final_grade = 'B'\n    elif final_average >= 70:\n        final_grade = 'C'\n    elif final_average >= 60:\n        final_grade = 'D'\n    else:\n        final_grade = 'F'\n    \n    # Check honors eligibility\n    honors = average >= 85 and attendance_rate >= 90\n    \n    # Check if at risk\n    at_risk = average < 70 or attendance_rate < 75\n    \n    return {\n        'name': name,\n        'average': round(average, 2),\n        'final_average': round(final_average, 2),\n        'grade': grade,\n        'final_grade': final_grade,\n        'attendance_rate': attendance_rate,\n        'participation': participation,\n        'honors': honors,\n        'at_risk': at_risk,\n        'highest_score': max(scores),\n        'lowest_score': min(scores)\n    }\n\n# Test cases\nresult1 = analyze_student(\n    \"Alice\", \n    [92, 88, 95, 91], \n    attendance_rate=95, \n    participation=True\n)\nprint(\"Alice's Results:\")\nfor key, value in result1.items():\n    print(f\"  {key}: {value}\")\n\nprint(\"\\nBob's Results:\")\nresult2 = analyze_student(\n    \"Bob\", \n    [75, 68, 72, 70], \n    attendance_rate=75, \n    participation=False\n)\nfor key, value in result2.items():\n    print(f\"  {key}: {value}\")",
+        "order": 8
+      },
+      {
+        "id": "operators-quiz",
+        "order": 9,
+        "questions": [
+          {
+            "correct_answer": 1,
+            "options": [
+              "number / 2 == 0",
+              "number % 2 == 0",
+              "number // 2 == 0",
+              "number ** 2 == 0"
+            ],
+            "explanation": "The modulo operator (%) returns the remainder after division. A number is even if number % 2 equals 0.",
+            "type": "multiple_choice",
+            "question": "Which operator would you use to check if a number is even?",
+            "id": "q1"
+          },
+          {
+            "correct_answer": 3,
+            "options": [
+              "counter = counter + 1",
+              "counter += 1",
+              "counter++ ",
+              "Both A and B are equally efficient"
+            ],
+            "explanation": "Both 'counter = counter + 1' and 'counter += 1' are valid and equally efficient. Python doesn't have ++ operator.",
+            "type": "multiple_choice",
+            "question": "What's the most efficient way to increase a counter by 1?",
+            "id": "q2"
+          },
+          {
+            "correct_answer": false,
+            "explanation": "'is' checks object identity, not value equality. Use '==' to compare string values, and 'is' only for checking None or object identity.",
+            "type": "true_false",
+            "question": "You should use 'is' to compare string values.",
+            "id": "q3"
+          },
+          {
+            "correct_answer": 2,
+            "options": [
+              "exists",
+              "has",
+              "in",
+              "contains"
+            ],
+            "explanation": "The 'in' operator checks membership. Example: if 'apple' in fruits_list:",
+            "type": "multiple_choice",
+            "question": "Which operator checks if an item exists in a list?",
+            "id": "q4"
+          },
+          {
+            "correct_answer": false,
+            "explanation": "'or' returns the first truthy value or the last value if all are falsy. For example, 'None or 5' returns 5, not True.",
+            "type": "true_false",
+            "question": "The expression 'x or y' returns True or False only.",
+            "id": "q5"
+          }
+        ],
+        "description": "Test your understanding of when to use different operators",
+        "type": "quiz",
+        "title": "Operator Selection Knowledge Check"
+      }
+    ],
+    "has_subtopics": false,
+    "estimated_time": 55,
+    "is_published": true,
+    "id": "python-operators-04",
+    "pycoins_reward": 30,
+    "description": "Master the selection and use of Python operators for different programming tasks",
+    "xp_reward": 150
+  },
+  {
+    "quiz_id": "precedence-quiz",
+    "prerequisites": [
+      "python-datatypes-01",
+      "python-operations-02"
+    ],
+    "difficulty": "intermediate",
+    "order": 3,
+    "created_at": "2025-01-05T10:00:00Z",
+    "total_subtopics": 3,
+    "subtopics": [
+      {
+        "id": "introduction",
+        "title": "Understanding Precedence",
+        "order": 0,
+        "blocks": [
+          {
+            "title": "Understanding Operator Precedence",
+            "order": 0,
+            "type": "text",
+            "content": "# Operator Precedence in Python\n\nWhen Python evaluates an expression with multiple operators, it follows specific rules to determine which operations to perform first. This is called **operator precedence**.\n\nJust like in mathematics where multiplication comes before addition (PEMDAS/BODMAS), Python has its own hierarchy of operations:\n\n1. **Parentheses** - Highest priority\n2. **Exponentiation** (`**`)\n3. **Unary operators** (`+x`, `-x`)\n4. **Multiplication/Division** (`*`, `/`, `//`, `%`)\n5. **Addition/Subtraction** (`+`, `-`)\n6. **Comparisons** (`<`, `>`, `<=`, `>=`, `==`, `!=`)\n7. **Boolean operators** (`not`, `and`, `or`)\n8. **Assignment operators** (`=`, `+=`, `-=`, etc.)\n\nUnderstanding precedence helps you write correct expressions and avoid bugs!",
+            "id": "intro-block"
+          }
+        ]
+      },
+      {
+        "id": "arithmetic-precedence",
+        "title": "Arithmetic Precedence",
+        "order": 1,
+        "blocks": [
+          {
+            "title": "Basic Arithmetic Precedence",
+            "code": "# Without parentheses - follows precedence rules\nresult1 = 2 + 3 * 4\nprint(f\"2 + 3 * 4 = {result1}\")  # 14 (not 20!)\n# Evaluated as: 2 + (3 * 4) = 2 + 12 = 14\n\n# With parentheses - override precedence\nresult2 = (2 + 3) * 4\nprint(f\"(2 + 3) * 4 = {result2}\")  # 20\n# Evaluated as: 5 * 4 = 20\n\n# Multiple operators\nresult3 = 10 + 5 * 2 - 3\nprint(f\"10 + 5 * 2 - 3 = {result3}\")  # 17\n# Step by step:\n# 1. 5 * 2 = 10 (multiplication first)\n# 2. 10 + 10 = 20 (addition)\n# 3. 20 - 3 = 17 (subtraction)",
+            "explanation": "Multiplication and division have higher precedence than addition and subtraction. Operations of the same precedence are evaluated left to right. Use parentheses to override default precedence.",
+            "order": 0,
+            "type": "code_example",
+            "id": "basic-precedence-example"
+          }
+        ]
+      },
+      {
+        "id": "practice",
+        "title": "Practice & Assessment",
+        "order": 2,
+        "blocks": [
+          {
+            "title": "Precedence Knowledge Check",
+            "order": 0,
+            "questions": [
+              {
+                "question": "What is the result of: 10 + 5 * 2?",
+                "options": [
+                  "30",
+                  "20",
+                  "15",
+                  "25"
+                ],
+                "explanation": "Multiplication has higher precedence than addition: 5 * 2 = 10, then 10 + 10 = 20.",
+                "type": "multiple_choice",
+                "correct_answer": 1,
+                "id": "q1"
+              },
+              {
+                "question": "What is the result of: -3 ** 2?",
+                "options": [
+                  "9",
+                  "-9",
+                  "6",
+                  "-6"
+                ],
+                "explanation": "Exponentiation has higher precedence than unary minus: 3 ** 2 = 9, then -9.",
+                "type": "multiple_choice",
+                "correct_answer": 1,
+                "id": "q2"
+              },
+              {
+                "question": "In the expression 'True or False and False', the 'and' operation is performed first.",
+                "explanation": "'and' has higher precedence than 'or', so 'False and False' is evaluated first, resulting in False, then 'True or False' gives True.",
+                "type": "true_false",
+                "correct_answer": true,
+                "id": "q3"
+              }
+            ],
+            "description": "Test your understanding of operator precedence",
+            "type": "quiz",
+            "id": "precedence-quiz"
+          }
+        ]
+      }
+    ],
+    "updated_at": "2025-01-05T10:00:00Z",
+    "tags": [
+      "operators",
+      "precedence",
+      "expressions",
+      "arithmetic",
+      "logical"
+    ],
+    "title": "Operator Precedence in Python",
+    "has_subtopics": true,
+    "estimated_time": 50,
+    "id": "python-precedence-03",
+    "is_published": true,
+    "pycoins_reward": 25,
+    "description": "Master the sequence of execution based on operator precedence in Python expressions",
+    "xp_reward": 120
+  }
+]

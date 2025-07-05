@@ -848,90 +848,75 @@ class FirebaseService:
             
             # Save term
             term_ref.set(term_data)
-            
-            logger.info(f"Vocabulary term {term_id} saved successfully")
+            logger.debug(f"Saved vocabulary term: {term_id}")
             return True
             
         except Exception as e:
             logger.error(f"Error saving vocabulary term {term_id}: {str(e)}")
             return False
     
-    def set_enhanced_lesson(self, lesson_id: str, lesson_data: Dict[str, Any]) -> bool:
-        """Save enhanced lesson metadata to Firebase."""
+    def delete_vocabulary_term(self, term_id: str) -> bool:
+        """Delete a vocabulary term from Firebase."""
         if not self.is_available():
-            logger.warning("Firebase not available, cannot save enhanced lesson")
+            logger.warning("Firebase not available for vocabulary term deletion")
             return False
         
         try:
-            # Save lesson metadata without blocks (they're stored separately)
-            # Remove blocks from the data if present to avoid duplication
-            if 'blocks' in lesson_data:
-                del lesson_data['blocks']
-                
-            # Add timestamps if not present
-            current_time = datetime.now().isoformat()
-            if 'updated_at' not in lesson_data:
-                lesson_data['updated_at'] = current_time
-                
-            if 'created_at' not in lesson_data and not self.db.collection('lessons').document(lesson_id).get().exists:
-                lesson_data['created_at'] = current_time
-            
-            # Save to Firestore
-            self.db.collection('lessons').document(lesson_id).set(lesson_data, merge=True)
-            logger.info(f"Saved enhanced lesson metadata for {lesson_id}")
+            term_ref = self.db.collection('vocabulary').document(term_id)
+            term_ref.delete()
+            logger.debug(f"Deleted vocabulary term: {term_id}")
             return True
             
         except Exception as e:
-            logger.error(f"Error saving enhanced lesson {lesson_id}: {str(e)}")
+            logger.error(f"Error deleting vocabulary term {term_id}: {str(e)}")
             return False
     
-    def set_lesson_block(self, lesson_id: str, block_id: str, block_data: Dict[str, Any]) -> bool:
-        """Save a lesson block to Firebase."""
+    def get_vocabulary_stats(self) -> Dict[str, Any]:
+        """Get statistics about vocabulary collection."""
         if not self.is_available():
-            logger.warning("Firebase not available, cannot save lesson block")
-            return False
+            logger.warning("Firebase not available for vocabulary stats")
+            return {
+                'total_terms': 0,
+                'categories': [],
+                'difficulty_breakdown': {}
+            }
         
         try:
-            # Create a reference to the blocks subcollection
-            block_ref = self.db.collection('lessons').document(lesson_id).collection('blocks').document(block_id)
+            # Get all vocabulary terms
+            all_terms = self.get_all_vocabulary()
             
-            # Add timestamp
-            if 'updated_at' not in block_data:
-                block_data['updated_at'] = datetime.now().isoformat()
+            # Calculate statistics
+            total_terms = len(all_terms)
+            categories = set()
+            difficulty_breakdown = {}
             
-            # Save block data
-            block_ref.set(block_data, merge=True)
-            logger.info(f"Saved block {block_id} for lesson {lesson_id}")
-            return True
+            for term in all_terms:
+                # Count categories
+                category = term.get('category', 'Uncategorized')
+                categories.add(category)
+                
+                # Count difficulty levels
+                difficulty = term.get('difficulty', 'unknown')
+                difficulty_breakdown[difficulty] = difficulty_breakdown.get(difficulty, 0) + 1
+            
+            stats = {
+                'total_terms': total_terms,
+                'categories': sorted(list(categories)),
+                'category_count': len(categories),
+                'difficulty_breakdown': difficulty_breakdown
+            }
+            
+            logger.debug(f"Retrieved vocabulary stats: {stats}")
+            return stats
             
         except Exception as e:
-            logger.error(f"Error saving block {block_id} for lesson {lesson_id}: {str(e)}")
-            return False
+            logger.error(f"Error retrieving vocabulary stats: {str(e)}")
+            return {
+                'total_terms': 0,
+                'categories': [],
+                'difficulty_breakdown': {}
+            }
     
-    def get_lesson_blocks(self, lesson_id: str) -> Optional[list]:
-        """Get all blocks for a lesson from Firebase."""
-        if not self.is_available():
-            logger.warning("Firebase not available, cannot get lesson blocks")
-            return None
-        
-        try:
-            # Get blocks from the subcollection, ordered by 'order' field
-            blocks_ref = self.db.collection('lessons').document(lesson_id).collection('blocks').order_by('order')
-            blocks_docs = blocks_ref.stream()
-            
-            blocks = []
-            for doc in blocks_docs:
-                block_data = doc.to_dict()
-                block_data['id'] = doc.id  # Ensure block ID is included
-                blocks.append(block_data)
-            
-            logger.debug(f"Retrieved {len(blocks)} blocks for lesson {lesson_id}")
-            return blocks
-            
-        except Exception as e:
-            logger.error(f"Error retrieving blocks for lesson {lesson_id}: {str(e)}")
-            return None
-
 # Legacy support functions for backward compatibility
 # TODO: Remove in Phase 2
 db = None

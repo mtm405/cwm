@@ -46,10 +46,41 @@ def lessons():
                 lesson['completed'] = progress_data.get('completed', False)
                 lesson['completed_subtopics'] = len(progress_data.get('completed_subtopics', []))
                 lesson['progress'] = progress_data.get('progress', 0)
+                
+                # Mark individual subtopics as completed
+                completed_subtopic_ids = progress_data.get('completed_subtopics', [])
+                if lesson.get('subtopics'):
+                    for i, subtopic in enumerate(lesson['subtopics']):
+                        if isinstance(subtopic, dict):
+                            # If subtopic is already an object, add completed flag
+                            subtopic_id = subtopic.get('id', f'subtopic-{i}')
+                            subtopic['completed'] = subtopic_id in completed_subtopic_ids
+                        else:
+                            # If subtopic is a string, convert to object with completed flag
+                            subtopic_id = f'subtopic-{i}'
+                            lesson['subtopics'][i] = {
+                                'id': subtopic_id,
+                                'title': subtopic,
+                                'order': i,
+                                'completed': subtopic_id in completed_subtopic_ids
+                            }
             else:
                 lesson['completed'] = False
                 lesson['completed_subtopics'] = 0
                 lesson['progress'] = 0
+                
+                # Mark all subtopics as not completed
+                if lesson.get('subtopics'):
+                    for i, subtopic in enumerate(lesson['subtopics']):
+                        if isinstance(subtopic, dict):
+                            subtopic['completed'] = False
+                        else:
+                            lesson['subtopics'][i] = {
+                                'id': f'subtopic-{i}',
+                                'title': subtopic,
+                                'order': i,
+                                'completed': False
+                            }
         
         current_app.logger.info("Calculating overall progress...")
         # Calculate overall progress
@@ -128,11 +159,10 @@ def lesson_view(lesson_id):
         return "Error loading lesson", 500
 
 @lesson_bp.route('/lesson/<lesson_id>')
-@lesson_bp.route('/lesson/<lesson_id>/<subtopic_id>')
-def lesson_fixed(lesson_id, subtopic_id=None):
-    """Individual lesson page with Firebase block transformation and subtopic support"""
+def lesson_fixed(lesson_id):
+    """Individual lesson page with Firebase block transformation"""
     try:
-        current_app.logger.info(f"=== LESSON ROUTE STARTED for lesson_id: {lesson_id}, subtopic_id: {subtopic_id} ===")
+        current_app.logger.info(f"=== LESSON ROUTE STARTED for lesson_id: {lesson_id} ===")
         
         config = get_config()
         current_app.logger.info("Got config")
@@ -148,49 +178,8 @@ def lesson_fixed(lesson_id, subtopic_id=None):
         if not lesson_data:
             current_app.logger.error(f"Lesson {lesson_id} not found")
             return "Lesson not found", 404
-            
-        # Handle subtopic navigation
-        if subtopic_id:
-            # Validate subtopic exists
-            valid_subtopic = False
-            if 'subtopics' in lesson_data:
-                for subtopic in lesson_data['subtopics']:
-                    if subtopic.get('id') == subtopic_id:
-                        valid_subtopic = True
-                        break
-            
-            if not valid_subtopic:
-                current_app.logger.error(f"Subtopic {subtopic_id} not found in lesson {lesson_id}")
-                return f"Subtopic {subtopic_id} not found", 404
-                
-            current_app.logger.info(f"Valid subtopic found: {subtopic_id}")
         
-        # Add subtopic navigation info to lesson data
-        if 'subtopics' in lesson_data and lesson_data['subtopics']:
-            lesson_data['has_subtopics'] = True
-            lesson_data['current_subtopic'] = subtopic_id
-            
-            # Find current subtopic index
-            current_subtopic_index = 0
-            if subtopic_id:
-                for i, subtopic in enumerate(lesson_data['subtopics']):
-                    if subtopic.get('id') == subtopic_id:
-                        current_subtopic_index = i
-                        break
-            
-            lesson_data['current_subtopic_index'] = current_subtopic_index
-        else:
-            lesson_data['has_subtopics'] = False
-            lesson_data['current_subtopic'] = None
-            lesson_data['current_subtopic_index'] = 0
-
         current_app.logger.info(f"Lesson title: {lesson_data.get('title', 'No title')}")
-        
-        # Get user progress for this lesson
-        current_app.logger.info("Loading user progress")
-        user_progress = get_user_progress(user['uid'] if user else 'dev-user-001')
-        lesson_progress = user_progress.get(lesson_id, {})
-        current_app.logger.info(f"User progress for lesson: {lesson_progress}")
         
         # CRITICAL FIX: Only transform to blocks if requested by frontend
         firebase_service = current_app.config.get('firebase_service')

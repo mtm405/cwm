@@ -466,7 +466,7 @@
 }
 
 .code_example-block .block-header,
-.code-example-block .block-header {
+.code_example-block .block-header {
     background: linear-gradient(135deg, rgba(230, 126, 34, 0.05) 0%, rgba(255, 255, 255, 0.9) 100%);
 }
 
@@ -1131,56 +1131,60 @@
     border-radius: 2px;
 }
 
-.subtopic-tab {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    background: var(--bg-secondary);
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.9rem;
-    font-weight: 500;
-    white-space: nowrap;
-    position: relative;
-    min-width: fit-content;
+.subtopic-tabs-container .subtopic-tab {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    padding: 0.75rem 1rem !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    background: var(--bg-secondary) !important;
+    color: var(--text-secondary) !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    white-space: nowrap !important;
+    position: relative !important;
+    min-width: fit-content !important;
     /* Enhanced contrast for better visibility */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    /* Override skeleton and other framework styles */
+    margin: 0 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
-/* Focus styles for accessibility */
-.subtopic-tab:focus {
-    outline: 2px solid var(--primary-color);
-    outline-offset: 2px;
+/* Focus styles for accessibility - Enhanced specificity */
+.subtopic-tabs-container .subtopic-tab:focus {
+    outline: 2px solid var(--primary-color) !important;
+    outline-offset: 2px !important;
 }
 
-.subtopic-tab:focus-visible {
-    outline: 2px solid var(--primary-color);
-    outline-offset: 2px;
+.subtopic-tabs-container .subtopic-tab:focus-visible {
+    outline: 2px solid var(--primary-color) !important;
+    outline-offset: 2px !important;
 }
 
 /* Remove default focus outline for mouse users */
-.subtopic-tab:focus:not(:focus-visible) {
-    outline: none;
+.subtopic-tabs-container .subtopic-tab:focus:not(:focus-visible) {
+    outline: none !important;
 }
 
-.subtopic-tab:hover {
-    border-color: var(--primary-color);
-    background: var(--primary-color);
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.3);
+.subtopic-tabs-container .subtopic-tab:hover {
+    border-color: var(--primary-color) !important;
+    background: var(--primary-color) !important;
+    color: white !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.3) !important;
 }
 
-.subtopic-tab.active {
-    border-color: var(--primary-color);
-    background: var(--primary-color);
-    color: white;
-    box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.3);
-    font-weight: 600;
+.subtopic-tabs-container .subtopic-tab.active {
+    border-color: var(--primary-color) !important;
+    background: var(--primary-color) !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.3) !important;
+    font-weight: 600 !important;
 }
 
 /* Enhanced visibility for different themes */
@@ -1655,5 +1659,109 @@
     }
 }
 
-/* === End static/css/lesson.css === */
+/* ================================
+   ENHANCED SUBTOPIC TAB VISIBILITY - DEBUG MODE
+   ================================ */
+
+/* Force visibility with highest specificity */
+.lesson-container .subtopic-tabs-container {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    margin-bottom: 2rem !important;
+    background: var(--bg-card) !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+    box-shadow: var(--shadow) !important;
+    border: 1px solid var(--border-color) !important;
+    /* Debug: Add a bright border to see if container is visible */
+    border: 3px solid #ff0000 !important;
+    background: #1a1a2e !important;
+}
+
+.lesson-container .subtopic-tabs-container .subtopic-tabs {
+    display: flex !important;
+    gap: 0.5rem !important;
+    margin-bottom: 1rem !important;
+    overflow-x: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: var(--border-color) transparent !important;
+    /* Debug: Add bright background */
+    background: #16213e !important;
+    padding: 0.5rem !important;
+}
+
+/* Force subtopic tabs to be visible with maximum specificity */
+.lesson-container .subtopic-tabs-container .subtopic-tabs .subtopic-tab {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    padding: 0.75rem 1rem !important;
+    border: 2px solid #6C63FF !important;
+    border-radius: 8px !important;
+    background: #16213e !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    white-space: nowrap !important;
+    position: relative !important;
+    min-width: fit-content !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    margin: 0 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    /* Debug: Make them very visible */
+    min-height: 40px !important;
+    z-index: 9999 !important;
+}
+
+.lesson-container .subtopic-tabs-container .subtopic-tabs .subtopic-tab:hover {
+    border-color: #6C63FF !important;
+    background: #6C63FF !important;
+    color: white !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3) !important;
+}
+
+.lesson-container .subtopic-tabs-container .subtopic-tabs .subtopic-tab.active {
+    border-color: #6C63FF !important;
+    background: #6C63FF !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3) !important;
+    font-weight: 600 !important;
+}
+
+/* Force tab text to be visible */
+.lesson-container .subtopic-tabs-container .subtopic-tabs .subtopic-tab .subtopic-title {
+    font-weight: 600 !important;
+    color: inherit !important;
+    display: block !important;
+}
+
+.lesson-container .subtopic-tabs-container .subtopic-tabs .subtopic-tab .subtopic-check {
+    font-size: 0.8rem !important;
+    opacity: 0.6 !important;
+    transition: all 0.3s ease !important;
+    display: inline-block !important;
+}
+
+.lesson-container .subtopic-tabs-container .subtopic-tabs .subtopic-tab .subtopic-order {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    border-radius: 50% !important;
+    width: 20px !important;
+    height: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    margin-left: auto !important;
+    min-width: 20px !important;
+    min-height: 20px !important;
+}
+
+/* ================================ */
 

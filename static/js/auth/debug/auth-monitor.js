@@ -338,38 +338,11 @@
         authServiceEl.textContent = authService ? '✅ Authenticated' : '❌ Not Authenticated';
         authServiceEl.className = authService ? 'auth-debug-status-success' : 'auth-debug-status-error';
         
-        // Check session-based authentication via backend
-        fetch('/auth/status', { credentials: 'same-origin' })
-            .then(response => response.json())
-            .then(sessionData => {
-                const isSessionAuth = sessionData.success && sessionData.authenticated;
-                
-                // Update overall status - improved logic with session check
-                const isAuthenticated = (authToken && currentUser) || isSessionAuth;
-                const overallEl = document.getElementById('overall-auth-status');
-                overallEl.textContent = isAuthenticated ? '✅ AUTHENTICATED' : '❌ NOT AUTHENTICATED';
-                overallEl.className = isAuthenticated ? 'auth-debug-status-success' : 'auth-debug-status-error';
-                
-                // If session is authenticated but no local user, restore from session
-                if (isSessionAuth && !window.currentUser && sessionData.user) {
-                    window.currentUser = sessionData.user;
-                    localStorage.setItem('cwm_user_profile', JSON.stringify(sessionData.user));
-                    console.log('👤 User restored from session:', sessionData.user);
-                    
-                    // Update the display
-                    currentUserEl.textContent = '✅ Present (From Session)';
-                    currentUserEl.className = 'auth-debug-status-success';
-                }
-            })
-            .catch(error => {
-                console.warn('Failed to check session status:', error);
-                
-                // Fallback to localStorage-only check
-                const isAuthenticated = authToken && currentUser;
-                const overallEl = document.getElementById('overall-auth-status');
-                overallEl.textContent = isAuthenticated ? '✅ AUTHENTICATED' : '❌ NOT AUTHENTICATED';
-                overallEl.className = isAuthenticated ? 'auth-debug-status-success' : 'auth-debug-status-error';
-            });
+        // Update overall status - improved logic
+        const isAuthenticated = authToken && (currentUser || authService);
+        const overallEl = document.getElementById('overall-auth-status');
+        overallEl.textContent = isAuthenticated ? '✅ AUTHENTICATED' : '❌ NOT AUTHENTICATED';
+        overallEl.className = isAuthenticated ? 'auth-debug-status-success' : 'auth-debug-status-error';
         
         // If we have a token but no user, try to restore it
         if (authToken && !window.currentUser) {
@@ -481,71 +454,43 @@
         let fixed = false;
         let fixes = [];
         
-        // Fix 0: Check session state first
-        fetch('/auth/status', { credentials: 'same-origin' })
-            .then(response => response.json())
-            .then(sessionData => {
-                if (sessionData.success && sessionData.authenticated && sessionData.user) {
-                    if (!window.currentUser) {
-                        window.currentUser = sessionData.user;
-                        localStorage.setItem('cwm_user_profile', JSON.stringify(sessionData.user));
-                        fixed = true;
-                        fixes.push('Restored user from session');
-                        console.log('✅ Restored user from session:', sessionData.user);
-                        
-                        // Update UI
-                        updateAuthStatus();
-                        alert(`Fixed authentication issues:\n${fixes.join('\n')}`);
-                    }
-                    return;
-                }
-                
-                // If no session auth, try local fixes
-                performLocalFixes();
-            })
-            .catch(error => {
-                console.warn('Session check failed, trying local fixes:', error);
-                performLocalFixes();
-            });
-            
-        function performLocalFixes() {
-            // Fix 1: Restore user object from localStorage if missing
-            if (!window.currentUser) {
-                const userProfile = localStorage.getItem('cwm_user_profile');
-                if (userProfile) {
-                    try {
-                        window.currentUser = JSON.parse(userProfile);
-                        fixed = true;
-                        fixes.push('Restored window.currentUser from localStorage');
-                        console.log('✅ Restored window.currentUser:', window.currentUser);
-                    } catch (e) {
-                        console.error('❌ Failed to restore user from storage:', e);
-                    }
+        // Fix 1: Restore user object from localStorage if missing
+        if (!window.currentUser) {
+            const userProfile = localStorage.getItem('cwm_user_profile');
+            if (userProfile) {
+                try {
+                    window.currentUser = JSON.parse(userProfile);
+                    fixed = true;
+                    fixes.push('Restored window.currentUser from localStorage');
+                    console.log('✅ Restored window.currentUser:', window.currentUser);
+                } catch (e) {
+                    console.error('❌ Failed to restore user from storage:', e);
                 }
             }
-            
-            // Fix 2: Try to extract user from token if still missing
-            if (!window.currentUser) {
-                const authToken = localStorage.getItem('auth_token') || localStorage.getItem('cwm_user_token');
-                if (authToken && authToken.includes('.')) {
-                    try {
-                        const payload = JSON.parse(atob(authToken.split('.')[1]));
-                        const userInfo = {
-                            id: payload.sub || payload.user_id,
-                            email: payload.email,
-                            name: payload.name,
-                            picture: payload.picture,
-                            given_name: payload.given_name,
-                            family_name: payload.family_name
-                        };
-                        
-                        if (userInfo.id || userInfo.email) {
-                            window.currentUser = userInfo;
-                            localStorage.setItem('cwm_user_profile', JSON.stringify(userInfo));
-                            fixed = true;
-                            fixes.push('Extracted and restored user from token');
-                            console.log('✅ Extracted user from token:', userInfo);
-                        }
+        }
+        
+        // Fix 2: Try to extract user from token if still missing
+        if (!window.currentUser) {
+            const authToken = localStorage.getItem('auth_token') || localStorage.getItem('cwm_user_token');
+            if (authToken && authToken.includes('.')) {
+                try {
+                    const payload = JSON.parse(atob(authToken.split('.')[1]));
+                    const userInfo = {
+                        id: payload.sub || payload.user_id,
+                        email: payload.email,
+                        name: payload.name,
+                        picture: payload.picture,
+                        given_name: payload.given_name,
+                        family_name: payload.family_name
+                    };
+                    
+                    if (userInfo.id || userInfo.email) {
+                        window.currentUser = userInfo;
+                        localStorage.setItem('cwm_user_profile', JSON.stringify(userInfo));
+                        fixed = true;
+                        fixes.push('Extracted and restored user from token');
+                        console.log('✅ Extracted user from token:', userInfo);
+                    }
                 } catch (e) {
                     console.error('❌ Failed to extract user from token:', e);
                 }

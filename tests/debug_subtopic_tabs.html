@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Subtopic Tabs</title>
+    <link rel="stylesheet" href="static/css/base/variables.css">
+    <link rel="stylesheet" href="static/css/bundles/lessons.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #1a1a2e;
+            color: #ffffff;
+            padding: 2rem;
+            margin: 0;
+        }
+        
+        .debug-info {
+            background: #16213e;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid #2a2a4e;
+        }
+        
+        .debug-info h3 {
+            color: #6C63FF;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-info">
+        <h3>🐛 Subtopic Tabs Debug Page</h3>
+        <p>This page tests the subtopic tabs in isolation without any framework interference.</p>
+        <p id="status">Loading...</p>
+    </div>
+
+    <!-- Test Subtopic Tabs -->
+    <div class="lesson-container">
+        <div class="subtopic-tabs-container">
+            <nav class="subtopic-tabs" role="tablist">
+                <button 
+                    class="subtopic-tab active"
+                    role="tab"
+                    data-subtopic-id="intro"
+                    data-subtopic-index="0"
+                    aria-selected="true"
+                    id="tab-intro"
+                    aria-controls="panel-intro"
+                >
+                    <i class="fas fa-check-circle subtopic-check"></i>
+                    <span class="subtopic-title">Introduction</span>
+                    <span class="subtopic-order">1</span>
+                </button>
+                
+                <button 
+                    class="subtopic-tab"
+                    role="tab"
+                    data-subtopic-id="basics"
+                    data-subtopic-index="1"
+                    aria-selected="false"
+                    id="tab-basics"
+                    aria-controls="panel-basics"
+                >
+                    <i class="fas fa-check-circle subtopic-check"></i>
+                    <span class="subtopic-title">Basics</span>
+                    <span class="subtopic-order">2</span>
+                </button>
+                
+                <button 
+                    class="subtopic-tab"
+                    role="tab"
+                    data-subtopic-id="advanced"
+                    data-subtopic-index="2"
+                    aria-selected="false"
+                    id="tab-advanced"
+                    aria-controls="panel-advanced"
+                >
+                    <i class="fas fa-check-circle subtopic-check completed"></i>
+                    <span class="subtopic-title">Advanced</span>
+                    <span class="subtopic-order">3</span>
+                </button>
+            </nav>
+            
+            <!-- Tab Progress Indicator -->
+            <div class="tab-progress-indicator">
+                <div class="tab-progress-fill" style="width: 33%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script>
+        // Mock lesson data
+        window.lessonData = {
+            id: 'test-lesson',
+            has_subtopics: true,
+            subtopics: [
+                { id: 'intro', title: 'Introduction', order: 0 },
+                { id: 'basics', title: 'Basics', order: 1 },
+                { id: 'advanced', title: 'Advanced', order: 2 }
+            ],
+            current_subtopic_index: 0
+        };
+        
+        window.lessonProgress = {
+            completed_subtopics: ['advanced']
+        };
+
+        // Update status
+        document.getElementById('status').innerHTML = `
+            ✅ Page loaded<br>
+            📊 Found ${document.querySelectorAll('.subtopic-tab').length} tabs<br>
+            🎯 Container visible: ${document.querySelector('.subtopic-tabs-container') ? 'Yes' : 'No'}<br>
+            🎨 Computed styles: ${window.getComputedStyle(document.querySelector('.subtopic-tabs-container')).display}
+        `;
+
+        // Add click handlers for testing
+        document.querySelectorAll('.subtopic-tab').forEach((tab, index) => {
+            tab.addEventListener('click', (e) => {
+                console.log(`Tab ${index} clicked:`, tab);
+                
+                // Update active state
+                document.querySelectorAll('.subtopic-tab').forEach(t => {
+                    t.classList.remove('active');
+                    t.setAttribute('aria-selected', 'false');
+                });
+                
+                tab.classList.add('active');
+                tab.setAttribute('aria-selected', 'true');
+                
+                // Update status
+                document.getElementById('status').innerHTML += `<br>🖱️ Clicked: ${tab.dataset.subtopicId}`;
+            });
+        });
+    </script>
+</body>
+</html>

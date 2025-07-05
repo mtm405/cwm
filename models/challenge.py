@@ -9,18 +9,7 @@ def get_daily_challenge():
     """Get today's daily challenge"""
     today = datetime.now().strftime('%Y-%m-%d')
     
-    config = get_config()
-    if getattr(config, 'DEV_MODE', False):
-        return {
-            'id': f'daily_{today}',
-            'title': 'Print Pattern Challenge',
-            'description': 'Create a function that prints a pyramid pattern',
-            'xp_reward': 100,
-            'coin_reward': 25,
-            'difficulty': 'medium'
-        }
-    
-    # In production, fetch from Firestore
+    # Always use Firebase data - no DEV_MODE override
     if db:
         challenge_ref = db.collection('daily_challenges').document(today)
         challenge = challenge_ref.get()

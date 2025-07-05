@@ -135,45 +135,90 @@
          * Extract user information from JWT token
          */
         extractUserFromToken: function(token) {
-            if (!token || token === 'session_authenticated') {
-                console.log('⚠️ Token is session placeholder, cannot extract user info');
-                return false;
-            }
-            
-            if (!token.includes('.')) {
-                console.log('⚠️ Token is not a JWT format');
-                return false;
-            }
+            if (!token || typeof token !== 'string') return false;
 
             try {
-                // Validate token format before decoding
+                // Validate token format (should have 3 parts separated by dots)
                 const parts = token.split('.');
                 if (parts.length !== 3) {
-                    console.warn('⚠️ Invalid JWT format: token must have 3 parts');
+                    console.warn('⚠️ Invalid JWT format: expected 3 parts, got', parts.length);
                     return false;
                 }
 
-                // Safely decode the payload with proper padding
-                let payload;
-                try {
-                    const encodedPayload = parts[1];
-                    // Add padding if needed for base64 decoding
-                    const paddedPayload = encodedPayload + '='.repeat((4 - encodedPayload.length % 4) % 4);
-                    const decodedPayload = atob(paddedPayload);
-                    payload = JSON.parse(decodedPayload);
-                } catch (decodeError) {
-                    console.warn('⚠️ Failed to decode JWT payload:', decodeError.message);
+                // Safe base64 decode with padding
+                const payload = this.safeBase64Decode(parts[1]);
+                if (!payload) {
+                    console.warn('⚠️ Failed to decode JWT payload');
                     return false;
                 }
+
+                const decoded = JSON.parse(payload);
+                console.log('🔍 Decoded JWT payload:', decoded);
+
+                // Check if token is expired
+                if (decoded.exp) {
+                    const now = Math.floor(Date.now() / 1000);
+                    if (decoded.exp < now) {
+                        console.warn('⚠️ JWT token is expired');
+                        return false;
+                    }
+                }
+
+                // Extract user information
+                const userInfo = {
+                    uid: decoded.sub || decoded.user_id,
+                    email: decoded.email,
+                    name: decoded.name,
+                    picture: decoded.picture,
+                    given_name: decoded.given_name,
+                    family_name: decoded.family_name,
+                    is_admin: decoded.is_admin || false,
+                    xp: decoded.xp || 0,
+                    level: decoded.level || 1
+                };
+
+                // Validate we have essential info
+                if (!userInfo.uid && !userInfo.email) {
+                    console.warn('❌ Token does not contain valid user identifier');
+                    return false;
+                }
+
+                // Store user info
+                try {
+                    localStorage.setItem('cwm_user_profile', JSON.stringify(userInfo));
+                    window.currentUser = userInfo;
+                    console.log('✅ User profile extracted and stored:', { 
+                        uid: userInfo.uid,
+                        email: userInfo.email, 
+                        name: userInfo.name 
+                    });
+                    return true;
+                } catch (storageError) {
+                    console.error('❌ Failed to store user profile:', storageError);
+                    window.currentUser = userInfo; // At least set in memory
+                    return true;
+                }
+
+            } catch (error) {
+                console.error('❌ Failed to extract user from token:', error);
+                return false;
+            }
+        },
+                    console.warn('⚠️ Could not decode JWT payload');
+                    return false;
+                }
+
+                // Parse JSON payload
+                const payloadData = JSON.parse(payload);
                 
                 // Extract user info
                 const userInfo = {
-                    id: payload.sub || payload.user_id,
-                    email: payload.email,
-                    name: payload.name,
-                    picture: payload.picture,
-                    given_name: payload.given_name,
-                    family_name: payload.family_name
+                    id: payloadData.sub || payloadData.user_id,
+                    email: payloadData.email,
+                    name: payloadData.name,
+                    picture: payloadData.picture,
+                    given_name: payloadData.given_name,
+                    family_name: payloadData.family_name
                 };
                 
                 // Only proceed if we have at least an ID or email
@@ -191,6 +236,30 @@
             }
             
             return false;
+        },
+
+        /**
+         * Safe base64 decode with proper padding
+         */
+        safeBase64Decode: function(str) {
+            if (!str || typeof str !== 'string') return null;
+
+            try {
+                // Add padding if missing
+                let paddedStr = str;
+                while (paddedStr.length % 4) {
+                    paddedStr += '=';
+                }
+
+                // Replace URL-safe characters
+                paddedStr = paddedStr.replace(/-/g, '+').replace(/_/g, '/');
+
+                // Decode
+                return atob(paddedStr);
+            } catch (error) {
+                console.warn('⚠️ Base64 decode failed:', error.message);
+                return null;
+            }
         },
 
         /**
@@ -239,7 +308,7 @@
                     return false;
                 }
 
-                // Request new token with proper error handling
+                // Request new token
                 const response = await fetch('/api/auth/refresh-token', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -252,19 +321,12 @@
                         this.restoreToken(data.token);
                         return true;
                     }
-                } else if (response.status === 404) {
-                    console.warn('⚠️ Token refresh endpoint not available - continuing without refresh');
-                    return false;
                 }
                 
                 console.warn('⚠️ Server did not provide a new token');
                 return false;
             } catch (error) {
-                if (error.message.includes('fetch') || error.message.includes('NetworkError')) {
-                    console.warn('⚠️ Network error during token refresh - continuing without refresh');
-                } else {
-                    console.error('❌ Error requesting new token:', error);
-                }
+                console.error('❌ Error requesting new token:', error);
                 return false;
             }
         },

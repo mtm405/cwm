@@ -109,3 +109,63 @@ def get_random_vocabulary():
     except Exception as e:
         logger.error(f"Error retrieving random vocabulary terms: {str(e)}")
         return jsonify({'error': 'Failed to retrieve random vocabulary terms'}), 500
+
+@vocabulary_api.route('/api/vocabulary/stats', methods=['GET'])
+def get_vocabulary_stats():
+    """Get vocabulary statistics."""
+    try:
+        firebase_service = get_firebase_service()
+        
+        if not firebase_service:
+            return jsonify({'error': 'Firebase service unavailable'}), 503
+        
+        stats = firebase_service.get_vocabulary_stats()
+        logger.info(f"Retrieved vocabulary stats: {stats}")
+        
+        return jsonify(stats), 200
+        
+    except Exception as e:
+        logger.error(f"Error retrieving vocabulary stats: {str(e)}")
+        return jsonify({'error': 'Failed to retrieve vocabulary statistics'}), 500
+
+@vocabulary_api.route('/api/vocabulary/search', methods=['GET'])
+def search_vocabulary():
+    """Search vocabulary terms by query."""
+    try:
+        firebase_service = get_firebase_service()
+        
+        if not firebase_service:
+            return jsonify({'error': 'Firebase service unavailable'}), 503
+        
+        query = request.args.get('q', '').strip().lower()
+        category = request.args.get('category')
+        difficulty = request.args.get('difficulty')
+        
+        if not query:
+            return jsonify({'error': 'Search query is required'}), 400
+        
+        # Get vocabulary terms based on filters
+        if category:
+            terms = firebase_service.get_vocabulary_by_category(category)
+        else:
+            terms = firebase_service.get_all_vocabulary()
+        
+        # Filter by difficulty if specified
+        if difficulty:
+            terms = [term for term in terms if term.get('difficulty') == difficulty]
+        
+        # Search through terms
+        matching_terms = []
+        for term in terms:
+            # Search in term name, definition, and tags
+            if (query in term.get('term', '').lower() or
+                query in term.get('definition', '').lower() or
+                any(query in tag.lower() for tag in term.get('tags', []))):
+                matching_terms.append(term)
+        
+        logger.info(f"Found {len(matching_terms)} terms matching query: {query}")
+        return jsonify(matching_terms), 200
+        
+    except Exception as e:
+        logger.error(f"Error searching vocabulary: {str(e)}")
+        return jsonify({'error': 'Failed to search vocabulary'}), 500
