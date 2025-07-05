@@ -1097,79 +1097,358 @@
 }
 
 /* ================================
-   RESPONSIVE DESIGN
+   SUBTOPIC TABS NAVIGATION
    ================================ */
 
+.subtopic-tabs-container {
+    margin-bottom: 2rem;
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+}
+
+.subtopic-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+
+.subtopic-tabs::-webkit-scrollbar {
+    height: 4px;
+}
+
+.subtopic-tabs::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.subtopic-tabs::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 2px;
+}
+
+.subtopic-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+    white-space: nowrap;
+    position: relative;
+    min-width: fit-content;
+    /* Enhanced contrast for better visibility */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Focus styles for accessibility */
+.subtopic-tab:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.subtopic-tab:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Remove default focus outline for mouse users */
+.subtopic-tab:focus:not(:focus-visible) {
+    outline: none;
+}
+
+.subtopic-tab:hover {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.3);
+}
+
+.subtopic-tab.active {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.3);
+    font-weight: 600;
+}
+
+/* Enhanced visibility for different themes */
+.theme-glass .subtopic-tab {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.theme-glass .subtopic-tab:hover,
+.theme-glass .subtopic-tab.active {
+    background: var(--primary-color);
+    backdrop-filter: blur(10px);
+    border-color: var(--primary-color);
+}
+
+.theme-light .subtopic-tab {
+    background: #f8f9fa;
+    border-color: #dee2e6;
+    color: #495057;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .subtopic-tab:hover,
+.theme-light .subtopic-tab.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.theme-cyberpunk .subtopic-tab {
+    background: #1a0d1a;
+    border-color: var(--primary-color);
+    color: var(--text-secondary);
+    box-shadow: 0 0 10px rgba(var(--primary-color-rgb), 0.3);
+}
+
+.theme-cyberpunk .subtopic-tab:hover,
+.theme-cyberpunk .subtopic-tab.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #000;
+    box-shadow: 0 0 20px rgba(var(--primary-color-rgb), 0.6);
+}
+
+.subtopic-check {
+    font-size: 0.8rem;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+
+.subtopic-check.completed {
+    opacity: 1;
+    color: var(--success-color);
+}
+
+.subtopic-tab.active .subtopic-check {
+    opacity: 1;
+    color: white;
+}
+
+.subtopic-title {
+    font-weight: 600;
+}
+
+.subtopic-order {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-left: auto;
+    min-width: 20px;
+    min-height: 20px;
+}
+
+.subtopic-tab:not(.active) .subtopic-order {
+    background: var(--text-secondary);
+    color: var(--bg-primary);
+}
+
+.theme-light .subtopic-tab:not(.active) .subtopic-order {
+    background: #6c757d;
+    color: white;
+}
+
+.theme-cyberpunk .subtopic-tab:not(.active) .subtopic-order {
+    background: var(--primary-color);
+    color: #000;
+}
+
+/* Tab Progress Indicator */
+.tab-progress-indicator {
+    height: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 1rem;
+}
+
+.tab-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--success-color), var(--primary-color));
+    border-radius: 2px;
+    transition: width 0.5s ease;
+}
+
+/* Success Toast Notification */
+.success-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--success-color);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+.toast-content i {
+    font-size: 1.1rem;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+/* Subtopic Content Styles */
+.subtopic-content-wrapper {
+    animation: fadeIn 0.3s ease;
+}
+
+.subtopic-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.subtopic-title {
+    color: var(--text-primary);
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.subtopic-meta {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.subtopic-order {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.subtopic-progress {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.subtopic-blocks {
+    margin-bottom: 2rem;
+}
+
+.subtopic-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 0;
+    border-top: 2px solid var(--border-color);
+    margin-top: 2rem;
+}
+
+.subtopic-navigation .btn {
+    min-width: 120px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mobile Responsive */
 @media (max-width: 768px) {
-    .lesson-container {
-        padding: 1rem;
+    .subtopic-tabs-container {
+        margin: 1rem;
+        padding: 0.75rem;
     }
     
-    .lesson-header {
-        padding: 1.5rem;
+    .subtopic-tab {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+        min-width: 100px;
     }
     
-    .lesson-title {
-        font-size: 2rem;
+    .subtopic-tab .subtopic-title {
+        font-size: 0.8rem;
     }
     
-    .lesson-badges {
-        flex-direction: column;
-        align-items: flex-start;
+    .subtopic-order {
+        width: 18px;
+        height: 18px;
+        font-size: 0.7rem;
     }
     
-    .content-block {
-        margin-bottom: 2rem;
-    }
-    
-    .block-header {
-        padding: 1.5rem;
+    .subtopic-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
     }
     
-    .block-content {
-        padding: 1.5rem;
+    .subtopic-title {
+        font-size: 1.5rem;
     }
     
-    .block-actions,
-    .lesson-block-actions {
-        padding: 1rem;
+    .subtopic-navigation {
         flex-direction: column;
+        gap: 1rem;
     }
     
-    .action-btn {
-        justify-content: center;
-    }
-    
-    .text-block h1::before,
-    .text-block h2::before,
-    .text-block h3::before {
-        left: 0;
-    }
-    
-    .text-block .callout {
-        padding: 1rem;
-    }
-    
-    .text-block .callout-content {
-        margin-left: 2rem;
-    }
-    
-    .code-editor {
-        min-height: 200px;
-    }
-    
-    .editor-toolbar {
-        flex-direction: column;
-        gap: 0.5rem;
-        align-items: flex-start;
-    }
-    
-    .editor-actions {
+    .subtopic-navigation .btn {
         width: 100%;
-        justify-content: space-between;
     }
 }
 
@@ -1190,6 +1469,45 @@
         padding: 1rem;
     }
     
+    .subtopic-tabs-container {
+        margin: 0.5rem;
+        padding: 0.5rem;
+    }
+    
+    .subtopic-tab {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+        min-width: 80px;
+        gap: 0.25rem;
+    }
+    
+    .subtopic-tab .subtopic-title {
+        display: none;
+    }
+    
+    .subtopic-tab {
+        flex-direction: column;
+        text-align: center;
+        justify-content: center;
+        height: 50px;
+    }
+    
+    .subtopic-order {
+        margin-left: 0;
+        margin-top: 0.25rem;
+        width: 16px;
+        height: 16px;
+        font-size: 0.65rem;
+    }
+    
+    .subtopic-check {
+        font-size: 0.9rem;
+        margin-top: 0.1rem;
+    }
+}
+
+/* Additional Mobile Styles */
+@media (max-width: 480px) {
     .content-block {
         margin-bottom: 1.5rem;
     }
@@ -1256,23 +1574,54 @@
     outline-offset: 2px;
 }
 
+/* High Contrast Support */
+@media (prefers-contrast: high) {
+    .subtopic-tab {
+        border-width: 3px;
+        font-weight: 600;
+    }
+    
+    .subtopic-tab:hover,
+    .subtopic-tab.active {
+        border-width: 3px;
+        font-weight: 700;
+    }
+    
+    .subtopic-tab:focus {
+        outline-width: 3px;
+    }
+}
+
+/* Reduced Motion Support */
 @media (prefers-reduced-motion: reduce) {
-    .content-block,
-    .action-btn,
-    .progress-fill {
+    .subtopic-tab {
         transition: none;
+    }
+    
+    .subtopic-tab:hover {
+        transform: none;
+    }
+    
+    .subtopic-content-wrapper {
         animation: none;
     }
     
-    .content-block:hover {
-        transform: none;
+    .success-toast {
+        animation: none;
     }
     
-    .action-btn:hover {
-        transform: none;
+    .tab-progress-fill {
+        transition: none;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .subtopic-tabs-container {
+        display: none;
     }
     
-    .loading-spinner {
+    .subtopic-content-wrapper {
         animation: none;
     }
 }

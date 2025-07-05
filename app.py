@@ -6,11 +6,19 @@ import os
 import logging
 import re
 import mimetypes
-from flask import Flask, request, jsonify, render_template, flash, redirect, url_for
+from flask import Flask, request, jsonify, render_template, flash, redirect, url_for, session, g
 from flask_caching import Cache
 from config import get_config, setup_logging
 from services.firebase_service import FirebaseService
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
+
+# Import auth debugging
+try:
+    from debug_auth_token import integrate_auth_debugger, AuthTokenDebugger
+    AUTH_DEBUG_AVAILABLE = True
+except ImportError:
+    AUTH_DEBUG_AVAILABLE = False
+    # Will log warning after logger is set up
 
 # CRITICAL: Fix MIME types for JavaScript modules
 mimetypes.add_type('application/javascript', '.js')
@@ -28,6 +36,16 @@ logger = logging.getLogger(__name__)
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
+
+# Initialize auth debugger if available
+if AUTH_DEBUG_AVAILABLE:
+    try:
+        integrate_auth_debugger(app)
+        logger.info("✅ Auth debugging integrated successfully")
+    except Exception as e:
+        logger.warning(f"Failed to integrate auth debugging: {e}")
+else:
+    logger.warning("Auth debugging not available - debug_auth_token.py not found")
 
 # Enhanced MIME type handler for ES6 modules
 @app.after_request
@@ -296,6 +314,15 @@ def debug_firebase_status():
         return jsonify(status)
     except Exception as e:
         return jsonify({'error': str(e), 'type': type(e).__name__})
+
+@app.route('/debug/auth-test')
+def debug_auth_test():
+    """Debug page for comprehensive auth testing"""
+    try:
+        return render_template('auth-debug-test-page.html')
+    except Exception as e:
+        logger.error(f"Error rendering auth debug test page: {e}")
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/debug_env_vars')
 def debug_env_vars():

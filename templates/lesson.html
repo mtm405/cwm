@@ -57,6 +57,35 @@
         </div>
     </header>
 
+    <!-- Subtopic Navigation Tabs -->
+    {% if lesson and lesson.has_subtopics %}
+    <div class="subtopic-tabs-container">
+        <nav class="subtopic-tabs" role="tablist">
+            {% for subtopic in lesson.subtopics %}
+            <button 
+                class="subtopic-tab {{ 'active' if loop.index0 == lesson.current_subtopic_index else '' }}"
+                role="tab"
+                data-subtopic-id="{{ subtopic.id }}"
+                data-subtopic-index="{{ loop.index0 }}"
+                onclick="switchSubtopic('{{ subtopic.id }}', {{ loop.index0 }})"
+                aria-selected="{{ 'true' if loop.index0 == lesson.current_subtopic_index else 'false' }}"
+                id="tab-{{ subtopic.id }}"
+                aria-controls="panel-{{ subtopic.id }}"
+            >
+                <i class="fas fa-check-circle subtopic-check {{ 'completed' if subtopic.id in (lesson_progress.completed_subtopics or []) else '' }}"></i>
+                <span class="subtopic-title">{{ subtopic.title }}</span>
+                <span class="subtopic-order">{{ loop.index }}</span>
+            </button>
+            {% endfor %}
+        </nav>
+        
+        <!-- Tab Progress Indicator -->
+        <div class="tab-progress-indicator">
+            <div class="tab-progress-fill" style="width: {{ ((lesson_progress.completed_subtopics | length) / (lesson.subtopics | length) * 100) if lesson_progress.completed_subtopics else 0 }}%"></div>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Main Content Area -->
     <main class="lesson-content-wrapper">
         <!-- Loading State -->
@@ -169,6 +198,8 @@ window.initFirebase();
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/theme-monokai.js"></script>
 
 <!-- Core lesson scripts -->
+<script src="{{ url_for('static', filename='js/lesson/subtopicTabManager.js') }}"></script>
+<script src="{{ url_for('static', filename='js/lesson/lessonRenderer.js') }}"></script>
 <script src="{{ url_for('static', filename='js/lesson/lesson-system.js') }}" type="module"></script>
 
 <!-- Explicitly load quiz scripts to ensure correct loading order -->

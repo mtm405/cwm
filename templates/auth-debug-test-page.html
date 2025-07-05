@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Debug Test - Code with Morais</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .debug-panel {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .debug-panel h3 {
+            color: #4CAF50;
+            margin-top: 0;
+        }
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .status-item {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #4CAF50;
+        }
+        .status-item.error {
+            border-left-color: #f44336;
+        }
+        .status-item.warning {
+            border-left-color: #ff9800;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        .btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background: #1976D2;
+        }
+        .btn.danger {
+            background: #f44336;
+        }
+        .btn.success {
+            background: #4CAF50;
+        }
+        .log-area {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Auth Debug Test Page</h1>
+        <p>This page tests the enhanced auth debugging system.</p>
+        
+        <div class="debug-panel">
+            <h3>📊 Current Auth Status</h3>
+            <div class="status-grid">
+                <div class="status-item" id="token-status">
+                    <strong>Auth Token:</strong> <span id="token-value">Checking...</span>
+                </div>
+                <div class="status-item" id="user-status">
+                    <strong>User Object:</strong> <span id="user-value">Checking...</span>
+                </div>
+                <div class="status-item" id="service-status">
+                    <strong>Auth Service:</strong> <span id="service-value">Checking...</span>
+                </div>
+                <div class="status-item" id="server-status">
+                    <strong>Server Status:</strong> <span id="server-value">Checking...</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="debug-panel">
+            <h3>🔧 Debug Actions</h3>
+            <div class="actions">
+                <button class="btn" onclick="runQuickFix()">🔧 Quick Fix</button>
+                <button class="btn" onclick="checkServerAuth()">🌐 Check Server</button>
+                <button class="btn" onclick="exportDebugData()">📥 Export Debug</button>
+                <button class="btn danger" onclick="clearAuthData()">🧹 Clear Auth</button>
+                <button class="btn success" onclick="testAuthFlow()">🧪 Test Flow</button>
+            </div>
+        </div>
+        
+        <div class="debug-panel">
+            <h3>📋 Debug Log</h3>
+            <div id="log-area" class="log-area">Loading debug information...</div>
+        </div>
+    </div>
+
+    <script>
+        // Debug functions
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logArea = document.getElementById('log-area');
+            logArea.textContent += `[${timestamp}] ${message}\n`;
+            logArea.scrollTop = logArea.scrollHeight;
+            
+            if (type === 'error') {
+                console.error(message);
+            } else if (type === 'warn') {
+                console.warn(message);
+            } else {
+                console.log(message);
+            }
+        }
+        
+        function updateStatus() {
+            log('🔍 Checking auth status...');
+            
+            // Check tokens
+            const hasLocalToken = !!localStorage.getItem('auth_token');
+            const hasCwmToken = !!localStorage.getItem('cwm_user_token');
+            const hasSessionToken = !!sessionStorage.getItem('auth_token');
+            
+            const tokenStatus = document.getElementById('token-status');
+            const tokenValue = document.getElementById('token-value');
+            
+            if (hasLocalToken) {
+                tokenValue.textContent = '✅ localStorage';
+                tokenStatus.className = 'status-item';
+            } else if (hasCwmToken) {
+                tokenValue.textContent = '⚠️ cwm_user_token only';
+                tokenStatus.className = 'status-item warning';
+            } else if (hasSessionToken) {
+                tokenValue.textContent = '⚠️ sessionStorage only';
+                tokenStatus.className = 'status-item warning';
+            } else {
+                tokenValue.textContent = '❌ No token';
+                tokenStatus.className = 'status-item error';
+            }
+            
+            // Check user
+            const hasUser = !!(window.currentUser || globalThis.currentUser);
+            const userStatus = document.getElementById('user-status');
+            const userValue = document.getElementById('user-value');
+            
+            if (hasUser) {
+                userValue.textContent = '✅ Available';
+                userStatus.className = 'status-item';
+            } else {
+                userValue.textContent = '❌ Missing';
+                userStatus.className = 'status-item error';
+            }
+            
+            // Check service
+            const hasService = !!(window.authService || window.authManager);
+            const serviceStatus = document.getElementById('service-status');
+            const serviceValue = document.getElementById('service-value');
+            
+            if (hasService) {
+                serviceValue.textContent = '✅ Available';
+                serviceStatus.className = 'status-item';
+            } else {
+                serviceValue.textContent = '❌ Missing';
+                serviceStatus.className = 'status-item error';
+            }
+            
+            log(`Status updated - Token: ${hasLocalToken ? 'Yes' : 'No'}, User: ${hasUser ? 'Yes' : 'No'}, Service: ${hasService ? 'Yes' : 'No'}`);
+        }
+        
+        async function checkServerAuth() {
+            log('🌐 Checking server auth status...');
+            
+            try {
+                const response = await fetch('/api/auth/status');
+                const data = await response.json();
+                
+                const serverStatus = document.getElementById('server-status');
+                const serverValue = document.getElementById('server-value');
+                
+                if (data.authenticated) {
+                    serverValue.textContent = '✅ Authenticated';
+                    serverStatus.className = 'status-item';
+                } else {
+                    serverValue.textContent = '❌ Not authenticated';
+                    serverStatus.className = 'status-item error';
+                }
+                
+                log(`Server status: ${JSON.stringify(data, null, 2)}`);
+                
+            } catch (error) {
+                log(`Server check failed: ${error.message}`, 'error');
+                
+                const serverStatus = document.getElementById('server-status');
+                const serverValue = document.getElementById('server-value');
+                serverValue.textContent = '❌ Connection failed';
+                serverStatus.className = 'status-item error';
+            }
+        }
+        
+        function runQuickFix() {
+            log('🔧 Running quick fix...');
+            
+            if (typeof window.runQuickAuthFix === 'function') {
+                const report = window.runQuickAuthFix();
+                log(`Quick fix report: ${JSON.stringify(report, null, 2)}`);
+                
+                // Update status after fix
+                setTimeout(updateStatus, 1000);
+            } else {
+                log('Quick fix function not available', 'error');
+            }
+        }
+        
+        function exportDebugData() {
+            log('📥 Exporting debug data...');
+            
+            const debugData = {
+                timestamp: new Date().toISOString(),
+                url: window.location.href,
+                userAgent: navigator.userAgent,
+                storage: {
+                    localStorage: {
+                        auth_token: !!localStorage.getItem('auth_token'),
+                        cwm_user_token: !!localStorage.getItem('cwm_user_token'),
+                        cwm_user_profile: !!localStorage.getItem('cwm_user_profile')
+                    },
+                    sessionStorage: {
+                        auth_token: !!sessionStorage.getItem('auth_token')
+                    }
+                },
+                objects: {
+                    currentUser: !!window.currentUser,
+                    globalCurrentUser: !!globalThis.currentUser,
+                    authService: !!window.authService,
+                    authManager: !!window.authManager
+                },
+                scripts: Array.from(document.scripts).map(s => s.src).filter(s => s)
+            };
+            
+            const blob = new Blob([JSON.stringify(debugData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `auth-debug-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            log('Debug data exported successfully');
+        }
+        
+        function clearAuthData() {
+            if (confirm('Clear all auth data? This will log you out.')) {
+                log('🧹 Clearing auth data...');
+                
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('cwm_user_token');
+                localStorage.removeItem('cwm_user_profile');
+                sessionStorage.removeItem('auth_token');
+                
+                window.currentUser = null;
+                globalThis.currentUser = null;
+                
+                log('Auth data cleared - page will reload');
+                setTimeout(() => window.location.reload(), 1000);
+            }
+        }
+        
+        async function testAuthFlow() {
+            log('🧪 Testing auth flow...');
+            
+            const endpoints = [
+                '/api/auth/status',
+                '/api/auth/validate',
+                '/debug/auth-comprehensive',
+                '/debug/auth-monitor-data'
+            ];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(endpoint, { method: 'POST' });
+                    const status = response.ok ? 'PASS' : 'FAIL';
+                    log(`${endpoint}: ${status} (${response.status})`);
+                } catch (error) {
+                    log(`${endpoint}: ERROR - ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🔍 Auth Debug Test Page loaded');
+            log('Available functions: runQuickFix, checkServerAuth, exportDebugData, clearAuthData, testAuthFlow');
+            
+            updateStatus();
+            checkServerAuth();
+            
+            // Auto-refresh every 10 seconds
+            setInterval(updateStatus, 10000);
+        });
+    </script>
+</body>
+</html>

@@ -1,10 +1,15 @@
 /* CSS Variables for Theming */
 :root {
     --primary-color: #6C63FF;
+    --primary-color-rgb: 108, 99, 255;
     --secondary-color: #FF6584;
+    --secondary-color-rgb: 255, 101, 132;
     --success-color: #4CAF50;
+    --success-color-rgb: 76, 175, 80;
     --warning-color: #FFC107;
+    --warning-color-rgb: 255, 193, 7;
     --danger-color: #F44336;
+    --danger-color-rgb: 244, 67, 54;
     --bg-primary: #1a1a2e;
     --bg-secondary: #16213e;
     --bg-card: #0f3460;
@@ -23,15 +28,20 @@
 .theme-glass {
     --bg-primary: rgba(255, 255, 255, 0.1);
     --bg-secondary: rgba(255, 255, 255, 0.05);
-    --bg-card: rgba(255, 255, 255, 0.1);
+    --bg-card: rgba(255, 255, 255, 0.15);
     --text-primary: #ffffff;
     --text-secondary: #e0e0e0;
-    --border-color: rgba(255, 255, 255, 0.2);
+    --border-color: rgba(255, 255, 255, 0.3);
     --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
 }
 
 /* Light Theme */
 .theme-light {
+    --primary-color-rgb: 108, 99, 255;
+    --secondary-color-rgb: 255, 101, 132;
+    --success-color-rgb: 76, 175, 80;
+    --warning-color-rgb: 255, 193, 7;
+    --danger-color-rgb: 244, 67, 54;
     --bg-primary: #f5f5f5;
     --bg-secondary: #ffffff;
     --bg-card: #ffffff;
@@ -44,10 +54,15 @@
 /* Cyberpunk Theme */
 .theme-cyberpunk {
     --primary-color: #00ffff;
+    --primary-color-rgb: 0, 255, 255;
     --secondary-color: #ff00ff;
+    --secondary-color-rgb: 255, 0, 255;
     --success-color: #00ff00;
+    --success-color-rgb: 0, 255, 0;
     --warning-color: #ffff00;
+    --warning-color-rgb: 255, 255, 0;
     --danger-color: #ff0000;
+    --danger-color-rgb: 255, 0, 0;
     --bg-primary: #0a0a0a;
     --bg-secondary: #1a0d1a;
     --bg-card: #2a1a2a;
