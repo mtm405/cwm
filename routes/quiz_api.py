@@ -6,6 +6,7 @@ from flask import Blueprint, request, jsonify, current_app
 from models.quiz import get_quiz
 from services.firebase_service import get_firebase_service
 import logging
+from datetime import datetime
 
 # Create blueprint
 quiz_api = Blueprint('quiz_api', __name__)
@@ -135,6 +136,31 @@ def save_quiz_results():
         logger.error(f"Error in quiz results endpoint: {str(e)}")
         return jsonify({
             'error': 'Internal server error'
+        }), 500
+
+@quiz_api.route('/api/quiz/<quiz_id>/start', methods=['POST'])
+def start_quiz(quiz_id):
+    """Start a quiz session - returns the quiz data for a new quiz attempt"""
+    try:
+        quiz_data = get_quiz(quiz_id)
+        
+        if not quiz_data:
+            return jsonify({
+                'error': 'Quiz not found',
+                'message': f'Quiz with ID {quiz_id} does not exist'
+            }), 404
+        
+        # Return quiz data to start the quiz
+        return jsonify({
+            'quiz': quiz_data,
+            'session_id': f"{quiz_id}-{datetime.now().timestamp()}"
+        })
+        
+    except Exception as e:
+        logger.error(f"Error starting quiz {quiz_id}: {str(e)}")
+        return jsonify({
+            'error': 'Internal server error',
+            'message': 'Failed to start quiz session'
         }), 500
 
 def calculate_xp(score, percentage):

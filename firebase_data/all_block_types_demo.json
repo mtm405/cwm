@@ -1,0 +1,130 @@
+{
+  "id": "all-block-types-demo",
+  "title": "Block Types Demo: All Available Components",
+  "description": "This lesson demonstrates all the different block types available in our system",
+  "order": 5,
+  "difficulty": "intermediate",
+  "estimated_time": 30,
+  "prerequisites": ["python-basics-01"],
+  "tags": ["demo", "tutorial", "blocks", "components"],
+  "xp_reward": 75,
+  "pycoins_reward": 25,
+  "quiz_id": "python-basics-quiz",
+  "created_at": "2025-07-04T15:00:00Z",
+  "updated_at": "2025-07-04T15:00:00Z",
+  "is_published": true,
+  "blocks": [
+    {
+      "id": "intro-block",
+      "type": "text",
+      "order": 0,
+      "title": "Introduction to Block Types",
+      "content": "# Block Types Demo\n\nThis lesson demonstrates all the different types of content blocks available in our learning platform. Each section shows a different block type with its features and functionality.\n\nAs you go through this lesson, try interacting with each block to see how it works!"
+    },
+    {
+      "id": "text-block-example",
+      "type": "text",
+      "order": 1,
+      "title": "Text Block with Key Points",
+      "content": "## Text Blocks\n\nText blocks are the most basic type of content. They can contain formatted text using Markdown syntax, including:\n\n- **Bold text** for emphasis\n- *Italic text* for slight emphasis\n- `Inline code` for code references\n- Lists and numbered items\n- And much more!\n\nText blocks are perfect for explanations, introductions, and theoretical content.",
+      "key_points": [
+        "Text blocks support Markdown formatting",
+        "They're ideal for explanatory content",
+        "You can add optional key points like these",
+        "Users can mark them as read when finished"
+      ]
+    },
+    {
+      "id": "code-example-basic",
+      "type": "code_example",
+      "order": 2,
+      "title": "Code Example Block",
+      "language": "python",
+      "code": "# This is a basic Python code example\ndef say_hello(name):\n    \"\"\"A simple function to greet someone\"\"\"\n    return f\"Hello, {name}!\"\n\n# Call the function\nresult = say_hello(\"Learner\")\nprint(result)  # Outputs: Hello, Learner!",
+      "explanation": "This code example shows a simple Python function that takes a name parameter and returns a greeting message. The function uses f-strings (formatted string literals) which were introduced in Python 3.6 to make string formatting more readable."
+    },
+    {
+      "id": "interactive-code-block",
+      "type": "interactive",
+      "order": 3,
+      "title": "Interactive Coding Exercise",
+      "instructions": "Complete the function below to calculate the area of a rectangle. The function should:\n\n1. Take two parameters: `length` and `width`\n2. Return the area (length × width)\n3. Handle non-numeric inputs by returning a string: 'Invalid input'",
+      "starter_code": "def calculate_rectangle_area(length, width):\n    # Your code here\n    pass\n\n# Test your function\nprint(calculate_rectangle_area(5, 3))  # Should output: 15",
+      "solution": "def calculate_rectangle_area(length, width):\n    try:\n        return length * width\n    except (TypeError, ValueError):\n        return 'Invalid input'\n\n# Test your function\nprint(calculate_rectangle_area(5, 3))  # Should output: 15",
+      "hints": [
+        "Use the multiplication operator (*) to calculate the area",
+        "Consider using a try-except block to handle non-numeric inputs",
+        "Make sure to return a number for valid inputs and a string for invalid ones"
+      ],
+      "language": "python"
+    },
+    {
+      "id": "code-challenge-block",
+      "type": "code_challenge",
+      "order": 4,
+      "title": "Code Challenge with Tests",
+      "instructions": "Write a function called `is_palindrome` that checks if a string is a palindrome (reads the same forward and backward). The function should:\n\n1. Take a string input\n2. Return True if it's a palindrome, False otherwise\n3. Ignore case (treat uppercase and lowercase as the same)\n4. Ignore spaces and punctuation",
+      "starter_code": "def is_palindrome(text):\n    # Your code here\n    pass\n\n# Examples:\n# is_palindrome(\"racecar\") -> True\n# is_palindrome(\"A man, a plan, a canal: Panama\") -> True\n# is_palindrome(\"hello\") -> False",
+      "solution": "def is_palindrome(text):\n    # Remove spaces and punctuation, convert to lowercase\n    import re\n    text = re.sub(r'[^\\w]', '', text).lower()\n    # Check if the string equals its reverse\n    return text == text[::-1]",
+      "tests": [
+        {"input": ["racecar"], "expected": true},
+        {"input": ["A man, a plan, a canal: Panama"], "expected": true},
+        {"input": ["hello"], "expected": false},
+        {"input": ["Was it a car or a cat I saw?"], "expected": true},
+        {"input": ["12321"], "expected": true}
+      ],
+      "language": "python",
+      "challenge_type": "Algorithm",
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "video-content-block",
+      "type": "video",
+      "order": 5,
+      "title": "Video Tutorial: Python Functions",
+      "description": "This video explains Python functions in detail, including how to define them, pass parameters, and return values.",
+      "video_id": "9Os0o3wzS_I",
+      "source": "youtube",
+      "duration": 458,
+      "thumbnail": "https://img.youtube.com/vi/9Os0o3wzS_I/maxresdefault.jpg",
+      "captions_available": true
+    },
+    {
+      "id": "text-with-questions",
+      "type": "text",
+      "order": 6,
+      "title": "Text with Embedded Questions",
+      "content": "## Understanding Variables\n\nVariables in Python are used to store values that can be referenced and manipulated in a program. Unlike some other programming languages, Python has no command for declaring a variable. A variable is created the moment you first assign a value to it.\n\nFor example:\n\n```python\nx = 5\nname = \"Python\"\n```\n\nPython is dynamically typed, which means you don't need to declare the type of a variable when you create one. The interpreter automatically determines the type based on the assigned value.",
+      "questions": [
+        {
+          "id": "var-q1",
+          "type": "multiple_choice",
+          "question": "In Python, how do you declare a variable?",
+          "options": [
+            "var x = 5;",
+            "dim x as integer = 5",
+            "x = 5",
+            "int x = 5;"
+          ],
+          "correct_answer": 2,
+          "explanation": "In Python, you simply assign a value to a variable name. There's no declaration keyword."
+        },
+        {
+          "id": "var-q2",
+          "type": "true_false",
+          "question": "In Python, you must specify the data type when creating a variable.",
+          "correct_answer": false,
+          "explanation": "Python is dynamically typed, so the interpreter automatically determines the type based on the assigned value."
+        }
+      ]
+    },
+    {
+      "id": "quiz-block",
+      "type": "quiz",
+      "order": 7,
+      "title": "Python Basics Quiz",
+      "description": "Test your understanding of Python fundamentals with this quiz.",
+      "quiz_id": "python-basics-quiz"
+    }
+  ]
+}

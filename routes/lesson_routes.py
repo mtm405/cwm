@@ -1,6 +1,7 @@
 """
 Lesson routes for Code with Morais
 """
+import os
 import traceback
 from datetime import datetime
 from flask import Blueprint, render_template, request, jsonify, session, current_app
@@ -56,10 +57,14 @@ def lessons():
         
         current_app.logger.info(f"Rendering lessons template with {len(lessons_data)} lessons and {overall_progress}% progress")
         
+        # Get Google Client ID for auth
+        google_client_id = os.environ.get('GOOGLE_CLIENT_ID')
+        
         result = render_template('pages/lessons.html', 
                              user=user, 
                              lessons=lessons_data,
-                             overall_progress=overall_progress)
+                             overall_progress=overall_progress,
+                             google_client_id=google_client_id)
         current_app.logger.info("Template rendered successfully")
         return result
     except Exception as e:
@@ -109,10 +114,14 @@ def lesson_view(lesson_id):
             current_app.logger.info("Skipping activity tracking (no Firebase or no user)")
         
         current_app.logger.info("Rendering lesson template")
+        # Get Google Client ID for auth
+        google_client_id = os.environ.get('GOOGLE_CLIENT_ID')
+        
         return render_template('lesson.html', 
                              user=user, 
                              lesson=lesson_data,
-                             lesson_progress=lesson_progress)
+                             lesson_progress=lesson_progress,
+                             google_client_id=google_client_id)
     except Exception as e:
         current_app.logger.error(f"Error in lesson route: {str(e)}")
         current_app.logger.error(f"Traceback: {traceback.format_exc()}")
@@ -168,10 +177,14 @@ def lesson_fixed(lesson_id):
             current_app.logger.info("Skipping activity tracking (no Firebase or no user)")
         
         current_app.logger.info("Rendering lesson template")
+        # Get Google Client ID for auth
+        google_client_id = os.environ.get('GOOGLE_CLIENT_ID')
+        
         return render_template('lesson.html', 
                              user=user, 
                              lesson=lesson_data,
-                             lesson_progress=lesson_progress)
+                             lesson_progress=lesson_progress,
+                             google_client_id=google_client_id)
     except Exception as e:
         current_app.logger.error(f"Error in lesson route: {str(e)}")
         current_app.logger.error(f"Traceback: {traceback.format_exc()}")
@@ -285,10 +298,14 @@ def lesson_debug(lesson_id):
             return "Lesson not found", 404
         
         # Use main lesson template for debug
+        # Get Google Client ID for auth
+        google_client_id = os.environ.get('GOOGLE_CLIENT_ID')
+        
         return render_template('lesson.html', 
                              user=user, 
                              lesson=lesson_data,
-                             lesson_progress={})
+                             lesson_progress={},
+                             google_client_id=google_client_id)
     except Exception as e:
         current_app.logger.error(f"Error in debug lesson route: {str(e)}")
         return f"Debug Error: {str(e)}", 500
@@ -306,9 +323,13 @@ def lesson_minimal(lesson_id):
             return "Lesson not found", 404
         
         # Use minimal test template
+        # Get Google Client ID for auth
+        google_client_id = os.environ.get('GOOGLE_CLIENT_ID')
+        
         return render_template('test_minimal.html', 
                              user=user, 
-                             lesson=lesson_data)
+                             lesson=lesson_data,
+                             google_client_id=google_client_id)
     except Exception as e:
         current_app.logger.error(f"Error in minimal lesson route: {str(e)}")
         return f"Minimal Error: {str(e)}", 500

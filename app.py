@@ -135,6 +135,9 @@ try:
     from routes.recommendation_api import recommendation_api_bp
     from routes.profile_routes_api import profile_bp
     from routes.quiz_api import quiz_api
+    from routes.challenge_api import challenge_api
+    from routes.vocabulary_api import vocabulary_api
+    from routes.user_streak_api import user_streak_api
     
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')
@@ -147,6 +150,9 @@ try:
     app.register_blueprint(recommendation_api_bp)
     app.register_blueprint(profile_bp)
     app.register_blueprint(quiz_api)
+    app.register_blueprint(challenge_api)
+    app.register_blueprint(vocabulary_api)
+    app.register_blueprint(user_streak_api)
     
     logger.info("Blueprints registered successfully")
 except Exception as e:
@@ -439,6 +445,13 @@ def debug_test_token():
 def test_logout_page():
     """Test page for logout functionality"""
     return render_template('test_logout.html')
+
+@app.route('/test-interactive')
+def test_interactive():
+    """Test page for Interactive block debugging"""
+    with open('test_interactive_debug.html', 'r', encoding='utf-8') as f:
+        content = f.read()
+    return content
 
 # Main entry point
 if __name__ == '__main__':

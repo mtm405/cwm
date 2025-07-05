@@ -1,0 +1,161 @@
+{
+  "id": "python-datatypes-01",
+  "title": "Python Data Types: str, int, float, and bool",
+  "description": "Learn to evaluate expressions and identify the data types Python assigns to variables",
+  "order": 1,
+  "difficulty": "beginner",
+  "estimated_time": 45,
+  "prerequisites": [],
+  "tags": ["data types", "variables", "python", "str", "int", "float", "bool"],
+  "xp_reward": 100,
+  "pycoins_reward": 20,
+  "quiz_id": "datatypes-quiz",
+  "created_at": "2025-01-05T10:00:00Z",
+  "updated_at": "2025-01-05T10:00:00Z",
+  "is_published": true,
+  "subtopics": [
+    {
+      "id": "introduction",
+      "title": "Introduction to Data Types",
+      "order": 0,
+      "blocks": [
+        {
+          "id": "intro-block",
+          "type": "text",
+          "order": 0,
+          "title": "Introduction to Python Data Types",
+          "content": "# Python Data Types\n\nEvery value in Python has a type. Understanding data types is crucial because it determines what operations you can perform with your data. Python has four fundamental data types that we'll explore:\n\n1. **str (String)** - Text data enclosed in quotes\n2. **int (Integer)** - Whole numbers without decimal points\n3. **float (Floating-point)** - Numbers with decimal points\n4. **bool (Boolean)** - True or False values\n\nLet's dive into each type and learn how to identify them!"
+        }
+      ]
+    },
+    {
+      "id": "strings",
+      "title": "String Data Type",
+      "order": 1,
+      "blocks": [
+        {
+          "id": "string-example",
+          "type": "code_example",
+          "order": 0,
+          "title": "String Examples",
+          "code": "# String examples\nname = \"Alice\"              # Text in double quotes\nmessage = 'Hello, World!'   # Text in single quotes\nage_text = \"16\"            # Numbers in quotes are strings!\nmultiline = '''This is\na multiline\nstring'''                   # Triple quotes for multiple lines\n\n# Checking the type\nprint(type(name))          # <class 'str'>\nprint(type(age_text))      # <class 'str'> - not a number!",
+          "explanation": "Strings are sequences of characters enclosed in quotes. You can use single (''), double (\"\"), or triple (''' or \"\"\") quotes. Remember: anything inside quotes becomes a string, even numbers!"
+        }
+      ]
+    },
+    {
+      "id": "integers",
+      "title": "Integer Data Type",
+      "order": 2,
+      "blocks": [
+        {
+          "id": "integer-example",
+          "type": "code_example",
+          "order": 0,
+          "title": "Integer Examples",
+          "code": "# Integer examples\nage = 16                   # Positive whole number\nscore = -5                 # Negative whole number\ncount = 0                  # Zero is also an integer\nbig_number = 1_000_000     # Underscores for readability\n\n# Checking the type\nprint(type(age))           # <class 'int'>\nprint(type(score))         # <class 'int'>\n\n# Common mistake\nwrong = \"16\"               # This is a string, not an integer!\nprint(type(wrong))         # <class 'str'>",
+          "explanation": "Integers are whole numbers without decimal points. They can be positive, negative, or zero. Python allows underscores in large numbers for better readability."
+        }
+      ]
+    },
+    {
+      "id": "floats",
+      "title": "Float Data Type",
+      "order": 3,
+      "blocks": [
+        {
+          "id": "float-example",
+          "type": "code_example",
+          "order": 0,
+          "title": "Float Examples",
+          "code": "# Float examples\nheight = 5.7               # Decimal number\ntemperature = -10.5        # Negative decimal\npi = 3.14159              # Many decimal places\nscientific = 1.5e-4       # Scientific notation (0.00015)\n\n# Checking the type\nprint(type(height))        # <class 'float'>\nprint(type(pi))           # <class 'float'>\n\n# Important: Division always returns a float\nresult = 10 / 2           # Even though 10÷2=5\nprint(result)             # 5.0\nprint(type(result))       # <class 'float'>",
+          "explanation": "Floats represent decimal numbers. They're called 'floating-point' because the decimal point can 'float' to different positions. Division in Python always returns a float, even when dividing evenly."
+        }
+      ]
+    },
+    {
+      "id": "booleans",
+      "title": "Boolean Data Type",
+      "order": 4,
+      "blocks": [
+        {
+          "id": "boolean-example",
+          "type": "code_example",
+          "order": 0,
+          "title": "Boolean Examples",
+          "code": "# Boolean examples\nis_student = True          # Note the capital T\nhas_homework = False       # Note the capital F\n\n# Booleans from comparisons\nage = 16\ncan_drive = age >= 16      # True\nis_adult = age >= 18       # False\n\n# Checking the type\nprint(type(is_student))    # <class 'bool'>\nprint(type(can_drive))     # <class 'bool'>\n\n# Common mistake\nwrong_bool = \"True\"       # This is a string!\nprint(type(wrong_bool))    # <class 'str'>",
+          "explanation": "Booleans represent truth values: True or False. They're often the result of comparisons or logical operations. Remember: True and False must be capitalized in Python!"
+        }
+      ]
+    },
+    {
+      "id": "practice",
+      "title": "Practice & Assessment",
+      "order": 5,
+      "blocks": [
+        {
+          "id": "type-identification-exercise",
+          "type": "interactive",
+          "order": 0,
+          "title": "Identify the Data Type",
+          "instructions": "Write a function that takes a value and returns a string describing its type in plain English.",
+          "starter_code": "def identify_type(value):\n    # Your code here\n    # Return \"integer\", \"string\", \"float\", or \"boolean\"\n    pass\n\n# Test your function\nprint(identify_type(42))        # Should return \"integer\"\nprint(identify_type(\"42\"))      # Should return \"string\"\nprint(identify_type(42.0))      # Should return \"float\"\nprint(identify_type(True))      # Should return \"boolean\"",
+          "solution": "def identify_type(value):\n    if type(value) == int:\n        return \"integer\"\n    elif type(value) == str:\n        return \"string\"\n    elif type(value) == float:\n        return \"float\"\n    elif type(value) == bool:\n        return \"boolean\"\n    else:\n        return \"unknown type\"\n\n# Test\nprint(identify_type(42))        # \"integer\"\nprint(identify_type(\"42\"))      # \"string\"\nprint(identify_type(42.0))      # \"float\"\nprint(identify_type(True))      # \"boolean\"",
+          "hints": [
+            "Use the type() function to check the data type",
+            "Compare with int, str, float, and bool",
+            "Use if-elif statements to check each type"
+          ],
+          "language": "python"
+        },
+        {
+          "id": "datatypes-quiz",
+          "type": "quiz",
+          "order": 1,
+          "title": "Data Types Knowledge Check",
+          "description": "Test your understanding of Python data types",
+          "questions": [
+            {
+              "id": "q1",
+              "type": "multiple_choice",
+              "question": "What is the data type of x = '123'?",
+              "options": ["int", "str", "float", "bool"],
+              "correct_answer": 1,
+              "explanation": "Even though it contains numbers, anything in quotes is a string."
+            },
+            {
+              "id": "q2",
+              "type": "multiple_choice",
+              "question": "Which of these will result in a float type?",
+              "options": ["x = 10", "x = 10 / 2", "x = 10 // 2", "x = '10.0'"],
+              "correct_answer": 1,
+              "explanation": "Division (/) always returns a float in Python, even when dividing evenly."
+            },
+            {
+              "id": "q3",
+              "type": "true_false",
+              "question": "The value False is of type bool.",
+              "correct_answer": true,
+              "explanation": "False (with capital F) is one of Python's two boolean values."
+            },
+            {
+              "id": "q4",
+              "type": "multiple_choice",
+              "question": "What type is the result of: type(42).__name__?",
+              "options": ["<class 'int'>", "int", "integer", "str"],
+              "correct_answer": 1,
+              "explanation": "The __name__ attribute gives the type name as a string without the class notation."
+            },
+            {
+              "id": "q5",
+              "type": "true_false",
+              "question": "A variable in Python can change its data type during program execution.",
+              "correct_answer": true,
+              "explanation": "Python is dynamically typed, allowing variables to hold different types of values."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -448,6 +448,37 @@ export class LessonSystem {
     }
     
     /**
+     * Debug Interactive blocks - for development/testing
+     */
+    debugInteractiveBlock(blockId = null) {
+        if (!this.services.interactions) {
+            console.error('❌ LessonInteractions not available');
+            return;
+        }
+        
+        // If no blockId provided, find the first interactive block
+        if (!blockId) {
+            const interactiveBlocks = this.state.lessonData?.blocks?.filter(b => b.type === 'interactive');
+            if (interactiveBlocks && interactiveBlocks.length > 0) {
+                blockId = interactiveBlocks[0].id;
+                console.log(`🔍 Using first interactive block: ${blockId}`);
+            } else {
+                console.error('❌ No interactive blocks found in lesson');
+                return;
+            }
+        }
+        
+        console.log(`🔍 Debugging interactive block: ${blockId}`);
+        
+        // Use the debug method from LessonInteractions
+        if (this.services.interactions.debugRunButton) {
+            return this.services.interactions.debugRunButton(blockId);
+        } else {
+            console.error('❌ Debug method not available in LessonInteractions');
+        }
+    }
+
+    /**
      * Public API for external access
      */
     getApi() {
@@ -465,6 +496,9 @@ export class LessonSystem {
             rerenderLesson: () => this.services.renderer.renderLesson(this.state.lessonData, this.state.userProgress),
             showError: (message) => this.services.renderer.showError(message),
             
+            // Debug methods
+            debugInteractiveBlock: (blockId) => this.debugInteractiveBlock(blockId),
+            
             // State
             isInitialized: () => this.state.initialized
         };
@@ -473,3 +507,15 @@ export class LessonSystem {
 
 // Export for use in templates
 export default LessonSystem;
+
+// Make available globally for template usage
+window.LessonSystem = LessonSystem;
+
+// Global debug helper for development
+window.debugLesson = function(blockId) {
+    if (window.lessonSystem && window.lessonSystem.getApi) {
+        return window.lessonSystem.getApi().debugInteractiveBlock(blockId);
+    } else {
+        console.error('❌ Lesson system not initialized');
+    }
+};

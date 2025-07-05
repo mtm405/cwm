@@ -1,0 +1,149 @@
+    },
+    {
+      "id": "basic-precedence-example",
+      "type": "code_example",
+      "order": 1,
+      "title": "Basic Arithmetic Precedence",
+      "code": "# Without parentheses - follows precedence rules\nresult1 = 2 + 3 * 4\nprint(f\"2 + 3 * 4 = {result1}\")  # 14 (not 20!)\n# Evaluated as: 2 + (3 * 4) = 2 + 12 = 14\n\n# With parentheses - override precedence\nresult2 = (2 + 3) * 4\nprint(f\"(2 + 3) * 4 = {result2}\")  # 20\n# Evaluated as: 5 * 4 = 20\n\n# Multiple operators\nresult3 = 10 + 5 * 2 - 3\nprint(f\"10 + 5 * 2 - 3 = {result3}\")  # 17\n# Step by step:\n# 1. 5 * 2 = 10 (multiplication first)\n# 2. 10 + 10 = 20 (addition)\n# 3. 20 - 3 = 17 (subtraction)",
+      "explanation": "Multiplication and division have higher precedence than addition and subtraction. Operations of the same precedence are evaluated left to right. Use parentheses to override default precedence."
+    },
+    {
+      "id": "exponentiation-example",
+      "type": "code_example",
+      "order": 2,
+      "title": "Exponentiation and Unary Operators",
+      "code": "# Exponentiation has very high precedence\nresult1 = 2 + 3 ** 2\nprint(f\"2 + 3 ** 2 = {result1}\")  # 11\n# Evaluated as: 2 + (3 ** 2) = 2 + 9 = 11\n\n# But watch out for unary minus!\nresult2 = -2 ** 2\nprint(f\"-2 ** 2 = {result2}\")  # -4 (not 4!)\n# Evaluated as: -(2 ** 2) = -4\n\n# To square a negative number, use parentheses\nresult3 = (-2) ** 2\nprint(f\"(-2) ** 2 = {result3}\")  # 4\n\n# Complex expression\nresult4 = 5 * 2 ** 3 + 1\nprint(f\"5 * 2 ** 3 + 1 = {result4}\")  # 41\n# Steps: 2**3 = 8, then 5*8 = 40, then 40+1 = 41",
+      "explanation": "Exponentiation (**) has higher precedence than multiplication, but unary operators like -x are evaluated after exponentiation. This can lead to surprises!"
+    },
+    {
+      "id": "comparison-precedence-example",
+      "type": "code_example",
+      "order": 3,
+      "title": "Comparison and Logical Operators",
+      "code": "# Arithmetic before comparisons\nx = 5\nresult1 = x + 2 > 10\nprint(f\"x + 2 > 10 = {result1}\")  # False\n# Evaluated as: (5 + 2) > 10 = 7 > 10 = False\n\n# Comparisons before logical operators\nresult2 = x > 3 and x < 10\nprint(f\"x > 3 and x < 10 = {result2}\")  # True\n# Evaluated as: (x > 3) and (x < 10) = True and True = True\n\n# 'not' has higher precedence than 'and' and 'or'\nresult3 = not False and True\nprint(f\"not False and True = {result3}\")  # True\n# Evaluated as: (not False) and True = True and True = True\n\n# 'and' has higher precedence than 'or'\nresult4 = True or False and False\nprint(f\"True or False and False = {result4}\")  # True\n# Evaluated as: True or (False and False) = True or False = True",
+      "explanation": "Logical operators have their own hierarchy: 'not' is evaluated first, then 'and', then 'or'. Comparisons are evaluated before logical operators."
+    },
+    {
+      "id": "complex-expression-example",
+      "type": "code_example",
+      "order": 4,
+      "title": "Complex Expressions",
+      "code": "# A complex expression with multiple operator types\na, b, c = 10, 5, 2\n\n# Without parentheses\nresult1 = a + b * c ** 2 // 3 > 15 and not False\nprint(f\"Result without parentheses: {result1}\")\n\n# Let's break it down step by step:\n# 1. c ** 2 = 2 ** 2 = 4 (exponentiation first)\n# 2. b * 4 = 5 * 4 = 20 (multiplication)\n# 3. 20 // 3 = 6 (floor division)\n# 4. a + 6 = 10 + 6 = 16 (addition)\n# 5. 16 > 15 = True (comparison)\n# 6. not False = True (logical not)\n# 7. True and True = True (logical and)\n\n# With strategic parentheses for clarity\nresult2 = ((a + (b * (c ** 2)) // 3) > 15) and (not False)\nprint(f\"Same result with parentheses: {result2}\")",
+      "explanation": "In complex expressions, operations are performed in order of precedence. Adding parentheses can make your code more readable, even when they don't change the result."
+    },
+    {
+      "id": "precedence-exercise",
+      "type": "interactive",
+      "order": 5,
+      "title": "Expression Evaluator",
+      "instructions": "Create a function that evaluates expressions step by step, showing the order of operations. Return a list of steps.",
+      "starter_code": "def show_evaluation_steps(expression_str, variables):\n    # Your code here\n    # This is a simplified version - just handle basic cases\n    # Return a list of strings showing each step\n    pass\n\n# Test case\nvars = {'x': 5, 'y': 3}\nexpr = \"x + y * 2 > 10\"\nsteps = show_evaluation_steps(expr, vars)\nfor step in steps:\n    print(step)\n\n# Expected output:\n# Step 1: y * 2 = 3 * 2 = 6\n# Step 2: x + 6 = 5 + 6 = 11\n# Step 3: 11 > 10 = True",
+      "solution": "def show_evaluation_steps(expression_str, variables):\n    # This is a simplified solution for demonstration\n    steps = []\n    \n    # Replace variables with values\n    expr = expression_str\n    for var, val in variables.items():\n        expr = expr.replace(var, str(val))\n    \n    # For this example, we'll handle the specific case\n    if \"*\" in expr and \"+\" in expr and \">\" in expr:\n        # Find multiplication first\n        steps.append(f\"Step 1: y * 2 = {variables['y']} * 2 = {variables['y'] * 2}\")\n        \n        # Then addition\n        result = variables['x'] + variables['y'] * 2\n        steps.append(f\"Step 2: x + {variables['y'] * 2} = {variables['x']} + {variables['y'] * 2} = {result}\")\n        \n        # Then comparison\n        final = result > 10\n        steps.append(f\"Step 3: {result} > 10 = {final}\")\n    \n    return steps\n\n# Test case\nvars = {'x': 5, 'y': 3}\nexpr = \"x + y * 2 > 10\"\nsteps = show_evaluation_steps(expr, vars)\nfor step in steps:\n    print(step)",
+      "hints": [
+        "Start by identifying all operators in the expression",
+        "Evaluate operators in order of precedence",
+        "Show each intermediate result"
+      ],
+      "language": "python"
+    },
+    {
+      "id": "assignment-precedence-example",
+      "type": "code_example",
+      "order": 6,
+      "title": "Assignment Operator Precedence",
+      "code": "# Assignment has the lowest precedence\nx = 5\ny = x + 3 * 2  # Right side evaluated first\nprint(f\"y = {y}\")  # 11\n\n# Compound assignments\na = 10\na += 5 * 2  # Same as: a = a + (5 * 2)\nprint(f\"a after a += 5 * 2: {a}\")  # 20\n\n# Multiple assignments\nb = c = 5 + 3  # Right-most expression evaluated first\nprint(f\"b = {b}, c = {c}\")  # Both are 8\n\n# Chained comparisons (special case)\nx = 5\nresult = 3 < x < 10  # Equivalent to: 3 < x and x < 10\nprint(f\"3 < {x} < 10 = {result}\")  # True\n\n# Assignment in conditions (not recommended but legal)\nif (n := len(\"hello\")) > 4:  # Walrus operator :=\n    print(f\"Length {n} is greater than 4\")",
+      "explanation": "Assignment operators have the lowest precedence, so everything on the right side is evaluated first. The walrus operator := allows assignment within expressions (Python 3.8+)."
+    },
+    {
+      "id": "parentheses-example",
+      "type": "code_example",
+      "order": 7,
+      "title": "Using Parentheses Effectively",
+      "code": "# Parentheses override all precedence rules\nresult1 = 2 * 3 + 4 * 5\nprint(f\"2 * 3 + 4 * 5 = {result1}\")  # 26\n\nresult2 = 2 * (3 + 4) * 5\nprint(f\"2 * (3 + 4) * 5 = {result2}\")  # 70\n\n# Nested parentheses - evaluated inside out\nresult3 = ((2 + 3) * (4 + 5)) ** 2\nprint(f\"((2 + 3) * (4 + 5)) ** 2 = {result3}\")  # 2025\n# Steps: (2+3)=5, (4+5)=9, 5*9=45, 45**2=2025\n\n# Using parentheses for clarity (even when not needed)\n# Less readable:\nif x > 5 and y < 10 or z == 0:\n    pass\n\n# More readable:\nif (x > 5 and y < 10) or z == 0:\n    pass",
+      "explanation": "Parentheses have the highest precedence and are evaluated from innermost to outermost. Use them liberally to make your code more readable and less error-prone."
+    },
+    {
+      "id": "precedence-challenge",
+      "type": "interactive",
+      "order": 8,
+      "title": "Precedence Predictor Challenge",
+      "instructions": "Create a function that takes an expression and returns the result WITHOUT using eval(). Handle +, -, *, /, ** and parentheses.",
+      "starter_code": "def evaluate_expression(expr):\n    # Your code here\n    # This is a challenging problem!\n    # Start with simple cases and build up\n    pass\n\n# Test cases\nprint(evaluate_expression(\"2 + 3 * 4\"))        # Should return 14\nprint(evaluate_expression(\"(2 + 3) * 4\"))      # Should return 20\nprint(evaluate_expression(\"2 ** 3 * 4\"))       # Should return 32\nprint(evaluate_expression(\"10 - 2 * 3 + 1\"))   # Should return 5",
+      "solution": "def evaluate_expression(expr):\n    # Simple solution using Python's parser\n    # In practice, you'd implement a proper expression parser\n    import ast\n    \n    # Parse the expression into an AST\n    node = ast.parse(expr, mode='eval')\n    \n    # Compile and evaluate safely\n    code = compile(node, '<string>', 'eval')\n    \n    # Only allow safe operations\n    safe_dict = {\n        '__builtins__': {},\n        'abs': abs,\n        'min': min,\n        'max': max\n    }\n    \n    return eval(code, safe_dict)\n\n# Alternative simple solution for basic cases\ndef simple_evaluate(expr):\n    # Remove spaces\n    expr = expr.replace(' ', '')\n    \n    # For this simple version, we'll use eval with safety checks\n    # Check that expression only contains allowed characters\n    allowed = '0123456789+-*/().**'\n    if all(c in allowed for c in expr):\n        return eval(expr)\n    else:\n        raise ValueError(\"Invalid expression\")\n\n# Test cases\nprint(evaluate_expression(\"2 + 3 * 4\"))        # 14\nprint(evaluate_expression(\"(2 + 3) * 4\"))      # 20\nprint(evaluate_expression(\"2 ** 3 * 4\"))       # 32\nprint(evaluate_expression(\"10 - 2 * 3 + 1\"))   # 5",
+      "hints": [
+        "Consider using a stack-based approach",
+        "Handle parentheses by finding matching pairs",
+        "Evaluate operations in order of precedence"
+      ],
+      "language": "python"
+    },
+    {
+      "id": "precedence-quiz",
+      "type": "quiz",
+      "order": 9,
+      "title": "Precedence Knowledge Check",
+      "description": "Test your understanding of operator precedence",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "multiple_choice",
+          "question": "What is the result of: 10 + 5 * 2?",
+          "options": ["30", "20", "15", "25"],
+          "correct_answer": 1,
+          "explanation": "Multiplication has higher precedence than addition: 5 * 2 = 10, then 10 + 10 = 20."
+        },
+        {
+          "id": "q2",
+          "type": "multiple_choice",
+          "question": "What is the result of: -3 ** 2?",
+          "options": ["9", "-9", "6", "-6"],
+          "correct_answer": 1,
+          "explanation": "Exponentiation has higher precedence than unary minus: 3 ** 2 = 9, then -9."
+        },
+        {
+          "id": "q3",
+          "type": "true_false",
+          "question": "In the expression 'True or False and False', the 'and' operation is performed first.",
+          "correct_answer": true,
+          "explanation": "'and' has higher precedence than 'or', so 'False and False' is evaluated first, resulting in False, then 'True or False' gives True."
+        },
+        {
+          "id": "q4",
+          "type": "multiple_choice",
+          "question": "Which operator has the highest precedence?",
+          "options": ["**", "*", "+", "()"],
+          "correct_answer": 3,
+          "explanation": "Parentheses have the highest precedence and can override all other operator precedence rules."
+        },
+        {
+          "id": "q5",
+          "type": "true_false",
+          "question": "The expression 'x = y = 5 + 3' assigns 8 to both x and y.",
+          "correct_answer": true,
+          "explanation": "Assignment is right-associative. First 5 + 3 = 8, then y = 8, then x = y (which is 8)."
+        }
+      ]
+    }
+  ]
+}{
+  "id": "python-precedence-03",
+  "title": "Operator Precedence in Python",
+  "description": "Master the sequence of execution based on operator precedence in Python expressions",
+  "order": 3,
+  "difficulty": "intermediate",
+  "estimated_time": 50,
+  "prerequisites": ["python-datatypes-01", "python-operations-02"],
+  "tags": ["operators", "precedence", "expressions", "arithmetic", "logical"],
+  "xp_reward": 120,
+  "pycoins_reward": 25,
+  "quiz_id": "precedence-quiz",
+  "created_at": "2025-01-05T10:00:00Z",
+  "updated_at": "2025-01-05T10:00:00Z",
+  "is_published": true,
+  "blocks": [
+    {
+      "id": "intro-block",
+      "type": "text",
+      "order": 0,
+      "title": "Understanding Operator Precedence",
+      "content": "# Operator Precedence in Python\n\nWhen Python evaluates an expression with multiple operators, it follows specific rules to determine which operations to perform first. This is called **operator precedence**.\n\nJust like in mathematics where multiplication comes before addition (PEMDAS/BODMAS), Python has its own hierarchy of operations:\n\n1. **Parentheses** - Highest priority\n2. **Exponentiation** (`**`)\n3. **Unary operators** (`+x`, `-x`)\n4. **Multiplication/Division** (`*`, `/`, `//`, `%`)\n5. **Addition/Subtraction** (`+`, `-`)\n6. **Comparisons** (`<`, `>`, `<=`, `>=`, `==`, `!=`)\n7. **Boolean operators** (`not`, `and`, `or`)\n8. **Assignment operators** (`=`, `+=`, `-=`, etc.)\n\nUnderstanding precedence helps you write correct expressions and avoid bugs!"

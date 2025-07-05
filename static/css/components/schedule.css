@@ -1,0 +1,406 @@
+/* 
+ * Enhanced Schedule Styling
+ * Clean, modern class schedule focused on period and time only
+ */
+
+/* Enhanced Schedule Container */
+.class-schedule-container {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(246, 248, 255, 0.95));
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    overflow: hidden;
+    backdrop-filter: blur(5px);
+}
+
+/* Improved Schedule Table */
+.class-schedule-table {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+    margin: 0 auto;
+    border: 1px solid rgba(var(--primary-rgb, 99, 102, 241), 0.1);
+}
+
+.class-schedule-table table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    table-layout: fixed; /* Fixed table layout for better control */
+}
+
+.class-schedule-table thead {
+    background: linear-gradient(135deg, var(--primary-color, #6366f1), var(--secondary-color, #8b5cf6));
+}
+
+.class-schedule-table th {
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+    padding: 1rem 1.5rem;
+    text-align: left;
+    position: relative;
+}
+
+/* Column width adjustments */
+.class-schedule-table th.period-column {
+    width: 120px;
+}
+
+.class-schedule-table th.time-column {
+    width: auto;
+}
+
+.class-schedule-table th::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.class-schedule-table tbody tr {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.class-schedule-table tbody tr:hover {
+    background: rgba(var(--primary-rgb, 99, 102, 241), 0.05);
+    transform: translateX(5px);
+}
+
+.class-schedule-table tbody tr::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10px;
+    right: 10px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-color, #e5e7eb), transparent);
+}
+
+.class-schedule-table tbody tr:last-child::after {
+    display: none;
+}
+
+.class-schedule-table td {
+    padding: 1.25rem 1.5rem;
+    color: var(--text-primary, #1f2937);
+    font-weight: 500;
+    font-size: 1rem;
+    vertical-align: middle;
+}
+
+/* Enhanced Period Number Styling */
+.period-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--primary-color, #6366f1), var(--primary-color-light, #818cf8));
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    box-shadow: 0 4px 10px rgba(var(--primary-rgb, 99, 102, 241), 0.2);
+    position: relative;
+    overflow: hidden;
+    font-size: 1rem;
+}
+
+.period-number::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
+    border-radius: 50%;
+    transform: translateY(-50%);
+}
+
+/* Enhanced Period Label Styling */
+.period-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    height: 36px;
+    padding: 0 1.25rem;
+    background: linear-gradient(135deg, #f59e0b, #f97316);
+    color: white;
+    border-radius: 18px;
+    font-weight: 700;
+    box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2);
+    font-size: 0.9rem;
+}
+
+/* Enhanced Current Period Styling */
+.current-period {
+    background: rgba(var(--success-rgb, 34, 197, 94), 0.08);
+    position: relative;
+    animation: pulse-highlight 2s infinite alternate;
+}
+
+@keyframes pulse-highlight {
+    0% {
+        background: rgba(var(--success-rgb, 34, 197, 94), 0.05);
+    }
+    100% {
+        background: rgba(var(--success-rgb, 34, 197, 94), 0.12);
+    }
+}
+
+.current-period::before {
+    content: '⦿ Current';
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--success-color, #10b981);
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(var(--success-rgb, 34, 197, 94), 0.08);
+    border-radius: 15px;
+    box-shadow: 0 2px 6px rgba(var(--success-rgb, 34, 197, 94), 0.15);
+}
+
+.lunch-period {
+    background: rgba(245, 158, 11, 0.06);
+}
+
+.lunch-period:hover {
+    background: rgba(245, 158, 11, 0.12) !important;
+}
+
+/* Modal Size and Style Improvements */
+.modal-md {
+    max-width: 500px;
+    width: 100%;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--primary-color, #6366f1), var(--secondary-color, #8b5cf6));
+    padding: 1.25rem 1.5rem;
+    border-radius: 12px 12px 0 0;
+}
+
+.modal-title {
+    color: white;
+    font-size: 1.4rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.modal-title i {
+    font-size: 1.2rem;
+}
+
+.modal-close {
+    color: white;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+/* Schedule Section Styles - Clean & Modern */
+.schedule-section {
+    background: linear-gradient(135deg, rgba(var(--primary-rgb, 99, 102, 241), 0.03), rgba(var(--secondary-rgb, 139, 92, 246), 0.03));
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+@keyframes pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.6;
+    }
+    70% {
+        opacity: 0;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* Next Class Indicator */
+.next-class-alert {
+    background: linear-gradient(135deg, rgba(var(--primary-rgb, 99, 102, 241), 0.1), rgba(var(--secondary-rgb, 139, 92, 246), 0.1));
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-left: 4px solid var(--primary-color, #6366f1);
+    box-shadow: 0 4px 15px rgba(var(--primary-rgb, 99, 102, 241), 0.1);
+}
+
+.next-class-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.next-class-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary, #4b5563);
+}
+
+.next-class-details {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary, #1f2937);
+}
+
+.countdown-timer {
+    font-family: 'JetBrains Mono', monospace, 'Courier New', Courier;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-color, #6366f1);
+    background: rgba(var(--primary-rgb, 99, 102, 241), 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.countdown-timer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color, #6366f1), var(--secondary-color, #8b5cf6));
+    animation: countdown-progress 60s linear infinite;
+}
+
+@keyframes countdown-progress {
+    0% {
+        width: 100%;
+    }
+    100% {
+        width: 0%;
+    }
+}
+
+/* Weekly Schedule Tab System */
+.schedule-tabs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    padding-bottom: 0.5rem;
+}
+
+.schedule-tab {
+    padding: 0.75rem 1.25rem;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    color: var(--text-secondary, #4b5563);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.schedule-tab::after {
+    content: '';
+    position: absolute;
+    bottom: -0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    background: var(--primary-color, #6366f1);
+    transition: all 0.2s ease;
+    border-radius: 3px;
+}
+
+.schedule-tab:hover {
+    color: var(--text-primary, #1f2937);
+    background: rgba(var(--primary-rgb, 99, 102, 241), 0.05);
+}
+
+.schedule-tab.active {
+    color: var(--primary-color, #6366f1);
+}
+
+.schedule-tab.active::after {
+    width: 80%;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .class-schedule-table th,
+    .class-schedule-table td {
+        padding: 1rem;
+    }
+    
+    .period-number {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+    
+    .next-class-alert {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .countdown-timer {
+        align-self: stretch;
+        text-align: center;
+    }
+    
+    .current-period::before {
+        position: static;
+        transform: none;
+        display: block;
+        margin-top: 0.5rem;
+        text-align: center;
+    }
+    
+    .schedule-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .schedule-date {
+        align-self: flex-start;
+    }
+}

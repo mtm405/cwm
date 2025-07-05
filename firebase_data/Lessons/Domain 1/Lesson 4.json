@@ -1,0 +1,166 @@
+{
+  "id": "python-operators-04",
+  "title": "Selecting Operators to Achieve Results",
+  "description": "Master the selection and use of Python operators for different programming tasks",
+  "order": 4,
+  "difficulty": "intermediate",
+  "estimated_time": 55,
+  "prerequisites": ["python-datatypes-01", "python-operations-02", "python-precedence-03"],
+  "tags": ["operators", "arithmetic", "comparison", "logical", "assignment", "identity", "membership"],
+  "xp_reward": 150,
+  "pycoins_reward": 30,
+  "quiz_id": "operators-quiz",
+  "created_at": "2025-01-05T10:00:00Z",
+  "updated_at": "2025-01-05T10:00:00Z",
+  "is_published": true,
+  "blocks": [
+    {
+      "id": "intro-block",
+      "type": "text",
+      "order": 0,
+      "title": "Choosing the Right Operator",
+      "content": "# Selecting Operators in Python\n\nPython provides a rich set of operators for different purposes. Choosing the right operator is crucial for writing efficient and readable code. This lesson covers:\n\n1. **Arithmetic Operators** - Mathematical calculations\n2. **Assignment Operators** - Storing and updating values\n3. **Comparison Operators** - Comparing values\n4. **Logical Operators** - Combining conditions\n5. **Identity Operators** - Checking object identity\n6. **Membership Operators** - Testing containment\n\nLet's explore when and how to use each type effectively!"
+    },
+    {
+      "id": "arithmetic-operators-example",
+      "type": "code_example",
+      "order": 1,
+      "title": "Arithmetic Operators",
+      "code": "# Basic arithmetic operators\na, b = 17, 5\n\nprint(f\"Addition: {a} + {b} = {a + b}\")           # 22\nprint(f\"Subtraction: {a} - {b} = {a - b}\")        # 12\nprint(f\"Multiplication: {a} * {b} = {a * b}\")     # 85\nprint(f\"Division: {a} / {b} = {a / b}\")           # 3.4 (always float)\nprint(f\"Floor Division: {a} // {b} = {a // b}\")   # 3 (integer result)\nprint(f\"Modulo: {a} % {b} = {a % b}\")             # 2 (remainder)\nprint(f\"Exponentiation: {a} ** 2 = {a ** 2}\")     # 289\n\n# Practical uses\n# Calculate average (division)\ngrades = [85, 92, 78, 95, 88]\naverage = sum(grades) / len(grades)\nprint(f\"\\nAverage grade: {average:.2f}\")\n\n# Check if even/odd (modulo)\nnum = 42\nif num % 2 == 0:\n    print(f\"{num} is even\")\n    \n# Calculate area of circle (exponentiation)\nimport math\nradius = 5\narea = math.pi * radius ** 2\nprint(f\"Circle area: {area:.2f}\")",
+      "explanation": "Arithmetic operators perform mathematical operations. Division (/) always returns a float, while floor division (//) returns an integer. The modulo operator (%) is useful for checking divisibility and cycling through values."
+    },
+    {
+      "id": "assignment-operators-example",
+      "type": "code_example",
+      "order": 2,
+      "title": "Assignment Operators",
+      "code": "# Basic assignment\nx = 10\nprint(f\"Initial value: x = {x}\")\n\n# Compound assignment operators\nx += 5    # Same as: x = x + 5\nprint(f\"After x += 5: {x}\")      # 15\n\nx -= 3    # Same as: x = x - 3\nprint(f\"After x -= 3: {x}\")      # 12\n\nx *= 2    # Same as: x = x * 2\nprint(f\"After x *= 2: {x}\")      # 24\n\nx //= 5   # Same as: x = x // 5\nprint(f\"After x //= 5: {x}\")     # 4\n\nx **= 3   # Same as: x = x ** 3\nprint(f\"After x **= 3: {x}\")     # 64\n\n# Practical example: Running total\ntotal = 0\nprices = [19.99, 5.50, 12.75, 8.00]\nfor price in prices:\n    total += price  # Add each price to total\nprint(f\"\\nTotal cost: ${total:.2f}\")\n\n# Multiple assignment\na = b = c = 0  # All variables get the same value\nx, y, z = 1, 2, 3  # Assign multiple values at once\nprint(f\"\\na={a}, b={b}, c={c}\")\nprint(f\"x={x}, y={y}, z={z}\")",
+      "explanation": "Assignment operators store values in variables. Compound operators (+=, -=, etc.) provide a shorthand for updating variables. They make code more concise and often more readable."
+    },
+    {
+      "id": "comparison-operators-example",
+      "type": "code_example",
+      "order": 3,
+      "title": "Comparison Operators",
+      "code": "# Comparison operators return boolean values\na, b = 10, 20\n\nprint(f\"{a} == {b}: {a == b}\")    # False (equal to)\nprint(f\"{a} != {b}: {a != b}\")    # True (not equal to)\nprint(f\"{a} < {b}: {a < b}\")      # True (less than)\nprint(f\"{a} > {b}: {a > b}\")      # False (greater than)\nprint(f\"{a} <= {b}: {a <= b}\")    # True (less than or equal)\nprint(f\"{a} >= {b}: {a >= b}\")    # False (greater than or equal)\n\n# Practical examples\n# Age verification\nage = 18\nif age >= 18:\n    print(\"\\nYou can vote!\")\n    \n# Grade classification\nscore = 85\nif score >= 90:\n    grade = 'A'\nelif score >= 80:\n    grade = 'B'\nelif score >= 70:\n    grade = 'C'\nelse:\n    grade = 'F'\nprint(f\"Score {score} = Grade {grade}\")\n\n# String comparisons (alphabetical)\nprint(f\"\\n'apple' < 'banana': {'apple' < 'banana'}\")  # True\nprint(f\"'Python' == 'python': {'Python' == 'python'}\")  # False (case-sensitive)",
+      "explanation": "Comparison operators test relationships between values and return boolean results. They're essential for decision-making in programs. String comparisons are case-sensitive and use alphabetical order."
+    },
+    {
+      "id": "logical-operators-example",
+      "type": "code_example",
+      "order": 4,
+      "title": "Logical Operators",
+      "code": "# Logical operators: and, or, not\nage = 25\nhas_license = True\nhas_insurance = False\n\n# 'and' - both conditions must be True\ncan_drive = age >= 16 and has_license\nprint(f\"Can drive: {can_drive}\")  # True\n\n# 'or' - at least one condition must be True\nneeds_training = age < 16 or not has_license\nprint(f\"Needs training: {needs_training}\")  # False\n\n# 'not' - inverts the boolean value\nis_insured = not has_insurance\nprint(f\"Is uninsured: {is_insured}\")  # True\n\n# Complex conditions\ncan_rent_car = age >= 25 and has_license and has_insurance\nprint(f\"Can rent car: {can_rent_car}\")  # False\n\n# Short-circuit evaluation\n# 'and' stops at first False, 'or' stops at first True\nresult = False and print(\"This won't print\")\nresult = True or print(\"This won't print either\")\n\n# Practical example: Password validation\npassword = \"SecurePass123\"\nis_long_enough = len(password) >= 8\nhas_digit = any(char.isdigit() for char in password)\nhas_upper = any(char.isupper() for char in password)\n\nis_valid = is_long_enough and has_digit and has_upper\nprint(f\"\\nPassword is valid: {is_valid}\")",
+      "explanation": "Logical operators combine boolean expressions. Python uses short-circuit evaluation: 'and' stops at the first False, 'or' stops at the first True. This can improve performance and prevent errors."
+    },
+    {
+      "id": "operator-selection-exercise",
+      "type": "interactive",
+      "order": 5,
+      "title": "Calculator Function",
+      "instructions": "Create a calculator function that takes two numbers and an operation string, then returns the result using the appropriate operator.",
+      "starter_code": "def calculate(a, b, operation):\n    # Your code here\n    # operation can be: 'add', 'subtract', 'multiply', 'divide',\n    # 'power', 'modulo', 'floor_divide'\n    pass\n\n# Test cases\nprint(calculate(10, 3, 'add'))          # Should return 13\nprint(calculate(10, 3, 'subtract'))     # Should return 7\nprint(calculate(10, 3, 'multiply'))     # Should return 30\nprint(calculate(10, 3, 'divide'))       # Should return 3.333...\nprint(calculate(10, 3, 'floor_divide')) # Should return 3\nprint(calculate(10, 3, 'modulo'))       # Should return 1\nprint(calculate(2, 8, 'power'))         # Should return 256",
+      "solution": "def calculate(a, b, operation):\n    if operation == 'add':\n        return a + b\n    elif operation == 'subtract':\n        return a - b\n    elif operation == 'multiply':\n        return a * b\n    elif operation == 'divide':\n        if b != 0:\n            return a / b\n        else:\n            return \"Error: Division by zero\"\n    elif operation == 'floor_divide':\n        if b != 0:\n            return a // b\n        else:\n            return \"Error: Division by zero\"\n    elif operation == 'modulo':\n        if b != 0:\n            return a % b\n        else:\n            return \"Error: Division by zero\"\n    elif operation == 'power':\n        return a ** b\n    else:\n        return \"Error: Unknown operation\"\n\n# Test cases\nprint(calculate(10, 3, 'add'))          # 13\nprint(calculate(10, 3, 'subtract'))     # 7\nprint(calculate(10, 3, 'multiply'))     # 30\nprint(calculate(10, 3, 'divide'))       # 3.333...\nprint(calculate(10, 3, 'floor_divide')) # 3\nprint(calculate(10, 3, 'modulo'))       # 1\nprint(calculate(2, 8, 'power'))         # 256",
+      "hints": [
+        "Use if-elif statements to check the operation",
+        "Remember to handle division by zero",
+        "Each operation corresponds to a specific operator"
+      ],
+      "language": "python"
+    },
+    {
+      "id": "identity-operators-example",
+      "type": "code_example",
+      "order": 6,
+      "title": "Identity and Membership Operators",
+      "code": "# Identity operators: is, is not\n# Check if two variables refer to the same object\n\n# With immutable objects (numbers, strings)\na = 1000\nb = 1000\nc = a\n\nprint(f\"a == b: {a == b}\")      # True (same value)\nprint(f\"a is b: {a is b}\")      # False (different objects)\nprint(f\"a is c: {a is c}\")      # True (same object)\n\n# With mutable objects (lists)\nlist1 = [1, 2, 3]\nlist2 = [1, 2, 3]\nlist3 = list1\n\nprint(f\"\\nlist1 == list2: {list1 == list2}\")  # True (same content)\nprint(f\"list1 is list2: {list1 is list2}\")    # False (different objects)\nprint(f\"list1 is list3: {list1 is list3}\")    # True (same object)\n\n# Membership operators: in, not in\n# Check if a value exists in a sequence\n\n# With strings\ntext = \"Python Programming\"\nprint(f\"\\n'Python' in text: {'Python' in text}\")      # True\nprint(f\"'java' in text: {'java' in text}\")            # False\nprint(f\"'java' not in text: {'java' not in text}\")    # True\n\n# With lists\nfruits = ['apple', 'banana', 'orange']\nprint(f\"\\n'banana' in fruits: {'banana' in fruits}\")  # True\nprint(f\"'grape' in fruits: {'grape' in fruits}\")      # False\n\n# With dictionaries (checks keys by default)\nscores = {'Alice': 92, 'Bob': 87, 'Charlie': 95}\nprint(f\"\\n'Alice' in scores: {'Alice' in scores}\")    # True\nprint(f\"92 in scores: {92 in scores}\")                # False (92 is a value, not a key)\nprint(f\"92 in scores.values(): {92 in scores.values()}\")  # True",
+      "explanation": "Identity operators check if variables refer to the same object in memory. Membership operators test whether a value exists in a sequence. Use 'is' for None checks and object identity, '==' for value equality."
+    },
+    {
+      "id": "operator-combination-example",
+      "type": "code_example",
+      "order": 7,
+      "title": "Combining Operators Effectively",
+      "code": "# Real-world example: User authentication system\nusers = {\n    'alice@email.com': {'password': 'SecurePass123', 'age': 25, 'premium': True},\n    'bob@email.com': {'password': 'MyPass456', 'age': 17, 'premium': False}\n}\n\ndef can_access_content(email, password, content_rating):\n    # Check if user exists\n    if email not in users:\n        return False, \"User not found\"\n    \n    user = users[email]\n    \n    # Verify password (using ==)\n    if user['password'] != password:\n        return False, \"Invalid password\"\n    \n    # Check age requirement (using >= and and)\n    if content_rating == 'R' and user['age'] < 18:\n        return False, \"Age restriction\"\n    \n    # Check premium requirement (using or)\n    if content_rating == 'Premium' and not user['premium']:\n        return False, \"Premium subscription required\"\n    \n    return True, \"Access granted\"\n\n# Test different scenarios\nprint(can_access_content('alice@email.com', 'SecurePass123', 'R'))\nprint(can_access_content('bob@email.com', 'MyPass456', 'R'))\nprint(can_access_content('bob@email.com', 'MyPass456', 'PG'))\n\n# Example: Smart discount calculator\ndef calculate_discount(price, quantity, is_member, coupon_code=None):\n    discount = 0\n    \n    # Quantity discount (using >= and *=)\n    if quantity >= 10:\n        discount += 0.1  # 10% for bulk\n    elif quantity >= 5:\n        discount += 0.05  # 5% for medium quantity\n    \n    # Member discount (using and)\n    if is_member and price >= 50:\n        discount += 0.15  # Extra 15% for members on large purchases\n    \n    # Coupon discount (using in and or)\n    valid_coupons = ['SAVE20', 'SPECIAL25']\n    if coupon_code in valid_coupons:\n        discount += 0.20 if coupon_code == 'SAVE20' else 0.25\n    \n    # Calculate final price\n    final_price = price * quantity * (1 - discount)\n    \n    return final_price, discount * 100\n\nprice, discount = calculate_discount(30, 5, True, 'SAVE20')\nprint(f\"\\nFinal price: ${price:.2f} (Discount: {discount:.0f}%)\")",
+      "explanation": "Real-world applications often require combining multiple operators. Use clear variable names and comments when logic gets complex. Break complex conditions into smaller, named boolean variables for better readability."
+    },
+    {
+      "id": "complex-operator-exercise",
+      "type": "interactive",
+      "order": 8,
+      "title": "Grade Analysis System",
+      "instructions": "Create a comprehensive grade analysis function that uses various operators to categorize students based on their scores, attendance, and participation.",
+      "starter_code": "def analyze_student(name, scores, attendance_rate, participation):\n    # Your code here\n    # scores: list of test scores\n    # attendance_rate: percentage (0-100)\n    # participation: boolean\n    \n    # Calculate average score\n    # Determine letter grade (A: 90+, B: 80-89, C: 70-79, D: 60-69, F: <60)\n    # Check if eligible for honors (avg >= 85 and attendance >= 90%)\n    # Apply penalties/bonuses\n    # Return a dictionary with results\n    pass\n\n# Test cases\nresult1 = analyze_student(\n    \"Alice\", \n    [92, 88, 95, 91], \n    attendance_rate=95, \n    participation=True\n)\nprint(result1)\n# Expected: {'name': 'Alice', 'average': 91.5, 'grade': 'A', 'honors': True, ...}\n\nresult2 = analyze_student(\n    \"Bob\", \n    [75, 68, 72, 70], \n    attendance_rate=75, \n    participation=False\n)\nprint(result2)",
+      "solution": "def analyze_student(name, scores, attendance_rate, participation):\n    # Calculate average score\n    if not scores:  # Handle empty list\n        return {'error': 'No scores provided'}\n    \n    average = sum(scores) / len(scores)\n    \n    # Determine letter grade\n    if average >= 90:\n        grade = 'A'\n    elif average >= 80:\n        grade = 'B'\n    elif average >= 70:\n        grade = 'C'\n    elif average >= 60:\n        grade = 'D'\n    else:\n        grade = 'F'\n    \n    # Apply attendance penalty/bonus\n    final_average = average\n    if attendance_rate < 70:\n        final_average *= 0.9  # 10% penalty for poor attendance\n    elif attendance_rate >= 95:\n        final_average *= 1.02  # 2% bonus for excellent attendance\n    \n    # Apply participation bonus\n    if participation and average >= 70:\n        final_average += 2  # 2 point bonus\n    \n    # Recalculate grade after adjustments\n    if final_average >= 90:\n        final_grade = 'A'\n    elif final_average >= 80:\n        final_grade = 'B'\n    elif final_average >= 70:\n        final_grade = 'C'\n    elif final_average >= 60:\n        final_grade = 'D'\n    else:\n        final_grade = 'F'\n    \n    # Check honors eligibility\n    honors = average >= 85 and attendance_rate >= 90\n    \n    # Check if at risk\n    at_risk = average < 70 or attendance_rate < 75\n    \n    return {\n        'name': name,\n        'average': round(average, 2),\n        'final_average': round(final_average, 2),\n        'grade': grade,\n        'final_grade': final_grade,\n        'attendance_rate': attendance_rate,\n        'participation': participation,\n        'honors': honors,\n        'at_risk': at_risk,\n        'highest_score': max(scores),\n        'lowest_score': min(scores)\n    }\n\n# Test cases\nresult1 = analyze_student(\n    \"Alice\", \n    [92, 88, 95, 91], \n    attendance_rate=95, \n    participation=True\n)\nprint(\"Alice's Results:\")\nfor key, value in result1.items():\n    print(f\"  {key}: {value}\")\n\nprint(\"\\nBob's Results:\")\nresult2 = analyze_student(\n    \"Bob\", \n    [75, 68, 72, 70], \n    attendance_rate=75, \n    participation=False\n)\nfor key, value in result2.items():\n    print(f\"  {key}: {value}\")",
+      "hints": [
+        "Use arithmetic operators to calculate averages",
+        "Use comparison operators for grade boundaries",
+        "Use logical operators to combine conditions for honors",
+        "Consider edge cases like empty score lists"
+      ],
+      "language": "python"
+    },
+    {
+      "id": "operators-quiz",
+      "type": "quiz",
+      "order": 9,
+      "title": "Operator Selection Knowledge Check",
+      "description": "Test your understanding of when to use different operators",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "multiple_choice",
+          "question": "Which operator would you use to check if a number is even?",
+          "options": [
+            "number / 2 == 0",
+            "number % 2 == 0",
+            "number // 2 == 0",
+            "number ** 2 == 0"
+          ],
+          "correct_answer": 1,
+          "explanation": "The modulo operator (%) returns the remainder after division. A number is even if number % 2 equals 0."
+        },
+        {
+          "id": "q2",
+          "type": "multiple_choice",
+          "question": "What's the most efficient way to increase a counter by 1?",
+          "options": [
+            "counter = counter + 1",
+            "counter += 1",
+            "counter++ ",
+            "Both A and B are equally efficient"
+          ],
+          "correct_answer": 3,
+          "explanation": "Both 'counter = counter + 1' and 'counter += 1' are valid and equally efficient. Python doesn't have ++ operator."
+        },
+        {
+          "id": "q3",
+          "type": "true_false",
+          "question": "You should use 'is' to compare string values.",
+          "correct_answer": false,
+          "explanation": "'is' checks object identity, not value equality. Use '==' to compare string values, and 'is' only for checking None or object identity."
+        },
+        {
+          "id": "q4",
+          "type": "multiple_choice",
+          "question": "Which operator checks if an item exists in a list?",
+          "options": [
+            "exists",
+            "has",
+            "in",
+            "contains"
+          ],
+          "correct_answer": 2,
+          "explanation": "The 'in' operator checks membership. Example: if 'apple' in fruits_list:"
+        },
+        {
+          "id": "q5",
+          "type": "true_false",
+          "question": "The expression 'x or y' returns True or False only.",
+          "correct_answer": false,
+          "explanation": "'or' returns the first truthy value or the last value if all are falsy. For example, 'None or 5' returns 5, not True."
+        }
+      ]
+    }
+  ]
+}

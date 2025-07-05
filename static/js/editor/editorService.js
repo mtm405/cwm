@@ -131,6 +131,12 @@ class EditorService {
             // Merge configuration
             const config = this.mergeConfig(options);
             
+            // Check if ACE editor is available
+            if (typeof ace === 'undefined') {
+                console.warn('⚠️ ACE editor not loaded, using fallback textarea');
+                return this.createFallbackEditor(editorId, config);
+            }
+            
             // Create ACE editor
             const editor = ace.edit(editorId);
             
@@ -173,6 +179,90 @@ class EditorService {
             });
             throw error;
         }
+    }
+
+    /**
+     * Create a fallback editor when ACE is not available
+     */
+    createFallbackEditor(editorId, config) {
+        const container = document.getElementById(editorId);
+        if (!container) {
+            throw new Error(`Editor container not found: ${editorId}`);
+        }
+        
+        // Create textarea fallback
+        const textarea = document.createElement('textarea');
+        textarea.id = editorId + '-fallback';
+        textarea.style.cssText = `
+            width: 100%;
+            height: 100%;
+            font-family: Monaco, Menlo, 'Ubuntu Mono', Consolas, monospace;
+            font-size: 14px;
+            tab-size: 4;
+            border: 1px solid #ccc;
+            padding: 10px;
+            resize: none;
+            background: #f8f9fa;
+            color: #333;
+        `;
+        
+        if (config.code) {
+            textarea.value = config.code;
+        }
+        
+        // Clear container and add textarea
+        container.innerHTML = '';
+        container.appendChild(textarea);
+        
+        // Create mock editor object with basic methods
+        const mockEditor = {
+            isFallback: true,
+            element: textarea,
+            getValue: () => textarea.value,
+            setValue: (value, cursor) => {
+                textarea.value = value;
+                if (cursor !== -1) {
+                    textarea.setSelectionRange(0, 0);
+                }
+            },
+            getSelection: () => ({
+                getRange: () => ({
+                    start: { row: 0, column: textarea.selectionStart },
+                    end: { row: 0, column: textarea.selectionEnd }
+                })
+            }),
+            focus: () => textarea.focus(),
+            blur: () => textarea.blur(),
+            on: (event, callback) => {
+                if (event === 'change') {
+                    textarea.addEventListener('input', callback);
+                }
+            },
+            off: (event, callback) => {
+                if (event === 'change') {
+                    textarea.removeEventListener('input', callback);
+                }
+            },
+            session: {
+                setMode: () => {},
+                setUseWrapMode: () => {},
+                setTabSize: () => {},
+                setUseSoftTabs: () => {}
+            },
+            setTheme: () => {},
+            setOptions: () => {},
+            commands: {
+                addCommand: () => {}
+            }
+        };
+        
+        // Store in editors map
+        this.editors.set(editorId, mockEditor);
+        this.editorConfigs.set(editorId, config);
+        
+        console.log(`✅ Fallback editor created for: ${editorId}`);
+        
+        return mockEditor;
     }
 
     /**

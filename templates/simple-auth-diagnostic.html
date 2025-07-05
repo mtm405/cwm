@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-signin-client_id" content="{{ google_client_id }}">
+    <title>Simple Auth Diagnostic - Code with Morais</title>
+    <style>
+        body {
+            font-family: monospace;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .diagnostic-box {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .error { border-left-color: #dc3545; }
+        .success { border-left-color: #28a745; }
+        .warning { border-left-color: #ffc107; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .clear-btn {
+            background: #dc3545;
+        }
+        .clear-btn:hover {
+            background: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Simple Auth Diagnostic</h1>
+    
+    <div class="diagnostic-box">
+        <h3>Current Status</h3>
+        <div id="status">Loading...</div>
+        <button onclick="refreshStatus()">Refresh Status</button>
+        <button onclick="fixAuthToken()">Fix Token</button>
+        <button onclick="clearAllAuth()" class="clear-btn">Clear All Auth Data</button>
+    </div>
+    
+    <div class="diagnostic-box">
+        <h3>Configuration</h3>
+        <div id="config">Loading...</div>
+    </div>
+    
+    <div class="diagnostic-box">
+        <h3>Storage Contents</h3>
+        <div id="storage">Loading...</div>
+    </div>
+    
+    <div class="diagnostic-box">
+        <h3>Google Auth Status</h3>
+        <div id="google-auth">Loading...</div>
+        <button onclick="testGoogleAuth()">Test Google Auth</button>
+    </div>
+    
+    <div class="diagnostic-box">
+        <h3>Console Log</h3>
+        <pre id="console-log">Starting diagnostic...</pre>
+    </div>
+
+    <script>
+        // Global CONFIG should be available
+        window.CONFIG = {
+            GOOGLE_CLIENT_ID: '{{ google_client_id }}',
+            API_BASE_URL: '/api',
+            AUTH_TOKEN_KEY: 'auth_token',
+            DEBUG_MODE: true
+        };
+
+        // Custom console to capture logs
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        const originalConsoleWarn = console.warn;
+        
+        let logMessages = [];
+        
+        function addLogMessage(type, message) {
+            const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+            logMessages.push(`[${timestamp}] ${type.toUpperCase()}: ${message}`);
+            if (logMessages.length > 50) logMessages.shift();
+            updateConsoleLog();
+        }
+        
+        console.log = function(...args) {
+            addLogMessage('log', args.join(' '));
+            originalConsoleLog.apply(console, args);
+        };
+        
+        console.error = function(...args) {
+            addLogMessage('error', args.join(' '));
+            originalConsoleError.apply(console, args);
+        };
+        
+        console.warn = function(...args) {
+            addLogMessage('warn', args.join(' '));
+            originalConsoleWarn.apply(console, args);
+        };
+        
+        function updateConsoleLog() {
+            document.getElementById('console-log').textContent = logMessages.join('\n');
+        }
+        
+        function refreshStatus() {
+            console.log('Refreshing authentication status...');
+            
+            // Check authentication state
+            const authToken = localStorage.getItem('auth_token') || 
+                              localStorage.getItem('cwm_user_token') || 
+                              sessionStorage.getItem('auth_token');
+            
+            const userProfile = localStorage.getItem('cwm_user_profile');
+            const currentUser = window.currentUser;
+            
+            const hasGoogle = !!window.google;
+            const hasGoogleAccounts = !!(window.google && window.google.accounts);
+            
+            let statusHtml = `
+                <div class="${authToken ? 'success' : 'error'}">
+                    <strong>Auth Token:</strong> ${authToken ? '✅ Present' : '❌ Missing'}
+                    ${authToken ? `<br><small>Token: ${authToken.substring(0, 20)}...</small>` : ''}
+                </div>
+                <div class="${userProfile ? 'success' : 'error'}">
+                    <strong>User Profile:</strong> ${userProfile ? '✅ Present' : '❌ Missing'}
+                </div>
+                <div class="${currentUser ? 'success' : 'error'}">
+                    <strong>Current User Object:</strong> ${currentUser ? '✅ Present' : '❌ Missing'}
+                </div>
+                <div class="${hasGoogle ? 'success' : 'error'}">
+                    <strong>Google API:</strong> ${hasGoogle ? '✅ Loaded' : '❌ Not Loaded'}
+                </div>
+                <div class="${hasGoogleAccounts ? 'success' : 'error'}">
+                    <strong>Google Accounts:</strong> ${hasGoogleAccounts ? '✅ Available' : '❌ Not Available'}
+                </div>
+            `;
+            
+            document.getElementById('status').innerHTML = statusHtml;
+            
+            // Update config
+            const configHtml = `
+                <pre>${JSON.stringify(window.CONFIG, null, 2)}</pre>
+            `;
+            document.getElementById('config').innerHTML = configHtml;
+            
+            // Update storage
+            const storageData = {
+                localStorage: {},
+                sessionStorage: {}
+            };
+            
+            // Get all localStorage items
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.includes('auth') || key.includes('cwm') || key.includes('user') || key.includes('google')) {
+                    storageData.localStorage[key] = localStorage.getItem(key);
+                }
+            }
+            
+            // Get all sessionStorage items
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                if (key.includes('auth') || key.includes('cwm') || key.includes('user') || key.includes('google')) {
+                    storageData.sessionStorage[key] = sessionStorage.getItem(key);
+                }
+            }
+            
+            document.getElementById('storage').innerHTML = `<pre>${JSON.stringify(storageData, null, 2)}</pre>`;
+            
+            console.log('Status refreshed');
+        }
+        
+        function clearAllAuth() {
+            console.log('Clearing all authentication data...');
+            
+            // Clear localStorage - comprehensive list
+            const localStorageKeys = [
+                'auth_token', 'cwm_user_token', 'authToken', 'user_token',
+                'cwm_user_profile', 'user_profile', 'currentUser', 'user_data',
+                'google_auth_token', 'google_user', 'gapi_token',
+                'firebase_auth_token', 'firebase_user'
+            ];
+            
+            localStorageKeys.forEach(key => {
+                if (localStorage.getItem(key)) {
+                    console.log(`Removing localStorage: ${key}`);
+                    localStorage.removeItem(key);
+                }
+            });
+            
+            // Also check for any other auth-related keys
+            const allLocalKeys = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                allLocalKeys.push(localStorage.key(i));
+            }
+            
+            allLocalKeys.forEach(key => {
+                if (key && (key.includes('auth') || key.includes('cwm') || key.includes('user') || key.includes('google') || key.includes('token'))) {
+                    console.log(`Removing localStorage: ${key}`);
+                    localStorage.removeItem(key);
+                }
+            });
+            
+            // Clear sessionStorage - comprehensive list
+            const sessionStorageKeys = [
+                'auth_token', 'cwm_user_token', 'authToken', 'user_token',
+                'cwm_user_profile', 'user_profile', 'currentUser', 'user_data',
+                'google_auth_token', 'google_user', 'gapi_token',
+                'firebase_auth_token', 'firebase_user'
+            ];
+            
+            sessionStorageKeys.forEach(key => {
+                if (sessionStorage.getItem(key)) {
+                    console.log(`Removing sessionStorage: ${key}`);
+                    sessionStorage.removeItem(key);
+                }
+            });
+            
+            // Also check for any other auth-related keys in sessionStorage
+            const allSessionKeys = [];
+            for (let i = 0; i < sessionStorage.length; i++) {
+                allSessionKeys.push(sessionStorage.key(i));
+            }
+            
+            allSessionKeys.forEach(key => {
+                if (key && (key.includes('auth') || key.includes('cwm') || key.includes('user') || key.includes('google') || key.includes('token'))) {
+                    console.log(`Removing sessionStorage: ${key}`);
+                    sessionStorage.removeItem(key);
+                }
+            });
+            
+            // Clear global objects
+            window.currentUser = null;
+            if (window.app) {
+                window.app.currentUser = null;
+            }
+            if (window.authUser) {
+                window.authUser = null;
+            }
+            if (window.googleUser) {
+                window.googleUser = null;
+            }
+            
+            // Clear Google Sign-In if available
+            if (window.google && window.google.accounts && window.google.accounts.id) {
+                try {
+                    window.google.accounts.id.disableAutoSelect();
+                    console.log('Google auto-select disabled');
+                } catch (e) {
+                    console.log('Could not disable Google auto-select:', e);
+                }
+            }
+            
+            // Clear any auth-related cookies
+            document.cookie.split(";").forEach(function(c) { 
+                const cookieName = c.replace(/^ +/, "").replace(/=.*/, "");
+                if (cookieName.includes('auth') || cookieName.includes('user') || cookieName.includes('google') || cookieName.includes('token')) {
+                    console.log(`Clearing cookie: ${cookieName}`);
+                    document.cookie = cookieName + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"; 
+                }
+            });
+            
+            console.log('All auth data cleared completely');
+            refreshStatus();
+        }
+        
+        function fixAuthToken() {
+            console.log('🔧 Attempting to fix auth token...');
+            
+            // First, check if we have a token but no user
+            const authToken = localStorage.getItem('auth_token') || 
+                              localStorage.getItem('cwm_user_token') || 
+                              sessionStorage.getItem('auth_token');
+            
+            if (authToken) {
+                console.log('💾 Found auth token, attempting to extract user info...');
+                
+                try {
+                    // Try to decode JWT token to get user info
+                    const payload = JSON.parse(atob(authToken.split('.')[1]));
+                    console.log('🔍 Token payload:', payload);
+                    
+                    // Extract user info from token
+                    const userInfo = {
+                        id: payload.sub || payload.user_id,
+                        email: payload.email,
+                        name: payload.name,
+                        picture: payload.picture,
+                        given_name: payload.given_name,
+                        family_name: payload.family_name
+                    };
+                    
+                    // Store user profile
+                    localStorage.setItem('cwm_user_profile', JSON.stringify(userInfo));
+                    window.currentUser = userInfo;
+                    
+                    console.log('✅ User profile extracted and stored:', userInfo);
+                    
+                    // Refresh status
+                    refreshStatus();
+                    
+                    alert('Auth token fixed! User profile restored from token.');
+                    
+                } catch (error) {
+                    console.error('❌ Failed to decode token:', error);
+                    alert('Failed to decode token. It may be corrupted.');
+                }
+            } else {
+                // Check if we have user profile but no window.currentUser
+                const userProfile = localStorage.getItem('cwm_user_profile');
+                if (userProfile && !window.currentUser) {
+                    try {
+                        window.currentUser = JSON.parse(userProfile);
+                        console.log('✅ Restored window.currentUser from localStorage:', window.currentUser);
+                        refreshStatus();
+                        alert('User object restored from localStorage!');
+                    } catch (error) {
+                        console.error('❌ Failed to parse user profile:', error);
+                        alert('Failed to parse user profile.');
+                    }
+                } else {
+                    console.log('❌ No auth token found');
+                    alert('No auth token found to fix.');
+                }
+            }
+        }
+        
+        function testGoogleAuth() {
+            console.log('Testing Google Authentication...');
+            
+            const clientId = window.CONFIG.GOOGLE_CLIENT_ID;
+            
+            if (!clientId) {
+                console.error('Google Client ID not available');
+                document.getElementById('google-auth').innerHTML = '<div class="error">❌ Google Client ID not configured</div>';
+                return;
+            }
+            
+            if (!window.google) {
+                console.error('Google API not loaded');
+                document.getElementById('google-auth').innerHTML = '<div class="error">❌ Google API not loaded</div>';
+                return;
+            }
+            
+            if (!window.google.accounts) {
+                console.error('Google Accounts API not available');
+                document.getElementById('google-auth').innerHTML = '<div class="error">❌ Google Accounts API not available</div>';
+                return;
+            }
+            
+            try {
+                // Try to initialize Google Sign-In
+                window.google.accounts.id.initialize({
+                    client_id: clientId,
+                    callback: function(response) {
+                        console.log('Google Sign-In successful:', response);
+                        
+                        // Store the token
+                        localStorage.setItem('auth_token', response.credential);
+                        
+                        // Decode the JWT to get user info
+                        try {
+                            const payload = JSON.parse(atob(response.credential.split('.')[1]));
+                            const userProfile = {
+                                id: payload.sub,
+                                email: payload.email,
+                                name: payload.name,
+                                picture: payload.picture
+                            };
+                            
+                            localStorage.setItem('cwm_user_profile', JSON.stringify(userProfile));
+                            window.currentUser = userProfile;
+                            
+                            console.log('User profile set:', userProfile);
+                            
+                            refreshStatus();
+                            
+                            document.getElementById('google-auth').innerHTML = '<div class="success">✅ Google Sign-In successful!</div>';
+                        } catch (e) {
+                            console.error('Error decoding JWT:', e);
+                            document.getElementById('google-auth').innerHTML = '<div class="error">❌ Error processing Google Sign-In response</div>';
+                        }
+                    }
+                });
+                
+                // Show the sign-in button
+                window.google.accounts.id.renderButton(
+                    document.getElementById('google-auth'),
+                    {
+                        theme: 'outline',
+                        size: 'large',
+                        text: 'signin_with',
+                        width: 250
+                    }
+                );
+                
+                console.log('Google Sign-In initialized successfully');
+                
+            } catch (error) {
+                console.error('Error initializing Google Sign-In:', error);
+                document.getElementById('google-auth').innerHTML = '<div class="error">❌ Error initializing Google Sign-In</div>';
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Simple Auth Diagnostic loaded');
+            refreshStatus();
+        });
+    </script>
+    
+    <!-- Load Google Sign-In API -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</body>
+</html>

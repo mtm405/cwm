@@ -1,3 +1,9 @@
+/* CSS Bundle: lessons */
+/* Generated on: 2025-07-05T04:00:15.029Z */
+/* Priority: medium */
+/* Load Strategy: lazy */
+
+/* === static/css/lesson.css === */
 /* 
  * Lessons CSS - Modern Consolidated Lesson Styles
  * Code with Morais - Lesson Block System
@@ -1299,3 +1305,6 @@
         border: 1px solid #ccc;
     }
 }
+
+/* === End static/css/lesson.css === */
+

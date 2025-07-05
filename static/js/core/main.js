@@ -123,16 +123,46 @@ class MainApp {
      */
     async initializeManagers() {
         // Initialize utilities first (provides global helpers)
-        this.managers.utils = new AppUtils();
+        // Create AppUtils if not available
+        if (typeof AppUtils !== 'undefined') {
+            this.managers.utils = new AppUtils();
+        } else if (typeof window.AppUtils !== 'undefined') {
+            this.managers.utils = new window.AppUtils();
+        } else {
+            // Create a basic AppUtils fallback
+            this.managers.utils = {
+                showNotification: function(msg, type) {
+                    console.log(`[${type}] ${msg}`);
+                    if (window.showToast) {
+                        window.showToast(msg, type);
+                    }
+                },
+                handleError: function(err, ctx) {
+                    console.error(`Error in ${ctx}:`, err);
+                }
+            };
+        }
         
         // Initialize theme manager
-        this.managers.theme = new ThemeManager();
+        if (typeof ThemeManager !== 'undefined') {
+            this.managers.theme = new ThemeManager();
+        } else {
+            this.managers.theme = { init: () => {} };
+        }
         
         // Initialize navigation manager
-        this.managers.navigation = new NavigationManager();
+        if (typeof NavigationManager !== 'undefined') {
+            this.managers.navigation = new NavigationManager();
+        } else {
+            this.managers.navigation = { init: () => {} };
+        }
         
         // Initialize auth manager
-        this.managers.auth = new AuthManager();
+        if (typeof AuthManager !== 'undefined') {
+            this.managers.auth = new AuthManager();
+        } else {
+            this.managers.auth = { init: () => {} };
+        }
         
         // Store managers globally for template access
         window.appManagers = this.managers;

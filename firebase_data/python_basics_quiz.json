@@ -1,0 +1,118 @@
+{
+  "id": "python-basics-quiz",
+  "title": "Python Basics Knowledge Check",
+  "description": "Test your understanding of Python basics including syntax, variables, and loops",
+  "difficulty": "beginner",
+  "time_limit": 600,
+  "passing_score": 70,
+  "xp_reward": 50,
+  "pycoins_reward": 10,
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Which of the following is the correct way to create a variable in Python?",
+      "options": [
+        "var name = \"John\"",
+        "name = \"John\"",
+        "string name = \"John\"",
+        "name := \"John\""
+      ],
+      "correct_answer": 1,
+      "explanation": "In Python, you assign values to variables using the equals sign (=). No variable declaration or type specification is needed."
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "What will this code print? x = 5; y = 2; print(x + y)",
+      "options": [
+        "5 + 2",
+        "7",
+        "52",
+        "Error"
+      ],
+      "correct_answer": 1,
+      "explanation": "The + operator adds two numbers together. 5 + 2 equals 7."
+    },
+    {
+      "id": "q3",
+      "type": "true_false",
+      "question": "In Python, indentation is optional and only used for readability.",
+      "correct_answer": false,
+      "explanation": "In Python, indentation is mandatory and used to define code blocks. Incorrect indentation will result in IndentationError."
+    },
+    {
+      "id": "q4",
+      "type": "code_completion",
+      "question": "Complete the code to print all numbers from 1 to 5 using a for loop:",
+      "code_template": "for i in range(___, ___):\n    print(i)",
+      "correct_answer": "1, 6",
+      "explanation": "range(1, 6) generates numbers from 1 up to (but not including) 6, which gives us 1, 2, 3, 4, 5."
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "How do you check if a variable x equals 5 in a conditional statement?",
+      "options": [
+        "if x = 5:",
+        "if x == 5:",
+        "if x === 5:",
+        "if equals(x, 5):"
+      ],
+      "correct_answer": 1,
+      "explanation": "In Python, the equality comparison operator is ==. The single = is used for assignment, not comparison."
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Which loop type would be best for iterating through a list of items?",
+      "options": [
+        "do-while loop",
+        "repeat-until loop",
+        "for loop",
+        "switch loop"
+      ],
+      "correct_answer": 2,
+      "explanation": "In Python, a for loop is designed to iterate over sequences like lists, tuples, and strings, making it perfect for processing collections of items."
+    },
+    {
+      "id": "q7",
+      "type": "code_completion",
+      "question": "Complete the code to define a function that returns the sum of two numbers:",
+      "code_template": "def add_numbers(a, b):\n    _______ a + b",
+      "correct_answer": "return",
+      "explanation": "The 'return' keyword is used to specify the value that a function should output when called."
+    },
+    {
+      "id": "q8",
+      "type": "multiple_choice",
+      "question": "What will the following code print? fruits = ['apple', 'banana', 'cherry']; print(fruits[1])",
+      "options": [
+        "apple",
+        "banana",
+        "cherry",
+        "Error"
+      ],
+      "correct_answer": 1,
+      "explanation": "List indexing in Python starts at 0, so fruits[0] is 'apple' and fruits[1] is 'banana'."
+    },
+    {
+      "id": "q9",
+      "type": "true_false",
+      "question": "The statement 'break' is used to skip the current iteration and continue with the next one in a loop.",
+      "correct_answer": false,
+      "explanation": "The 'break' statement exits the loop entirely. It's the 'continue' statement that skips the current iteration and moves to the next one."
+    },
+    {
+      "id": "q10",
+      "type": "code_completion",
+      "question": "Complete the while loop that prints numbers from 1 to 5:",
+      "code_template": "count = 1\nwhile count <= ___:\n    print(count)\n    count += 1",
+      "correct_answer": "5",
+      "explanation": "The condition 'count <= 5' ensures the loop continues until count reaches 5, printing numbers 1 through 5."
+    }
+  ],
+  "created_at": "2025-07-04T14:00:00Z",
+  "updated_at": "2025-07-04T14:00:00Z",
+  "is_published": true
+}

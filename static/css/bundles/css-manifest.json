@@ -1,46 +1,46 @@
 {
   "version": "1.0.0",
-  "generated": "2025-07-04T17:05:39.997Z",
+  "generated": "2025-07-05T04:00:15.073Z",
   "bundles": {
     "critical": {
       "file": "critical.css",
-      "size": 4554,
+      "size": 3261,
       "priority": "high",
       "loadStrategy": "blocking"
     },
     "core": {
       "file": "core.css",
-      "size": 29863,
+      "size": 8595,
       "priority": "high",
       "loadStrategy": "async"
     },
     "dashboard": {
       "file": "dashboard.css",
-      "size": 11436,
+      "size": 123,
       "priority": "medium",
       "loadStrategy": "lazy"
     },
     "lessons": {
       "file": "lessons.css",
-      "size": 92011,
+      "size": 28033,
       "priority": "medium",
       "loadStrategy": "lazy"
     },
     "auth": {
       "file": "auth.css",
-      "size": 17268,
+      "size": 11481,
       "priority": "medium",
       "loadStrategy": "lazy"
     },
     "ui": {
       "file": "ui.css",
-      "size": 39107,
+      "size": 113,
       "priority": "low",
       "loadStrategy": "lazy"
     },
     "utils": {
       "file": "utils.css",
-      "size": 16642,
+      "size": 17473,
       "priority": "low",
       "loadStrategy": "lazy"
     }

@@ -107,6 +107,43 @@ def get_mock_quiz(quiz_id):
                     'correct_answer': '='
                 }
             ]
+        },
+        'quiz-variables-basics': {
+            'id': 'quiz-variables-basics',
+            'title': 'Variable Basics Quiz',
+            'description': 'Test your understanding of variables in Python',
+            'passing_score': 70,
+            'xp_reward': 30,
+            'coin_reward': 5,
+            'questions': [
+                {
+                    'type': 'multiple_choice',
+                    'question': 'Which of the following is a valid variable name in Python?',
+                    'options': [
+                        '1variable',
+                        '_variable',
+                        'variable-name',
+                        'variable name'
+                    ],
+                    'correct_answer': '_variable'
+                },
+                {
+                    'type': 'true_false',
+                    'question': 'In Python, variables must be declared with their type before use',
+                    'correct_answer': 'False'
+                },
+                {
+                    'type': 'multiple_choice',
+                    'question': 'What will the variable x contain after this code? x = 5 + 2 * 3',
+                    'options': [
+                        '21',
+                        '11',
+                        '17',
+                        'Error'
+                    ],
+                    'correct_answer': '11'
+                }
+            ]
         }
     }
     return quizzes.get(quiz_id)

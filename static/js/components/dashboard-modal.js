@@ -91,5 +91,10 @@ class DashboardModal {
     }
 }
 
+// Initialize the modal system when document is ready
+document.addEventListener('DOMContentLoaded', () => {
+    window.dashboardModal = new DashboardModal();
+});
+
 // Export for use in other modules
 window.DashboardModal = DashboardModal;

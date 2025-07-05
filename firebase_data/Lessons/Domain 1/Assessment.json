@@ -1,0 +1,295 @@
+{
+  "id": "python-datatypes-operators-assessment",
+  "title": "Comprehensive Assessment: Data Types and Operators",
+  "description": "Test your mastery of Python data types, operations, precedence, and operator selection",
+  "type": "assessment",
+  "difficulty": "intermediate",
+  "estimated_time": 90,
+  "prerequisites": [
+    "python-datatypes-01",
+    "python-operations-02", 
+    "python-precedence-03",
+    "python-operators-04"
+  ],
+  "passing_score": 70,
+  "total_points": 100,
+  "created_at": "2025-01-05T10:00:00Z",
+  "updated_at": "2025-01-05T10:00:00Z",
+  "is_published": true,
+  "sections": [
+    {
+      "id": "section-1",
+      "title": "Part 1: Multiple Choice Questions",
+      "description": "Test your conceptual understanding",
+      "points": 30,
+      "questions": [
+        {
+          "id": "mc1",
+          "type": "multiple_choice",
+          "question": "What is the result of: type(10 / 2).__name__?",
+          "options": ["'int'", "'float'", "'str'", "'number'"],
+          "correct_answer": 1,
+          "points": 3,
+          "explanation": "Division (/) always returns a float in Python, even when dividing evenly. So 10/2 = 5.0 (float)."
+        },
+        {
+          "id": "mc2",
+          "type": "multiple_choice",
+          "question": "What does 'Python'[-3:] return?",
+          "options": ["'Pyt'", "'hon'", "'tho'", "'on'"],
+          "correct_answer": 1,
+          "points": 3,
+          "explanation": "[-3:] means 'from 3 positions from the end to the end', which gives us 'hon'."
+        },
+        {
+          "id": "mc3",
+          "type": "multiple_choice",
+          "question": "What is the value of: 2 + 3 * 4 ** 2 // 5?",
+          "options": ["20", "11", "200", "50"],
+          "correct_answer": 1,
+          "points": 3,
+          "explanation": "Following precedence: 4**2=16, 3*16=48, 48//5=9, 2+9=11."
+        },
+        {
+          "id": "mc4",
+          "type": "multiple_choice",
+          "question": "Which operator would you use to swap two variables' values efficiently?",
+          "options": [
+            "temp = a; a = b; b = temp",
+            "a, b = b, a",
+            "a += b; b = a - b; a -= b",
+            "Both A and B work"
+          ],
+          "correct_answer": 3,
+          "points": 3,
+          "explanation": "Both methods work, but Python's tuple unpacking (a, b = b, a) is more Pythonic and readable."
+        },
+        {
+          "id": "mc5",
+          "type": "multiple_choice",
+          "question": "What type does bool('0') return?",
+          "options": ["False", "True", "0", "'0'"],
+          "correct_answer": 1,
+          "points": 3,
+          "explanation": "'0' is a non-empty string, so bool('0') returns True. Only empty strings return False."
+        },
+        {
+          "id": "mc6",
+          "type": "true_false",
+          "question": "The expression [] is [] returns True.",
+          "correct_answer": false,
+          "points": 3,
+          "explanation": "Each [] creates a new list object. Even though they're equal in value, they're different objects in memory."
+        },
+        {
+          "id": "mc7",
+          "type": "true_false",
+          "question": "list.append() can be used to add multiple elements at once.",
+          "correct_answer": false,
+          "points": 3,
+          "explanation": "append() adds only one element. Use extend() to add multiple elements from an iterable."
+        },
+        {
+          "id": "mc8",
+          "type": "multiple_choice",
+          "question": "What's the result of: 'hello' + 5?",
+          "options": [
+            "'hello5'",
+            "TypeError",
+            "'hello hello hello hello hello'",
+            "5"
+          ],
+          "correct_answer": 1,
+          "points": 3,
+          "explanation": "Python doesn't automatically convert types for string concatenation. You need str(5) to concatenate."
+        },
+        {
+          "id": "mc9",
+          "type": "multiple_choice",
+          "question": "Which has the highest precedence?",
+          "options": ["and", "not", "or", "=="],
+          "correct_answer": 1,
+          "points": 3,
+          "explanation": "Among logical operators, 'not' has the highest precedence, followed by 'and', then 'or'."
+        },
+        {
+          "id": "mc10",
+          "type": "true_false",
+          "question": "x += 1 is always identical to x = x + 1",
+          "correct_answer": true,
+          "points": 3,
+          "explanation": "For basic types like int and float, += is just syntactic sugar for x = x + 1."
+        }
+      ]
+    },
+    {
+      "id": "section-2",
+      "title": "Part 2: Code Analysis",
+      "description": "Analyze code snippets and predict outputs",
+      "points": 20,
+      "questions": [
+        {
+          "id": "ca1",
+          "type": "code_analysis",
+          "question": "What is the output of this code?",
+          "code": "x = '42'\ny = 8\nresult = int(x) + y // 2\nprint(result, type(result))",
+          "correct_answer": "46 <class 'int'>",
+          "points": 5,
+          "explanation": "int('42') = 42, y // 2 = 8 // 2 = 4, so 42 + 4 = 46 (integer)"
+        },
+        {
+          "id": "ca2",
+          "type": "code_analysis",
+          "question": "What is the final value of the list?",
+          "code": "nums = [1, 2, 3]\nnums.append(4)\nnums.insert(0, 0)\nnums.remove(2)\nnums.sort(reverse=True)\nprint(nums)",
+          "correct_answer": "[4, 3, 1, 0]",
+          "points": 5,
+          "explanation": "After append: [1,2,3,4], after insert: [0,1,2,3,4], after remove(2): [0,1,3,4], after reverse sort: [4,3,1,0]"
+        },
+        {
+          "id": "ca3",
+          "type": "code_analysis",
+          "question": "What does this expression evaluate to?",
+          "code": "result = not False and True or False and True\nprint(result)",
+          "correct_answer": "True",
+          "points": 5,
+          "explanation": "Following precedence: not False = True, True and True = True, False and True = False, True or False = True"
+        },
+        {
+          "id": "ca4",
+          "type": "code_analysis",
+          "question": "What is printed?",
+          "code": "a = [1, 2, 3]\nb = a\nc = a[:]\nb.append(4)\nc.append(5)\nprint(len(a), len(b), len(c))",
+          "correct_answer": "4 4 4",
+          "points": 5,
+          "explanation": "b = a makes b reference the same list as a. c = a[:] creates a copy. When b.append(4), both a and b show the change."
+        }
+      ]
+    },
+    {
+      "id": "section-3",
+      "title": "Part 3: Problem Solving",
+      "description": "Write code to solve specific problems",
+      "points": 35,
+      "questions": [
+        {
+          "id": "ps1",
+          "type": "coding_problem",
+          "question": "Write a function that takes a mixed list of integers, floats, and strings. Convert all numeric strings to their appropriate numeric type (int if possible, otherwise float), and return the sum of all numeric values.",
+          "starter_code": "def sum_numeric_values(mixed_list):\n    # Your code here\n    pass\n\n# Test: sum_numeric_values([1, '2', 3.5, 'hello', '4.5', True])\n# Should return: 12.0 (1 + 2 + 3.5 + 4.5 + 1)",
+          "test_cases": [
+            {
+              "input": "[1, '2', 3.5, 'hello', '4.5', True]",
+              "expected": "12.0"
+            },
+            {
+              "input": "['10', 20, '30.5', 'abc', False]",
+              "expected": "60.5"
+            }
+          ],
+          "points": 10
+        },
+        {
+          "id": "ps2",
+          "type": "coding_problem",
+          "question": "Create a function that evaluates a simple mathematical expression string containing only numbers, +, -, *, and parentheses. Respect operator precedence.",
+          "starter_code": "def evaluate_expression(expr):\n    # Your code here\n    # Hint: For this assessment, you may use eval() with safety checks\n    pass\n\n# Test: evaluate_expression('2 + 3 * 4')\n# Should return: 14",
+          "test_cases": [
+            {
+              "input": "'2 + 3 * 4'",
+              "expected": "14"
+            },
+            {
+              "input": "'(2 + 3) * 4'",
+              "expected": "20"
+            }
+          ],
+          "points": 10
+        },
+        {
+          "id": "ps3",
+          "type": "coding_problem", 
+          "question": "Write a function that processes student grades. It should take a list of scores, drop the lowest score, calculate the average of the remaining scores, and return both the average and the appropriate letter grade (A: 90+, B: 80-89, C: 70-79, D: 60-69, F: <60).",
+          "starter_code": "def process_grades(scores):\n    # Your code here\n    # Return tuple: (average, letter_grade)\n    pass\n\n# Test: process_grades([85, 92, 78, 95, 60])\n# Should drop 60, average = 87.5, return (87.5, 'B')",
+          "test_cases": [
+            {
+              "input": "[85, 92, 78, 95, 60]",
+              "expected": "(87.5, 'B')"
+            },
+            {
+              "input": "[95, 98, 92, 100]",
+              "expected": "(97.67, 'A')"
+            }
+          ],
+          "points": 15
+        }
+      ]
+    },
+    {
+      "id": "section-4",
+      "title": "Part 4: Real-World Application",
+      "description": "Apply your knowledge to a practical scenario",
+      "points": 15,
+      "questions": [
+        {
+          "id": "rw1",
+          "type": "project_problem",
+          "question": "Create a shopping cart price calculator that handles various discounts and tax calculations.",
+          "requirements": [
+            "Accept a list of items with prices (can be strings or numbers)",
+            "Apply a 10% discount if total > $100",
+            "Apply an additional 5% member discount if user is a member",
+            "Add 8% tax after all discounts",
+            "Return a detailed breakdown"
+          ],
+          "starter_code": "def calculate_total(items, is_member=False):\n    '''\n    items: list of prices (can be strings or numbers)\n    is_member: boolean indicating membership status\n    \n    Returns dictionary with:\n    - subtotal: sum before discounts\n    - discount_amount: total discount applied\n    - tax_amount: tax calculated after discounts\n    - final_total: final amount to pay\n    '''\n    # Your code here\n    pass\n\n# Test: calculate_total(['29.99', 45.50, '35.00'], True)\n# Subtotal: 110.49, gets both discounts, then tax",
+          "test_cases": [
+            {
+              "description": "Member with total > $100",
+              "input": "['29.99', 45.50, '35.00'], is_member=True",
+              "expected_keys": ["subtotal", "discount_amount", "tax_amount", "final_total"]
+            }
+          ],
+          "points": 15
+        }
+      ]
+    }
+  ],
+  "grading_rubric": {
+    "90-100": {
+      "grade": "A",
+      "feedback": "Excellent! You have mastered Python data types and operators."
+    },
+    "80-89": {
+      "grade": "B", 
+      "feedback": "Good work! You have a strong understanding with minor areas to review."
+    },
+    "70-79": {
+      "grade": "C",
+      "feedback": "Satisfactory. Review operator precedence and type conversions."
+    },
+    "60-69": {
+      "grade": "D",
+      "feedback": "Below average. Significant review needed in multiple areas."
+    },
+    "0-59": {
+      "grade": "F",
+      "feedback": "Needs improvement. Please review all lessons before retaking."
+    }
+  },
+  "time_limit": 90,
+  "allow_retake": true,
+  "retake_delay": 24,
+  "resources": [
+    {
+      "type": "hint",
+      "title": "Type Conversion Tips",
+      "content": "Remember: int() fails on strings with decimals. Try int() first, then float() in a try-except block."
+    },
+    {
+      "type": "reference",
+      "title": "Operator Precedence Table",
+      "content": "() → ** → +x,-x → *,/,//,% → +,- → ==,!=,<,>,<=,>= → not → and → or → ="
+    }
+  ]
+}

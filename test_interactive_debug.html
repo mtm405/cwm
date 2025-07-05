@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Block Test - Code with Morais</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn.danger {
+            background: #dc3545;
+        }
+        .btn.danger:hover {
+            background: #c82333;
+        }
+        .log-output {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .code-editor {
+            background: #2d3748;
+            color: #e2e8f0;
+            border: 1px solid #4a5568;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            width: 100%;
+            min-height: 100px;
+            resize: vertical;
+        }
+        .output-box {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 10px;
+            min-height: 50px;
+        }
+        .output-success {
+            border-color: #38a169;
+            background: #f0fff4;
+        }
+        .output-error {
+            border-color: #e53e3e;
+            background: #fed7d7;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Interactive Block Debug Test</h1>
+    <p>This page tests the Interactive block functionality without relying on the full lesson system.</p>
+
+    <div class="test-section">
+        <h2>🧪 Direct Code Execution Test</h2>
+        <p>Test the <code>/run_python</code> endpoint directly:</p>
+        
+        <textarea class="code-editor" id="test-code" placeholder="Write your Python code here...">print("Hello, World!")
+x = 5
+y = 10
+print(f"x + y = {x + y}")
+
+# Test with a simple function
+def greet(name):
+    return f"Hello, {name}!"
+
+print(greet("Code with Morais"))</textarea>
+        
+        <div>
+            <button class="btn" onclick="runTestCode()">▶️ Run Code</button>
+            <button class="btn" onclick="clearOutput()">🗑️ Clear Output</button>
+        </div>
+        
+        <div id="output" class="output-box">
+            Output will appear here...
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Endpoint Status Check</h2>
+        <div>
+            <button class="btn" onclick="checkEndpoints()">🔍 Check Endpoints</button>
+        </div>
+        <div id="endpoint-status" class="log-output" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔄 Interactive Block Simulation</h2>
+        <p>Simulate an Interactive block with proper DOM structure:</p>
+        
+        <!-- Simulated Interactive Block -->
+        <div class="content-block interactive-block" id="block-test-interactive" data-block-id="test-interactive" data-block-type="interactive">
+            <div class="block-header">
+                <div class="block-icon">
+                    <i class="fas fa-laptop-code"></i>
+                </div>
+                <span class="block-type-label">Code Challenge</span>
+            </div>
+            <div class="block-content">
+                <div class="challenge-instructions">
+                    <h4>Test Challenge:</h4>
+                    <p>Write a function that calculates the area of a rectangle.</p>
+                </div>
+                <div class="code-editor-container">
+                    <div class="editor-toolbar">
+                        <span class="editor-label">Python Editor</span>
+                        <div class="editor-actions">
+                            <button class="action-btn primary run-btn" data-block-id="test-interactive" onclick="simulateRunClick(this)">
+                                <i class="fas fa-play"></i>
+                                <span>Run Code</span>
+                            </button>
+                        </div>
+                    </div>
+                    <textarea class="code-editor" id="editor-test-interactive">def calculate_area(length, width):
+    # Your code here
+    return length * width
+
+# Test the function
+result = calculate_area(5, 3)
+print(f"Area: {result}")</textarea>
+                </div>
+                <div id="output-test-interactive" class="output-box" style="display: none;">
+                    Output will appear here...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Test functions
+        async function runTestCode() {
+            const code = document.getElementById('test-code').value;
+            const outputDiv = document.getElementById('output');
+            
+            if (!code.trim()) {
+                outputDiv.innerHTML = '<span style="color: #e53e3e;">Please write some code first!</span>';
+                outputDiv.className = 'output-box output-error';
+                return;
+            }
+            
+            outputDiv.innerHTML = '<span style="color: #4299e1;">Running code...</span>';
+            outputDiv.className = 'output-box';
+            
+            try {
+                const response = await fetch('/run_python', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        inputs: '',
+                        timeout: 10000
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    outputDiv.innerHTML = `<strong>✅ Success:</strong><br><pre>${escapeHtml(result.output || 'Code executed successfully!')}</pre>`;
+                    outputDiv.className = 'output-box output-success';
+                } else {
+                    outputDiv.innerHTML = `<strong>❌ Error:</strong><br><pre>${escapeHtml(result.error || 'Unknown error occurred')}</pre>`;
+                    outputDiv.className = 'output-box output-error';
+                }
+                
+            } catch (error) {
+                outputDiv.innerHTML = `<strong>❌ Network Error:</strong><br>${escapeHtml(error.message)}`;
+                outputDiv.className = 'output-box output-error';
+            }
+        }
+        
+        async function checkEndpoints() {
+            const statusDiv = document.getElementById('endpoint-status');
+            statusDiv.style.display = 'block';
+            statusDiv.innerHTML = 'Checking endpoints...\n';
+            
+            const endpoints = [
+                { url: '/run_python', method: 'POST', data: { code: 'print("test")', inputs: '' } },
+                { url: '/api/execute', method: 'POST', data: { code: 'print("test")' } },
+                { url: '/health', method: 'GET' }
+            ];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const options = {
+                        method: endpoint.method,
+                        headers: { 'Content-Type': 'application/json' }
+                    };
+                    
+                    if (endpoint.data) {
+                        options.body = JSON.stringify(endpoint.data);
+                    }
+                    
+                    const response = await fetch(endpoint.url, options);
+                    const status = response.status;
+                    const statusText = response.statusText;
+                    
+                    statusDiv.innerHTML += `${endpoint.method} ${endpoint.url}: ${status} ${statusText}\n`;
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        statusDiv.innerHTML += `  Response: ${JSON.stringify(result, null, 2)}\n\n`;
+                    } else {
+                        statusDiv.innerHTML += `  Error response\n\n`;
+                    }
+                    
+                } catch (error) {
+                    statusDiv.innerHTML += `${endpoint.method} ${endpoint.url}: ERROR - ${error.message}\n\n`;
+                }
+            }
+        }
+        
+        async function simulateRunClick(button) {
+            const blockId = button.dataset.blockId;
+            const editorElement = document.getElementById(`editor-${blockId}`);
+            const outputElement = document.getElementById(`output-${blockId}`);
+            
+            if (!editorElement || !outputElement) {
+                alert('Editor or output element not found!');
+                return;
+            }
+            
+            const code = editorElement.value;
+            
+            if (!code.trim()) {
+                outputElement.innerHTML = '<span style="color: #e53e3e;">Please write some code first!</span>';
+                outputElement.style.display = 'block';
+                outputElement.className = 'output-box output-error';
+                return;
+            }
+            
+            // Show loading state
+            outputElement.style.display = 'block';
+            outputElement.innerHTML = '<span style="color: #4299e1;"><i class="fas fa-spinner fa-spin"></i> Running code...</span>';
+            outputElement.className = 'output-box';
+            
+            try {
+                const response = await fetch('/run_python', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        inputs: '',
+                        timeout: 10000
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    outputElement.innerHTML = `
+                        <div style="color: #38a169;"><strong>✅ Success:</strong></div>
+                        <pre style="margin-top: 10px; white-space: pre-wrap;">${escapeHtml(result.output || 'Code executed successfully!')}</pre>
+                    `;
+                    outputElement.className = 'output-box output-success';
+                } else {
+                    outputElement.innerHTML = `
+                        <div style="color: #e53e3e;"><strong>❌ Error:</strong></div>
+                        <pre style="margin-top: 10px; white-space: pre-wrap;">${escapeHtml(result.error || 'Unknown error occurred')}</pre>
+                    `;
+                    outputElement.className = 'output-box output-error';
+                }
+                
+            } catch (error) {
+                outputElement.innerHTML = `
+                    <div style="color: #e53e3e;"><strong>❌ Network Error:</strong></div>
+                    <div style="margin-top: 10px;">${escapeHtml(error.message)}</div>
+                `;
+                outputElement.className = 'output-box output-error';
+            }
+        }
+        
+        function clearOutput() {
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = 'Output will appear here...';
+            outputDiv.className = 'output-box';
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Auto-run endpoint check on load
+        window.addEventListener('load', function() {
+            setTimeout(checkEndpoints, 1000);
+        });
+    </script>
+</body>
+</html>

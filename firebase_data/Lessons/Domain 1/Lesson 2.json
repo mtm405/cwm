@@ -1,0 +1,160 @@
+{
+  "id": "python-operations-02",
+  "title": "Data Type Operations and List Manipulations",
+  "description": "Master data type conversion, indexing, slicing, and list operations in Python",
+  "order": 2,
+  "difficulty": "intermediate",
+  "estimated_time": 60,
+  "prerequisites": ["python-datatypes-01"],
+  "tags": ["type conversion", "indexing", "slicing", "lists", "data structures"],
+  "xp_reward": 150,
+  "pycoins_reward": 30,
+  "quiz_id": "operations-quiz",
+  "created_at": "2025-01-05T10:00:00Z",
+  "updated_at": "2025-01-05T10:00:00Z",
+  "is_published": true,
+  "blocks": [
+    {
+      "id": "intro-block",
+      "type": "text",
+      "order": 0,
+      "title": "Introduction to Data Operations",
+      "content": "# Data Type Operations in Python\n\nNow that you understand Python's basic data types, let's explore how to manipulate them. This lesson covers:\n\n1. **Type Conversion** - Converting between different data types\n2. **Indexing** - Accessing individual elements in sequences\n3. **Slicing** - Extracting portions of sequences\n4. **List Operations** - Creating and manipulating lists\n\nThese operations are fundamental to working with data in Python!"
+    },
+    {
+      "id": "type-conversion-example",
+      "type": "code_example",
+      "order": 1,
+      "title": "Type Conversion Basics",
+      "code": "# Converting strings to numbers\nage_str = \"18\"\nage_int = int(age_str)      # String to integer\nprint(f\"String: {age_str}, Type: {type(age_str)}\")\nprint(f\"Integer: {age_int}, Type: {type(age_int)}\")\n\n# Converting to float\nprice_str = \"19.99\"\nprice_float = float(price_str)  # String to float\nprint(f\"Float: {price_float}, Type: {type(price_float)}\")\n\n# Converting numbers to strings\nscore = 95\nscore_str = str(score)      # Integer to string\nprint(f\"String: '{score_str}', Type: {type(score_str)}\")\n\n# Be careful with invalid conversions!\n# This would cause an error:\n# int(\"hello\")  # ValueError: invalid literal for int()",
+      "explanation": "Type conversion (or casting) allows you to convert values from one type to another. Use int(), float(), str(), and bool() functions. Be careful - not all conversions are valid!"
+    },
+    {
+      "id": "boolean-conversion-example",
+      "type": "code_example",
+      "order": 2,
+      "title": "Boolean Conversions",
+      "code": "# Converting to boolean\n# Empty values are False, non-empty are True\nprint(bool(\"\"))          # False (empty string)\nprint(bool(\"Hello\"))     # True (non-empty string)\nprint(bool(0))           # False (zero)\nprint(bool(42))          # True (non-zero)\nprint(bool([]))          # False (empty list)\nprint(bool([1, 2, 3]))   # True (non-empty list)\n\n# Practical example\nuser_input = input(\"Enter your name (or press Enter to skip): \")\nif bool(user_input):  # Same as: if user_input:\n    print(f\"Hello, {user_input}!\")\nelse:\n    print(\"No name provided.\")",
+      "explanation": "In Python, empty values (empty strings, 0, empty lists) convert to False, while non-empty values convert to True. This is useful for checking if data exists."
+    },
+    {
+      "id": "indexing-example",
+      "type": "code_example",
+      "order": 3,
+      "title": "Indexing Sequences",
+      "code": "# Indexing strings\nword = \"Python\"\n# Positive:  0  1  2  3  4  5\n# Letters:   P  y  t  h  o  n\n# Negative: -6 -5 -4 -3 -2 -1\n\nprint(word[0])     # 'P' (first character)\nprint(word[5])     # 'n' (last character)\nprint(word[-1])    # 'n' (last, using negative)\nprint(word[-6])    # 'P' (first, using negative)\n\n# Indexing lists\nscores = [85, 92, 78, 95, 88]\nprint(scores[0])   # 85 (first element)\nprint(scores[-1])  # 88 (last element)\n\n# Modifying list elements (strings are immutable!)\nscores[0] = 90     # Changes first element to 90\nprint(scores)      # [90, 92, 78, 95, 88]",
+      "explanation": "Indexing lets you access individual elements using square brackets. Python uses 0-based indexing (first element is at index 0). Negative indices count from the end."
+    },
+    {
+      "id": "slicing-example",
+      "type": "code_example",
+      "order": 4,
+      "title": "Slicing Sequences",
+      "code": "# Slicing syntax: sequence[start:end:step]\ntext = \"Python Programming\"\n\n# Basic slicing\nprint(text[0:6])     # 'Python' (index 0 to 5)\nprint(text[7:18])    # 'Programming'\nprint(text[:6])      # 'Python' (start to 5)\nprint(text[7:])      # 'Programming' (7 to end)\n\n# Using step\nprint(text[::2])     # 'Pto rgamn' (every 2nd char)\nprint(text[1::2])    # 'yhnPormig' (odd positions)\nprint(text[::-1])    # 'gnimmargorP nohtyP' (reversed)\n\n# Slicing lists\nnumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]\nprint(numbers[2:7])  # [2, 3, 4, 5, 6]\nprint(numbers[::3])  # [0, 3, 6, 9] (every 3rd)",
+      "explanation": "Slicing extracts portions of sequences. The syntax is [start:end:step]. The end index is exclusive (not included). Omitting values uses defaults: start=0, end=length, step=1."
+    },
+    {
+      "id": "type-conversion-exercise",
+      "type": "interactive",
+      "order": 5,
+      "title": "Smart Type Converter",
+      "instructions": "Create a function that attempts to convert a string to the most appropriate numeric type (int or float), or returns the original string if conversion fails.",
+      "starter_code": "def smart_convert(value):\n    # Your code here\n    # Try to convert to int first, then float\n    # If both fail, return the original string\n    pass\n\n# Test cases\nprint(smart_convert(\"42\"))      # Should return 42 (int)\nprint(smart_convert(\"3.14\"))    # Should return 3.14 (float)\nprint(smart_convert(\"hello\"))   # Should return \"hello\" (str)\nprint(smart_convert(\"123.0\"))   # Should return 123.0 (float)",
+      "solution": "def smart_convert(value):\n    # Try integer conversion first\n    try:\n        return int(value)\n    except ValueError:\n        # Try float conversion\n        try:\n            return float(value)\n        except ValueError:\n            # Return original string\n            return value\n\n# Test cases\nprint(smart_convert(\"42\"))      # 42 (int)\nprint(smart_convert(\"3.14\"))    # 3.14 (float)\nprint(smart_convert(\"hello\"))   # \"hello\" (str)\nprint(smart_convert(\"123.0\"))   # 123.0 (float)",
+      "hints": [
+        "Use try-except blocks to handle conversion errors",
+        "Try int() first, as it's more restrictive",
+        "If int() fails, try float() before giving up"
+      ],
+      "language": "python"
+    },
+    {
+      "id": "list-operations-example",
+      "type": "code_example",
+      "order": 6,
+      "title": "List Operations",
+      "code": "# Creating and modifying lists\nfruits = [\"apple\", \"banana\", \"orange\"]\n\n# Appending (add to end)\nfruits.append(\"grape\")\nprint(fruits)  # ['apple', 'banana', 'orange', 'grape']\n\n# Inserting at specific position\nfruits.insert(1, \"mango\")  # Insert at index 1\nprint(fruits)  # ['apple', 'mango', 'banana', 'orange', 'grape']\n\n# Removing elements\nfruits.remove(\"banana\")  # Remove first occurrence\nprint(fruits)  # ['apple', 'mango', 'orange', 'grape']\n\n# Pop removes and returns an element\nlast = fruits.pop()      # Remove last element\nprint(f\"Removed: {last}, List: {fruits}\")\n\n# Extending lists (adding multiple elements)\nmore_fruits = [\"kiwi\", \"pear\"]\nfruits.extend(more_fruits)\nprint(fruits)  # ['apple', 'mango', 'orange', 'kiwi', 'pear']",
+      "explanation": "Lists are mutable (changeable) sequences. Common operations include append(), insert(), remove(), pop(), and extend(). Each method modifies the list in place."
+    },
+    {
+      "id": "list-sorting-example",
+      "type": "code_example",
+      "order": 7,
+      "title": "Sorting and Finding Min/Max",
+      "code": "# Sorting lists\nnumbers = [45, 23, 67, 12, 89, 34]\n\n# Sort in place (modifies original list)\nnumbers.sort()\nprint(\"Ascending:\", numbers)  # [12, 23, 34, 45, 67, 89]\n\nnumbers.sort(reverse=True)\nprint(\"Descending:\", numbers) # [89, 67, 45, 34, 23, 12]\n\n# Finding min and max\nscores = [85, 92, 78, 95, 88]\nprint(f\"Highest score: {max(scores)}\")  # 95\nprint(f\"Lowest score: {min(scores)}\")   # 78\nprint(f\"Total scores: {sum(scores)}\")   # 438\nprint(f\"Average: {sum(scores) / len(scores)}\")  # 87.6\n\n# Reversing a list\nletters = ['a', 'b', 'c', 'd']\nletters.reverse()  # Modifies in place\nprint(letters)     # ['d', 'c', 'b', 'a']",
+      "explanation": "Python provides built-in functions for common list operations: sort() for ordering, max() and min() for finding extremes, sum() for totaling, and reverse() for reversing order."
+    },
+    {
+      "id": "list-manipulation-exercise",
+      "type": "interactive",
+      "order": 8,
+      "title": "List Processing Challenge",
+      "instructions": "Create a function that takes a list of mixed strings and numbers, converts all strings that can be numbers to their numeric types, removes any remaining strings, and returns the sorted numeric list.",
+      "starter_code": "def process_mixed_list(mixed_list):\n    # Your code here\n    # 1. Convert numeric strings to numbers\n    # 2. Remove non-numeric strings\n    # 3. Sort and return the result\n    pass\n\n# Test cases\ntest1 = [\"5\", 2, \"hello\", \"3.14\", 10, \"world\", \"7\"]\nprint(process_mixed_list(test1))  # Should return [2, 3.14, 5, 7, 10]\n\ntest2 = [\"42\", \"abc\", \"0\", \"-5\", \"3.5\"]\nprint(process_mixed_list(test2))  # Should return [-5, 0, 3.5, 42]",
+      "solution": "def process_mixed_list(mixed_list):\n    numeric_list = []\n    \n    for item in mixed_list:\n        # If already a number, add it\n        if isinstance(item, (int, float)):\n            numeric_list.append(item)\n        # If string, try to convert\n        elif isinstance(item, str):\n            try:\n                # Try int first\n                numeric_list.append(int(item))\n            except ValueError:\n                try:\n                    # Try float\n                    numeric_list.append(float(item))\n                except ValueError:\n                    # Skip non-numeric strings\n                    pass\n    \n    # Sort and return\n    numeric_list.sort()\n    return numeric_list\n\n# Test cases\ntest1 = [\"5\", 2, \"hello\", \"3.14\", 10, \"world\", \"7\"]\nprint(process_mixed_list(test1))  # [2, 3.14, 5, 7, 10]\n\ntest2 = [\"42\", \"abc\", \"0\", \"-5\", \"3.5\"]\nprint(process_mixed_list(test2))  # [-5, 0, 3.5, 42]",
+      "hints": [
+        "Use isinstance() to check if an item is already a number",
+        "Use try-except for safe string-to-number conversion",
+        "Remember to sort the final list before returning"
+      ],
+      "language": "python"
+    },
+    {
+      "id": "operations-quiz",
+      "type": "quiz",
+      "order": 9,
+      "title": "Data Operations Knowledge Check",
+      "description": "Test your understanding of type conversion and list operations",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "multiple_choice",
+          "question": "What happens when you run int('3.14')?",
+          "options": [
+            "Returns 3",
+            "Returns 3.14", 
+            "Raises a ValueError",
+            "Returns 4"
+          ],
+          "correct_answer": 2,
+          "explanation": "int() cannot directly convert a string containing a decimal point. You need to convert to float first, then to int."
+        },
+        {
+          "id": "q2",
+          "type": "multiple_choice",
+          "question": "What does 'Python'[1:4] return?",
+          "options": ["'Pyt'", "'yth'", "'ytho'", "'thon'"],
+          "correct_answer": 1,
+          "explanation": "Slicing [1:4] extracts characters from index 1 up to (but not including) index 4, giving us 'yth'."
+        },
+        {
+          "id": "q3",
+          "type": "true_false",
+          "question": "The append() method can add multiple elements to a list at once.",
+          "correct_answer": false,
+          "explanation": "append() adds only one element. Use extend() to add multiple elements from another iterable."
+        },
+        {
+          "id": "q4",
+          "type": "multiple_choice",
+          "question": "Which converts the string '0' to False?",
+          "options": [
+            "bool('0')",
+            "bool(int('0'))",
+            "Both of the above",
+            "Neither of the above"
+          ],
+          "correct_answer": 1,
+          "explanation": "bool('0') is True (non-empty string), but bool(int('0')) converts '0' to 0, which is False."
+        },
+        {
+          "id": "q5",
+          "type": "true_false",
+          "question": "list.sort() returns a new sorted list.",
+          "correct_answer": false,
+          "explanation": "sort() modifies the list in place and returns None. Use sorted() to get a new sorted list."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Debug & Recovery Test - Code with Morais</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 40px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .section h2 {
+            color: #007bff;
+            margin-top: 0;
+        }
+        .test-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .features-list {
+            list-style: none;
+            padding: 0;
+        }
+        .features-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .features-list li:last-child {
+            border-bottom: none;
+        }
+        .features-list li::before {
+            content: "✓";
+            color: #28a745;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .debug-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            border: 1px solid #dee2e6;
+        }
+        .floating-notices {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            max-width: 300px;
+        }
+        .notice {
+            background: #333;
+            color: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        .notice.success {
+            background: #28a745;
+        }
+        .notice.error {
+            background: #dc3545;
+        }
+        .notice.warning {
+            background: #ffc107;
+            color: #212529;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Auth Debug & Recovery Test Suite</h1>
+        
+        <div class="section">
+            <h2>🎯 Integration Status</h2>
+            <p>This page tests all authentication debugging and recovery tools that have been integrated into Code with Morais.</p>
+            
+            <ul class="features-list">
+                <li>Auth debug tools consolidated in static/js/auth/debug/</li>
+                <li>Auth recovery system in static/js/auth/auth-recovery.js</li>
+                <li>Floating debug button for quick access</li>
+                <li>Global CONFIG object with Google Client ID</li>
+                <li>All templates updated to pass google_client_id</li>
+                <li>Automatic auth token recovery on page load</li>
+                <li>Manual recovery buttons for user interaction</li>
+                <li>Enhanced error handling in API calls</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>🔍 Authentication Status</h2>
+            <div id="auth-status" class="status info">Checking authentication status...</div>
+            <div class="test-buttons">
+                <button class="btn btn-primary" onclick="checkAuthStatus()">Check Auth Status</button>
+                <button class="btn btn-warning" onclick="showAuthInfo()">Show Auth Info</button>
+                <button class="btn btn-success" onclick="testGoogleAuth()">Test Google Auth</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🛠️ Debug Tools</h2>
+            <p>These tools should be available on all pages:</p>
+            <div class="test-buttons">
+                <button class="btn btn-primary" onclick="openDebugPanel()">Open Debug Panel</button>
+                <button class="btn btn-warning" onclick="showDebugButton()">Show Debug Button</button>
+                <button class="btn btn-success" onclick="testAuthMonitor()">Test Auth Monitor</button>
+            </div>
+            <div id="debug-status" class="status info">Debug tools ready</div>
+        </div>
+        
+        <div class="section">
+            <h2>🔄 Recovery Tools</h2>
+            <p>Test authentication recovery features:</p>
+            <div class="test-buttons">
+                <button class="btn btn-success" onclick="testAutoRecovery()">Test Auto Recovery</button>
+                <button class="btn btn-warning" onclick="simulateTokenLoss()">Simulate Token Loss</button>
+                <button class="btn btn-danger" onclick="clearAuthData()">Clear Auth Data</button>
+                <button class="btn btn-primary" onclick="runManualRecovery()">Run Manual Recovery</button>
+            </div>
+            <div id="recovery-status" class="status info">Recovery tools ready</div>
+        </div>
+        
+        <div class="section">
+            <h2>📊 System Information</h2>
+            <div id="system-info" class="debug-info">
+                <div>Loading system information...</div>
+            </div>
+            <div class="test-buttons">
+                <button class="btn btn-primary" onclick="refreshSystemInfo()">Refresh Info</button>
+                <button class="btn btn-warning" onclick="exportDebugData()">Export Debug Data</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🧪 Test Results</h2>
+            <div id="test-results" class="debug-info">
+                <div>No tests run yet. Click buttons above to test functionality.</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="floating-notices" id="notices"></div>
+    
+    <script>
+        // Global CONFIG should be available
+        console.log('🔧 Auth Debug Test Page Loaded');
+        console.log('CONFIG:', window.CONFIG);
+        
+        // Test functions
+        function showNotice(message, type = 'info') {
+            const notices = document.getElementById('notices');
+            const notice = document.createElement('div');
+            notice.className = `notice ${type}`;
+            notice.textContent = message;
+            notices.appendChild(notice);
+            
+            setTimeout(() => {
+                if (notice.parentNode) {
+                    notice.parentNode.removeChild(notice);
+                }
+            }, 3000);
+        }
+        
+        function updateStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+        
+        function checkAuthStatus() {
+            updateStatus('auth-status', 'Checking authentication...', 'info');
+            
+            // Check for user and token
+            const hasUser = !!(window.currentUser || localStorage.getItem('cwm_user_profile'));
+            const hasToken = !!(localStorage.getItem('auth_token') || localStorage.getItem('cwm_user_token'));
+            const hasGoogleClientId = !!(window.CONFIG && window.CONFIG.GOOGLE_CLIENT_ID);
+            
+            let message = `User: ${hasUser ? 'Found' : 'Not found'}, Token: ${hasToken ? 'Found' : 'Not found'}, Google Client ID: ${hasGoogleClientId ? 'Available' : 'Missing'}`;
+            let type = hasUser && hasToken && hasGoogleClientId ? 'success' : 'error';
+            
+            updateStatus('auth-status', message, type);
+            showNotice(message, type);
+        }
+        
+        function showAuthInfo() {
+            const info = {
+                'Window objects': {
+                    'currentUser': !!window.currentUser,
+                    'AuthRecovery': !!window.AuthRecovery,
+                    'CONFIG': !!window.CONFIG,
+                    'google': !!window.google
+                },
+                'localStorage': {
+                    'auth_token': !!localStorage.getItem('auth_token'),
+                    'cwm_user_token': !!localStorage.getItem('cwm_user_token'),
+                    'cwm_user_profile': !!localStorage.getItem('cwm_user_profile')
+                },
+                'Configuration': {
+                    'GOOGLE_CLIENT_ID': window.CONFIG ? window.CONFIG.GOOGLE_CLIENT_ID : 'Not available',
+                    'DEBUG_MODE': window.CONFIG ? window.CONFIG.DEBUG_MODE : 'Not available'
+                }
+            };
+            
+            console.log('🔍 Auth Info:', info);
+            updateStatus('auth-status', 'Auth info logged to console', 'info');
+            showNotice('Auth info logged to console', 'info');
+        }
+        
+        function testGoogleAuth() {
+            updateStatus('auth-status', 'Testing Google Auth...', 'info');
+            
+            if (!window.CONFIG || !window.CONFIG.GOOGLE_CLIENT_ID) {
+                updateStatus('auth-status', 'Google Client ID not available', 'error');
+                showNotice('Google Client ID not available', 'error');
+                return;
+            }
+            
+            if (window.google && window.google.accounts) {
+                updateStatus('auth-status', 'Google Auth API loaded successfully', 'success');
+                showNotice('Google Auth API loaded', 'success');
+            } else {
+                updateStatus('auth-status', 'Google Auth API not loaded', 'error');
+                showNotice('Google Auth API not loaded', 'error');
+            }
+        }
+        
+        function openDebugPanel() {
+            if (window.AuthMonitor && window.AuthMonitor.createDebugPanel) {
+                try {
+                    window.AuthMonitor.createDebugPanel();
+                    updateStatus('debug-status', 'Debug panel opened', 'success');
+                    showNotice('Debug panel opened', 'success');
+                } catch (error) {
+                    updateStatus('debug-status', 'Error opening debug panel: ' + error.message, 'error');
+                    showNotice('Error opening debug panel', 'error');
+                }
+            } else {
+                updateStatus('debug-status', 'AuthMonitor not available', 'error');
+                showNotice('AuthMonitor not available', 'error');
+            }
+        }
+        
+        function showDebugButton() {
+            // The debug button should be automatically created
+            const debugButton = document.getElementById('auth-debug-button');
+            if (debugButton) {
+                updateStatus('debug-status', 'Debug button found', 'success');
+                showNotice('Debug button found', 'success');
+            } else {
+                updateStatus('debug-status', 'Debug button not found', 'error');
+                showNotice('Debug button not found', 'error');
+            }
+        }
+        
+        function testAuthMonitor() {
+            if (window.AuthMonitor) {
+                updateStatus('debug-status', 'AuthMonitor available', 'success');
+                showNotice('AuthMonitor available', 'success');
+                console.log('🔍 AuthMonitor:', window.AuthMonitor);
+            } else {
+                updateStatus('debug-status', 'AuthMonitor not available', 'error');
+                showNotice('AuthMonitor not available', 'error');
+            }
+        }
+        
+        function testAutoRecovery() {
+            if (window.AuthRecovery) {
+                const recovered = window.AuthRecovery.runIfNeeded();
+                updateStatus('recovery-status', `Auto recovery: ${recovered ? 'Success' : 'No issues found'}`, recovered ? 'success' : 'info');
+                showNotice(`Auto recovery: ${recovered ? 'Success' : 'No issues found'}`, recovered ? 'success' : 'info');
+            } else {
+                updateStatus('recovery-status', 'AuthRecovery not available', 'error');
+                showNotice('AuthRecovery not available', 'error');
+            }
+        }
+        
+        function simulateTokenLoss() {
+            // Save current token
+            const currentToken = localStorage.getItem('auth_token') || localStorage.getItem('cwm_user_token');
+            if (currentToken) {
+                sessionStorage.setItem('backup_token', currentToken);
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('cwm_user_token');
+                updateStatus('recovery-status', 'Token removed (backed up)', 'warning');
+                showNotice('Token removed (backed up)', 'warning');
+            } else {
+                updateStatus('recovery-status', 'No token to remove', 'info');
+                showNotice('No token to remove', 'info');
+            }
+        }
+        
+        function clearAuthData() {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('cwm_user_token');
+            localStorage.removeItem('cwm_user_profile');
+            sessionStorage.removeItem('backup_token');
+            updateStatus('recovery-status', 'All auth data cleared', 'warning');
+            showNotice('All auth data cleared', 'warning');
+        }
+        
+        function runManualRecovery() {
+            if (window.AuthRecovery) {
+                // Try to recover from backup
+                const backupToken = sessionStorage.getItem('backup_token');
+                if (backupToken) {
+                    localStorage.setItem('auth_token', backupToken);
+                    sessionStorage.removeItem('backup_token');
+                    updateStatus('recovery-status', 'Token recovered from backup', 'success');
+                    showNotice('Token recovered from backup', 'success');
+                } else {
+                    const recovered = window.AuthRecovery.runIfNeeded();
+                    updateStatus('recovery-status', `Manual recovery: ${recovered ? 'Success' : 'No issues found'}`, recovered ? 'success' : 'info');
+                    showNotice(`Manual recovery: ${recovered ? 'Success' : 'No issues found'}`, recovered ? 'success' : 'info');
+                }
+            } else {
+                updateStatus('recovery-status', 'AuthRecovery not available', 'error');
+                showNotice('AuthRecovery not available', 'error');
+            }
+        }
+        
+        function refreshSystemInfo() {
+            const info = {
+                'Timestamp': new Date().toISOString(),
+                'User Agent': navigator.userAgent,
+                'Location': window.location.href,
+                'Available Objects': {
+                    'window.CONFIG': !!window.CONFIG,
+                    'window.AuthRecovery': !!window.AuthRecovery,
+                    'window.AuthMonitor': !!window.AuthMonitor,
+                    'window.google': !!window.google,
+                    'window.currentUser': !!window.currentUser
+                },
+                'localStorage Keys': Object.keys(localStorage).filter(key => key.includes('auth') || key.includes('cwm') || key.includes('user')),
+                'sessionStorage Keys': Object.keys(sessionStorage).filter(key => key.includes('auth') || key.includes('cwm') || key.includes('user')),
+                'Scripts Loaded': Array.from(document.querySelectorAll('script')).length
+            };
+            
+            document.getElementById('system-info').innerHTML = '<pre>' + JSON.stringify(info, null, 2) + '</pre>';
+        }
+        
+        function exportDebugData() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                location: window.location.href,
+                config: window.CONFIG,
+                auth: {
+                    hasUser: !!(window.currentUser || localStorage.getItem('cwm_user_profile')),
+                    hasToken: !!(localStorage.getItem('auth_token') || localStorage.getItem('cwm_user_token')),
+                    hasGoogle: !!window.google,
+                    hasRecovery: !!window.AuthRecovery,
+                    hasMonitor: !!window.AuthMonitor
+                },
+                localStorage: Object.fromEntries(
+                    Object.entries(localStorage).filter(([key]) => 
+                        key.includes('auth') || key.includes('cwm') || key.includes('user')
+                    )
+                )
+            };
+            
+            console.log('📊 Debug Data:', data);
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'auth-debug-data.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotice('Debug data exported', 'success');
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔧 Auth Debug Test Page Ready');
+            checkAuthStatus();
+            refreshSystemInfo();
+            
+            // Show initial test results
+            document.getElementById('test-results').innerHTML = `
+                <div>✅ Page loaded successfully</div>
+                <div>✅ Global CONFIG available: ${!!window.CONFIG}</div>
+                <div>✅ Google Client ID available: ${!!(window.CONFIG && window.CONFIG.GOOGLE_CLIENT_ID)}</div>
+                <div>✅ AuthRecovery available: ${!!window.AuthRecovery}</div>
+                <div>✅ AuthMonitor available: ${!!window.AuthMonitor}</div>
+                <div>✅ Test page ready for manual testing</div>
+            `;
+        });
+    </script>
+</body>
+</html>

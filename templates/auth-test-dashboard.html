@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication System - Complete Test Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 30px;
+        }
+        
+        .card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid #e9ecef;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .status-label {
+            font-weight: 500;
+            color: #495057;
+        }
+        
+        .status-value {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #6c757d;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .status-good {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .status-bad {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .status-warning {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            margin: 5px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #45a049;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        
+        .test-results {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .test-results pre {
+            background: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            overflow-x: auto;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .console-output {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        .scenario-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Authentication System Test Dashboard</h1>
+            <p>Complete verification and testing suite for the authentication recovery system</p>
+        </div>
+        
+        <div class="dashboard">
+            <!-- Current Authentication Status -->
+            <div class="card">
+                <h3>🔍 Current Authentication Status</h3>
+                <div id="auth-status">
+                    <div class="status-item">
+                        <span class="status-label">Auth Token:</span>
+                        <span class="status-value" id="token-status">Checking...</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">User Object:</span>
+                        <span class="status-value" id="user-status">Checking...</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Current User ID:</span>
+                        <span class="status-value" id="user-id">Checking...</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">User Email:</span>
+                        <span class="status-value" id="user-email">Checking...</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Auth State:</span>
+                        <span class="status-value" id="auth-state">Checking...</span>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn" onclick="refreshAuthStatus()">🔄 Refresh Status</button>
+                    <button class="btn btn-secondary" onclick="showStorageDetails()">📁 Storage Details</button>
+                </div>
+            </div>
+            
+            <!-- System Health -->
+            <div class="card">
+                <h3>⚡ System Health</h3>
+                <div id="system-health">
+                    <div class="status-item">
+                        <span class="status-label">AuthRecovery Module:</span>
+                        <span class="status-value" id="recovery-module">Checking...</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">GoogleAuth Module:</span>
+                        <span class="status-value" id="google-module">Checking...</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Global CONFIG:</span>
+                        <span class="status-value" id="config-status">Checking...</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Debug Tools:</span>
+                        <span class="status-value" id="debug-tools">Checking...</span>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn" onclick="checkSystemHealth()">🔍 Check Health</button>
+                    <button class="btn btn-secondary" onclick="showDebugPanel()">🐛 Debug Panel</button>
+                </div>
+            </div>
+            
+            <!-- Test Scenarios -->
+            <div class="card">
+                <h3>🧪 Test Scenarios</h3>
+                <p>Test different authentication scenarios to ensure the system works correctly:</p>
+                <div class="scenario-buttons">
+                    <button class="btn" onclick="testNewUser()">👤 New User</button>
+                    <button class="btn" onclick="testReturningUser()">🔄 Returning User</button>
+                    <button class="btn" onclick="testBrokenAuth()">⚠️ Broken Auth</button>
+                    <button class="btn" onclick="testTokenRecovery()">🔧 Token Recovery</button>
+                    <button class="btn" onclick="testUserRecovery()">👤 User Recovery</button>
+                    <button class="btn" onclick="testJWTExtraction()">🔐 JWT Extraction</button>
+                </div>
+                <div id="scenario-results" class="test-results" style="display: none;"></div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="card">
+                <h3>⚡ Quick Actions</h3>
+                <div class="actions">
+                    <button class="btn" onclick="runRecovery()">🔄 Run Recovery</button>
+                    <button class="btn btn-warning" onclick="clearStorage()">🗑️ Clear Storage</button>
+                    <button class="btn btn-secondary" onclick="simulateLogin()">🚀 Simulate Login</button>
+                    <button class="btn btn-danger" onclick="simulateLogout()">🚪 Simulate Logout</button>
+                </div>
+                <div id="action-results" class="test-results" style="display: none;"></div>
+            </div>
+            
+            <!-- Automated Tests -->
+            <div class="card full-width">
+                <h3>🔬 Automated Test Suite</h3>
+                <p>Run comprehensive automated tests to verify all authentication scenarios:</p>
+                <div class="actions">
+                    <button class="btn" onclick="runTestSuite()">🧪 Run Test Suite</button>
+                    <button class="btn" onclick="runVerification()">🔍 Run Verification</button>
+                    <button class="btn btn-secondary" onclick="generateReport()">📊 Generate Report</button>
+                </div>
+                <div id="test-suite-results" class="test-results" style="display: none;"></div>
+            </div>
+            
+            <!-- Console Output -->
+            <div class="card full-width">
+                <h3>📟 Console Output</h3>
+                <div id="console-output" class="console-output">
+                    Console output will appear here...
+                </div>
+                <div class="actions">
+                    <button class="btn btn-secondary" onclick="clearConsole()">🧹 Clear Console</button>
+                    <button class="btn btn-secondary" onclick="exportLogs()">📥 Export Logs</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Console capture
+        const consoleOutput = document.getElementById('console-output');
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        const originalConsoleWarn = console.warn;
+        
+        let logHistory = [];
+        
+        function captureConsole(method, args) {
+            const timestamp = new Date().toLocaleTimeString();
+            const message = `[${timestamp}] ${Array.from(args).join(' ')}`;
+            logHistory.push(message);
+            
+            consoleOutput.textContent += message + '\n';
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            
+            // Keep only last 100 messages
+            if (logHistory.length > 100) {
+                logHistory = logHistory.slice(-100);
+                consoleOutput.textContent = logHistory.join('\n');
+            }
+        }
+        
+        console.log = function() {
+            captureConsole('log', arguments);
+            originalConsoleLog.apply(console, arguments);
+        };
+        
+        console.error = function() {
+            captureConsole('error', arguments);
+            originalConsoleError.apply(console, arguments);
+        };
+        
+        console.warn = function() {
+            captureConsole('warn', arguments);
+            originalConsoleWarn.apply(console, arguments);
+        };
+        
+        // Dashboard functions
+        function refreshAuthStatus() {
+            console.log('🔄 Refreshing authentication status...');
+            
+            // Check auth token
+            const hasToken = window.AuthRecovery && window.AuthRecovery.hasAuthToken();
+            document.getElementById('token-status').textContent = hasToken ? 'Present' : 'Missing';
+            document.getElementById('token-status').className = hasToken ? 'status-value status-good' : 'status-value status-bad';
+            
+            // Check user object
+            const hasUser = window.AuthRecovery && window.AuthRecovery.hasUserObject();
+            document.getElementById('user-status').textContent = hasUser ? 'Present' : 'Missing';
+            document.getElementById('user-status').className = hasUser ? 'status-value status-good' : 'status-value status-bad';
+            
+            // Check current user details
+            if (window.currentUser) {
+                document.getElementById('user-id').textContent = window.currentUser.id || window.currentUser.sub || 'Unknown';
+                document.getElementById('user-email').textContent = window.currentUser.email || 'Unknown';
+            } else {
+                document.getElementById('user-id').textContent = 'No user';
+                document.getElementById('user-email').textContent = 'No user';
+            }
+            
+            // Determine auth state
+            let authState = 'Unknown';
+            if (hasToken && hasUser) {
+                authState = 'Complete';
+                document.getElementById('auth-state').className = 'status-value status-good';
+            } else if (hasToken && !hasUser) {
+                authState = 'Token Only';
+                document.getElementById('auth-state').className = 'status-value status-warning';
+            } else if (!hasToken && hasUser) {
+                authState = 'Broken';
+                document.getElementById('auth-state').className = 'status-value status-bad';
+            } else {
+                authState = 'Clean';
+                document.getElementById('auth-state').className = 'status-value';
+            }
+            
+            document.getElementById('auth-state').textContent = authState;
+            
+            console.log('✅ Authentication status refreshed');
+        }
+        
+        function checkSystemHealth() {
+            console.log('⚡ Checking system health...');
+            
+            // Check AuthRecovery module
+            const hasRecovery = typeof window.AuthRecovery === 'object';
+            document.getElementById('recovery-module').textContent = hasRecovery ? 'Loaded' : 'Missing';
+            document.getElementById('recovery-module').className = hasRecovery ? 'status-value status-good' : 'status-value status-bad';
+            
+            // Check GoogleAuth module
+            const hasGoogle = typeof window.GoogleAuth === 'object';
+            document.getElementById('google-module').textContent = hasGoogle ? 'Loaded' : 'Missing';
+            document.getElementById('google-module').className = hasGoogle ? 'status-value status-good' : 'status-value status-bad';
+            
+            // Check CONFIG
+            const hasConfig = typeof window.CONFIG === 'object';
+            document.getElementById('config-status').textContent = hasConfig ? 'Available' : 'Missing';
+            document.getElementById('config-status').className = hasConfig ? 'status-value status-good' : 'status-value status-bad';
+            
+            // Check debug tools
+            const hasDebugButton = document.getElementById('auth-debug-button') !== null;
+            document.getElementById('debug-tools').textContent = hasDebugButton ? 'Available' : 'Missing';
+            document.getElementById('debug-tools').className = hasDebugButton ? 'status-value status-good' : 'status-value status-warning';
+            
+            console.log('✅ System health check completed');
+        }
+        
+        function showStorageDetails() {
+            console.log('📁 Storage details:');
+            console.log('localStorage auth_token:', localStorage.getItem('auth_token'));
+            console.log('localStorage cwm_user_token:', localStorage.getItem('cwm_user_token'));
+            console.log('localStorage cwm_user_profile:', localStorage.getItem('cwm_user_profile'));
+            console.log('sessionStorage auth_token:', sessionStorage.getItem('auth_token'));
+            console.log('window.currentUser:', window.currentUser);
+        }
+        
+        function showDebugPanel() {
+            if (document.getElementById('auth-debug-button')) {
+                document.getElementById('auth-debug-button').click();
+            } else {
+                console.log('⚠️ Debug panel not available');
+            }
+        }
+        
+        function runRecovery() {
+            console.log('🔄 Running authentication recovery...');
+            
+            if (window.AuthRecovery && typeof window.AuthRecovery.runIfNeeded === 'function') {
+                const recovered = window.AuthRecovery.runIfNeeded();
+                console.log('Recovery result:', recovered);
+                
+                const results = document.getElementById('action-results');
+                results.style.display = 'block';
+                results.innerHTML = `<pre>Recovery completed: ${recovered ? 'SUCCESS' : 'NO ACTION NEEDED'}</pre>`;
+                
+                // Refresh status
+                setTimeout(refreshAuthStatus, 500);
+            } else {
+                console.error('❌ AuthRecovery module not available');
+            }
+        }
+        
+        function clearStorage() {
+            console.log('🗑️ Clearing authentication storage...');
+            
+            const keys = ['auth_token', 'cwm_user_token', 'cwm_user_profile', 'currentUser'];
+            keys.forEach(key => {
+                localStorage.removeItem(key);
+                sessionStorage.removeItem(key);
+            });
+            
+            delete window.currentUser;
+            
+            const results = document.getElementById('action-results');
+            results.style.display = 'block';
+            results.innerHTML = '<pre>Storage cleared successfully</pre>';
+            
+            setTimeout(refreshAuthStatus, 500);
+        }
+        
+        function simulateLogin() {
+            console.log('🚀 Simulating successful login...');
+            
+            const mockToken = btoa(JSON.stringify({alg: 'HS256', typ: 'JWT'})) + '.' + 
+                              btoa(JSON.stringify({
+                                  sub: 'test123',
+                                  email: 'test@example.com',
+                                  name: 'Test User',
+                                  exp: Math.floor(Date.now() / 1000) + 3600
+                              })) + '.test-signature';
+            
+            const mockUser = {
+                id: 'test123',
+                email: 'test@example.com',
+                name: 'Test User',
+                picture: 'https://via.placeholder.com/150'
+            };
+            
+            localStorage.setItem('auth_token', mockToken);
+            localStorage.setItem('cwm_user_profile', JSON.stringify(mockUser));
+            window.currentUser = mockUser;
+            
+            const results = document.getElementById('action-results');
+            results.style.display = 'block';
+            results.innerHTML = '<pre>Login simulation completed</pre>';
+            
+            setTimeout(refreshAuthStatus, 500);
+        }
+        
+        function simulateLogout() {
+            console.log('🚪 Simulating logout...');
+            
+            if (window.signOut && typeof window.signOut === 'function') {
+                // Don't actually call signOut as it will redirect
+                console.log('signOut function is available');
+            }
+            
+            // Clear data manually
+            clearStorage();
+            
+            const results = document.getElementById('action-results');
+            results.style.display = 'block';
+            results.innerHTML = '<pre>Logout simulation completed</pre>';
+        }
+        
+        function testNewUser() {
+            console.log('👤 Testing new user scenario...');
+            
+            // Clear everything first
+            clearStorage();
+            
+            const results = document.getElementById('scenario-results');
+            results.style.display = 'block';
+            results.innerHTML = '<pre>New user scenario: All data cleared</pre>';
+            
+            setTimeout(refreshAuthStatus, 500);
+        }
+        
+        function testReturningUser() {
+            console.log('🔄 Testing returning user scenario...');
+            
+            // Simulate returning user with stored data
+            simulateLogin();
+            
+            // Clear window object to simulate page reload
+            delete window.currentUser;
+            
+            // Run recovery
+            setTimeout(() => {
+                runRecovery();
+                
+                const results = document.getElementById('scenario-results');
+                results.style.display = 'block';
+                results.innerHTML = '<pre>Returning user scenario: Recovery attempted</pre>';
+            }, 500);
+        }
+        
+        function testBrokenAuth() {
+            console.log('⚠️ Testing broken auth scenario...');
+            
+            // Create broken auth state (user but no token)
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('cwm_user_token');
+            window.currentUser = {
+                id: 'test123',
+                email: 'test@example.com',
+                name: 'Test User'
+            };
+            
+            const results = document.getElementById('scenario-results');
+            results.style.display = 'block';
+            results.innerHTML = '<pre>Broken auth scenario: User without token</pre>';
+            
+            setTimeout(refreshAuthStatus, 500);
+        }
+        
+        function testTokenRecovery() {
+            console.log('🔧 Testing token recovery...');
+            
+            // Create scenario with token but no user
+            clearStorage();
+            const mockToken = btoa(JSON.stringify({alg: 'HS256', typ: 'JWT'})) + '.' + 
+                              btoa(JSON.stringify({
+                                  sub: 'test123',
+                                  email: 'test@example.com',
+                                  name: 'Test User',
+                                  exp: Math.floor(Date.now() / 1000) + 3600
+                              })) + '.test-signature';
+            
+            localStorage.setItem('auth_token', mockToken);
+            
+            // Run recovery
+            setTimeout(() => {
+                runRecovery();
+                
+                const results = document.getElementById('scenario-results');
+                results.style.display = 'block';
+                results.innerHTML = '<pre>Token recovery scenario: User should be extracted from JWT</pre>';
+            }, 500);
+        }
+        
+        function testUserRecovery() {
+            console.log('👤 Testing user recovery...');
+            
+            // Create scenario with user in storage but not in window
+            clearStorage();
+            const mockUser = {
+                id: 'test123',
+                email: 'test@example.com',
+                name: 'Test User'
+            };
+            
+            localStorage.setItem('cwm_user_profile', JSON.stringify(mockUser));
+            
+            // Run recovery
+            setTimeout(() => {
+                runRecovery();
+                
+                const results = document.getElementById('scenario-results');
+                results.style.display = 'block';
+                results.innerHTML = '<pre>User recovery scenario: User should be restored to window</pre>';
+            }, 500);
+        }
+        
+        function testJWTExtraction() {
+            console.log('🔐 Testing JWT extraction...');
+            
+            if (window.AuthRecovery && typeof window.AuthRecovery.extractUserFromToken === 'function') {
+                const testToken = btoa(JSON.stringify({alg: 'HS256', typ: 'JWT'})) + '.' + 
+                                  btoa(JSON.stringify({
+                                      sub: 'jwt-test',
+                                      email: 'jwt@example.com',
+                                      name: 'JWT Test User',
+                                      exp: Math.floor(Date.now() / 1000) + 3600
+                                  })) + '.test-signature';
+                
+                const extracted = window.AuthRecovery.extractUserFromToken(testToken);
+                
+                const results = document.getElementById('scenario-results');
+                results.style.display = 'block';
+                results.innerHTML = `<pre>JWT extraction result: ${extracted ? 'SUCCESS' : 'FAILED'}</pre>`;
+                
+                setTimeout(refreshAuthStatus, 500);
+            } else {
+                console.error('❌ AuthRecovery.extractUserFromToken not available');
+            }
+        }
+        
+        function runTestSuite() {
+            console.log('🧪 Running test suite...');
+            
+            const results = document.getElementById('test-suite-results');
+            results.style.display = 'block';
+            results.innerHTML = '<pre>Running test suite...</pre>';
+            
+            if (window.AuthTestSuite && typeof window.AuthTestSuite.runAllTests === 'function') {
+                window.AuthTestSuite.runAllTests();
+                results.innerHTML = '<pre>Test suite completed - check console for results</pre>';
+            } else {
+                results.innerHTML = '<pre>Test suite not available</pre>';
+            }
+        }
+        
+        function runVerification() {
+            console.log('🔍 Running system verification...');
+            
+            const results = document.getElementById('test-suite-results');
+            results.style.display = 'block';
+            results.innerHTML = '<pre>Running verification...</pre>';
+            
+            if (window.AuthSystemVerification && typeof window.AuthSystemVerification.verifyCompleteSystem === 'function') {
+                const verificationResult = window.AuthSystemVerification.verifyCompleteSystem();
+                results.innerHTML = `<pre>Verification completed - ${verificationResult.success ? 'SUCCESS' : 'ISSUES FOUND'}</pre>`;
+            } else {
+                results.innerHTML = '<pre>Verification system not available</pre>';
+            }
+        }
+        
+        function generateReport() {
+            console.log('📊 Generating comprehensive report...');
+            
+            const report = {
+                timestamp: new Date().toISOString(),
+                authStatus: {
+                    hasToken: window.AuthRecovery && window.AuthRecovery.hasAuthToken(),
+                    hasUser: window.AuthRecovery && window.AuthRecovery.hasUserObject(),
+                    currentUser: window.currentUser
+                },
+                systemHealth: {
+                    authRecovery: typeof window.AuthRecovery === 'object',
+                    googleAuth: typeof window.GoogleAuth === 'object',
+                    config: typeof window.CONFIG === 'object',
+                    debugTools: document.getElementById('auth-debug-button') !== null
+                },
+                storage: {
+                    localStorage: {
+                        auth_token: localStorage.getItem('auth_token'),
+                        cwm_user_token: localStorage.getItem('cwm_user_token'),
+                        cwm_user_profile: localStorage.getItem('cwm_user_profile')
+                    },
+                    sessionStorage: {
+                        auth_token: sessionStorage.getItem('auth_token')
+                    }
+                }
+            };
+            
+            const results = document.getElementById('test-suite-results');
+            results.style.display = 'block';
+            results.innerHTML = '<pre>' + JSON.stringify(report, null, 2) + '</pre>';
+        }
+        
+        function clearConsole() {
+            consoleOutput.textContent = '';
+            logHistory = [];
+        }
+        
+        function exportLogs() {
+            const logData = logHistory.join('\n');
+            const blob = new Blob([logData], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `auth-logs-${new Date().toISOString().replace(/[:.]/g, '-')}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔐 Authentication Test Dashboard loaded');
+            
+            // Initial status check
+            setTimeout(() => {
+                refreshAuthStatus();
+                checkSystemHealth();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

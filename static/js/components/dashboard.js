@@ -8,8 +8,43 @@
  * - Simplified loading state management
  */
 
-// Import Wordle game functionality (commented out for now)
-// import '../../js/games/WordleGame.js';
+// Import dashboard components with fallbacks
+let DashboardChallengeManager, DashboardStreakTracker, AppUtils;
+
+// Try to import modules, use fallbacks if not available
+try {
+    if (typeof window !== 'undefined') {
+        // Use global versions if available
+        DashboardChallengeManager = window.DashboardChallengeManager || class { 
+            constructor() {} 
+            async init() { console.log('Dashboard Challenge Manager (fallback)'); }
+        };
+        DashboardStreakTracker = window.DashboardStreakTracker || class { 
+            constructor() {} 
+            async init() { console.log('Dashboard Streak Tracker (fallback)'); }
+        };
+        AppUtils = window.AppUtils || window.appUtils || class {
+            showNotification(msg, type) { console.log(`[${type}] ${msg}`); }
+            handleError(err, ctx) { console.error(ctx, err); }
+        };
+    }
+} catch (error) {
+    console.warn('Failed to import dashboard dependencies, using fallbacks:', error);
+    
+    // Define fallback classes
+    DashboardChallengeManager = class { 
+        constructor() {} 
+        async init() { console.log('Dashboard Challenge Manager (fallback)'); }
+    };
+    DashboardStreakTracker = class { 
+        constructor() {} 
+        async init() { console.log('Dashboard Streak Tracker (fallback)'); }
+    };
+    AppUtils = class {
+        showNotification(msg, type) { console.log(`[${type}] ${msg}`); }
+        handleError(err, ctx) { console.error(ctx, err); }
+    };
+}
 
 class ModernDashboardManager {
     constructor() {
@@ -1330,7 +1365,33 @@ class ModernDashboardManager {
 
     async loadDailyChallenge() {
         console.log('Loading daily challenge...');
-        // TODO: Implement daily challenge loading
+        
+        try {
+            const challengeContainer = document.querySelector('#challenge-tab');
+            if (!challengeContainer) {
+                console.error('Challenge container not found');
+                return;
+            }
+            
+            // Initialize challenge manager
+            const challengeManager = new DashboardChallengeManager();
+            challengeManager.init();
+            
+            // Initialize streak tracker
+            const streakContainer = document.querySelector('#challenge-tab .streak-container');
+            if (streakContainer) {
+                const streakTracker = new DashboardStreakTracker();
+                streakTracker.init(streakContainer);
+                
+                // Store reference for future updates
+                this.streakTracker = streakTracker;
+            }
+            
+            console.log('Daily challenge loaded successfully');
+        } catch (error) {
+            console.error('Failed to load daily challenge:', error);
+            this.showError('Failed to load daily challenge. Please try again later.');
+        }
     }
 
     async loadExamObjectives() {
@@ -1459,7 +1520,6 @@ window.openLeaderboardModal = function() {
     const isDashboardPage = document.body.classList.contains('dashboard-page') || 
                            document.body.dataset.page === 'dashboard' ||
                            window.location.pathname.includes('dashboard');
-                           
     if (!isDashboardPage) {
         // Redirect to dashboard with leaderboard tab parameter
         window.location.href = '/dashboard?tab=leaderboard';

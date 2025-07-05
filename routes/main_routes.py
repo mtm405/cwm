@@ -81,17 +81,21 @@ def dashboard():
             {'username': 'ScriptKid', 'xp': 750, 'level': 7}
         ]
         
-        daily_challenge = firebase_service.get_daily_challenge()
+        daily_challenge = None  # Don't pre-fetch challenge - let JavaScript handle it
         recent_activity = firebase_service.get_user_activities(user['uid'], limit=10)
     
     # Temporary debug - return simple response to test template issue
     # return jsonify({'status': 'template_test', 'user_exists': user is not None})
     
+    # Get Google Client ID for auth
+    google_client_id = os.environ.get('GOOGLE_CLIENT_ID')
+    
     return render_template('dashboard.html', 
                          user=user, 
                          leaderboard=leaderboard,
                          daily_challenge=daily_challenge,
-                         recent_activity=recent_activity)
+                         recent_activity=recent_activity,
+                         google_client_id=google_client_id)
 
 @main_bp.route('/test-template')
 def test_template():
@@ -134,7 +138,40 @@ def profile():
             'show_achievements': True
         }
     
-    return render_template('profile.html', user=user)
+    # Get Google Client ID for auth
+    google_client_id = os.environ.get('GOOGLE_CLIENT_ID')
+    
+    return render_template('profile.html', user=user, google_client_id=google_client_id)
+
+@main_bp.route('/test-text-with-questions')
+def test_text_with_questions():
+    """Test page for the text_with_questions block type"""
+    return render_template('test_text_with_questions.html')
+
+@main_bp.route('/auth-debug-test')
+def auth_debug_test():
+    """Authentication debug and recovery test page"""
+    google_client_id = os.environ.get('GOOGLE_CLIENT_ID')
+    return render_template('auth-debug-test.html', google_client_id=google_client_id)
+
+@main_bp.route('/simple-auth-diagnostic')
+def simple_auth_diagnostic():
+    """Simple authentication diagnostic page"""
+    google_client_id = os.environ.get('GOOGLE_CLIENT_ID')
+    return render_template('simple-auth-diagnostic.html', google_client_id=google_client_id)
+
+@main_bp.route('/auth-test-dashboard')
+def auth_test_dashboard():
+    """Authentication system test dashboard"""
+    # Only allow access in development mode or with debug parameter
+    config = get_config()
+    is_debug = config.DEV_MODE or request.args.get('debug') == 'true'
+    
+    if not is_debug:
+        return redirect(url_for('main.index'))
+    
+    google_client_id = os.environ.get('GOOGLE_CLIENT_ID')
+    return render_template('auth-test-dashboard.html', google_client_id=google_client_id)
 
 # Note: /lessons route moved to lesson_routes.py for better organization
 # Note: /lesson/<lesson_id> route also moved to lesson_routes.py for proper data handling

@@ -60,6 +60,9 @@
 
             this.isInitialized = true;
             
+            // Restore authentication state from localStorage
+            this.restoreAuthState();
+            
             // Process any pending response
             if (this.pendingResponse || window.pendingGoogleResponse) {
                 console.log('🔄 Processing pending Google response...');
@@ -129,12 +132,25 @@
             if (data.success) {
                 console.log('✅ Authentication successful');
                 
+                // Store auth token for persistence
+                if (data.token) {
+                    localStorage.setItem('auth_token', data.token);
+                    console.log('💾 Auth token stored in localStorage');
+                }
+                
+                // Store user token if different from auth token
+                if (data.user_token && data.user_token !== data.token) {
+                    localStorage.setItem('cwm_user_token', data.user_token);
+                    console.log('💾 User token stored in localStorage');
+                }
+                
                 // Show success feedback
                 this.showMessage('Login successful! Redirecting...', 'success');
                 
                 // Store user data if available
                 if (data.user) {
                     window.currentUser = data.user;
+                    localStorage.setItem('cwm_user_profile', JSON.stringify(data.user));
                     console.log('👤 User data stored:', data.user);
                 }
                 
@@ -371,6 +387,137 @@
                     this.clearLocalData();
                     window.location.href = '/';
                 });
+        },
+
+        /**
+         * Restore authentication state from localStorage
+         */
+        restoreAuthState: function() {
+            console.log('🔄 Restoring authentication state...');
+            
+            // Check for stored tokens
+            const authToken = localStorage.getItem('auth_token');
+            const userToken = localStorage.getItem('cwm_user_token');
+            const userProfile = localStorage.getItem('cwm_user_profile');
+            
+            if (authToken) {
+                console.log('💾 Found stored auth token');
+                
+                // Check if it's a placeholder token or real JWT
+                if (authToken === 'session_authenticated') {
+                    console.log('🔄 Found session placeholder token');
+                    
+                    // Restore user profile if available
+                    if (userProfile) {
+                        try {
+                            window.currentUser = JSON.parse(userProfile);
+                            console.log('👤 User profile restored from session:', window.currentUser);
+                            return true;
+                        } catch (e) {
+                            console.error('❌ Failed to parse user profile:', e);
+                        }
+                    }
+                } else {
+                    // Validate JWT token is not expired
+                    try {
+                        const payload = JSON.parse(atob(authToken.split('.')[1]));
+                        const now = Math.floor(Date.now() / 1000);
+                        
+                        if (payload.exp && payload.exp > now) {
+                            console.log('✅ Auth token is still valid');
+                            
+                            // Restore user profile
+                            if (userProfile) {
+                                try {
+                                    window.currentUser = JSON.parse(userProfile);
+                                    console.log('👤 User profile restored:', window.currentUser);
+                                } catch (e) {
+                                    console.error('❌ Failed to parse user profile:', e);
+                                }
+                            }
+                            
+                            return true;
+                        } else {
+                            console.warn('⚠️ Auth token is expired, removing...');
+                            localStorage.removeItem('auth_token');
+                            localStorage.removeItem('cwm_user_token');
+                            localStorage.removeItem('cwm_user_profile');
+                            window.currentUser = null;
+                        }
+                    } catch (e) {
+                        console.error('❌ Failed to parse auth token:', e);
+                        localStorage.removeItem('auth_token');
+                    }
+                }
+            }
+            
+            // Check for user token if no auth token
+            if (!authToken && userToken) {
+                console.log('💾 Found stored user token');
+                
+                if (userProfile) {
+                    try {
+                        window.currentUser = JSON.parse(userProfile);
+                        console.log('👤 User profile restored from user token:', window.currentUser);
+                        return true;
+                    } catch (e) {
+                        console.error('❌ Failed to parse user profile:', e);
+                    }
+                }
+            }
+            
+            console.log('❌ No valid authentication state found');
+            return false;
+        },
+
+        /**
+         * Initialize Google Auth from global config
+         */
+        init: function() {
+            if (this.isInitialized) return;
+            
+            console.log('🔐 Initializing Google Auth module...');
+            
+            // Get client ID from global config
+            if (window.CONFIG && window.CONFIG.GOOGLE_CLIENT_ID) {
+                this.config.clientId = window.CONFIG.GOOGLE_CLIENT_ID;
+                console.log('✅ Google Auth config loaded');
+                
+                // Initialize Google Identity Services if available
+                if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+                    try {
+                        console.log('🔄 Initializing Google Identity Services with client ID:', this.config.clientId);
+                        google.accounts.id.initialize({
+                            client_id: this.config.clientId,
+                            callback: this.handleCredentialResponse.bind(this),
+                            auto_select: false,
+                            cancel_on_tap_outside: true
+                        });
+                        console.log('✅ Google Identity Services initialized successfully');
+                    } catch (error) {
+                        console.error('❌ Failed to initialize Google Identity Services:', error);
+                    }
+                } else {
+                    console.warn('⚠️ Google Identity Services not yet available');
+                    // The script might still be loading, we'll rely on the global callback
+                }
+            } else {
+                console.warn('⚠️ Google Auth config not found');
+                return;
+            }
+
+            this.isInitialized = true;
+            
+            // Restore authentication state from localStorage
+            this.restoreAuthState();
+            
+            // Process any pending response
+            if (this.pendingResponse || window.pendingGoogleResponse) {
+                console.log('🔄 Processing pending Google response...');
+                this.handleCredentialResponse(this.pendingResponse || window.pendingGoogleResponse);
+                this.pendingResponse = null;
+                window.pendingGoogleResponse = null;
+            }
         },
     };
 

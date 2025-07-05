@@ -42,6 +42,9 @@ function createBlockElement(block, index, lessonProgress) {
         case 'quiz':
             article.innerHTML = createQuizBlockHTML(block);
             break;
+        case 'text_with_questions':
+            article.innerHTML = createTextWithQuestionsHTML(block);
+            break;
         default:
             article.innerHTML = createDefaultBlockHTML(block);
     }
@@ -256,6 +259,162 @@ function createQuizBlockHTML(block) {
                     </div>
                 </div>
             </div>
+        </div>
+    `;
+}
+
+// Function to create the HTML for a text_with_questions block
+function createTextWithQuestionsHTML(block) {
+    // Create the embedded questions HTML
+    const questionsHTML = createEmbeddedQuestionsHTML(block.questions || []);
+    
+    return `
+        <div class="block-header">
+            <div class="block-icon">
+                <i class="fas fa-book-open"></i>
+            </div>
+            <div class="block-meta">
+                <span class="block-type">Interactive Reading</span>
+                <span class="block-progress-indicator" id="progress-${block.id}">
+                    <i class="fas fa-circle"></i>
+                </span>
+            </div>
+        </div>
+        <div class="block-content">
+            <div class="text-content">
+                ${block.title ? `<h3>${block.title}</h3>` : ''}
+                ${processContent(block.content || '')}
+            </div>
+            <div class="embedded-questions-container">
+                ${questionsHTML}
+            </div>
+        </div>
+        <div class="block-actions">
+            <button class="btn btn-success complete-btn" data-block-id="${block.id}">
+                <i class="fas fa-check"></i> Mark as Complete
+            </button>
+        </div>
+    `;
+}
+
+// Function to create the HTML for embedded questions
+function createEmbeddedQuestionsHTML(questions) {
+    if (!questions || !Array.isArray(questions) || questions.length === 0) {
+        return '<div class="no-questions">No questions available</div>';
+    }
+
+    return `
+        <div class="embedded-questions">
+            <h4>Knowledge Check</h4>
+            ${questions.map((question, index) => createQuestionHTML(question, index)).join('')}
+        </div>
+    `;
+}
+
+// Function to create the HTML for a single question
+function createQuestionHTML(question, index) {
+    const questionId = `embedded-question-${question.id || index}`;
+
+    let questionContent = '';
+    
+    switch (question.type) {
+        case 'multiple_choice':
+            questionContent = createMultipleChoiceQuestionHTML(question, questionId);
+            break;
+        case 'true_false':
+            questionContent = createTrueFalseQuestionHTML(question, questionId);
+            break;
+        case 'fill_blank':
+            questionContent = createFillBlankQuestionHTML(question, questionId);
+            break;
+        case 'open_ended':
+            questionContent = createOpenEndedQuestionHTML(question, questionId);
+            break;
+        default:
+            questionContent = `<div class="question-error">Unsupported question type: ${question.type}</div>`;
+    }
+
+    return `
+        <div class="embedded-question" data-question-id="${question.id || index}" data-question-type="${question.type}">
+            <div class="question-number">${index + 1}</div>
+            <div class="question-content">
+                ${questionContent}
+            </div>
+        </div>
+    `;
+}
+
+// Function to create the HTML for a multiple choice question
+function createMultipleChoiceQuestionHTML(question, questionId) {
+    return `
+        <div class="question-text">${question.question}</div>
+        <div class="question-options">
+            ${question.options.map((option, idx) => `
+                <div class="question-option">
+                    <input type="radio" id="${questionId}-option-${idx}" name="${questionId}" value="${idx}" class="embedded-mc-option">
+                    <label for="${questionId}-option-${idx}">${option}</label>
+                </div>
+            `).join('')}
+        </div>
+        <div class="question-feedback" style="display: none;"></div>
+        <div class="question-actions">
+            <button class="btn btn-primary check-answer-btn" data-question-id="${questionId}" data-correct-answer="${question.correct_answer}">
+                Check Answer
+            </button>
+        </div>
+    `;
+}
+
+// Function to create the HTML for a true/false question
+function createTrueFalseQuestionHTML(question, questionId) {
+    return `
+        <div class="question-text">${question.question}</div>
+        <div class="question-options tf-options">
+            <div class="question-option">
+                <input type="radio" id="${questionId}-true" name="${questionId}" value="true" class="embedded-tf-option">
+                <label for="${questionId}-true">True</label>
+            </div>
+            <div class="question-option">
+                <input type="radio" id="${questionId}-false" name="${questionId}" value="false" class="embedded-tf-option">
+                <label for="${questionId}-false">False</label>
+            </div>
+        </div>
+        <div class="question-feedback" style="display: none;"></div>
+        <div class="question-actions">
+            <button class="btn btn-primary check-answer-btn" data-question-id="${questionId}" data-correct-answer="${question.correct_answer}">
+                Check Answer
+            </button>
+        </div>
+    `;
+}
+
+// Function to create the HTML for a fill-in-the-blank question
+function createFillBlankQuestionHTML(question, questionId) {
+    return `
+        <div class="question-text">${question.question}</div>
+        <div class="fill-blank-container">
+            <input type="text" id="${questionId}-input" class="fill-blank-input" placeholder="Your answer...">
+        </div>
+        <div class="question-feedback" style="display: none;"></div>
+        <div class="question-actions">
+            <button class="btn btn-primary check-answer-btn" data-question-id="${questionId}" data-correct-answer="${question.correct_answer}">
+                Check Answer
+            </button>
+        </div>
+    `;
+}
+
+// Function to create the HTML for an open-ended question
+function createOpenEndedQuestionHTML(question, questionId) {
+    return `
+        <div class="question-text">${question.question}</div>
+        <div class="open-ended-container">
+            <textarea id="${questionId}-input" class="open-ended-input" rows="4" placeholder="Write your answer here..."></textarea>
+        </div>
+        <div class="question-actions">
+            <button class="btn btn-primary save-answer-btn" data-question-id="${questionId}">
+                Save Answer
+            </button>
         </div>
     `;
 }

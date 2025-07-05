@@ -1,0 +1,139 @@
+{
+  "lesson_metadata": {
+    "id": "text-with-questions-demo",
+    "title": "Interactive Lesson with Embedded Questions",
+    "description": "A demonstration of the new text_with_questions block type featuring multiple types of embedded questions",
+    "order": 10,
+    "difficulty": "intermediate",
+    "estimated_time": 30,
+    "prerequisites": [],
+    "tags": ["demo", "interactive", "questions"],
+    "xp_reward": 100,
+    "pycoins_reward": 25,
+    "created_at": "2023-12-01T10:00:00Z",
+    "updated_at": "2023-12-01T10:00:00Z",
+    "is_published": true
+  },
+  
+  "blocks": [
+    {
+      "id": "intro-block",
+      "type": "text",
+      "order": 0,
+      "title": "Introduction to Interactive Blocks",
+      "content": "# Interactive Lesson with Embedded Questions\n\nWelcome to this demonstration lesson! In this lesson, we'll showcase the new **text_with_questions** block type that allows embedding different types of questions directly within text content.\n\nThis feature allows for a more interactive reading experience, helping you to check your understanding as you learn new concepts."
+    },
+    {
+      "id": "python-variables",
+      "type": "text_with_questions",
+      "order": 1,
+      "title": "Understanding Python Variables",
+      "content": "## Python Variables\n\nVariables in Python are used to store data that can be referenced and manipulated in a program. Unlike some other programming languages, Python has no command for declaring a variable. A variable is created the moment you first assign a value to it.\n\n```python\n# Creating variables\nname = \"Python\"\nversion = 3.9\nis_awesome = True\n```\n\nPython is dynamically typed, which means you don't need to declare the type of a variable when you create one. The interpreter automatically determines the type based on the assigned value.\n\n### Variable Naming Rules\n\n- Variable names must start with a letter or underscore\n- The rest of the name can contain letters, numbers, and underscores\n- Names are case-sensitive (`age` and `Age` are different variables)\n- Names cannot be Python keywords (like `if`, `for`, `while`, etc.)",
+      "questions": [
+        {
+          "id": "var-q1",
+          "type": "multiple_choice",
+          "question": "In Python, how do you declare a variable?",
+          "options": [
+            "var name = \"John\";",
+            "dim name as string = \"John\"",
+            "name = \"John\"",
+            "string name = \"John\";"
+          ],
+          "correct_answer": 2,
+          "explanation": "In Python, you simply assign a value to a variable name. There's no declaration keyword or type specification needed."
+        },
+        {
+          "id": "var-q2",
+          "type": "true_false",
+          "question": "In Python, variable names are case-insensitive, meaning 'age' and 'Age' refer to the same variable.",
+          "correct_answer": false,
+          "explanation": "Python is case-sensitive, so 'age' and 'Age' are considered different variables."
+        },
+        {
+          "id": "var-q3",
+          "type": "fill_blank",
+          "question": "To check the data type of a variable in Python, you can use the __________ function.",
+          "correct_answer": "type",
+          "explanation": "The type() function returns the data type of the specified variable or value."
+        }
+      ]
+    },
+    {
+      "id": "python-data-types",
+      "type": "text_with_questions",
+      "order": 2,
+      "title": "Python Data Types",
+      "content": "## Python Data Types\n\nPython has several built-in data types that are used to define the operations possible on variables and the storage method for each type.\n\n### Numeric Types\n\n- **int**: Integer numbers (e.g., `42`, `-7`)\n- **float**: Floating-point numbers (e.g., `3.14`, `-0.001`)\n- **complex**: Complex numbers (e.g., `3+4j`)\n\n### Sequence Types\n\n- **str**: Strings - ordered, immutable sequences of characters (e.g., `\"Hello\"`, `'Python'`)\n- **list**: Lists - ordered, mutable sequences (e.g., `[1, 2, 3]`, `['a', 'b', 'c']`)\n- **tuple**: Tuples - ordered, immutable sequences (e.g., `(1, 2, 3)`, `('a', 'b', 'c')`)\n\n### Mapping Type\n\n- **dict**: Dictionaries - unordered collections of key-value pairs (e.g., `{'name': 'John', 'age': 30}`)\n\n### Set Types\n\n- **set**: Sets - unordered collections of unique elements (e.g., `{1, 2, 3}`)\n- **frozenset**: Immutable sets\n\n### Boolean Type\n\n- **bool**: Boolean values (`True` or `False`)\n\n### None Type\n\n- **NoneType**: The `None` object, which represents the absence of a value",
+      "questions": [
+        {
+          "id": "dt-q1",
+          "type": "multiple_choice",
+          "question": "Which of the following is NOT a sequence type in Python?",
+          "options": [
+            "str",
+            "list",
+            "dict",
+            "tuple"
+          ],
+          "correct_answer": 2,
+          "explanation": "dict (dictionary) is a mapping type, not a sequence type. Sequence types in Python include str, list, and tuple."
+        },
+        {
+          "id": "dt-q2",
+          "type": "multiple_choice",
+          "question": "Which data type would you use to store a collection of unique elements?",
+          "options": [
+            "list",
+            "set",
+            "tuple",
+            "dict"
+          ],
+          "correct_answer": 1,
+          "explanation": "sets are unordered collections of unique elements. If you add a duplicate element to a set, it will be ignored."
+        },
+        {
+          "id": "dt-q3",
+          "type": "true_false",
+          "question": "In Python, lists are immutable, meaning their content cannot be changed after creation.",
+          "correct_answer": false,
+          "explanation": "Lists are mutable, meaning you can change their content after creation. Tuples, on the other hand, are immutable."
+        }
+      ]
+    },
+    {
+      "id": "open-ended-example",
+      "type": "text_with_questions",
+      "order": 3,
+      "title": "Applying Your Knowledge",
+      "content": "## Applying Your Knowledge\n\nNow that you've learned about Python variables and data types, let's think about how you might apply this knowledge in real-world scenarios.\n\nConsider a program that needs to store information about a user profile for a social media application. You would need to choose appropriate variable names and data types to store different pieces of information such as:\n\n- Username\n- Age\n- Email address\n- List of friends\n- Online status\n- Account creation date\n- Profile settings",
+      "questions": [
+        {
+          "id": "apply-q1",
+          "type": "open_ended",
+          "question": "How would you organize the user profile data described above? What variables and data types would you use? Write a short code example."
+        },
+        {
+          "id": "apply-q2",
+          "type": "multiple_choice",
+          "question": "For storing a user's list of friends, which data type would be most appropriate?",
+          "options": [
+            "String with comma-separated values",
+            "Integer count of friends",
+            "List of usernames or user IDs",
+            "Boolean value indicating whether they have friends"
+          ],
+          "correct_answer": 2,
+          "explanation": "A list is the most appropriate data type for storing multiple related items like a collection of friends, as it can store multiple values and be easily modified when friends are added or removed."
+        }
+      ]
+    },
+    {
+      "id": "conclusion-block",
+      "type": "text",
+      "order": 4,
+      "title": "Conclusion",
+      "content": "# Conclusion\n\nCongratulations on completing this interactive lesson! You've now experienced the new text_with_questions block type, which allows for embedding different types of questions directly within lesson content.\n\nThis approach helps to:\n\n- Reinforce learning as you read\n- Test understanding of key concepts immediately\n- Provide immediate feedback\n- Create a more engaging learning experience\n\nWe hope you found this lesson format helpful and engaging!"
+    }
+  ]
+}

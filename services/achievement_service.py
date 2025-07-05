@@ -1,8 +1,9 @@
 from typing import Dict, List, Optional, Any
 from datetime import datetime
+import uuid
+import asyncio
 from models.user_profile import Achievement, UserStats, UserActivity
 from services.firebase_service import firebase_service
-import uuid
 
 class AchievementService:
     """Service for managing user achievements and gamification"""
@@ -389,3 +390,107 @@ class AchievementService:
 
 # Create global instance
 achievement_service = AchievementService()
+
+# Simple wrapper function for the existing check_achievements method
+def check_achievement_progress(user_id: str, action_type: str, data: Dict[str, Any] = None):
+    """
+    Check if a user has unlocked any achievements based on an action
+    
+    Args:
+        user_id: The ID of the user
+        action_type: The type of action performed (e.g., 'complete_challenge', 'lesson_completed')
+        data: Additional data about the action
+        
+    Returns:
+        An achievement object if one was unlocked, None otherwise
+    """
+    if data is None:
+        data = {}
+    
+    # Since this is called synchronously, we'll do a simple check
+    # For daily challenges, we'll focus on streak-related achievements
+    if action_type == 'complete_challenge':
+        # Get the streak value from the user data
+        try:
+            from services.firebase_service import get_firestore_instance
+            db = get_firestore_instance()
+            user_ref = db.collection('users').document(user_id)
+            user_doc = user_ref.get()
+            
+            if user_doc.exists:
+                user_data = user_doc.to_dict()
+                current_streak = user_data.get('streak', 0)
+                
+                # Check if the streak milestone unlocks an achievement
+                if current_streak == 3:
+                    return {
+                        'id': 'streak_starter',
+                        'name': 'Streak Starter',
+                        'description': 'Maintain a 3-day learning streak',
+                        'icon': '🔥',
+                        'points': 20
+                    }
+                elif current_streak == 7:
+                    return {
+                        'id': 'streak_apprentice',
+                        'name': 'Streak Apprentice',
+                        'description': 'Maintain a 7-day learning streak',
+                        'icon': '📆',
+                        'points': 50
+                    }
+                elif current_streak == 30:
+                    return {
+                        'id': 'streak_master',
+                        'name': 'Streak Master',
+                        'description': 'Maintain a 30-day learning streak',
+                        'icon': '⚡',
+                        'points': 150
+                    }
+                elif current_streak == 100:
+                    return {
+                        'id': 'streak_legend',
+                        'name': 'Streak Legend',
+                        'description': 'Maintain a 100-day learning streak',
+                        'icon': '🌟',
+                        'points': 500
+                    }
+        except Exception as e:
+            print(f"Error checking achievements: {e}")
+    
+    # No achievement unlocked
+    return None
+
+def check_achievement_progress(user_id: str, activity_type: str, activity_data: dict) -> Optional[dict]:
+    """
+    Check and update achievement progress for a user activity
+    
+    Args:
+        user_id: User ID
+        activity_type: Type of activity (e.g., 'complete_challenge', 'complete_lesson')
+        activity_data: Data about the activity
+    
+    Returns:
+        Achievement data if one was unlocked, None otherwise
+    """
+    try:
+        # Create instance of AchievementService
+        achievement_service = AchievementService()
+        
+        # Check achievements using the async method
+        import asyncio
+        
+        # Run the async method in a sync context
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        try:
+            result = loop.run_until_complete(
+                achievement_service.check_achievements(user_id, activity_type, activity_data)
+            )
+            return result
+        finally:
+            loop.close()
+            
+    except Exception as e:
+        print(f"Error checking achievement progress: {e}")
+        return None

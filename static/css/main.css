@@ -40,12 +40,6 @@ body {
 }
 
 /* --- Modern Dashboard Header --- */
-.modern-dashboard-header {
-    background: var(--background-color);
-    padding: 1rem 2rem;
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 1.5rem;
-}
 
 .header-content {
     display: flex;
@@ -116,32 +110,4 @@ body {
 .search-container.active .search-input {
     width: 250px; /* Expanded width */
     padding-left: 0.5rem;
-}
-
-/* Dashboard Nav Tabs */
-.dashboard-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid var(--border-color);
-    padding-top: 0.5rem;
-}
-
-.nav-tabs-container {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.nav-tab {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 500;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.nav-tab.active {
-    background-color: var(--primary-color) !important;
-    color: #fff !important;
-    box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
 }

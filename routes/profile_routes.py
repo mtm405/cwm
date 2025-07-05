@@ -1,11 +1,12 @@
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
 from services.firebase_service import firebase_service
-from models.user import get_current_user
+from models.user import get_current_user, User
 from models.user_profile import UserProfile, UserStats, Achievement, ActivityFeed
 from services.achievement_service import AchievementService
 from datetime import datetime
 import json
+import os
 
 profile_bp = Blueprint('profile', __name__, url_prefix='/profile')
 
@@ -40,13 +41,17 @@ def view_profile(username):
         # Check if viewing own profile
         is_own_profile = current_user.is_authenticated and current_user.id == user.id
         
+        # Get Google Client ID for auth
+        google_client_id = os.environ.get('GOOGLE_CLIENT_ID')
+        
         return render_template('profile.html',
                              user=user,
                              profile_data=profile_data,
                              stats=stats,
                              achievements=achievements,
                              recent_activity=recent_activity,
-                             is_own_profile=is_own_profile)
+                             is_own_profile=is_own_profile,
+                             google_client_id=google_client_id)
     
     except Exception as e:
         flash('Error loading profile', 'error')

@@ -1,0 +1,207 @@
+/**
+ * Streak Tracker Styles
+ * Styles for the Daily Challenge streak tracker
+ */
+
+.streak-tracker {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.streak-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.streak-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+}
+
+.streak-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+.streak-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.current-streak .streak-value {
+    color: #ff9f43;
+}
+
+.longest-streak .streak-value {
+    color: #4d7cff;
+}
+
+.next-challenge .streak-value {
+    font-size: 1.2rem;
+    color: var(--text-color);
+}
+
+.streak-calendar {
+    margin-top: 15px;
+}
+
+.streak-calendar h4 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    color: var(--text-color);
+}
+
+.calendar-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.day-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.day-label {
+    width: 24px;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.calendar-week {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.calendar-day {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    background-color: var(--bg-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.calendar-day.completed {
+    background-color: var(--success-light);
+}
+
+.calendar-day.today {
+    border: 2px solid var(--primary-color);
+}
+
+.calendar-day .day-indicator {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+}
+
+.calendar-day.completed .day-indicator {
+    background-color: var(--success-color);
+}
+
+.streak-error, .streak-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.streak-error i, .streak-empty i {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    opacity: 0.7;
+}
+
+.streak-error .btn-retry {
+    margin-top: 10px;
+}
+
+/* Achievement unlock animation */
+@keyframes achievement-unlock {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.achievement-unlock {
+    animation: achievement-unlock 0.5s ease-out forwards;
+}
+
+/* Streak milestone toast */
+.streak-toast {
+    background: linear-gradient(135deg, #ff9a44, #fc6076);
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(252, 96, 118, 0.3);
+    transform: translateY(0);
+    opacity: 1;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.streak-toast.hiding {
+    transform: translateY(-20px);
+    opacity: 0;
+}
+
+.streak-toast-icon {
+    font-size: 1.5rem;
+    margin-right: 12px;
+}
+
+.streak-toast-content {
+    flex: 1;
+}
+
+.streak-toast-title {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.streak-toast-body {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .streak-stats {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .streak-stat {
+        padding: 5px;
+    }
+    
+    .calendar-day {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .day-label {
+        width: 20px;
+    }
+}

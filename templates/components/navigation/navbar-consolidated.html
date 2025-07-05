@@ -14,7 +14,7 @@ Last updated: July 9, 2025
         <div class="nav-left">
             <ul class="nav-links-modern">
                 <li><a href="/dashboard" class="nav-link-modern {{ 'active' if request.endpoint == 'main.dashboard' }}"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-                <li><a href="/lessons" class="nav-link-modern {{ 'active' if request.endpoint == 'lesson.index' or request.endpoint == 'lesson.view' }}"><i class="fas fa-book"></i> Lessons</a></li>
+                <li><a href="/lessons" class="nav-link-modern {{ 'active' if request.endpoint and ('lesson' in request.endpoint) }}"><i class="fas fa-book"></i> Lessons</a></li>
                 <li><button class="nav-link-modern leaderboard-btn" onclick="openLeaderboardModal()"><i class="fas fa-trophy"></i> Leaderboard</button></li>
                 {% if user and user.is_admin %}
                 <li><a href="/admin" class="nav-link-modern {{ 'active' if request.endpoint and 'admin' in request.endpoint }}"><i class="fas fa-shield-alt"></i> Admin</a></li>

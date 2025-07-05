@@ -198,6 +198,7 @@ nav.navbar,
 .nav-left {
     display: flex;
     align-items: center;
+    height: 100%;
 }
 
 .nav-links-modern {
@@ -207,11 +208,14 @@ nav.navbar,
     margin: 0;
     padding: 0;
     white-space: nowrap;
+    align-items: center; /* Changed from flex-end to center for better alignment */
+    height: 100%;
 }
 
 .nav-link-modern {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
     padding: 0.75rem 1.25rem;
     border-radius: 12px;
@@ -226,6 +230,8 @@ nav.navbar,
     position: relative;
     overflow: hidden;
     letter-spacing: 0.2px;
+    height: 100%; /* Changed from fixed height to 100% for consistent alignment */
+    box-sizing: border-box;
 }
 
 .nav-link-modern::before {
@@ -253,10 +259,12 @@ nav.navbar,
 }
 
 .nav-link-modern.active {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.35);
     color: white;
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.6);
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.35);
+    transform: translateY(-2px);
+    font-weight: 700;
 }
 
 .nav-link-modern i {
@@ -278,7 +286,7 @@ nav.navbar,
     border-radius: 25px;
     font-family: 'Monaco', 'Consolas', monospace;
     font-weight: 700;
-    font-size: 2.2rem;
+    font-size: 2.5rem; /* Already the correct size */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -313,10 +321,6 @@ nav.navbar,
     100% { transform: rotate(360deg) translate(-50%, -50%); }
 }
 
-.time-display {
-    font-size: 1.5rem;
-    letter-spacing: 0.5px;
-}
 
 .period-display {
     font-size: 1.1rem;

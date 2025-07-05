@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navbar Test</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            background-color: #f4f7fa;
+            color: #333;
+        }
+        
+        /* Navbar Styles */
+        .navbar {
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 0.8rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-container-modern {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Left Side */
+        .nav-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-links-modern {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+            margin-left: 1rem;
+        }
+        
+        .nav-link-modern {
+            color: #4b5563;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 0.5rem 0.8rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Center */
+        .nav-center {
+            display: flex;
+            align-items: center;
+        }
+        
+        .live-clock {
+            background-color: #f3f4f6;
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #4b5563;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .live-clock:hover {
+            background-color: #e5e7eb;
+        }
+        
+        .time-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+        }
+        
+        .period-display {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #6366f1;
+            background-color: #e0e7ff;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+        }
+        
+        /* Right Side */
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        /* Search Bar */
+        .search-container {
+            position: relative;
+            margin-right: 0.5rem;
+        }
+        
+        .search-toggle {
+            background: none;
+            border: none;
+            color: #4b5563;
+            font-size: 1.1rem;
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .search-toggle:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .search-bar {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 0.5rem);
+            width: 0;
+            overflow: hidden;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        .search-bar.active {
+            width: 300px;
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
+        
+        .search-input {
+            flex: 1;
+            border: none;
+            padding: 0.8rem 1rem;
+            font-size: 0.95rem;
+            outline: none;
+            background-color: transparent;
+        }
+        
+        .search-submit {
+            background-color: #4f46e5;
+            border: none;
+            color: white;
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .search-submit:hover {
+            background-color: #4338ca;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container-modern">
+            <!-- Left Side: Main Navigation -->
+            <div class="nav-left">
+                <ul class="nav-links-modern">
+                    <li><a href="#" class="nav-link-modern active"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="#" class="nav-link-modern"><i class="fas fa-book"></i> Lessons</a></li>
+                    <li><button class="nav-link-modern"><i class="fas fa-trophy"></i> Leaderboard</button></li>
+                </ul>
+            </div>
+            
+            <!-- Center: Live Clock -->
+            <div class="nav-center">
+                <div class="live-clock" id="live-clock" onclick="showClockOptions()">
+                    <span class="time-display">12:00:00</span>
+                    <span class="period-display">AM</span>
+                </div>
+            </div>
+            
+            <!-- Right Side: Search & User Info -->
+            <div class="nav-right">
+                <!-- Search Bar -->
+                <div class="search-container">
+                    <button class="search-toggle" onclick="toggleSearch()">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <div class="search-bar" id="search-bar">
+                        <input type="text" placeholder="Search lessons, topics..." class="search-input" id="search-input">
+                        <button class="search-submit" onclick="performSearch()">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div style="padding: 2rem; max-width: 800px; margin: 0 auto;">
+        <h1>Navbar Test Page</h1>
+        <p>This page tests the functionality of the live clock and search bar.</p>
+        <ul>
+            <li>The clock should update automatically every second</li>
+            <li>Clicking on the search icon should open the search bar</li>
+        </ul>
+    </div>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        // Clock functionality
+        function showClockOptions() {
+            console.log('Clock options triggered.');
+            alert('Clock options would show here');
+        }
+
+        function updateLiveClock() {
+            const timeDisplay = document.querySelector('.live-clock .time-display');
+            const periodDisplay = document.querySelector('.live-clock .period-display');
+
+            if (timeDisplay && periodDisplay) {
+                const now = new Date();
+                let hours = now.getHours();
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const seconds = now.getSeconds().toString().padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+
+                hours = hours % 12;
+                hours = hours ? hours : 12; // the hour '0' should be '12'
+                const hoursStr = hours.toString().padStart(2, '0');
+
+                timeDisplay.textContent = `${hoursStr}:${minutes}:${seconds}`;
+                periodDisplay.textContent = ampm;
+            }
+        }
+
+        // Search functionality
+        function toggleSearch() {
+            const searchBar = document.getElementById('search-bar');
+            const searchInput = document.getElementById('search-input');
+            
+            if (searchBar) {
+                searchBar.classList.toggle('active');
+                
+                if (searchBar.classList.contains('active')) {
+                    setTimeout(() => {
+                        if (searchInput) searchInput.focus();
+                    }, 300);
+                }
+            }
+        }
+        
+        function performSearch() {
+            const searchInput = document.getElementById('search-input');
+            if (searchInput && searchInput.value) {
+                alert(`You searched for: ${searchInput.value}`);
+            }
+        }
+
+        // Initialize clock
+        updateLiveClock();
+        setInterval(updateLiveClock, 1000);
+        
+        // Add event listener for search input
+        document.getElementById('search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+    </script>
+</body>
+</html>

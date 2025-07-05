@@ -5,6 +5,7 @@
 {% block extra_css %}
 <!-- Lesson CSS is loaded via bundles/lessons.css through the CSS lazy loader -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/bundles/utils.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/quiz.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -167,50 +168,132 @@ window.initFirebase();
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/mode-python.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/theme-monokai.js"></script>
 
-<!-- Main Lesson System (ES6 Module) -->
-<script type="module">
-import LessonSystem from '{{ url_for("static", filename="js/lesson/lesson-system.js") }}';
+<!-- Core lesson scripts -->
+<script src="{{ url_for('static', filename='js/lesson/lesson-system.js') }}" type="module"></script>
 
-// Initialize lesson system when DOM is ready
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log('🚀 Initializing lesson system...');
-    
-    try {
-        // Wait a bit for Firebase to initialize
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        const lessonSystem = new LessonSystem();
-        await lessonSystem.initialize();
-        
-        console.log('✅ Lesson system initialized successfully');
-        
-        // Make API available globally for debugging and external access
-        window.lessonSystem = lessonSystem;
-        window.lessonAPI = lessonSystem.getApi();
-        
-        // Initialize test system if in debug mode
-        if (window.location.search.includes('test=true')) {
-            const { LessonSystemTest } = await import('{{ url_for("static", filename="js/lesson/debug/lessonSystemTest.js") }}');
-            const tester = new LessonSystemTest();
-            await tester.runAllTests();
+<!-- Explicitly load quiz scripts to ensure correct loading order -->
+<script src="{{ url_for('static', filename='js/quiz/QuizState.js') }}"></script>
+<script src="{{ url_for('static', filename='js/quiz/QuizEngine.js') }}"></script>
+<script src="{{ url_for('static', filename='js/quiz/QuizController.js') }}"></script>
+
+<!-- Quiz renderers -->
+<script src="{{ url_for('static', filename='js/quiz/renderers/MultipleChoiceRenderer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/quiz/renderers/TrueFalseRenderer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/quiz/renderers/FillBlankRenderer.js') }}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize lesson system with quiz support
+        if (window.LessonSystem) {
+            window.lessonSystem = new LessonSystem();
+            console.log('✅ Lesson system initialized');
+            
+            // Add debug test after a short delay to ensure everything is loaded
+            setTimeout(() => {
+                console.log('🔍 Running Interactive Block Debug Test...');
+                
+                // Debug test function
+                function testInteractiveBlock() {
+                    console.log('🔍 Testing Interactive Block Functionality');
+                    console.log('==========================================');
+                    
+                    // Step 1: Check if lesson system is loaded
+                    console.log('1. Checking lesson system...');
+                    if (!window.lessonSystem) {
+                        console.error('❌ Lesson system not found');
+                        return;
+                    }
+                    console.log('✅ Lesson system found');
+                    
+                    // Step 2: Check if interactions are available
+                    if (!window.lessonSystem.services || !window.lessonSystem.services.interactions) {
+                        console.error('❌ LessonInteractions not available');
+                        return;
+                    }
+                    console.log('✅ LessonInteractions available');
+                    
+                    // Step 3: Find interactive blocks
+                    const lessonData = window.lessonSystem.state.lessonData;
+                    if (!lessonData || !lessonData.blocks) {
+                        console.error('❌ No lesson data available');
+                        return;
+                    }
+                    
+                    const interactiveBlocks = lessonData.blocks.filter(block => block.type === 'interactive');
+                    console.log(`📊 Found ${interactiveBlocks.length} interactive blocks`);
+                    
+                    if (interactiveBlocks.length === 0) {
+                        console.warn('⚠️ No interactive blocks found in this lesson');
+                        return;
+                    }
+                    
+                    // Step 4: Test the first interactive block
+                    const testBlock = interactiveBlocks[0];
+                    console.log(`🎯 Testing block: ${testBlock.id}`);
+                    
+                    // Check DOM elements
+                    const runButton = document.querySelector(`[data-block-id="${testBlock.id}"].run-btn`);
+                    const outputElement = document.getElementById(`output-${testBlock.id}`);
+                    const editorElement = document.getElementById(`editor-${testBlock.id}`);
+                    
+                    console.log('Run button found:', !!runButton);
+                    console.log('Output element found:', !!outputElement);
+                    console.log('Editor element found:', !!editorElement);
+                    
+                    if (!runButton) {
+                        console.error('❌ Run button not found. Checking for alternative selectors...');
+                        const allRunButtons = document.querySelectorAll('.run-btn');
+                        console.log(`Found ${allRunButtons.length} elements with .run-btn class`);
+                        allRunButtons.forEach((btn, index) => {
+                            console.log(`  Button ${index + 1}:`, btn.dataset.blockId, btn.textContent.trim());
+                        });
+                        
+                        // Try alternative selectors
+                        const actionBtns = document.querySelectorAll('.action-btn');
+                        console.log(`Found ${actionBtns.length} elements with .action-btn class`);
+                        actionBtns.forEach((btn, index) => {
+                            if (btn.textContent.includes('Run')) {
+                                console.log(`  Run action button ${index + 1}:`, btn.dataset.blockId, btn.textContent.trim());
+                            }
+                        });
+                        return;
+                    }
+                    
+                    // Step 5: Check editor registration
+                    const editorId = `editor-${testBlock.id}`;
+                    const editor = window.lessonSystem.services.interactions.codeEditors.get(editorId);
+                    console.log('Editor registered:', !!editor);
+                    
+                    if (editor) {
+                        console.log('Editor type:', typeof editor);
+                        console.log('Editor has getValue:', typeof editor.getValue === 'function');
+                        console.log('Editor has runCode:', typeof editor.runCode === 'function');
+                    }
+                    
+                    console.log('==========================================');
+                    console.log('🏁 Test completed. Check the output above for issues.');
+                    
+                    // Return debug info for potential manual testing
+                    return {
+                        testBlock,
+                        runButton,
+                        outputElement,
+                        editorElement,
+                        editor
+                    };
+                }
+                
+                // Run the test and expose globally
+                window.debugInteractiveTest = testInteractiveBlock;
+                const testResult = testInteractiveBlock();
+                
+                if (testResult) {
+                    window.testResult = testResult;
+                    console.log('🔧 Test result saved to window.testResult for manual testing');
+                }
+                
+            }, 3000); // Wait 3 seconds for everything to load
         }
-        
-    } catch (error) {
-        console.error('❌ Failed to initialize lesson system:', error);
-        
-        // Show error state
-        const loading = document.getElementById('content-loading');
-        const fallback = document.getElementById('lesson-fallback');
-        
-        if (loading) loading.style.display = 'none';
-        if (fallback) {
-            fallback.style.display = 'block';
-            const errorText = fallback.querySelector('.alert p');
-            if (errorText) {
-                errorText.textContent = `Failed to initialize lesson system: ${error.message}`;
-            }
-        }
-    }
-});
+    });
 </script>
 {% endblock %}

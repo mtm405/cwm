@@ -430,28 +430,31 @@ export class LessonInteractions {
     }
     
     displayCodeResult(outputElement, result) {
-        const outputContent = outputElement.querySelector('.output-content');
         const isSuccess = result.success && !result.error;
         
-        outputContent.innerHTML = `
+        // Create the full output HTML directly
+        outputElement.innerHTML = `
             <div class="output-result ${isSuccess ? 'output-success' : 'output-error'}">
+                <div class="output-header">
+                    <i class="fas ${isSuccess ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i>
+                    <span>${isSuccess ? 'Output' : 'Error'}</span>
+                </div>
+                
                 ${result.output ? `
-                    <div class="output-text">
+                    <div class="output-content">
                         <pre>${this.escapeHtml(result.output)}</pre>
                     </div>
                 ` : ''}
                 
                 ${result.error ? `
-                    <div class="error-message">
-                        <i class="fas fa-exclamation-triangle"></i>
+                    <div class="error-content">
                         <strong>Error:</strong> ${this.escapeHtml(result.error)}
                     </div>
                 ` : ''}
                 
-                ${isSuccess ? `
-                    <div class="success-message">
-                        <i class="fas fa-check-circle"></i>
-                        <strong>Success!</strong> Code executed successfully.
+                ${isSuccess && !result.output ? `
+                    <div class="success-content">
+                        <strong>Success!</strong> Code executed successfully (no output).
                     </div>
                 ` : ''}
                 
@@ -1614,5 +1617,40 @@ export class LessonInteractions {
         });
         
         console.log(`📝 Rendered ${quizElements.length} quiz placeholders`);
+    }
+
+    // Debug method to check event handling
+    debugRunButton(blockId) {
+        console.log(`🔍 Debugging run button for block: ${blockId}`);
+        
+        const runButton = document.querySelector(`[data-block-id="${blockId}"].run-btn`);
+        const outputElement = document.getElementById(`output-${blockId}`);
+        const editorElement = document.getElementById(`editor-${blockId}`);
+        
+        console.log('Run button:', runButton);
+        console.log('Output element:', outputElement);
+        console.log('Editor element:', editorElement);
+        
+        if (runButton) {
+            console.log('Run button classes:', runButton.className);
+            console.log('Run button dataset:', runButton.dataset);
+        }
+        
+        // Check if editor is in codeEditors map
+        const editorId = `editor-${blockId}`;
+        const editor = this.codeEditors.get(editorId);
+        console.log('Editor in map:', editor);
+        
+        if (editor) {
+            console.log('Editor type:', typeof editor);
+            console.log('Editor methods:', Object.getOwnPropertyNames(editor).filter(name => typeof editor[name] === 'function'));
+        }
+        
+        return {
+            runButton,
+            outputElement,
+            editorElement,
+            editor
+        };
     }
 }

@@ -138,6 +138,8 @@ def google_callback():
                 return jsonify({
                     'success': True,
                     'redirect_url': '/dashboard',
+                    'token': id_token,  # Return the Google ID token for frontend storage
+                    'user_token': id_token,  # Also store as user_token for compatibility
                     'user': {
                         'uid': user_id,
                         'email': user_email,
@@ -165,6 +167,8 @@ def google_callback():
                 return jsonify({
                     'success': True, 
                     'redirect_url': '/dashboard',
+                    'token': id_token,  # Return the Google ID token for frontend storage
+                    'user_token': id_token,  # Also store as user_token for compatibility
                     'warning': 'User data sync failed'
                 })
         else:
@@ -180,6 +184,8 @@ def google_callback():
             return jsonify({
                 'success': True, 
                 'redirect_url': '/dashboard',
+                'token': id_token,  # Return the Google ID token for frontend storage
+                'user_token': id_token,  # Also store as user_token for compatibility
                 'warning': 'Firebase unavailable'
             })
     except Exception as e:
@@ -375,3 +381,41 @@ def auth_debug():
     except Exception as e:
         logger.error(f"Error rendering auth debug page: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+@auth_bp.route('/api/auth/refresh-token', methods=['POST'])
+def refresh_token():
+    """Handle token refresh requests"""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+        
+        # Check if user is authenticated via session
+        if 'user_id' in session:
+            # User is authenticated via session, no need to refresh
+            return jsonify({
+                'success': True,
+                'message': 'Session-based authentication active',
+                'token': 'session_authenticated'
+            })
+        
+        # Extract user info from request
+        user_id = data.get('userId') or data.get('user_id')
+        email = data.get('email')
+        
+        if not user_id and not email:
+            return jsonify({'success': False, 'error': 'User ID or email required'}), 400
+        
+        # For now, return a session-based response
+        # In a full implementation, this would generate a new JWT token
+        logger.info(f"Token refresh requested for user: {user_id or email}")
+        
+        return jsonify({
+            'success': False,
+            'error': 'Token refresh not implemented - using session authentication',
+            'message': 'Please log in again if needed'
+        }), 501
+        
+    except Exception as e:
+        logger.error(f"Token refresh error: {str(e)}")
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500

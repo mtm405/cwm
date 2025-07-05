@@ -125,5 +125,56 @@
       "updated_at": "2025-06-29T12:00:00Z",
       "is_published": true
     }
+  },
+  "quiz-variables-basics": {
+    "id": "quiz-variables-basics",
+    "title": "Variable Basics Quiz",
+    "description": "Test your understanding of variables in Python.",
+    "lesson_id": "variables-02",
+    "difficulty": "beginner",
+    "time_limit": 300,
+    "passing_score": 70,
+    "xp_reward": 30,
+    "pycoins_reward": 5,
+    
+    "questions": [
+      {
+        "id": "q1",
+        "type": "multiple_choice",
+        "question": "Which of the following is a valid variable name in Python?",
+        "options": [
+          "1variable",
+          "_variable",
+          "variable-name",
+          "variable name"
+        ],
+        "correct_answer": 1,
+        "explanation": "Variable names cannot start with a number, cannot contain hyphens, and cannot contain spaces. Underscores are allowed."
+      },
+      {
+        "id": "q2",
+        "type": "true_false",
+        "question": "In Python, variables must be declared with their type before use.",
+        "correct_answer": false,
+        "explanation": "Python is dynamically typed. You don't need to declare variable types."
+      },
+      {
+        "id": "q3",
+        "type": "multiple_choice",
+        "question": "What will the variable x contain after this code? x = 5 + 2 * 3",
+        "options": [
+          "21",
+          "11", 
+          "17",
+          "Error"
+        ],
+        "correct_answer": 1,
+        "explanation": "Python follows standard order of operations. Multiplication happens before addition."
+      }
+    ],
+    
+    "created_at": "2025-06-15T09:00:00Z",
+    "updated_at": "2025-06-29T12:00:00Z",
+    "is_published": true
   }
 }

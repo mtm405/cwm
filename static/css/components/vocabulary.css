@@ -1,0 +1,468 @@
+/**
+ * Vocabulary Styles
+ * CSS for the vocabulary flashcards and related functionality
+ */
+
+/* Vocabulary Tab Container */
+.vocabulary-container {
+    padding: 1.5rem;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+}
+
+/* Vocabulary Header */
+.vocabulary-header {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.vocabulary-header h2 {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.vocabulary-header p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+/* Category Sidebar */
+.category-sidebar {
+    background-color: var(--bg-card);
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+    height: 100%;
+    position: sticky;
+    top: 1.5rem;
+}
+
+.category-sidebar h5 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+}
+
+.category-filter {
+    color: var(--text-secondary);
+    background-color: transparent;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s ease;
+    display: flex;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.category-filter:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    transform: translateX(2px);
+}
+
+.category-filter.active {
+    background-color: var(--primary-color);
+    color: #fff;
+    font-weight: 500;
+}
+
+.category-filter.active:hover {
+    background-color: var(--primary-color);
+    opacity: 0.9;
+}
+
+.category-count {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 0.1rem 0.5rem;
+    font-size: 0.8rem;
+    min-width: 24px;
+    text-align: center;
+}
+
+.category-filter.active .category-count {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Study progress styles */
+.study-stats {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1.5rem;
+}
+
+.progress-wrapper {
+    margin-bottom: 0.75rem;
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.progress {
+    height: 0.5rem;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    transition: width 0.5s ease;
+}
+
+.study-stats-details {
+    display: flex;
+    justify-content: space-between;
+}
+
+.stat-item {
+    text-align: center;
+    flex: 1;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.stat-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Flashcard Styles */
+.flashcard-container {
+    perspective: 1000px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.flashcard {
+    width: 100%;
+    height: 280px;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.flashcard-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+}
+
+.flashcard.flipped .flashcard-inner {
+    transform: rotateY(180deg);
+}
+
+.flashcard-front, .flashcard-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+    padding: 2rem;
+}
+
+.flashcard-front {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    background-image: linear-gradient(
+        to bottom right,
+        rgba(255, 255, 255, 0.02),
+        rgba(0, 0, 0, 0.02)
+    );
+}
+
+.flashcard-back {
+    background-color: var(--bg-card);
+    transform: rotateY(180deg);
+    border: 1px solid var(--border-color);
+    background-image: linear-gradient(
+        to bottom right,
+        rgba(0, 0, 0, 0.02),
+        rgba(255, 255, 255, 0.02)
+    );
+}
+
+.flashcard-front h3 {
+    color: var(--text-primary);
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 0;
+    padding: 0;
+    max-width: 90%;
+    text-align: center;
+}
+
+.flashcard-back p {
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+    max-width: 90%;
+    text-align: center;
+}
+
+.flashcard-back .badge {
+    padding: 0.5rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.flip-prompt {
+    position: absolute;
+    bottom: 1rem;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+}
+
+.flashcard:hover .flip-prompt {
+    opacity: 1;
+}
+
+.difficulty-indicator {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.difficulty-indicator.new {
+    background-color: rgba(33, 150, 243, 0.1);
+    color: #2196F3;
+}
+
+.difficulty-indicator.learning {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #FFC107;
+}
+
+.difficulty-indicator.difficult {
+    background-color: rgba(244, 67, 54, 0.1);
+    color: #F44336;
+}
+
+.difficulty-indicator.mastered {
+    background-color: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+}
+
+/* Knowledge Controls */
+.knowledge-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+.knowledge-controls button {
+    padding: 0.5rem 1.25rem;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+    flex: 1;
+    max-width: 200px;
+}
+
+.knowledge-controls button:hover {
+    transform: translateY(-2px);
+}
+
+/* Flashcard Controls */
+.flashcard-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
+    width: 100%;
+}
+
+.flashcard-controls button {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.flashcard-controls button:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+#flashcard-counter {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Dictionary Table Styles */
+.vocabulary-search {
+    margin-bottom: 1rem;
+}
+
+.vocabulary-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.vocabulary-table th {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    text-align: left;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.vocabulary-table td {
+    padding: 1rem;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.vocabulary-table tr:hover td {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+/* Loading and Error States */
+.vocabulary-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+}
+
+.vocabulary-loading .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    border-width: 0.25rem;
+    margin-bottom: 1rem;
+}
+
+.vocabulary-error {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    margin: 1rem 0;
+}
+
+.vocabulary-error i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+/* Navigation Pills */
+.vocabulary-nav-pills {
+    display: flex;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+.vocabulary-nav-pills .nav-link {
+    padding: 0.75rem 1.25rem;
+    color: var(--text-secondary);
+    border-radius: 8px 8px 0 0;
+    margin-right: 0.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.vocabulary-nav-pills .nav-link:hover {
+    color: var(--text-primary);
+}
+
+.vocabulary-nav-pills .nav-link.active {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.vocabulary-nav-pills .nav-link i {
+    margin-right: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .flashcard {
+        height: 200px;
+    }
+    
+    .flashcard-front h3 {
+        font-size: 1.5rem;
+    }
+    
+    .flashcard-back p {
+        font-size: 1rem;
+    }
+    
+    .vocabulary-nav-pills {
+        flex-wrap: wrap;
+    }
+    
+    .vocabulary-nav-pills .nav-link {
+        flex: 1;
+        text-align: center;
+        padding: 0.5rem;
+    }
+}
+
+/* Override placeholder content from dashboard.css */
+#vocabulary-tab .placeholder-content {
+    display: none;
+}

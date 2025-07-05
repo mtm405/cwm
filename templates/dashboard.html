@@ -48,7 +48,12 @@
                     {% if daily_challenge %}
                         {{ render_daily_challenge(daily_challenge) }}
                     {% else %}
-                        {{ render_no_challenge() }}
+                        <div class="loading-container">
+                            <div class="spinner-border" role="status">
+                                <span class="sr-only">Loading challenge...</span>
+                            </div>
+                            <p>Loading your daily challenge...</p>
+                        </div>
                     {% endif %}
                 </div>
             </div>
@@ -120,8 +125,30 @@
         <div class="tab-pane" id="vocabulary-tab">
             <div class="placeholder-content">
                 <i class="fas fa-book"></i>
-                <h3>Vocabulary Section</h3>
-                <p>This section is under construction. Come back soon for new ways to learn!</p>
+                <h3>Python Vocabulary</h3>
+                <p>Build your Python programming vocabulary with interactive flashcards, term explanations, and practice exercises.</p>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <i class="fas fa-layer-group"></i>
+                        <span>Flashcards</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Term Dictionary</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Practice Quizzes</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-brain"></i>
+                        <span>Spaced Repetition</span>
+                    </div>
+                </div>
+                <span class="coming-soon-badge">Coming Soon</span>
+                <button class="notify-button">
+                    <i class="fas fa-bell"></i> Notify me when available
+                </button>
             </div>
         </div>
 
@@ -129,8 +156,30 @@
         <div class="tab-pane" id="games-tab">
             <div class="placeholder-content">
                 <i class="fas fa-gamepad"></i>
-                <h3>Games Section</h3>
-                <p>This section is under construction. Exciting games are coming soon!</p>
+                <h3>Coding Games</h3>
+                <p>Learn Python concepts through fun, interactive games designed to reinforce programming skills while having fun.</p>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <i class="fas fa-puzzle-piece"></i>
+                        <span>Code Puzzles</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-robot"></i>
+                        <span>Algorithm Challenges</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-trophy"></i>
+                        <span>Competitive Coding</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>Logic Games</span>
+                    </div>
+                </div>
+                <span class="coming-soon-badge">Coming Soon</span>
+                <button class="notify-button">
+                    <i class="fas fa-bell"></i> Notify me when available
+                </button>
             </div>
         </div>
         
@@ -147,49 +196,51 @@
                 <button class="modal-close" onclick="closeScheduleModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="class-schedule-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Period</th>
-                                <th>Time</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><span class="period-number">1</span></td>
-                                <td>8:00 AM - 8:55 AM</td>
-                            </tr>
-                            <tr>
-                                <td><span class="period-number">2</span></td>
-                                <td>9:00 AM - 9:55 AM</td>
-                            </tr>
-                            <tr>
-                                <td><span class="period-number">3</span></td>
-                                <td>10:00 AM - 10:55 AM</td>
-                            </tr>
-                            <tr>
-                                <td><span class="period-number">4</span></td>
-                                <td>11:00 AM - 11:55 AM</td>
-                            </tr>
-                            <tr class="lunch-period">
-                                <td><span class="period-label">Lunch</span></td>
-                                <td>12:00 PM - 12:30 PM</td>
-                            </tr>
-                            <tr>
-                                <td><span class="period-number">5</span></td>
-                                <td>12:35 PM - 1:30 PM</td>
-                            </tr>
-                            <tr>
-                                <td><span class="period-number">6</span></td>
-                                <td>1:35 PM - 2:30 PM</td>
-                            </tr>
-                            <tr>
-                                <td><span class="period-number">7</span></td>
-                                <td>2:35 PM - 3:30 PM</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="class-schedule-container">
+                    <div class="class-schedule-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="period-column">Period</th>
+                                    <th class="time-column">Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="period-number">1</span></td>
+                                    <td>8:00 AM - 8:55 AM</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="period-number">2</span></td>
+                                    <td>9:00 AM - 9:55 AM</td>
+                                </tr>
+                                <tr class="current-period">
+                                    <td><span class="period-number">3</span></td>
+                                    <td>10:00 AM - 10:55 AM</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="period-number">4</span></td>
+                                    <td>11:00 AM - 11:55 AM</td>
+                                </tr>
+                                <tr class="lunch-period">
+                                    <td><span class="period-label">Lunch</span></td>
+                                    <td>12:00 PM - 12:30 PM</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="period-number">5</span></td>
+                                    <td>12:35 PM - 1:30 PM</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="period-number">6</span></td>
+                                    <td>1:35 PM - 2:30 PM</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="period-number">7</span></td>
+                                    <td>2:35 PM - 3:30 PM</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -202,8 +253,10 @@
 <script src="{{ url_for('static', filename='js/components/dashboard.js') }}"></script>
 <script src="{{ url_for('static', filename='js/components/dashboard-greeting.js') }}"></script>
 <script src="{{ url_for('static', filename='js/components/dashboard-modal.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/dashboard-placeholders.js') }}"></script>
 <script src="{{ url_for('static', filename='js/components/progress-bar-manager.js') }}"></script>
 <script src="{{ url_for('static', filename='js/modules/tab-system.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/dashboard/DashboardChallengeManager.js') }}"></script>
 <script>
 // Initialize dashboard components after loading
 document.addEventListener('DOMContentLoaded', function() {
@@ -224,7 +277,16 @@ document.addEventListener('DOMContentLoaded', function() {
         window.dashboardModal = new DashboardModal();
     }
     
+    // Initialize placeholder handlers
+    if (typeof DashboardPlaceholders !== 'undefined') {
+        window.dashboardPlaceholders = new DashboardPlaceholders();
+        window.dashboardPlaceholders.init();
+    }
+    
     // Progress bar manager is auto-initialized
 });
 </script>
+
+<!-- Include Vocabulary Module -->
+<script src="{{ url_for('static', filename='js/vocabulary.js') }}"></script>
 {% endblock %}

@@ -178,6 +178,7 @@
 .nav-tabs-container {
     display: flex;
     gap: 1rem;
+
 }
 
 .nav-tab {
@@ -525,4 +526,147 @@
 /* Page-specific animation */
 body[data-page="dashboard"] .dashboard-container {
     animation: fadeInUp 0.6s ease-out;
+}
+
+/* ================================
+   PLACEHOLDER CONTENT STYLING
+   ================================ */
+
+.placeholder-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    background: var(--bg-card);
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+    transition: all 0.3s ease;
+    min-height: 300px;
+}
+
+.placeholder-content i {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+    opacity: 0.7;
+    transform: translateY(0px);
+    transition: all 0.5s ease;
+}
+
+.placeholder-content:hover i {
+    transform: translateY(-10px);
+    opacity: 1;
+}
+
+.placeholder-content h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.placeholder-content p {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    max-width: 500px;
+    margin: 0 auto 1.5rem;
+    line-height: 1.6;
+}
+
+.placeholder-content .coming-soon-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, var(--primary-color-light), var(--secondary-color-light));
+    border-radius: 20px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+}
+
+.placeholder-content .feature-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    width: 100%;
+    max-width: 600px;
+}
+
+.placeholder-content .feature-item {
+    background: rgba(var(--primary-rgb), 0.1);
+    padding: 0.8rem 1.2rem;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.placeholder-content .feature-item:hover {
+    background: rgba(var(--primary-rgb), 0.2);
+    transform: translateY(-3px);
+}
+
+.placeholder-content .feature-item i {
+    font-size: 1rem;
+    margin: 0;
+    opacity: 0.8;
+}
+
+.placeholder-content .notify-button {
+    margin-top: 2rem;
+    padding: 0.8rem 1.5rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.placeholder-content .notify-button:hover {
+    background: var(--primary-color-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.4);
+}
+
+/* ================================
+   TOAST NOTIFICATION STYLES
+   ================================ */
+
+/* Toast Notification */
+.toast-notification {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    padding: 1rem 1.5rem;
+    border-left: 4px solid var(--primary-color);
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.toast-notification.show {
+    opacity: 1;
+    transform: translateY(0);
 }

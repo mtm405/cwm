@@ -1,0 +1,103 @@
+{
+  "id": "python-loops-test",
+  "title": "Python Loops and Iterations",
+  "description": "Learn how to use loops to automate repetitive tasks in Python",
+  "order": 4,
+  "difficulty": "intermediate",
+  "estimated_time": 45,
+  "prerequisites": ["python-basics-01", "variables-02"],
+  "tags": ["loops", "for loop", "while loop", "iteration", "python"],
+  "xp_reward": 100,
+  "pycoins_reward": 20,
+  "quiz_id": "loops-quiz",
+  "created_at": "2025-07-04T10:00:00Z",
+  "updated_at": "2025-07-04T10:00:00Z",
+  "is_published": true,
+  "blocks": [
+    {
+      "id": "intro-block",
+      "type": "text",
+      "order": 0,
+      "title": "Introduction to Loops",
+      "content": "# Python Loops and Iterations\n\nLoops are a fundamental concept in programming that allow you to execute a block of code multiple times. In Python, there are two main types of loops:\n\n1. **For loops** - used when you know how many times you want to execute a block of code\n2. **While loops** - used when you want to execute a block of code as long as a condition is true\n\nLet's explore both types in detail."
+    },
+    {
+      "id": "for-loop-example",
+      "type": "code_example",
+      "order": 1,
+      "title": "For Loop Basics",
+      "code": "# Basic for loop with a list\nfruits = ['apple', 'banana', 'cherry']\n\nfor fruit in fruits:\n    print(f\"I like {fruit}s!\")\n\n# Output:\n# I like apples!\n# I like bananas!\n# I like cherrys!",
+      "explanation": "A for loop iterates over each item in a sequence (like a list, tuple, or string). In this example, we iterate through a list of fruits and print a message for each one."
+    },
+    {
+      "id": "range-example",
+      "type": "code_example",
+      "order": 2,
+      "title": "Using range() Function",
+      "code": "# Using range to generate a sequence of numbers\nfor number in range(1, 6):\n    print(f\"Number: {number}\")\n    \n# Output:\n# Number: 1\n# Number: 2\n# Number: 3\n# Number: 4\n# Number: 5",
+      "explanation": "The range() function generates a sequence of numbers. range(1, 6) creates numbers from 1 to 5 (the end number is exclusive)."
+    },
+    {
+      "id": "while-loop-example",
+      "type": "code_example",
+      "order": 3,
+      "title": "While Loop Basics",
+      "code": "# Basic while loop\ncount = 0\n\nwhile count < 5:\n    print(f\"Count is {count}\")\n    count += 1\n    \n# Output:\n# Count is 0\n# Count is 1\n# Count is 2\n# Count is 3\n# Count is 4",
+      "explanation": "A while loop continues executing as long as its condition is True. Here, we keep printing and incrementing count until it reaches 5."
+    },
+    {
+      "id": "loop-control-example",
+      "type": "code_example",
+      "order": 4,
+      "title": "Loop Control Statements",
+      "code": "# Using break and continue\nfor i in range(10):\n    if i == 3:\n        continue  # Skip the rest of the loop for i=3\n    if i == 7:\n        break     # Exit the loop when i=7\n    print(i)\n    \n# Output:\n# 0\n# 1\n# 2\n# 4\n# 5\n# 6",
+      "explanation": "Loop control statements modify the execution of loops:\n- continue: skips the current iteration and moves to the next one\n- break: exits the loop entirely"
+    },
+    {
+      "id": "loop-exercise",
+      "type": "interactive",
+      "order": 5,
+      "title": "Sum of Even Numbers",
+      "instructions": "Write a function that calculates the sum of all even numbers from 1 to n (inclusive).",
+      "starter_code": "def sum_even_numbers(n):\n    # Your code here\n    pass\n\n# Test your function\nprint(sum_even_numbers(10))  # Should output 30 (2+4+6+8+10)",
+      "solution": "def sum_even_numbers(n):\n    total = 0\n    for i in range(1, n+1):\n        if i % 2 == 0:  # Check if number is even\n            total += i\n    return total\n\n# Test\nprint(sum_even_numbers(10))  # Should output 30 (2+4+6+8+10)",
+      "hints": [
+        "Use a for loop with range() to iterate from 1 to n",
+        "Check if each number is even using the modulo operator (i % 2 == 0)",
+        "Keep a running total by adding each even number"
+      ],
+      "language": "python"
+    },
+    {
+      "id": "nested-loops-example",
+      "type": "code_example",
+      "order": 6,
+      "title": "Nested Loops",
+      "code": "# Creating a multiplication table using nested loops\nfor i in range(1, 4):\n    for j in range(1, 4):\n        product = i * j\n        print(f\"{i} × {j} = {product}\")\n    print(\"-----\")  # Separator between tables\n    \n# Output:\n# 1 × 1 = 1\n# 1 × 2 = 2\n# 1 × 3 = 3\n# -----\n# 2 × 1 = 2\n# 2 × 2 = 4\n# 2 × 3 = 6\n# -----\n# 3 × 1 = 3\n# 3 × 2 = 6\n# 3 × 3 = 9\n# -----",
+      "explanation": "Nested loops are loops inside other loops. The inner loop completes all its iterations for each iteration of the outer loop. This is useful for working with multi-dimensional data."
+    },
+    {
+      "id": "advanced-exercise",
+      "type": "interactive",
+      "order": 7,
+      "title": "FizzBuzz Challenge",
+      "instructions": "Write a function that prints numbers from 1 to n. But for multiples of 3, print 'Fizz' instead of the number, and for multiples of 5, print 'Buzz'. For numbers that are multiples of both 3 and 5, print 'FizzBuzz'.",
+      "starter_code": "def fizzbuzz(n):\n    # Your code here\n    pass\n\n# Test your function\nfizzbuzz(15)",
+      "solution": "def fizzbuzz(n):\n    for i in range(1, n+1):\n        if i % 3 == 0 and i % 5 == 0:\n            print('FizzBuzz')\n        elif i % 3 == 0:\n            print('Fizz')\n        elif i % 5 == 0:\n            print('Buzz')\n        else:\n            print(i)\n\n# Test\nfizzbuzz(15)",
+      "hints": [
+        "Check for the FizzBuzz case first (divisible by both 3 and 5)",
+        "Then check for Fizz (divisible by 3) and Buzz (divisible by 5) separately",
+        "The order of the conditions matters!"
+      ],
+      "language": "python"
+    },
+    {
+      "id": "python-loops-test-quiz",
+      "type": "quiz",
+      "order": 8,
+      "title": "Knowledge Check",
+      "description": "Test your understanding of Python loops",
+      "quiz_id": "loops-quiz"
+    }
+  ]
+}

@@ -5,12 +5,17 @@
 
 <!-- CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/text-with-questions.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- Page-specific CSS -->
 {% if request.endpoint == 'main.index' %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/homepage.css') }}">
+{% endif %}
+
+{% if request.endpoint == 'main.dashboard' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/challenges.css') }}">
 {% endif %}
 
 <!-- JS: Core and Modular Loading -->
@@ -27,9 +32,10 @@
 <script src="{{ url_for('static', filename='js/modules/auth-manager.js') }}"></script>
 <script src="{{ url_for('static', filename='js/modules/navigation-manager.js') }}"></script>
 <!-- Auth and Google: Load Google Identity Services first -->
-<script src="https://accounts.google.com/gsi/client" async defer onload="initGoogleAuth()"></script>
 <script src="{{ url_for('static', filename='js/auth/google-auth.js') }}"></script>
+<script src="https://accounts.google.com/gsi/client" async defer onload="initGoogleAuth()"></script>
 <script src="{{ url_for('static', filename='js/auth/google-buttons.js') }}"></script>
+
 <script>
 function initGoogleAuth() {
     console.log('🔐 Google Identity Services loaded, initializing auth...');
@@ -37,6 +43,67 @@ function initGoogleAuth() {
         window.GoogleAuth.init();
     }
 }
+</script>
+
+<!-- Auth Recovery System -->
+<script src="{{ url_for('static', filename='js/auth/auth-recovery.js') }}"></script>
+
+<!-- Auth State Auto-Fixer -->
+<script src="{{ url_for('static', filename='js/auth/auth-state-auto-fixer.js') }}"></script>
+
+<!-- Auth Debug Tools - Fixed to prevent reload loops -->
+<script src="{{ url_for('static', filename='js/auth/debug/auth-monitor-loader.js') }}"></script>
+<script src="{{ url_for('static', filename='js/auth/debug/auth-debug-button.js') }}"></script>
+
+<!-- Auth Test and Verification Tools (only in debug mode) -->
+<script>
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.search.includes('debug=true')) {
+    // Load test suite
+    const testSuiteScript = document.createElement('script');
+    testSuiteScript.src = '{{ url_for("static", filename="js/auth/auth-test-suite.js") }}';
+    document.head.appendChild(testSuiteScript);
+    
+    // Load verification system
+    const verificationScript = document.createElement('script');
+    verificationScript.src = '{{ url_for("static", filename="js/auth/auth-system-verification.js") }}';
+    document.head.appendChild(verificationScript);
+    
+    // Load automatic system tester
+    const testerScript = document.createElement('script');
+    testerScript.src = '{{ url_for("static", filename="js/auth/auth-system-tester.js") }}';
+    document.head.appendChild(testerScript);
+}
+</script>
+
+<!-- UI Components -->
+<script src="{{ url_for('static', filename='js/core/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/clock.js') }}"></script>
+
+<script>
+// Initialize global CONFIG object
+window.CONFIG = {
+    GOOGLE_CLIENT_ID: '{{ google_client_id }}',
+    API_BASE_URL: '/api',
+    AUTH_TOKEN_KEY: 'auth_token',
+    DEBUG_MODE: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+};
+
+// Initialize clock when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Update clock immediately
+    if (typeof updateLiveClock === 'function') {
+        updateLiveClock();
+    }
+    
+    // Make sure functions are available globally
+    if (typeof toggleSearch === 'function' && !window.toggleSearch) {
+        window.toggleSearch = toggleSearch;
+    }
+    
+    if (typeof showClockOptions === 'function' && !window.showClockOptions) {
+        window.showClockOptions = showClockOptions;
+    }
+});
 </script>
 
 {% block extra_css %}{% endblock %}

@@ -76,6 +76,32 @@ export class LessonRenderer {
         }
         
         console.log(`✅ Rendered ${sortedBlocks.length} lesson blocks`);
+        
+        // Add fallback event handlers after rendering
+        setTimeout(() => {
+            this.addFallbackEventHandlers();
+            
+            // Test if run buttons are working
+            const runButtons = document.querySelectorAll('.run-btn[data-block-id]');
+            console.log(`🔧 Found ${runButtons.length} run buttons, adding test helpers...`);
+            
+            // Add a global test function
+            if (runButtons.length > 0) {
+                window.testRunButton = function(blockId) {
+                    const button = document.querySelector(`[data-block-id="${blockId || runButtons[0].dataset.blockId}"].run-btn`);
+                    if (button) {
+                        console.log(`🧪 Testing run button for block: ${button.dataset.blockId}`);
+                        button.click();
+                        return true;
+                    } else {
+                        console.error('❌ Run button not found');
+                        return false;
+                    }
+                };
+                
+                console.log(`🔧 Global test function added: window.testRunButton('${runButtons[0].dataset.blockId}')`);
+            }
+        }, 100);
     }
     
     async createBlockElement(block, userProgress) {
@@ -336,8 +362,10 @@ export class LessonRenderer {
             .replace(/\\n/g, '<br>');
     }
     
+    /**
+     * Escape HTML to prevent XSS
+     */
     escapeHtml(text) {
-        if (!text) return '';
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
@@ -358,5 +386,123 @@ export class LessonRenderer {
                 progressIndicator.style.color = '#10b981';
             }
         });
+    }
+    
+    /**
+     * Add fallback event handlers for interactive elements
+     * This ensures buttons work even if the main event system fails
+     */
+    addFallbackEventHandlers() {
+        // Add click handlers for run buttons
+        document.querySelectorAll('.run-btn[data-block-id]').forEach(button => {
+            if (!button.dataset.handlerAdded) {
+                button.addEventListener('click', async (event) => {
+                    event.preventDefault();
+                    const blockId = button.dataset.blockId;
+                    
+                    console.log(`🚀 Fallback: Running code for block ${blockId}`);
+                    
+                    // Get editor and output elements
+                    const editorElement = document.getElementById(`editor-${blockId}`);
+                    const outputElement = document.getElementById(`output-${blockId}`);
+                    
+                    if (!editorElement || !outputElement) {
+                        console.error('❌ Editor or output element not found');
+                        return;
+                    }
+                    
+                    // Get code
+                    const code = editorElement.textContent || editorElement.value || '';
+                    
+                    if (!code.trim()) {
+                        outputElement.style.display = 'block';
+                        outputElement.innerHTML = `
+                            <div class="output-header">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Error</span>
+                            </div>
+                            <div class="output-content">
+                                <div style="color: #e53e3e;">Please write some code first!</div>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    // Show loading
+                    outputElement.style.display = 'block';
+                    outputElement.innerHTML = `
+                        <div class="output-header">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Running...</span>
+                        </div>
+                        <div class="output-content">
+                            <div>Executing code...</div>
+                        </div>
+                    `;
+                    
+                    try {
+                        // Execute code
+                        const response = await fetch('/run_python', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                code: code,
+                                inputs: '',
+                                timeout: 10000
+                            })
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+                        
+                        const result = await response.json();
+                        
+                        // Display result
+                        if (result.success) {
+                            outputElement.innerHTML = `
+                                <div class="output-header">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Output</span>
+                                </div>
+                                <div class="output-content">
+                                    <pre style="white-space: pre-wrap; font-family: monospace;">${this.escapeHtml(result.output || 'Code executed successfully!')}</pre>
+                                </div>
+                            `;
+                        } else {
+                            outputElement.innerHTML = `
+                                <div class="output-header">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span>Error</span>
+                                </div>
+                                <div class="output-content">
+                                    <pre style="white-space: pre-wrap; font-family: monospace; color: #e53e3e;">${this.escapeHtml(result.error || 'Unknown error occurred')}</pre>
+                                </div>
+                            `;
+                        }
+                        
+                    } catch (error) {
+                        console.error('❌ Code execution failed:', error);
+                        outputElement.innerHTML = `
+                            <div class="output-header">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Error</span>
+                            </div>
+                            <div class="output-content">
+                                <div style="color: #e53e3e;">Network error: ${this.escapeHtml(error.message)}</div>
+                            </div>
+                        `;
+                    }
+                });
+                
+                // Mark as having handler to avoid duplicates
+                button.dataset.handlerAdded = 'true';
+            }
+        });
+        
+        console.log('✅ Fallback event handlers added');
     }
 }
